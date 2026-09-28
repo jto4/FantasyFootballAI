@@ -74,11 +74,11 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The macOS ARM DMG was rebuilt from the current source, including passphrase-encrypted portable
-backups. The mounted artifact passed its API/dashboard smoke check with an isolated data folder,
-the package MCP smoke completed a stdio handshake and local API call, and `hdiutil verify`
-confirmed the image checksum. This does not verify interactive tray lifecycle behavior on other
-operating systems; the artifact remains unsigned and not notarized.
+The macOS ARM DMG was rebuilt from the current source after adding the Linux RPM maker to the
+isolated desktop build. The artifact passed its API/dashboard smoke check with an isolated data
+folder, the package MCP smoke completed a stdio handshake and local API call, and `hdiutil verify`
+confirmed the image checksum. It remains unsigned and not notarized; Intel Mac and Linux RPM
+packaging still need hosted verification, and interactive tray lifecycle checks remain open.
 The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The polling configuration and restore behavior pass repository checks; live Twilio polling and
 Windows/Linux packaged runtime verification remain open.
 
@@ -91,8 +91,8 @@ dev` remains available for development.
   public release. A self-contained Electron package using stable Forge 7.11.2 and an
   `@electron/rebuild` 4 override creates a macOS ARM DMG and smoke-checks the packaged
   API/dashboard locally. Packaging dependencies install only in the isolated staging app,
-  keeping Forge out of the normal workspace install. Windows/Linux package behavior, signing,
-  and interactive installation remain unverified.
+  keeping Forge out of the normal workspace install. Intel Mac and Linux RPM packaging await
+  hosted verification; signing and interactive installation remain open.
 - **Does it run as a managed background app?** Partly. `npm run service -- install`
   registers a per-user macOS LaunchAgent, Linux systemd unit, or Windows logon task from a
   source checkout, with start, stop, status, and uninstall commands. Keep Node.js and the
