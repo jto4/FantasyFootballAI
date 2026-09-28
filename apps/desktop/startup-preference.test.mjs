@@ -55,7 +55,10 @@ test('start-hidden preference defaults off and survives atomic private writes', 
     await setStartHiddenPreference(preferencePath, true);
     assert.equal(await getStartHiddenPreference(preferencePath), true);
     assert.deepEqual(JSON.parse(await readFile(preferencePath, 'utf8')), { startHidden: true });
-    assert.equal((await stat(preferencePath)).mode & 0o777, 0o600);
+    // Windows protects Electron's userData directory with the user's profile ACL;
+    // POSIX mode bits are not an access-control guarantee on NTFS.
+    if (process.platform !== 'win32')
+      assert.equal((await stat(preferencePath)).mode & 0o777, 0o600);
     await setStartHiddenPreference(preferencePath, false);
     assert.equal(await getStartHiddenPreference(preferencePath), false);
     await assert.rejects(setStartHiddenPreference(preferencePath, 'yes'), /must be boolean/);

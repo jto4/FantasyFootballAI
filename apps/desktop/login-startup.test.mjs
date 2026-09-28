@@ -77,12 +77,15 @@ test('Windows launch-at-login uses the stable Squirrel launcher path', async () 
       return { openAtLogin: enabled };
     },
   };
-  const options = { platform: 'win32', executable: '/app/app-1.0/sidekick.exe' };
+  const options = {
+    platform: 'win32',
+    executable: path.win32.join('C:\\app\\app-1.0', 'sidekick.exe'),
+  };
   assert.deepEqual(await setLaunchAtLogin(app, true, options), {
     supported: true,
     enabled: true,
   });
-  assert.deepEqual(windowsOptions, { path: '/app/sidekick.exe', args: [] });
+  assert.deepEqual(windowsOptions, { path: path.win32.join('C:\\app', 'sidekick.exe'), args: [] });
 });
 
 test('Windows hidden startup passes the tray argument to the stable Squirrel launcher', async () => {
@@ -101,13 +104,13 @@ test('Windows hidden startup passes the tray argument to the stable Squirrel lau
   assert.deepEqual(
     await setLaunchAtLogin(app, true, {
       platform: 'win32',
-      executable: '/app/app-1.0/sidekick.exe',
+      executable: path.win32.join('C:\\app\\app-1.0', 'sidekick.exe'),
       startHidden: true,
     }),
     { supported: true, enabled: true },
   );
   assert.deepEqual(windowsOptions, {
-    path: '/app/sidekick.exe',
+    path: path.win32.join('C:\\app', 'sidekick.exe'),
     args: ['--sidekick-start-hidden'],
   });
 });

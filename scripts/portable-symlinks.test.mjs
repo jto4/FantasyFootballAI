@@ -22,7 +22,10 @@ test('rewrites absolute links within packaged trees and rejects broken links', a
     await makeInternalSymlinksRelative(root);
 
     assert.equal(await readlink(path.join(framework, 'Versions', 'Current')), 'A');
-    assert.equal(await readlink(path.join(framework, 'Example')), 'Versions/Current/Example');
+    assert.equal(
+      await readlink(path.join(framework, 'Example')),
+      path.join('Versions', 'Current', 'Example'),
+    );
     assert.equal(
       await realpath(path.join(framework, 'Example')),
       await realpath(path.join(versions, 'Example')),

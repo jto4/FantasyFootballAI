@@ -1,6 +1,7 @@
 import { lstat, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { basename, dirname, join, resolve } from 'node:path';
+import path from 'node:path';
+const { basename, dirname, join, resolve } = path;
 
 export function linuxAutostartFile(home = homedir()) {
   return join(home, '.config', 'autostart', 'sunday-sidekick.desktop');
@@ -83,8 +84,13 @@ export async function setLaunchAtLogin(
 function loginItemOptions(platform, executable, startHidden) {
   if (platform !== 'win32') return {};
   // Squirrel installs versioned app folders; its stable launcher lives one directory up.
+  const windowsPath = path.win32;
   return {
-    path: resolve(dirname(executable), '..', basename(executable)),
+    path: windowsPath.resolve(
+      windowsPath.dirname(executable),
+      '..',
+      windowsPath.basename(executable),
+    ),
     args: startHidden ? ['--sidekick-start-hidden'] : [],
   };
 }

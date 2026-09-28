@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createServer } from 'node:net';
+import path from 'node:path';
 import {
   renderLaunchAgent,
   renderSystemdUnit,
@@ -48,9 +49,12 @@ describe('background service configuration', () => {
   });
 
   it('stores the service data folder and runtime logs under a private user directory', () => {
-    assert.equal(paths.dataDirectory, '/Users/League Owner/.sidekick');
-    assert.equal(paths.logDirectory, '/Users/League Owner/.sidekick/logs');
-    assert.equal(paths.stdoutLog, '/Users/League Owner/.sidekick/logs/service.log');
+    assert.equal(paths.dataDirectory, path.join('/Users/League Owner', '.sidekick'));
+    assert.equal(paths.logDirectory, path.join('/Users/League Owner', '.sidekick', 'logs'));
+    assert.equal(
+      paths.stdoutLog,
+      path.join('/Users/League Owner', '.sidekick', 'logs', 'service.log'),
+    );
   });
 
   it('sets a stable data directory for the background service without changing unrelated environment', () => {

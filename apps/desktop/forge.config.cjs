@@ -24,6 +24,7 @@ module.exports = {
         options: {
           maintainer: 'Sunday Sidekick',
           categories: ['Utility'],
+          bin: 'Sunday Sidekick',
         },
       },
     },

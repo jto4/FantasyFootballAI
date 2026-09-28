@@ -181,39 +181,22 @@ if (process.platform === 'win32') {
       await writeFile(path.join(source, 'nested', 'backup.zip'), 'private');
       await copyLocalDirectory(source, destination);
 
-      const readAcl = (target) => {
-        const encodedPath = Buffer.from(target, 'utf8').toString('base64');
-        const script = [
-          `$TargetPath = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${encodedPath}'))`,
-          '$acl = Get-Acl -LiteralPath $TargetPath',
-          '$sids = @($acl.Access | ForEach-Object { $_.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value })',
-          'ConvertTo-Json -Compress -InputObject @{ protected = $acl.AreAccessRulesProtected; sids = $sids }',
-        ].join('; ');
-        return JSON.parse(
-          execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
-            encoding: 'utf8',
-          }),
-        );
-      };
-      const accountSid = execFileSync(
-        'powershell.exe',
-        [
-          '-NoProfile',
-          '-NonInteractive',
-          '-Command',
-          '[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value',
-        ],
-        { encoding: 'utf8' },
-      ).trim();
-
+      const account = execFileSync('whoami.exe', [], { encoding: 'utf8' }).trim();
       for (const target of [
         destination,
         path.join(destination, 'nested'),
         path.join(destination, 'nested', 'backup.zip'),
       ]) {
-        const acl = readAcl(target);
-        assert.deepEqual(acl.sids, [accountSid]);
-        if (target === destination) assert.equal(acl.protected, true);
+        const acl = execFileSync('icacls.exe', [target], { encoding: 'utf8' });
+        const entries = acl.split(/\r?\n/).filter((line) => /:\(/.test(line));
+        assert.equal(entries.length, 1, acl);
+        assert.match(
+          entries[0],
+          new RegExp(`^\\s*${account.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}:`),
+        );
+        assert.match(entries[0], /\(F\)/);
+        if (target === destination) assert.doesNotMatch(entries[0], /\(I\)/);
+        else assert.match(entries[0], /\(I\)/);
       }
     } finally {
       await rm(root, { recursive: true, force: true });
