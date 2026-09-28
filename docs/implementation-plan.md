@@ -440,8 +440,9 @@ visible; backup and restore are documented and exercised.
 - Finish authorized ESPN and Sleeper connection flows.
 - Build representative fixtures for league formats, scoring rules, team counts, and
   access errors. Mocked contract fixtures now cover these areas for all three adapters,
-  including owner-authorized ESPN cookies, Yahoo OAuth failures, and unavailable supplemental
-  data; live account verification and broader cross-platform fixtures remain.
+  including owner-authorized ESPN cookies, Yahoo OAuth failures, ESPN OP-lineup and non-H2H
+  formats, unknown ESPN lineup slots, and unavailable supplemental data; live account
+  verification and broader cross-platform fixtures remain.
 - [~] Add comparable-metric standings rankings and per-report evidence limits so missing
   draft picks, projections, or matchups are stated; owner-imported season projections now
   support cautious per-pick/per-team replacement evidence, and imported week-specific

@@ -278,7 +278,7 @@ describe('Yahoo league connector', () => {
 });
 
 describe('ESPN league connector', () => {
-  it('uses the owner session and normalizes a private superflex league', async () => {
+  it('uses the owner session and normalizes an offensive-player flex league', async () => {
     const requests: Array<{ url: string; init?: RequestInit }> = [];
     vi.stubGlobal(
       'fetch',
@@ -289,12 +289,20 @@ describe('ESPN league connector', () => {
           return json({
             id: 77,
             seasonId: 2026,
-            name: 'ESPN Superflex',
+            name: 'ESPN OP flex',
             status: { currentMatchupPeriod: 3, isExpired: false },
             settings: {
-              name: 'ESPN Superflex',
+              name: 'ESPN OP flex',
               rosterSettings: {
-                lineupSlotCounts: { '0': 1, '2': 2, '4': 2, '20': 6, '21': 1, '23': 1 },
+                lineupSlotCounts: {
+                  '0': 1,
+                  '2': 2,
+                  '4': 2,
+                  '20': 6,
+                  '21': 1,
+                  '23': 1,
+                  '24': 1,
+                },
               },
               scheduleSettings: { matchupPeriodCount: 14, playoffTeamCount: 4 },
               scoringSettings: {
@@ -371,7 +379,7 @@ describe('ESPN league connector', () => {
         scoringType: 'H2H_POINTS',
         playoffStartWeek: 15,
         playoffStartWeekSource: 'derived',
-        roster_positions: expect.arrayContaining(['QB', 'RB', 'WR', 'FLEX', 'BENCH', 'IR']),
+        roster_positions: expect.arrayContaining(['QB', 'RB', 'WR', 'FLEX', 'OP', 'BENCH', 'IR']),
       }),
       teams: [
         expect.objectContaining({
@@ -412,5 +420,37 @@ describe('ESPN league connector', () => {
       'Private leagues need an owner-authorized session',
     );
     expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get('cookie')).toBeNull();
+  });
+
+  it('withholds unsupported roster slots and does not infer playoffs for a non-H2H format', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.includes('view=mTeam'))
+          return json({
+            id: 88,
+            seasonId: 2026,
+            name: 'Rotisserie League',
+            teams: [
+              { id: 1, name: 'One' },
+              { id: 2, name: 'Two' },
+            ],
+            settings: {
+              rosterSettings: { lineupSlotCounts: { '0': 1, '99': 1 } },
+              scheduleSettings: { matchupPeriodCount: 14, playoffTeamCount: 4 },
+              scoringSettings: { scoringType: 'ROTISSERIE', scoringItems: [] },
+            },
+          });
+        if (url.includes('view=mRoster')) return json({ teams: [] });
+        throw new Error(`Unexpected ESPN request: ${url}`);
+      }),
+    );
+
+    const league = await new EspnConnector(undefined, 2026).fetchLeague('88');
+
+    expect(league.settings.scoringType).toBe('ROTISSERIE');
+    expect(league.settings).not.toHaveProperty('roster_positions');
+    expect(league.settings).not.toHaveProperty('playoffStartWeek');
   });
 });
