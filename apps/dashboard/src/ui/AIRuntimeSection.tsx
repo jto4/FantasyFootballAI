@@ -10,8 +10,10 @@ type AIRuntimeSectionProps = {
   runtime: AIRuntime;
   availableModels: string[];
   appleCliPlatform: boolean;
+  apiKeyConfigured: boolean | null;
   busy: boolean;
   onChange: RuntimeChange;
+  onOpenCredentials: () => void;
   onDiscoverModels: () => void;
   onTestRuntime: () => void;
 };
@@ -22,8 +24,10 @@ export function AIRuntimeSection({
   runtime,
   availableModels,
   appleCliPlatform,
+  apiKeyConfigured,
   busy,
   onChange,
+  onOpenCredentials,
   onDiscoverModels,
   onTestRuntime,
 }: AIRuntimeSectionProps) {
@@ -195,6 +199,20 @@ export function AIRuntimeSection({
           {busy ? 'Testing…' : 'Save and test runtime'}
         </button>
       </div>
+      {runtime.mode === 'api' && (
+        <div className="schedule-explainer">
+          <p role="status">
+            {apiKeyConfigured === true
+              ? 'An API key is saved in the operating-system credential store.'
+              : apiKeyConfigured === false
+                ? 'An API key is required for API mode. Add it in credentials before testing this runtime.'
+                : 'API credential status is unavailable. Check the credential store in Credentials before testing.'}
+          </p>
+          <button type="button" className="small-button" onClick={onOpenCredentials}>
+            Manage API credentials <span>→</span>
+          </button>
+        </div>
+      )}
       <small>
         Model discovery sends an authenticated request to your configured API endpoint and sends no
         league data. Runtime testing uses a fixed, data-free prompt. Settings are saved first.

@@ -8,8 +8,12 @@ import {
 
 export interface ImageRouteDependencies {
   databasePath: string;
-  readImageGenerationKey: () => Promise<string | undefined>;
-  generateImage: (key: string, prompt: string) => Promise<{ src: string }>;
+  readImageGenerationKey: (provider: 'openai' | 'stability') => Promise<string | undefined>;
+  generateImage: (
+    key: string,
+    prompt: string,
+    provider: 'openai' | 'stability',
+  ) => Promise<{ src: string }>;
 }
 
 /** Keep image-library HTTP behavior out of the API bootstrap and inject provider access. */
@@ -17,17 +21,22 @@ export function createImageRouter(dependencies: ImageRouteDependencies): Router 
   const router = Router();
 
   router.post('/api/images', async (req, res) => {
-    const { prompt } = req.body as { prompt?: unknown };
+    const { prompt, provider = 'openai' } = req.body as {
+      prompt?: unknown;
+      provider?: unknown;
+    };
+    if (provider !== 'openai' && provider !== 'stability')
+      return res.status(400).json({ error: 'Unsupported image provider.' });
     if (typeof prompt !== 'string') return res.status(400).json({ error: 'Prompt is required.' });
     if (!prompt.trim() || prompt.length > 4_000)
       return res
         .status(400)
         .json({ error: 'Image prompt must be between 1 and 4,000 characters.' });
     try {
-      const key = await dependencies.readImageGenerationKey();
+      const key = await dependencies.readImageGenerationKey(provider);
       if (!key)
-        return res.status(409).json({ error: 'Save an image generation key in Settings first.' });
-      const generated = await dependencies.generateImage(key, prompt);
+        return res.status(409).json({ error: `Save a ${provider} image key in Settings first.` });
+      const generated = await dependencies.generateImage(key, prompt, provider);
       if (generated.src.startsWith('data:image/')) {
         const saved = await saveGeneratedImage(dependencies.databasePath, generated.src);
         return res.status(201).json({ ...saved, src: `/api/images/${saved.id}`, saved: true });

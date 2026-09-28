@@ -50,7 +50,7 @@ export async function recoverFromSafetyBackup(
   const detail = [
     ...candidates.map(
       (backup, index) =>
-        `${index + 1}. ${backup.name}${backup.name.includes('-salvage-') ? ' (partial-data salvage; malformed rows were omitted)' : ''}`,
+        `${index + 1}. ${backup.name}${backup.name.includes('-page-salvage-') ? ' (raw-page recovery and validated salvage; some data may be missing)' : backup.name.includes('-salvage-') ? ' (partial-data salvage; malformed rows were omitted)' : ''}`,
     ),
     '',
     'The current database and SQLite journals will be preserved in a recovery folder. Restored automatic sends will be paused and custom CLI or AI endpoints reset for review.',

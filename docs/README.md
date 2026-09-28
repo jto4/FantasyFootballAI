@@ -25,6 +25,8 @@ Use this page to find the right project context and keep the records in sync.
 - [`mcp.md`](mcp.md) — MCP server behavior and client configuration.
 - [`performance.md`](performance.md) — repeatable local performance smoke measurements and
   their limits.
+- [`maintenance-review.md`](maintenance-review.md) — quarterly manual code, security, and
+  refactoring review checklist used by the GitHub reminder workflow.
 - [`release-install.md`](release-install.md) — building and installing release artifacts.
 - [`design/dashboard-visual-direction.md`](design/dashboard-visual-direction.md) — dashboard
   design goals and reference limitations.

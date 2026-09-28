@@ -19,8 +19,11 @@ npm start
 
 ## Requirements
 
-- Node.js 22.13 or newer and npm
+- [Node.js 22.13 or newer](https://nodejs.org/en/download) and npm
 - macOS, Windows, or Linux
+
+On Linux, install the `libsecret` development package before `npm ci`; see the
+[setup guide](docs/setup.md#local-development) for the Debian/Ubuntu package name.
 
 ## Start the development app
 
@@ -72,7 +75,7 @@ Platform access must be authorized by the league owner. Sleeper uses its public 
 
 Compatible local AI clients can use the stdio MCP server and reusable skill. MCP sending is a separate tool and stays disabled until the owner opts in through Settings. See the [MCP setup guide](docs/mcp.md) for Claude Desktop, Cursor, and Visual Studio Code configuration examples and the current desktop-app limitation.
 
-See the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
+See the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [maintainer release process](docs/release-process.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
 
 ## Development
 

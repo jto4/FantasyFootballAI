@@ -18,5 +18,6 @@ describe('local backup settings section', () => {
     expect(markup).toContain('Restore backup');
     expect(markup).toContain('Older ZIP and SQLite backups remain supported');
     expect(markup).toContain('Provider secrets stay in the operating system credential manager.');
+    expect(markup).toContain('Loading local safety backups');
   });
 });

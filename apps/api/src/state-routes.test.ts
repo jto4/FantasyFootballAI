@@ -1,6 +1,6 @@
 import express from 'express';
-import type { AppState } from './store.js';
-import { afterEach, describe, expect, it } from 'vitest';
+import type { AppState, DashboardStateSnapshot } from './store.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createStateRouter } from './state-routes.js';
 
 describe('state API routes', () => {
@@ -17,9 +17,18 @@ describe('state API routes', () => {
     );
   });
 
-  async function startServer(state: AppState): Promise<string> {
+  async function startServer(
+    state: AppState,
+    dashboardSnapshot?: () => DashboardStateSnapshot,
+  ): Promise<{ baseUrl: string; snapshot: ReturnType<typeof vi.fn> }> {
     const app = express();
-    app.use(createStateRouter({ snapshot: () => state }));
+    const snapshot = vi.fn(() => state);
+    app.use(
+      createStateRouter({
+        snapshot,
+        ...(dashboardSnapshot ? { dashboardSnapshot } : {}),
+      }),
+    );
     const server = app.listen(0, '127.0.0.1');
     servers.push(server);
     await new Promise<void>((resolve, reject) => {
@@ -29,7 +38,7 @@ describe('state API routes', () => {
     const address = server.address();
     if (!address || typeof address === 'string')
       throw new Error('Test server did not bind a port.');
-    return `http://127.0.0.1:${address.port}`;
+    return { baseUrl: `http://127.0.0.1:${address.port}`, snapshot };
   }
 
   function makeState(): AppState {
@@ -72,7 +81,21 @@ describe('state API routes', () => {
         importedAt: '2026-09-01T00:00:00.000Z',
       },
     ];
-    const baseUrl = await startServer(state);
+    const dashboardSnapshot = vi.fn(
+      () =>
+        ({
+          settings: state.settings,
+          leagues: state.leagues,
+          reports: state.reports,
+          scheduledRuns: state.scheduledRuns,
+          memories: state.memories.map(({ sourceText, sourceAuthorId, ...profile }) => ({
+            ...profile,
+            sourceLength: sourceText.length,
+            canMergeImportedConversation: !sourceAuthorId,
+          })),
+        }) as DashboardStateSnapshot,
+    );
+    const { baseUrl, snapshot } = await startServer(state, dashboardSnapshot);
 
     const response = await fetch(`${baseUrl}/api/state`);
     const payload = (await response.json()) as Record<string, unknown>;
@@ -83,10 +106,12 @@ describe('state API routes', () => {
     expect(serialized).not.toContain('Private imported message');
     expect(serialized).not.toContain('author-1');
     expect(memories[0]).toMatchObject({ canMergeImportedConversation: false, sourceLength: 24 });
+    expect(dashboardSnapshot).toHaveBeenCalledOnce();
+    expect(snapshot).not.toHaveBeenCalled();
   });
 
   it('validates report list limits and gives bounded league summaries', async () => {
-    const baseUrl = await startServer(makeState());
+    const { baseUrl } = await startServer(makeState());
 
     expect((await fetch(`${baseUrl}/api/reports?limit=0`)).status).toBe(400);
     expect((await fetch(`${baseUrl}/api/reports?limit=51`)).status).toBe(400);

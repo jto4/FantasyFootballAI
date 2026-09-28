@@ -31,9 +31,12 @@ describe('delivery channel settings section', () => {
         blueBubblesConfigured: false,
         imessageAutoSyncStatus: null,
         blueBubblesWebhookConfigured: false,
+        blueBubblesWebhookLoading: false,
+        blueBubblesWebhookError: '',
         blueBubblesWebhookUrl: '',
         onCreateWebhook: vi.fn(),
         onRevokeWebhook: vi.fn(),
+        onRetryWebhookStatus: vi.fn(),
         onNotice: vi.fn(),
       }),
     );
@@ -46,5 +49,31 @@ describe('delivery channel settings section', () => {
     expect(markup).toContain('Draft a reply when someone directly addresses the agent');
     expect(markup).toContain('Send generated chat replies automatically');
     expect(markup).toContain('By default, review and send from Schedule &amp; drafts.');
+  });
+
+  it('shows a retry state instead of assuming the webhook is absent when status fails', () => {
+    const markup = renderToStaticMarkup(
+      createElement(DeliveryChannelsSection, {
+        settings: { actions: [] } as unknown as AppSettings,
+        setSettings: vi.fn() as Dispatch<SetStateAction<AppSettings>>,
+        leagues: [],
+        twilioConfigured: false,
+        twilioAutoSyncStatus: null,
+        blueBubblesConfigured: false,
+        imessageAutoSyncStatus: null,
+        blueBubblesWebhookConfigured: false,
+        blueBubblesWebhookLoading: false,
+        blueBubblesWebhookError: 'Could not read BlueBubbles webhook status.',
+        blueBubblesWebhookUrl: '',
+        onCreateWebhook: vi.fn(),
+        onRevokeWebhook: vi.fn(),
+        onRetryWebhookStatus: vi.fn(),
+        onNotice: vi.fn(),
+      }),
+    );
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain('Try again');
+    expect(markup).toContain('disabled=""');
   });
 });

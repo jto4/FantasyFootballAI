@@ -8,6 +8,7 @@ import {
   shell,
   Tray,
   utilityProcess,
+  autoUpdater,
 } from 'electron';
 import { lstat, mkdir, readFile, realpath, rename, rm, unlink, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
@@ -21,10 +22,12 @@ import {
   shouldStartHidden,
 } from './startup-preference.mjs';
 import { createBackgroundTray } from './background-tray.mjs';
+import { isHeadlessLaunch, shouldKeepDashboardClosed } from './background-mode.mjs';
 import { createRotatingLogWriter } from './log-writer.mjs';
 import { recoverFromSafetyBackup } from './database-recovery-flow.mjs';
 import { readDesktopMcpEndpoint } from './mcp-endpoint.mjs';
 import { checkForDesktopUpdate } from './update-check.mjs';
+import { createNativeUpdater } from './native-updater.mjs';
 import {
   copyLocalDirectory,
   isDataDirectoryActive,
@@ -35,9 +38,13 @@ import {
 const startupTimeoutMs = 30_000;
 const smokeTest = process.argv.includes('--sidekick-smoke-test');
 const mcpMode = process.argv.includes('--sidekick-mcp');
+const headlessMode = isHeadlessLaunch(process.argv);
+let showWindowWhenReady = false;
 // The Squirrel helper can consume headless smoke arguments as installer events on Windows.
 const squirrelStartup =
-  smokeTest || mcpMode ? false : (await import('electron-squirrel-startup')).default;
+  smokeTest || mcpMode || headlessMode
+    ? false
+    : (await import('electron-squirrel-startup')).default;
 let apiProcess;
 let apiPort;
 let apiExited = false;
@@ -55,6 +62,33 @@ let dashboardOrigin;
 // Keep the selection outside the selected folder so startup can find it after a move.
 const dataDirectoryPreference = join(app.getPath('appData'), app.getName(), 'data-directory.json');
 const startupPreference = join(app.getPath('appData'), app.getName(), 'startup.json');
+const nativeUpdater = createNativeUpdater({
+  autoUpdater,
+  platform: process.platform,
+  architecture: process.arch,
+  version: app.getVersion(),
+  packaged: app.isPackaged && !smokeTest && !mcpMode && !headlessMode,
+});
+nativeUpdater.subscribe((status) => {
+  for (const window of BrowserWindow.getAllWindows()) {
+    window.webContents.send('sidekick:update-status', status);
+  }
+  if (status.state === 'downloaded') {
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: 'Sunday Sidekick update ready',
+        message: 'The update has downloaded. Restart Sunday Sidekick to install it.',
+        buttons: ['Restart and install', 'Later'],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      .then(({ response }) => {
+        if (response === 0) nativeUpdater.install();
+      })
+      .catch(() => undefined);
+  }
+});
 
 ipcMain.handle('sidekick:get-launch-at-login', async (event) => {
   assertTrustedDashboard(event);
@@ -111,7 +145,23 @@ ipcMain.handle('sidekick:get-data-directory', async (event) => {
 });
 ipcMain.handle('sidekick:check-for-updates', async (event) => {
   assertTrustedDashboard(event);
-  return checkForDesktopUpdate(app.getVersion());
+  const result = await checkForDesktopUpdate(app.getVersion());
+  if (result.status === 'available') {
+    return {
+      ...result,
+      nativeUpdateSupported: nativeUpdater.supported,
+      nativeUpdate: nativeUpdater.supported ? nativeUpdater.check() : nativeUpdater.getStatus(),
+    };
+  }
+  return { ...result, nativeUpdateSupported: nativeUpdater.supported };
+});
+ipcMain.handle('sidekick:install-update', (event) => {
+  assertTrustedDashboard(event);
+  return nativeUpdater.install();
+});
+ipcMain.handle('sidekick:get-update-status', (event) => {
+  assertTrustedDashboard(event);
+  return nativeUpdater.getStatus();
 });
 ipcMain.handle('sidekick:open-release-page', async (event) => {
   assertTrustedDashboard(event);
@@ -221,6 +271,12 @@ if (mcpMode) {
     if (window) {
       if (window.isMinimized()) window.restore();
       window.focus();
+    } else if (headlessMode) {
+      if (startupInProgress) showWindowWhenReady = true;
+      else {
+        app.dock?.show();
+        createWindow();
+      }
     }
   });
 
@@ -270,16 +326,29 @@ async function start() {
     return;
   }
   await writeFile(join(dataDirectory, 'service-port'), `${apiPort}\n`, { mode: 0o600 });
+  if (
+    shouldKeepDashboardClosed({ headless: headlessMode, showWindowRequested: showWindowWhenReady })
+  ) {
+    startupInProgress = false;
+    app.dock?.hide();
+    process.once('SIGINT', requestGracefulQuit);
+    process.once('SIGTERM', requestGracefulQuit);
+    console.info(`Sunday Sidekick background service ready at http://127.0.0.1:${apiPort}`);
+    return;
+  }
+  if (headlessMode) app.dock?.show();
   const startHiddenPreferenceValue = await getStartHiddenPreference(startupPreference);
   // Electron 44 removed openAsHidden; macOS identifies login launches so regular starts stay visible.
   const wasOpenedAtLogin =
     process.platform === 'darwin' && app.getLoginItemSettings().wasOpenedAtLogin;
-  const startHidden = shouldStartHidden({
-    platform: process.platform,
-    argumentsList: process.argv,
-    startHidden: startHiddenPreferenceValue,
-    wasOpenedAtLogin,
-  });
+  const startHidden =
+    !showWindowWhenReady &&
+    shouldStartHidden({
+      platform: process.platform,
+      argumentsList: process.argv,
+      startHidden: startHiddenPreferenceValue,
+      wasOpenedAtLogin,
+    });
   createWindow({ initiallyHidden: startHidden });
   startupInProgress = false;
 }
@@ -581,14 +650,21 @@ async function removeServicePortFile(dataDirectory) {
 app.on('before-quit', (event) => {
   if (quitting) return;
   event.preventDefault();
-  if (quitPromise) return;
-  quitting = true;
-  tray?.destroy();
-  quitPromise = stopApi().finally(() => app.quit());
+  void requestGracefulQuit();
 });
 
+function requestGracefulQuit() {
+  if (quitPromise) return quitPromise;
+  quitting = true;
+  tray?.destroy();
+  quitPromise = stopApi()
+    .catch((error) => console.error('Could not stop the local service cleanly.', error))
+    .finally(() => app.quit());
+  return quitPromise;
+}
+
 async function showStartupError(error) {
-  if (mcpMode) {
+  if (mcpMode || headlessMode) {
     console.error(error);
     app.exit(1);
     return;

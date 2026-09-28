@@ -145,6 +145,42 @@ describe('report schedules', () => {
     }
   });
 
+  it('fires a recurring local time only once during the repeated DST fall-back hour', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-01T05:30:00.000Z'));
+    try {
+      const run = vi.fn().mockResolvedValue(undefined);
+      let callback: TaskFn | undefined;
+      const scheduleTask = ((_expression: string, task: TaskFn | string) => {
+        if (typeof task === 'function') callback = task;
+        return { stop: vi.fn() } as unknown as ScheduledTask;
+      }) as typeof cron.schedule;
+      const scheduler = new ReportScheduler(run, scheduleTask);
+      const action = structuredClone(
+        defaultActionSettings.find((item) => item.kind === 'power-rankings')!,
+      );
+      action.schedule = {
+        ...action.schedule,
+        enabled: true,
+        frequency: 'daily',
+        time: '01:30',
+        timezone: 'America/New_York',
+      };
+
+      scheduler.reconcile([action]);
+      await callback!({} as TaskContext);
+      scheduler.reconcile([action]);
+      vi.setSystemTime(new Date('2026-11-01T06:30:00.000Z'));
+      await callback!({} as TaskContext);
+
+      expect(run).toHaveBeenCalledOnce();
+      expect(run.mock.calls[0]?.[1]).toContain('2026-11-01');
+      scheduler.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('preserves completion across stale settings saves but clears it for a changed event', () => {
     const existing = structuredClone(defaultActionSettings);
     const original = existing.find((item) => item.kind === 'draft-hype')!;

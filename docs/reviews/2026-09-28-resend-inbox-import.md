@@ -22,13 +22,19 @@ changed code; no automated security scan was run.
   flight, yet the prior settings snapshot could still authorize AI analysis. The importer now
   re-reads memory settings after retrieval and refuses the import before AI access if memory
   has been disabled. A regression test covers this timing.
+- A second review found that imported-conversation analysis consent was not refreshed while
+  the AI runtime initialized or while the model call was in flight. The route now checks after
+  runtime setup, after the response, and inside the final store update. Revoked results are not
+  saved; existing profile notes are preserved and the owner-authorized email remains local.
 - Credential-store, authentication, and provider errors are returned as generic actionable
   messages without exposing keys or native backend details.
 
 ## Validation
 
 - `npm run typecheck --workspace @sidekick/api`
-- `npm test --workspace @sidekick/api -- --run src/received-email-routes.test.ts`
+- `npm run test --workspace @sidekick/api -- src/received-email-routes.test.ts`
+- Tests cover opt-out during runtime setup, an in-flight model call, and immediately before
+  persistence.
 - Full `npm test`, lint, format check, production build, and packaged macOS API/dashboard/MCP
   smoke checks are run separately and recorded in `docs/tasks.md`.
 

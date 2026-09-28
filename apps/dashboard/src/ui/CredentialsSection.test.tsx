@@ -11,13 +11,17 @@ const callbacks = {
   onTestTwilio: vi.fn(),
   onTestEspn: vi.fn(),
   onTestResend: vi.fn(),
+  imageProvider: 'openai' as const,
+  onImageProviderChange: vi.fn(),
+  imageProviderConfigured: true,
   onImagePromptChange: vi.fn(),
   onCreateImage: vi.fn(),
+  onRefreshImages: vi.fn(),
   onRemoveImage: vi.fn(),
 };
 
 describe('credentials settings section', () => {
-  it('shows setup status without exposing saved secrets and explains local image generation', () => {
+  it('shows setup status without exposing saved secrets and offers configured image providers', () => {
     const markup = renderToStaticMarkup(
       createElement(CredentialsSection, {
         headingRef: createRef<HTMLHeadingElement>(),
@@ -36,6 +40,8 @@ describe('credentials settings section', () => {
         generatedImage: '',
         imageGenerationBusy: false,
         localImages: [],
+        imageLibraryLoading: true,
+        imageLibraryError: '',
         ...callbacks,
       }),
     );
@@ -45,7 +51,12 @@ describe('credentials settings section', () => {
     expect(markup).toContain('NOT SET');
     expect(markup).toContain('Test access');
     expect(markup).toContain('placeholder="Enter to replace"');
+    expect(markup).toContain('Stability AI image generation key');
+    expect(markup).toContain('id="image-generation-provider"');
+    expect(markup).toContain('OpenAI · GPT Image');
+    expect(markup).toContain('Stable Image Core');
     expect(markup).toContain('Generate a league image');
     expect(markup).toContain('generation may incur API charges');
+    expect(markup).toContain('Loading saved images');
   });
 });

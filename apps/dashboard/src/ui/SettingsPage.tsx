@@ -11,6 +11,7 @@ import { DesktopSettingsSections } from './DesktopSettingsSections.js';
 import { CredentialsSection, type LocalImage, type SecretState } from './CredentialsSection.js';
 import { AutomaticActionsSection } from './AutomaticActionsSection.js';
 import { DeliveryChannelsSection } from './DeliveryChannelsSection.js';
+import { readImageProviderPreference, writeImageProviderPreference } from './image-provider.js';
 import { RefreshCw, Save } from 'lucide-react';
 import {
   applyScheduleRecommendations,
@@ -45,6 +46,7 @@ type SettingsPageProps = {
   leagues: LeagueConnection[];
   onSaved: (settings: AppSettings) => void;
   onCredentialsChanged: () => void;
+  onFocusCredentials: () => void;
   onRuntimeTested: (runtime: NonNullable<AppSettings['aiRuntime']>) => void;
   focusTarget: 'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null;
   onFocusTargetHandled: () => void;
@@ -57,11 +59,24 @@ const actionNames: Record<string, string> = {
   'power-rankings': 'Weekly power rankings',
   'matchup-preview': 'Matchup previews',
 };
+
+function isYahooOAuthStatus(value: unknown): value is YahooOAuthStatus {
+  if (!value || typeof value !== 'object') return false;
+  const status = value as Record<string, unknown>;
+  return (
+    typeof status.clientConfigured === 'boolean' &&
+    typeof status.authorized === 'boolean' &&
+    typeof status.requiresReconnect === 'boolean' &&
+    typeof status.redirectUri === 'string'
+  );
+}
+
 export function SettingsPage({
   settings,
   leagues,
   onSaved,
   onCredentialsChanged,
+  onFocusCredentials,
   onRuntimeTested,
   focusTarget,
   onFocusTargetHandled,
@@ -112,8 +127,14 @@ export function SettingsPage({
   const [credentialStoreAvailable, setCredentialStoreAvailable] = useState<boolean | null>(null);
   const [secretValues, setSecretValues] = useState<Record<string, string>>({});
   const [imagePrompt, setImagePrompt] = useState('');
+  const [imageProvider, setImageProvider] = useState<'openai' | 'stability'>(() =>
+    readImageProviderPreference(),
+  );
+  const [imageProviderManuallySelected, setImageProviderManuallySelected] = useState(false);
   const [generatedImage, setGeneratedImage] = useState('');
   const [localImages, setLocalImages] = useState<LocalImage[]>([]);
+  const [imageLibraryLoading, setImageLibraryLoading] = useState(true);
+  const [imageLibraryError, setImageLibraryError] = useState('');
   const [imageGenerationBusy, setImageGenerationBusy] = useState(false);
   const [credentialTestBusy, setCredentialTestBusy] = useState(false);
   const [resendTestRecipient, setResendTestRecipient] = useState('');
@@ -123,12 +144,16 @@ export function SettingsPage({
     null,
   );
   const [blueBubblesWebhookConfigured, setBlueBubblesWebhookConfigured] = useState(false);
+  const [blueBubblesWebhookLoading, setBlueBubblesWebhookLoading] = useState(true);
+  const [blueBubblesWebhookError, setBlueBubblesWebhookError] = useState('');
   const [blueBubblesWebhookUrl, setBlueBubblesWebhookUrl] = useState('');
   const [yahooClientId, setYahooClientId] = useState('');
   const [yahooClientSecret, setYahooClientSecret] = useState('');
   const [yahooAuthorizationUrl, setYahooAuthorizationUrl] = useState('');
   const [yahooAuthorizationState, setYahooAuthorizationState] = useState('');
   const [yahooAuthorizationCode, setYahooAuthorizationCode] = useState('');
+  const [yahooStatusLoading, setYahooStatusLoading] = useState(true);
+  const [yahooStatusError, setYahooStatusError] = useState('');
   const [yahooOAuthStatus, setYahooOAuthStatus] = useState<YahooOAuthStatus>({
     clientConfigured: false,
     authorized: false,
@@ -155,8 +180,66 @@ export function SettingsPage({
     secretState.find((item) => item.provider === 'bluebubbles')?.configured === true;
   const twilioConfigured =
     secretState.find((item) => item.provider === 'twilio')?.configured === true;
+  const imageProviderCredential =
+    imageProvider === 'openai' ? 'image-generation' : 'stability-image-generation';
   const imageGenerationConfigured =
-    secretState.find((item) => item.provider === 'image-generation')?.configured === true;
+    secretState.find((item) => item.provider === imageProviderCredential)?.configured === true;
+  const imageProviderConfigured = secretState.some(
+    (item) =>
+      (item.provider === 'image-generation' || item.provider === 'stability-image-generation') &&
+      item.configured,
+  );
+
+  useEffect(() => {
+    if (
+      !imageProviderManuallySelected &&
+      !secretState.find((item) => item.provider === 'image-generation')?.configured &&
+      secretState.find((item) => item.provider === 'stability-image-generation')?.configured
+    )
+      setImageProvider('stability');
+  }, [imageProviderManuallySelected, secretState]);
+
+  async function refreshYahooOAuthStatus() {
+    setYahooStatusLoading(true);
+    setYahooStatusError('');
+    try {
+      const response = await fetch('/api/yahoo/oauth/status');
+      const result: unknown = await response.json();
+      if (!response.ok || !isYahooOAuthStatus(result))
+        throw new Error('Could not read Yahoo connection status.');
+      setYahooOAuthStatus(result);
+    } catch (error) {
+      setYahooStatusError(
+        error instanceof Error ? error.message : 'Could not read Yahoo connection status.',
+      );
+    } finally {
+      setYahooStatusLoading(false);
+    }
+  }
+
+  async function refreshBlueBubblesWebhookStatus() {
+    setBlueBubblesWebhookLoading(true);
+    setBlueBubblesWebhookError('');
+    try {
+      const response = await fetch('/api/bluebubbles/webhook');
+      const result: unknown = await response.json();
+      if (
+        !response.ok ||
+        !result ||
+        typeof result !== 'object' ||
+        typeof (result as { configured?: unknown }).configured !== 'boolean'
+      )
+        throw new Error('Could not read BlueBubbles webhook status.');
+      setBlueBubblesWebhookConfigured((result as { configured: boolean }).configured);
+    } catch (error) {
+      setBlueBubblesWebhookError(
+        error instanceof Error ? error.message : 'Could not read BlueBubbles webhook status.',
+      );
+    } finally {
+      setBlueBubblesWebhookLoading(false);
+    }
+  }
+
   useEffect(() => {
     void fetch('/api/credentials')
       .then(async (response) => {
@@ -173,17 +256,9 @@ export function SettingsPage({
           'OS credential store is unavailable. On Linux, make a Secret Service such as GNOME Keyring or KWallet available on this user’s D-Bus session.',
         );
       });
-    void fetch('/api/bluebubbles/webhook')
-      .then((response) => response.json())
-      .then((result: { configured?: boolean }) =>
-        setBlueBubblesWebhookConfigured(result.configured === true),
-      )
-      .catch(() => setMessage('Could not read BlueBubbles webhook status.'));
+    void refreshBlueBubblesWebhookStatus();
     void refreshImages();
-    void fetch('/api/yahoo/oauth/status')
-      .then((r) => r.json())
-      .then(setYahooOAuthStatus)
-      .catch(() => setMessage('Could not read Yahoo connection status.'));
+    void refreshYahooOAuthStatus();
   }, []);
 
   async function refreshDiagnosticLogs() {
@@ -380,6 +455,8 @@ export function SettingsPage({
     );
     if (provider === 'bluebubbles') {
       setBlueBubblesWebhookConfigured(false);
+      setBlueBubblesWebhookError('');
+      setBlueBubblesWebhookLoading(false);
       setBlueBubblesWebhookUrl('');
     }
     onCredentialsChanged();
@@ -394,6 +471,8 @@ export function SettingsPage({
       return;
     }
     setBlueBubblesWebhookConfigured(true);
+    setBlueBubblesWebhookError('');
+    setBlueBubblesWebhookLoading(false);
     setBlueBubblesWebhookUrl(result.url);
     setMessage('Webhook URL created. Copy it into BlueBubbles now; it is shown only once.');
   }
@@ -405,6 +484,8 @@ export function SettingsPage({
       return;
     }
     setBlueBubblesWebhookConfigured(false);
+    setBlueBubblesWebhookError('');
+    setBlueBubblesWebhookLoading(false);
     setBlueBubblesWebhookUrl('');
     setMessage('Webhook URL revoked.');
   }
@@ -476,7 +557,7 @@ export function SettingsPage({
       const response = await fetch('/api/images', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ prompt: imagePrompt }),
+        body: JSON.stringify({ prompt: imagePrompt, provider: imageProvider }),
       });
       const result = (await response.json()) as {
         id?: string;
@@ -512,11 +593,21 @@ export function SettingsPage({
   }
 
   async function refreshImages() {
+    setImageLibraryLoading(true);
+    setImageLibraryError('');
     try {
       const response = await fetch('/api/images');
-      if (response.ok) setLocalImages(await response.json());
-    } catch {
-      setMessage('Could not read the local image library.');
+      if (!response.ok)
+        throw new Error(`Could not read the local image library (${response.status}).`);
+      const images = (await response.json()) as LocalImage[];
+      if (!Array.isArray(images)) throw new Error('The local image library response was invalid.');
+      setLocalImages(images);
+    } catch (error) {
+      setImageLibraryError(
+        error instanceof Error ? error.message : 'Could not read the local image library.',
+      );
+    } finally {
+      setImageLibraryLoading(false);
     }
   }
 
@@ -546,6 +637,8 @@ export function SettingsPage({
     setYahooClientId('');
     setYahooClientSecret('');
     setYahooOAuthStatus((current) => ({ ...current, clientConfigured: true }));
+    setYahooStatusError('');
+    setYahooStatusLoading(false);
     setMessage('Yahoo app credentials saved to the operating system credential store.');
   }
 
@@ -580,6 +673,8 @@ export function SettingsPage({
       authorized: true,
       requiresReconnect: false,
     }));
+    setYahooStatusError('');
+    setYahooStatusLoading(false);
     setYahooAuthorizationUrl('');
     setYahooAuthorizationState('');
     setYahooAuthorizationCode('');
@@ -600,6 +695,8 @@ export function SettingsPage({
       authorized: false,
       requiresReconnect: false,
     }));
+    setYahooStatusError('');
+    setYahooStatusLoading(false);
     onCredentialsChanged();
     setMessage('Yahoo authorization removed from the operating system credential store.');
   }
@@ -695,6 +792,8 @@ export function SettingsPage({
       <YahooConnectionSection
         headingRef={yahooHeadingRef}
         status={yahooOAuthStatus}
+        statusLoading={yahooStatusLoading}
+        statusError={yahooStatusError}
         clientId={yahooClientId}
         clientSecret={yahooClientSecret}
         authorizationUrl={yahooAuthorizationUrl}
@@ -706,6 +805,7 @@ export function SettingsPage({
         onAuthorize={() => void authorizeYahoo()}
         onDisconnect={() => void disconnectYahoo()}
         onCompleteAuthorization={() => void completeYahooAuthorization()}
+        onRetryStatus={() => void refreshYahooOAuthStatus()}
       />
       <DesktopSettingsSections
         dataDirectoryHeadingRef={dataDirectoryHeadingRef}
@@ -714,7 +814,10 @@ export function SettingsPage({
       />
       <LocalBackupSection
         onNotice={setMessage}
-        onRestored={onRestored}
+        onRestored={async () => {
+          await onRestored();
+          await refreshImages();
+        }}
         onSettingsRestored={handleRestoredSettings}
       />
       <WritingStyleSection
@@ -772,8 +875,14 @@ export function SettingsPage({
         runtime={runtime}
         availableModels={availableModels}
         appleCliPlatform={appleCliPlatform}
+        apiKeyConfigured={
+          credentialStoreAvailable === true
+            ? secretState.some((item) => item.provider === 'openai' && item.configured)
+            : null
+        }
         busy={runtimeBusy}
         onChange={setRuntime}
+        onOpenCredentials={onFocusCredentials}
         onDiscoverModels={() => void discoverModels()}
         onTestRuntime={() => void testRuntime()}
       />
@@ -1012,9 +1121,12 @@ export function SettingsPage({
           blueBubblesConfigured={blueBubblesConfigured}
           imessageAutoSyncStatus={imessageAutoSyncStatus}
           blueBubblesWebhookConfigured={blueBubblesWebhookConfigured}
+          blueBubblesWebhookLoading={blueBubblesWebhookLoading}
+          blueBubblesWebhookError={blueBubblesWebhookError}
           blueBubblesWebhookUrl={blueBubblesWebhookUrl}
           onCreateWebhook={() => void createBlueBubblesWebhook()}
           onRevokeWebhook={() => void revokeBlueBubblesWebhook()}
+          onRetryWebhookStatus={() => void refreshBlueBubblesWebhookStatus()}
           onNotice={setMessage}
         />
       </section>
@@ -1036,12 +1148,22 @@ export function SettingsPage({
         onTestTwilio={() => void testTwilioCredentials()}
         onTestResend={() => void testResendCredentials()}
         imageGenerationConfigured={imageGenerationConfigured}
+        imageProvider={imageProvider}
+        onImageProviderChange={(provider) => {
+          setImageProviderManuallySelected(true);
+          setImageProvider(provider);
+          writeImageProviderPreference(provider);
+        }}
+        imageProviderConfigured={imageProviderConfigured}
         imagePrompt={imagePrompt}
         onImagePromptChange={setImagePrompt}
         generatedImage={generatedImage}
         imageGenerationBusy={imageGenerationBusy}
         onCreateImage={() => void createImage()}
         localImages={localImages}
+        imageLibraryLoading={imageLibraryLoading}
+        imageLibraryError={imageLibraryError}
+        onRefreshImages={() => void refreshImages()}
         onRemoveImage={(id) => void removeLocalImage(id)}
       />
       <section className="settings-card">

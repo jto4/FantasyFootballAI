@@ -246,6 +246,54 @@ describe('league analysis', () => {
     expect(rankTeams(league).basis).toBe('wins');
   });
 
+  it('keeps tied records tied when points-for is not available for every team', () => {
+    const partialTiebreak: LeagueConnection = {
+      ...league,
+      teams: [
+        { id: '1', name: 'First tied team', wins: 2, pointsFor: 320 },
+        { id: '2', name: 'Second tied team', wins: 2 },
+        { id: '3', name: 'Next team', wins: 1, pointsFor: 500 },
+      ],
+    };
+
+    const ranking = rankTeams(partialTiebreak);
+    expect(ranking.tieBreaker).toBeUndefined();
+    expect(ranking.teams.map((team) => team.name)).toEqual([
+      'First tied team',
+      'Second tied team',
+      'Next team',
+    ]);
+    expect(ranking.places).toEqual([
+      { rank: 1, tied: true },
+      { rank: 1, tied: true },
+      { rank: 3, tied: false },
+    ]);
+    expect(analyzeLeague(partialTiebreak, 'power-rankings', 'dry').body).toContain(
+      'T-1. First tied team',
+    );
+    expect(reportEvidenceGuidance(partialTiebreak, 'power-rankings')).toContain(
+      'keep equal records tied',
+    );
+  });
+
+  it('uses points-for to break equal records only when all teams have the value', () => {
+    const completeTiebreak: LeagueConnection = {
+      ...league,
+      teams: [
+        { id: '1', name: 'Lower points', wins: 2, pointsFor: 280 },
+        { id: '2', name: 'Higher points', wins: 2, pointsFor: 320 },
+      ],
+    };
+
+    const ranking = rankTeams(completeTiebreak);
+    expect(ranking.tieBreaker).toBe('pointsFor');
+    expect(ranking.teams.map((team) => team.name)).toEqual(['Higher points', 'Lower points']);
+    expect(ranking.places).toEqual([
+      { rank: 1, tied: false },
+      { rank: 2, tied: false },
+    ]);
+  });
+
   it('does not compare incompatible metrics when the team snapshot is incomplete', () => {
     const partial = {
       ...league,
@@ -1205,8 +1253,8 @@ describe('league analysis', () => {
   it('limits saved news sources to the supported feed identifiers', () => {
     expect(normalizeNewsSources(undefined)).toEqual(defaultNewsSources);
     expect(
-      normalizeNewsSources(['pff', 'espn', 'fox', 'cbs', 'pff', 'https://example.test/rss']),
-    ).toEqual(['pff', 'espn', 'fox', 'cbs']);
+      normalizeNewsSources(['pff', 'espn', 'fox', 'cbs', 'pft', 'pff', 'https://example.test/rss']),
+    ).toEqual(['pff', 'espn', 'fox', 'cbs', 'pft']);
     expect(normalizeNewsSources([])).toEqual([]);
     expect(isValidNewsSources(['espn', 'cbs'])).toBe(true);
     expect(isValidNewsSources(['espn', 'custom'])).toBe(false);

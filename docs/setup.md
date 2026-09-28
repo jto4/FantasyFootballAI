@@ -13,10 +13,15 @@ KWallet to be available on the current user's D-Bus session. This also applies t
 headless background-service account; the smoke command reports failure when no usable
 credential service is available.
 
-To check current ESPN, PFF, and FOX Sports RSS availability, run `npm run news:smoke`. This
+To check current ESPN, PFF, FOX Sports, CBS Sports, and Pro Football Talk RSS availability, run `npm run news:smoke`. This
 opt-in live check reports a headline count, latest publication timestamp, and one citation
 URL per feed. It is not run in CI because feed availability and terms are controlled by their
 publishers.
+
+To verify Sleeper's public player catalog without connecting a league, run
+`npm run sleeper:catalog:smoke`. This opt-in read-only check downloads the bounded public NFL
+catalog, verifies several known player ID/name/position records, and reports the normalized
+catalog size; it does not request league or account data.
 
 ## Local development
 
@@ -61,7 +66,7 @@ stop its local API. The **Start hidden in the system tray** option applies at th
 it starts the service without opening the dashboard window. For headless operation,
 use the source-checkout service commands instead.
 
-If the desktop app cannot open its SQLite database, it checks the five most recent valid local safety copies and offers an explicit restore choice. The app preserves the failed database and journal files in a recovery folder, then restores the chosen copy with automatic sends paused and custom AI/CLI runtimes reset for review. If no valid safety copy exists, it leaves the data folder unchanged and displays source-checkout recovery guidance.
+If the desktop app cannot open its SQLite database, startup attempts page or row salvage before checking the five most recent valid local safety copies and offering an explicit restore choice. The app preserves the failed database and journal files in a recovery folder, then restores the chosen copy with automatic sends paused and custom AI/CLI runtimes reset for review. If neither salvage nor a valid safety copy is available, it leaves the data folder unchanged and displays source-checkout recovery guidance.
 Packages are unsigned and are not published for end users yet. Version tags create a draft
 GitHub Release with a ZIP for Linux and Windows, plus separate Apple Silicon and Intel macOS
 ZIPs, and a `SHA256SUMS` file; an owner must complete
@@ -142,20 +147,26 @@ The `.sidekick/` directory under the current user's home directory holds local a
 
 Use **Settings → Local backup and restore** to download a portable `.ssb` backup containing the database and generated images. Enter and confirm a passphrase of 12–200 characters; the archive is encrypted with AES-256-GCM and a per-file scrypt-derived key. Keep the passphrase separately because it cannot be recovered. Restore accepts encrypted archives up to 201 MB, older ZIP archives up to 200 MB, and legacy SQLite files up to 50 MB. The service validates the archive before replacing local data and preserves the pre-restore database in `.sidekick/backups/`. Provider secrets are not included because they stay in the OS credential manager. Restored automatic actions return to draft mode with schedules disabled. Custom AI endpoints and local CLI runtimes return to the default API configuration, so a backup cannot silently choose an executable or a destination for your API key. Review AI and delivery settings, then explicitly re-enable any automation you want. Restoring an older SQLite-only backup clears the generated-image library. Local safety copies remain protected by filesystem permissions and are not passphrase-encrypted.
 
-If the desktop app cannot open its database and neither salvage nor an existing safety copy works,
-startup offers to start with an empty library. Choosing it moves the unreadable database and
-SQLite journals into a private `recovery-*` folder first; data in those files will not appear in
-the new library. Keep that folder if you may seek specialist data recovery later.
+If the desktop app cannot open its database, startup first tries SQLite raw-page recovery when a
+local SQLite CLI with `.recover` support is installed. It validates the recovered data, then
+creates a labeled backup for the owner to review. Otherwise, or if page recovery fails, startup
+tries a labeled partial-salvage backup from independently readable and valid rows. Malformed rows
+are omitted; the original database and journals remain preserved. Raw-page recovery depends on
+the system CLI and is not available in every packaged environment.
 
-When SQLite can still read some normalized tables, startup first creates a labeled partial-salvage
-backup from independently valid rows and offers it with the other safety copies. Malformed rows
-are omitted; the original database and journals remain preserved. From a source checkout, run
-`npm run build` followed by `npm run db:recover -- --salvage` to create that backup without
-replacing the source database.
+If neither salvage method nor an existing safety copy works, startup offers to start with an empty
+library. Choosing it moves the unreadable database and SQLite journals into a private
+`recovery-*` folder first; data in those files will not appear in the new library. Keep that folder
+if you may seek specialist data recovery later.
+
+From a source checkout, run `npm run build` followed by `npm run db:recover -- --salvage` to create
+a salvage backup without replacing the source database. This also attempts `.recover` when the
+local SQLite CLI supports it. If the CLI is unavailable or recovery fails, row-level salvage still
+preserves independently readable records.
 
 If a source-checkout database will not open, stop Sunday Sidekick and run `npm run db:recover -- --check` to inspect the current database and recognized safety copies. Use `--restore-backup <filename>` only with a listed, valid copy; the command validates it again and saves the previous database and any SQLite journal files in a private `recovery-*` folder before replacing `state.sqlite`. For a desktop install, use `--data-dir` with the selected local data folder shown in Desktop Settings. Keep the recovery folder until you have reviewed the restored data. This command does not reconstruct data when no valid safety copy exists; preserve the data folder and its recovery files for manual assistance rather than deleting them.
 
-Generated GPT Image files are stored privately in the selected local data folder's `images/` directory. Use **Settings → Credentials → Saved images** to preview, download, or delete them. Encrypted Settings backups include both the SQLite database and generated images; older ZIP and SQLite-only backups can still be restored, and restoring an SQLite-only file clears the current generated-image library. Image prompts are sent to OpenAI when you generate an image, and generation may incur API charges.
+Generated OpenAI GPT Image and Stability AI Stable Image Core files are stored privately in the selected local data folder's `images/` directory. Choose the provider in **Settings → Credentials** and save its key in the OS credential store. The selected provider is remembered in this browser. OpenAI image keys use the **OpenAI image generation key** field; Stability keys use **Stability AI image generation key**. Stability documents the [Stable Image Core API](https://platform.stability.ai/docs/api-reference). Use **Settings → Credentials → Saved images** to preview, download, or delete them. Encrypted Settings backups include both the SQLite database and generated images; older ZIP and SQLite-only backups can still be restored, and restoring an SQLite-only file clears the current generated-image library. Image prompts are sent to the selected provider when you generate an image, and generation may incur API charges.
 
 Use **Settings → AI privacy → Imported source retention** to keep imported conversation text until you delete it, or purge it after 30, 90, or 365 days. Cleanup runs when you save the setting, when the app starts, and daily while it is running. The profile, editable notes, and banter preferences stay available after source text expires. The local database enables SQLite secure-delete and checkpoints its write-ahead log after purging. Retention does not alter downloaded backups or pre-restore safety copies: delete the copies in **Settings → Local backup and restore**, and manually delete downloaded files from wherever you saved them, if those copies should also be removed. Use **Enable member memory** to pause conversation imports, AI analysis of imports, and use of member notes with AI. Report prompts and group-chat reply prompts have separate sharing opt-ins in Settings; pausing member memory blocks both while keeping existing profiles stored locally for later review or re-enabling. **Members & memory → Delete all memory** removes every member profile and its imported source messages; deleting an individual profile removes its source messages too.
 

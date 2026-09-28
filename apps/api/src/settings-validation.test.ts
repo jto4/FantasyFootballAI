@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isValidAction, isValidRuntime } from './settings-validation.js';
+import { isValidAction, isValidRuntime, isValidSettingsUpdate } from './settings-validation.js';
 
 const runtime = {
   mode: 'api',
@@ -68,5 +68,62 @@ describe('scheduled action settings validation', () => {
 
   it.each(invalidValues)('rejects malformed actions and schedules', (value) => {
     expect(isValidAction(value)).toBe(false);
+  });
+});
+
+describe('complete settings update validation', () => {
+  const validSettings = {
+    writingStyle: 'Playful and sharp',
+    reportLength: 'standard',
+    actions: [action],
+    aiRuntime: runtime,
+    newsRefreshMinutes: 15,
+  };
+  const leagueIds = new Set(['league-a']);
+
+  it('accepts settings scoped to connected leagues', () => {
+    expect(
+      isValidSettingsUpdate(
+        {
+          ...validSettings,
+          calendarEvents: [
+            {
+              id: '550e8400-e29b-41d4-a716-446655440000',
+              leagueId: 'league-a',
+              title: 'Draft night',
+              kind: 'draft-hype',
+              date: '2026-08-01',
+              time: '19:00',
+              timezone: 'America/New_York',
+            },
+          ],
+        },
+        leagueIds,
+      ),
+    ).toBe(true);
+  });
+
+  it.each([
+    undefined,
+    [],
+    { ...validSettings, writingStyle: 42 },
+    { ...validSettings, imessageSyncIntervalMinutes: '15' },
+    { ...validSettings, chatAgentName: 'Bot\nInjected' },
+    {
+      ...validSettings,
+      calendarEvents: [
+        {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          leagueId: 'disconnected-league',
+          title: 'Draft night',
+          kind: 'draft-hype',
+          date: '2026-08-01',
+          time: '19:00',
+          timezone: 'America/New_York',
+        },
+      ],
+    },
+  ])('rejects malformed, unsafe, or stale settings updates', (candidate) => {
+    expect(isValidSettingsUpdate(candidate, leagueIds)).toBe(false);
   });
 });

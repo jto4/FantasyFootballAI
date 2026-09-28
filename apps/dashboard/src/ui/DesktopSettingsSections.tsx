@@ -19,12 +19,14 @@ export function DesktopSettingsSections({
   const [dataDirectory, setDataDirectory] = useState<string | null>(null);
   const [dataDirectoryBusy, setDataDirectoryBusy] = useState(false);
   const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateCheckResult | null>(null);
+  const [nativeUpdate, setNativeUpdate] = useState<DesktopNativeUpdateState | null>(null);
   const [desktopUpdateBusy, setDesktopUpdateBusy] = useState(false);
   const desktopAvailable = typeof window !== 'undefined' && Boolean(window.sidekickDesktop);
 
   useEffect(() => {
     const desktop = typeof window !== 'undefined' ? window.sidekickDesktop : undefined;
     if (!desktop) return;
+    const unsubscribe = desktop.onUpdateStatus(setNativeUpdate);
     void desktop
       .getLaunchAtLogin()
       .then(setLaunchAtLogin)
@@ -40,6 +42,11 @@ export function DesktopSettingsSections({
         onDataDirectoryLoaded(path);
       })
       .catch(() => onNotice('Could not read the local data folder.'));
+    void desktop
+      .getUpdateStatus()
+      .then(setNativeUpdate)
+      .catch(() => undefined);
+    return unsubscribe;
   }, [onDataDirectoryLoaded, onNotice]);
 
   async function changeLaunchAtLogin(enabled: boolean) {
@@ -111,7 +118,9 @@ export function DesktopSettingsSections({
     setDesktopUpdateBusy(true);
     setDesktopUpdate(null);
     try {
-      setDesktopUpdate(await desktop.checkForUpdates());
+      const result = await desktop.checkForUpdates();
+      setDesktopUpdate(result);
+      if (result.nativeUpdate) setNativeUpdate(result.nativeUpdate);
     } catch {
       setDesktopUpdate({
         status: 'error',
@@ -120,6 +129,14 @@ export function DesktopSettingsSections({
       });
     } finally {
       setDesktopUpdateBusy(false);
+    }
+  }
+
+  async function installDesktopUpdate() {
+    try {
+      await window.sidekickDesktop?.installUpdate();
+    } catch {
+      onNotice('Could not restart to install the update.');
     }
   }
 
@@ -175,7 +192,10 @@ export function DesktopSettingsSections({
           <div className="settings-card-title">
             <div>
               <h2 id="desktop-updates-title">Desktop updates</h2>
-              <p>Check the latest published stable release and download updates in your browser.</p>
+              <p>
+                Check for stable releases. macOS and Windows packages can download updates in the
+                app.
+              </p>
             </div>
             <Download size={18} />
           </div>
@@ -189,19 +209,38 @@ export function DesktopSettingsSections({
               <RefreshCw size={13} /> {desktopUpdateBusy ? 'Checking…' : 'Check for updates'}
             </button>
             {desktopUpdate?.status === 'available' && (
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => void openDesktopReleasePage()}
-              >
-                <Download size={13} /> View version {desktopUpdate.latestVersion}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="small-button"
+                  onClick={() => void openDesktopReleasePage()}
+                >
+                  <Download size={13} /> View version {desktopUpdate.latestVersion}
+                </button>
+                {nativeUpdate?.state === 'downloaded' && (
+                  <button
+                    type="button"
+                    className="small-button"
+                    onClick={() => void installDesktopUpdate()}
+                  >
+                    Restart to install
+                  </button>
+                )}
+              </>
             )}
           </div>
           {desktopUpdate && (
             <p role="status" className="schedule-explainer">
               {desktopUpdate.status === 'available'
-                ? `Version ${desktopUpdate.latestVersion} is available. You have ${desktopUpdate.currentVersion}. Download it from the official release page and follow the platform install steps.`
+                ? nativeUpdate?.state === 'checking'
+                  ? `Version ${desktopUpdate.latestVersion} is available. Checking the signed update feed…`
+                  : nativeUpdate?.state === 'downloading'
+                    ? `Version ${desktopUpdate.latestVersion} is downloading${nativeUpdate.percent === undefined ? '…' : ` (${Math.round(nativeUpdate.percent)}%)`}`
+                    : nativeUpdate?.state === 'downloaded'
+                      ? `Version ${desktopUpdate.latestVersion} is ready. Choose Restart to install when convenient.`
+                      : nativeUpdate?.state === 'error'
+                        ? `${nativeUpdate.message} Version ${desktopUpdate.latestVersion} is available for manual installation.`
+                        : `Version ${desktopUpdate.latestVersion} is available. You have ${desktopUpdate.currentVersion}. Use the official release page to download it if in-app updates are unavailable.`
                 : desktopUpdate.status === 'current'
                   ? `You have the latest published version (${desktopUpdate.currentVersion}).`
                   : desktopUpdate.status === 'unreleased'
@@ -210,8 +249,9 @@ export function DesktopSettingsSections({
             </p>
           )}
           <p className="schedule-explainer">
-            Downloads are manual. Back up your local data before installing a release; see the
-            install guide for platform-specific steps.
+            In-app updates are supported by signed macOS and Windows releases. Linux updates use the
+            distribution package or the manual release download. Your local data remains in its
+            current data folder when the app updates.
           </p>
         </section>
       )}

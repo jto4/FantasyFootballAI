@@ -38,15 +38,26 @@ In Settings, enable **Launch at sign-in** to start the app in the background whe
 Closing the dashboard window hides the app to the system tray; choose **Quit Sunday Sidekick**
 from the tray menu to stop scheduled work.
 
+For scripted or headless desktop use, launch the packaged executable with
+`--sidekick-headless`. This starts the local API and scheduled work without opening a dashboard
+or tray icon. The service remains bound to loopback. Send SIGINT or SIGTERM to stop it cleanly
+on macOS and Linux. A regular launch using the same user-data directory can open the dashboard
+in the existing headless app process. This advanced mode is smoke-tested in the macOS package;
+Windows and Linux device lifecycle verification remains outstanding.
+
 ## Check for updates
 
 In the desktop app, open **Settings → Desktop updates** and choose **Check for updates**. The
-check asks GitHub for the latest published stable release; it sends no league, profile, or
-credential data. When an update is available, choose **View version** to open the official
-release page in your browser, then download and install the package for your operating system
-using the steps above. Back up local data before installing.
+check sends only the app version to GitHub. If a newer stable release exists, signed macOS and
+Windows packages check Electron's public update feed and download the update in the background.
+Sunday Sidekick asks before restarting to apply it; it never restarts automatically. If the
+native updater is unavailable, **View version** opens the official release page for a manual
+install. Linux updates use the distribution package or a manual release download.
 
-Downloads are installed manually; the app does not silently replace or restart itself. The
-repository still needs a published signed release, and interactive installation, upgrade, data
-folder migration, background-service, and credential-storage checks on each supported operating
-system before claiming full platform support.
+The updater sends the app version, operating system, and architecture to Electron's update
+service and downloads the matching public release asset. It does not send league, profile,
+message, or credential data. macOS automatic updates require a signed app; tagged releases also
+need the Squirrel.Windows `RELEASES`, full package, and installer assets. There is no public
+stable signed release yet, so automatic updates cannot be verified end to end. Interactive
+installation, upgrade, data-folder migration, background-service, and credential-storage checks
+on each supported operating system are still required before claiming full platform support.

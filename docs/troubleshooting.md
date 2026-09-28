@@ -71,9 +71,11 @@ service details, see the [setup guide](setup.md).
 ## Data, backups, and recovery
 
 - **The database cannot open:** do not delete or replace `state.sqlite` manually. Use the
-  desktop recovery prompt or the documented offline recovery command; both preserve the
-  original database and journals before replacing data. If recovery cannot validate a copy,
-  preserve the damaged files and consult the [recovery section in Setup](setup.md#desktop-installer).
+  desktop recovery prompt or the documented offline recovery command; salvage tries `.recover`
+  when a local SQLite CLI supports it, then falls back to independently readable valid rows.
+  Raw-page recovery is not available in every environment. The original database and journals
+  are preserved; if recovery cannot validate salvaged data or a safety copy, preserve the
+  damaged files and consult the [recovery section in Setup](setup.md#desktop-installer).
 - **An encrypted `.ssb` backup will not restore:** enter the original backup passphrase.
   There is no password reset for a per-file encrypted backup. Confirm the file is intact and
   keep a separate copy before retrying restore.

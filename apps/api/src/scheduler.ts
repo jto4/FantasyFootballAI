@@ -10,7 +10,7 @@ import {
 import type { ScheduledTask } from './lifecycle.js';
 import { errorName, logEvent } from './logger.js';
 
-export type ReportRunner = (action: ActionSetting) => Promise<void>;
+export type ReportRunner = (action: ActionSetting, occurrenceKey?: string) => Promise<void>;
 export type MissedRunHandler = (action: ActionSetting, missedAt: Date) => Promise<void> | void;
 export type CalendarEventRunner = (event: LeagueCalendarEvent) => Promise<void>;
 export type MissedCalendarEventHandler = (
@@ -105,6 +105,7 @@ export function isValidReportSchedule(value: unknown): value is ReportSchedule {
 export class ReportScheduler {
   private tasks: ScheduledTask[] = [];
   private readonly firedOneOffs = new Set<string>();
+  private readonly firedRecurringOccurrences = new Set<string>();
 
   constructor(
     private readonly run: ReportRunner,
@@ -129,6 +130,7 @@ export class ReportScheduler {
       const task = this.scheduleTask(
         toCronExpression(action.schedule),
         () => {
+          let occurrenceKey: string | undefined;
           if (action.schedule.frequency === 'once') {
             if (this.firedOneOffs.has(oneOffKey)) return;
             const now = new Date();
@@ -143,8 +145,16 @@ export class ReportScheduler {
             }
             if (!isOneOffDue(action.schedule, now)) return;
             this.firedOneOffs.add(oneOffKey);
+          } else {
+            occurrenceKey = recurringOccurrenceIdentity(action, new Date());
+            if (!occurrenceKey || this.firedRecurringOccurrences.has(occurrenceKey)) return;
+            this.firedRecurringOccurrences.add(occurrenceKey);
+            if (this.firedRecurringOccurrences.size > 1_024) {
+              const oldest = this.firedRecurringOccurrences.values().next().value;
+              if (oldest) this.firedRecurringOccurrences.delete(oldest);
+            }
           }
-          return this.run(action).catch((error: unknown) => {
+          return this.run(action, occurrenceKey).catch((error: unknown) => {
             if (action.schedule.frequency === 'once') this.firedOneOffs.delete(oneOffKey);
             this.onError(action.kind, error);
           });
@@ -276,4 +286,30 @@ export function isOneOffMissed(schedule: ReportSchedule, now: Date): boolean {
 
 function oneOffIdentity(schedule: ReportSchedule, kind: ActionSetting['kind']): string {
   return `${kind}:${schedule.date}:${schedule.time}:${schedule.timezone}`;
+}
+
+/** Prevent the repeated wall-clock minute at DST fall-back from running twice per action. */
+function recurringOccurrenceIdentity(action: ActionSetting, instant: Date): string | undefined {
+  const schedule = action.schedule;
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: schedule.timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(instant);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const localDate = `${values.year}-${values.month}-${values.day}`;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate)) return undefined;
+  return [
+    action.kind,
+    schedule.frequency,
+    schedule.weekday,
+    schedule.dayOfMonth ?? '',
+    schedule.time,
+    schedule.timezone,
+    localDate,
+  ].join(':');
 }

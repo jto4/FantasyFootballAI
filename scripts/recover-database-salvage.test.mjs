@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import Database from 'better-sqlite3';
-import { mkdtemp, mkdir, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, open, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { platform } from 'node:os';
 import {
   inspectDataDirectory,
+  findSqliteRecoverExecutable,
   isValidAppDatabase,
+  recoverSqlitePages,
   recoveryStoreModulePaths,
   salvageDamagedDatabase,
 } from './recover-database.mjs';
@@ -14,6 +17,109 @@ import {
 function addRow(database, table, id, value) {
   database.prepare(`INSERT INTO ${table} (id, payload) VALUES (?, ?)`).run(id, value);
 }
+
+await test('page recovery uses a supported local SQLite CLI without changing its source', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'sidekick-db-page-recovery-'));
+  const source = join(root, 'source.sqlite');
+  const recoveredPath = join(root, 'recovered.sqlite');
+  const database = new Database(source);
+  database.exec('CREATE TABLE fixture (id INTEGER PRIMARY KEY, payload TEXT NOT NULL)');
+  database.prepare('INSERT INTO fixture (payload) VALUES (?)').run('recoverable fixture row');
+  database.close();
+
+  try {
+    if (!findSqliteRecoverExecutable()) {
+      t.skip('No local SQLite CLI with .recover support.');
+      return;
+    }
+    await recoverSqlitePages(source, recoveredPath);
+    if (platform() !== 'win32') assert.equal((await stat(recoveredPath)).mode & 0o777, 0o600);
+    const recovered = new Database(recoveredPath, { readonly: true });
+    assert.equal(
+      recovered.prepare('SELECT payload FROM fixture WHERE id = 1').get().payload,
+      'recoverable fixture row',
+    );
+    recovered.close();
+    const original = new Database(source, { readonly: true });
+    assert.equal(original.prepare('SELECT COUNT(*) AS count FROM fixture').get().count, 1);
+    original.close();
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+await test(
+  'raw-page recovery salvages validated app rows without modifying the damaged database',
+  { skip: findSqliteRecoverExecutable() ? false : 'SQLite CLI with .recover is unavailable' },
+  async () => {
+    const root = await mkdtemp(join(tmpdir(), 'sidekick-db-raw-page-salvage-'));
+    const backups = join(root, 'backups');
+    const databasePath = join(root, 'state.sqlite');
+    await mkdir(backups);
+    const database = new Database(databasePath);
+    database.pragma('page_size = 512');
+    database.exec(`
+      CREATE TABLE app_settings (id INTEGER PRIMARY KEY, payload TEXT NOT NULL);
+      CREATE TABLE leagues (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
+      CREATE TABLE reports (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
+    `);
+    addRow(database, 'app_settings', 1, JSON.stringify({ actions: [] }));
+    const league = {
+      id: 'raw-league',
+      platform: 'sleeper',
+      name: 'raw league',
+      displayName: 'Raw Page Recovery League',
+      teamCount: 1,
+      scoring: {},
+      settings: {},
+      teams: [],
+      connectedAt: '2026-09-01T00:00:00.000Z',
+    };
+    addRow(database, 'leagues', league.id, JSON.stringify(league));
+    const insertReport = database.prepare('INSERT INTO reports (id, payload) VALUES (?, ?)');
+    for (let index = 0; index < 180; index += 1) {
+      const report = {
+        id: `report-${index}`,
+        leagueId: league.id,
+        kind: 'power-rankings',
+        createdAt: '2026-09-01T01:00:00.000Z',
+        title: `Report ${index}`,
+        body: `A recoverable body ${index}. `.repeat(40),
+        citations: [],
+        status: 'draft',
+      };
+      insertReport.run(report.id, JSON.stringify(report));
+    }
+    const pageSize = database.pragma('page_size', { simple: true });
+    const pageCount = database.pragma('page_count', { simple: true });
+    database.close();
+
+    const originalSize = (await stat(databasePath)).size;
+    // Damage an interior report page so row reads exercise the corruption path.
+    const damagedPage = Math.floor(pageCount / 2);
+    const file = await open(databasePath, 'r+');
+    try {
+      await file.write(Buffer.alloc(pageSize), 0, pageSize, damagedPage * pageSize);
+      await file.sync();
+    } finally {
+      await file.close();
+    }
+
+    try {
+      assert.equal(isValidAppDatabase(databasePath), false);
+      const result = await salvageDamagedDatabase(root);
+      assert.equal(result.rawPageRecovery, true);
+      assert.match(result.backupName, /-page-salvage-[a-f\d]{8}\.sqlite$/);
+      assert.ok(result.counts.leagues >= 1);
+      assert.ok(result.counts.reports > 0);
+      assert.equal((await stat(databasePath)).size, originalSize);
+      assert.equal(isValidAppDatabase(databasePath), false);
+      assert.equal(isValidAppDatabase(join(backups, result.backupName)), true);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  },
+);
 
 await test('partial-row salvage preserves valid records and omits malformed rows', async () => {
   const root = await mkdtemp(join(tmpdir(), 'sidekick-db-salvage-'));

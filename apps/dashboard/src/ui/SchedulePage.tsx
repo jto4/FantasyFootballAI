@@ -26,6 +26,7 @@ export function SchedulePage({
   reports,
   scheduledRuns,
   retryingRunId,
+  sendingReportId,
   onGenerate,
   onRetry,
   onSend,
@@ -34,6 +35,7 @@ export function SchedulePage({
   reports: SavedReport[];
   scheduledRuns: ScheduledRun[];
   retryingRunId: string;
+  sendingReportId: string;
   onGenerate: (kind: string) => void;
   onRetry: (run: ScheduledRun) => void;
   onSend: (reportId: string) => void;
@@ -200,14 +202,21 @@ export function SchedulePage({
               </p>
             </div>
             {report.status === 'draft' && report.deliveryState !== 'sending' && (
-              <button className="small-button" onClick={() => onSend(report.id)}>
-                {report.deliveryState === 'uncertain'
-                  ? 'Check & retry…'
-                  : report.deliveryState === 'failed'
-                    ? 'Retry send'
-                    : report.kind === 'chat-reply'
-                      ? 'Send to group'
-                      : 'Send now'}
+              <button
+                className="small-button"
+                onClick={() => onSend(report.id)}
+                disabled={Boolean(sendingReportId)}
+                aria-busy={sendingReportId === report.id}
+              >
+                {sendingReportId === report.id
+                  ? 'Sending…'
+                  : report.deliveryState === 'uncertain'
+                    ? 'Check & retry…'
+                    : report.deliveryState === 'failed'
+                      ? 'Retry send'
+                      : report.kind === 'chat-reply'
+                        ? 'Send to group'
+                        : 'Send now'}
               </button>
             )}
             {report.deliveryState === 'sending' && (

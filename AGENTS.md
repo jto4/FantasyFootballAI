@@ -32,4 +32,4 @@
 - `npm run build`: build shared packages before the API and dashboard so production imports resolve to compiled JavaScript.
 - `npm run perf:smoke`: build and measure local API startup, representative state latency, dashboard assets, and API memory; see `docs/performance.md` for scope and release limitations.
 - `npm run credentials:smoke`: build the API and round-trip a random temporary credential through the current OS credential store, then delete it; it does not touch saved Sidekick credentials.
-- `npm run news:smoke`: check the configured ESPN, PFF, and FOX Sports RSS feeds directly; this is an opt-in live check, not part of CI.
+- `npm run news:smoke`: check the configured ESPN, PFF, FOX Sports, CBS Sports, and Pro Football Talk RSS feeds directly; this is an opt-in live check, not part of CI.

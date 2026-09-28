@@ -10,5 +10,12 @@ contextBridge.exposeInMainWorld('sidekickDesktop', {
   getDataDirectory: () => ipcRenderer.invoke('sidekick:get-data-directory'),
   chooseDataDirectory: () => ipcRenderer.invoke('sidekick:choose-data-directory'),
   checkForUpdates: () => ipcRenderer.invoke('sidekick:check-for-updates'),
+  getUpdateStatus: () => ipcRenderer.invoke('sidekick:get-update-status'),
+  installUpdate: () => ipcRenderer.invoke('sidekick:install-update'),
+  onUpdateStatus: (listener) => {
+    const handler = (_event, status) => listener(status);
+    ipcRenderer.on('sidekick:update-status', handler);
+    return () => ipcRenderer.removeListener('sidekick:update-status', handler);
+  },
   openReleasePage: () => ipcRenderer.invoke('sidekick:open-release-page'),
 });

@@ -15,25 +15,31 @@ and privacy review; no automated security scan was run.
 - Both paths now reload settings after history retrieval and before each AI stage. They stop
   when member memory is off, the configured chat target changed, or an automatic poll was
   disabled while the provider request was in flight.
-- Member conversation analysis checks the current memory and analysis opt-in before each
-  participant-specific AI call. Mention-reply generation receives a fresh state snapshot
-  after history retrieval; iMessage also refreshes once more after member analysis.
+- Member conversation analysis now shares `group-chat-analysis.ts`, which checks the current
+  memory and analysis opt-in after provider setup, before each participant prompt, and after
+  each model response. It discards an in-flight response when consent changes.
 - Mention-reply generation now performs a synchronous last-moment check immediately before
   each model call, after asynchronous provider construction. It re-reads the destination,
   background polling and reply toggles, selected league, and the exact member-context text
-  that would be sent. A mismatch aborts before calling the model.
+  that would be sent. It repeats this check after the model response, so a revoked context
+  opt-in prevents the generated draft from being saved. A mismatch aborts the sync.
 - The final SQLite update still checks memory, target, polling, and reply controls before it
-  stores imported text, advances cursors, or saves drafts. This prevents an in-flight request
-  from persisting after an owner disables its settings.
+  stores imported text, advances cursors, or saves drafts. It also checks the current
+  conversation-analysis opt-in before saving generated notes. Imported source messages remain
+  local when AI analysis is revoked; existing notes are not overwritten.
 - A shared pure guard is covered for enabled manual sync, memory opt-out, target changes, and
   disabled background polling. A second shared guard now covers the final pre-generation
   check for reply opt-out, target and background-poll changes, selected-league changes, and
   changes to member-context sharing; both iMessage and Twilio use this same implementation.
+- Shared group-analysis tests cover opt-out during provider setup and an in-flight call, plus
+  per-author prompt isolation. The API-process integration turns off analysis during both
+  Twilio and BlueBubbles requests and verifies that existing notes remain unchanged.
 
 ## Validation
 
 - `npm run typecheck --workspace @sidekick/api`
-- `npm run test --workspace @sidekick/api -- src/chat-reply-consent.test.ts src/chat-replies.test.ts`
+- `npm run test --workspace @sidekick/api -- src/chat-reply-consent.test.ts src/chat-replies.test.ts src/group-chat-analysis.test.ts`
+- `node scripts/twilio-conversation-sync.integration.test.mjs`
 - Full `npm test`, `npm run typecheck`, `npm run lint`, and `npm run format:check`
 - Full project tests, lint, format check, production build, and packaged smoke checks are
   recorded separately in `docs/tasks.md`.

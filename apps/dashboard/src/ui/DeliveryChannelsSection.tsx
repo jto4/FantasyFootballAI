@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { Copy } from 'lucide-react';
 import type { AppSettings, LeagueConnection } from '@sidekick/core';
+import { LoadError, LoadingStatus } from './LoadFeedback.js';
 
 type AutoSyncStatus = {
   enabled: boolean;
@@ -19,9 +20,12 @@ type Props = {
   blueBubblesConfigured: boolean;
   imessageAutoSyncStatus: AutoSyncStatus | null;
   blueBubblesWebhookConfigured: boolean;
+  blueBubblesWebhookLoading: boolean;
+  blueBubblesWebhookError: string;
   blueBubblesWebhookUrl: string;
   onCreateWebhook: () => void;
   onRevokeWebhook: () => void;
+  onRetryWebhookStatus: () => void;
   onNotice: (message: string) => void;
 };
 
@@ -34,9 +38,12 @@ export function DeliveryChannelsSection({
   blueBubblesConfigured,
   imessageAutoSyncStatus,
   blueBubblesWebhookConfigured,
+  blueBubblesWebhookLoading,
+  blueBubblesWebhookError,
   blueBubblesWebhookUrl,
   onCreateWebhook,
   onRevokeWebhook,
+  onRetryWebhookStatus,
   onNotice,
 }: Props) {
   const validTwilioConversationTarget = /^CH[0-9a-fA-F]{32}$/.test(
@@ -213,8 +220,19 @@ export function DeliveryChannelsSection({
             the same bounded history sync and memory settings as polling. The URL contains a secret
             and is shown once; regenerate it if you lose it.
           </p>
+          {blueBubblesWebhookLoading && (
+            <LoadingStatus message="Checking BlueBubbles webhook status…" />
+          )}
+          {blueBubblesWebhookError && (
+            <LoadError message={blueBubblesWebhookError} onRetry={onRetryWebhookStatus} />
+          )}
           <div className="button-row">
-            <button type="button" className="small-button" onClick={() => void onCreateWebhook()}>
+            <button
+              type="button"
+              className="small-button"
+              disabled={blueBubblesWebhookLoading || Boolean(blueBubblesWebhookError)}
+              onClick={() => void onCreateWebhook()}
+            >
               {blueBubblesWebhookConfigured ? 'Regenerate webhook URL' : 'Create webhook URL'}
             </button>
             {blueBubblesWebhookConfigured && (

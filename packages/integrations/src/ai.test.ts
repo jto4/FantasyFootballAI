@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   AppleFoundationModelCLIProvider,
   LocalCLIProvider,
@@ -68,6 +70,17 @@ describe('LocalCLIProvider', () => {
     await expect(provider.generate({ system: 'private', prompt: 'private' })).rejects.not.toThrow(
       'sensitive prompt or credential',
     );
+  });
+
+  it('reports a missing CLI without disclosing its configured filesystem path', async () => {
+    const executable = join(tmpdir(), `private ai runtime ${process.pid}`, 'missing cli');
+    const provider = new LocalCLIProvider(executable);
+    const generation = provider.generate({ system: 'private', prompt: 'private' });
+
+    await expect(generation).rejects.toThrow(
+      'Could not start the configured AI CLI. Confirm it is installed and executable.',
+    );
+    await expect(generation).rejects.not.toThrow(executable);
   });
 
   it('rejects an empty CLI response', async () => {

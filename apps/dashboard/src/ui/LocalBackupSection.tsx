@@ -1,7 +1,8 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import { Download, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import type { AppSettings } from '@sidekick/core';
 import { normalizeActionSettings } from '@sidekick/core';
+import { EmptyStatus, LoadError, LoadingStatus } from './LoadFeedback.js';
 
 type SafetyBackup = { name: string; createdAt: string; size: number };
 type Props = {
@@ -16,13 +17,31 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
   const [backupPassphraseConfirmation, setBackupPassphraseConfirmation] = useState('');
   const [restorePassphrase, setRestorePassphrase] = useState('');
   const [safetyBackups, setSafetyBackups] = useState<SafetyBackup[]>([]);
+  const [safetyBackupsLoading, setSafetyBackupsLoading] = useState(true);
+  const [safetyBackupsError, setSafetyBackupsError] = useState('');
+
+  const refreshSafetyBackups = useCallback(async () => {
+    setSafetyBackupsLoading(true);
+    setSafetyBackupsError('');
+    try {
+      const response = await fetch('/api/backups');
+      if (!response.ok)
+        throw new Error(`Could not read local safety backups (${response.status}).`);
+      const backups = (await response.json()) as SafetyBackup[];
+      if (!Array.isArray(backups)) throw new Error('The local safety backup list was invalid.');
+      setSafetyBackups(backups);
+    } catch (error) {
+      setSafetyBackupsError(
+        error instanceof Error ? error.message : 'Could not read local safety backups.',
+      );
+    } finally {
+      setSafetyBackupsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    void fetch('/api/backups')
-      .then((response) => (response.ok ? response.json() : []))
-      .then((backups: SafetyBackup[]) => setSafetyBackups(Array.isArray(backups) ? backups : []))
-      .catch(() => onNotice('Could not read local safety backups.'));
-  }, [onNotice]);
+    void refreshSafetyBackups();
+  }, [refreshSafetyBackups]);
 
   async function downloadBackup() {
     if (backupPassphrase.length < 12 || backupPassphrase.length > 200) {
@@ -201,6 +220,13 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
           placeholder="Only needed for .ssb backups"
         />
       </label>
+      {safetyBackupsLoading && <LoadingStatus message="Loading local safety backups…" />}
+      {safetyBackupsError && (
+        <LoadError message={safetyBackupsError} onRetry={() => void refreshSafetyBackups()} />
+      )}
+      {!safetyBackupsLoading && !safetyBackupsError && safetyBackups.length === 0 && (
+        <EmptyStatus message="No local safety backups are currently saved." />
+      )}
       {safetyBackups.length > 0 && (
         <div className="safety-backup-list" aria-label="Local safety backups">
           <h3>Local safety copies</h3>

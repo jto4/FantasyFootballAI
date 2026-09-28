@@ -15,9 +15,9 @@ import {
 } from './shared.js';
 
 const sleeperPlayerCatalogTtlMs = 24 * 60 * 60 * 1_000;
-const sleeperPlayerCatalogMaxBytes = 6_000_000;
+const sleeperPlayerCatalogMaxBytes = 20_000_000;
 
-/** Sleeper asks clients to cache this roughly 5 MB reference dataset and fetch it at most daily. */
+/** Sleeper asks clients to cache this large reference dataset and fetch it at most daily. */
 export class SleeperPlayerCatalog {
   private loadedAt = 0;
   private retryAfter = 0;

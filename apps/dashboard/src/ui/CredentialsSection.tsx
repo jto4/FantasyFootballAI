@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import { Download, ShieldCheck, Trash2 } from 'lucide-react';
 import { credentialStatusLabel } from './credential-status.js';
+import { EmptyStatus, LoadError, LoadingStatus } from './LoadFeedback.js';
 
 export type SecretState = { provider: string; configured: boolean }[];
 export type LocalImage = { id: string; createdAt: string; size: number; mimeType: string };
@@ -10,8 +11,13 @@ const secrets: SecretDefinition[] = [
   { id: 'openai', name: 'AI API key', help: 'Used only when API mode is selected.' },
   {
     id: 'image-generation',
-    name: 'Image generation key',
-    help: 'Saved in the operating system credential store.',
+    name: 'OpenAI image generation key',
+    help: 'Used for GPT Image. Saved in the operating system credential store.',
+  },
+  {
+    id: 'stability-image-generation',
+    name: 'Stability AI image generation key',
+    help: 'Used for Stable Image Core. Saved in the operating system credential store.',
   },
   {
     id: 'espn',
@@ -50,6 +56,9 @@ type Props = {
   onResendTestRecipientChange: (recipient: string) => void;
   onTestTwilio: () => void;
   onTestResend: () => void;
+  imageProvider: 'openai' | 'stability';
+  onImageProviderChange: (provider: 'openai' | 'stability') => void;
+  imageProviderConfigured: boolean;
   imageGenerationConfigured: boolean;
   imagePrompt: string;
   onImagePromptChange: (prompt: string) => void;
@@ -57,6 +66,9 @@ type Props = {
   imageGenerationBusy: boolean;
   onCreateImage: () => void;
   localImages: LocalImage[];
+  imageLibraryLoading: boolean;
+  imageLibraryError: string;
+  onRefreshImages: () => void;
   onRemoveImage: (id: string) => void;
 };
 
@@ -75,6 +87,9 @@ export function CredentialsSection({
   onResendTestRecipientChange,
   onTestTwilio,
   onTestResend,
+  imageProvider,
+  onImageProviderChange,
+  imageProviderConfigured,
   imageGenerationConfigured,
   imagePrompt,
   onImagePromptChange,
@@ -82,6 +97,9 @@ export function CredentialsSection({
   imageGenerationBusy,
   onCreateImage,
   localImages,
+  imageLibraryLoading,
+  imageLibraryError,
+  onRefreshImages,
   onRemoveImage,
 }: Props) {
   return (
@@ -186,14 +204,38 @@ export function CredentialsSection({
           );
         })}
       </div>
-      {(imageGenerationConfigured || localImages.length > 0) && (
+      {(imageProviderConfigured ||
+        localImages.length > 0 ||
+        imageLibraryLoading ||
+        imageLibraryError) && (
         <div className="image-generation-tool">
+          {imageLibraryLoading && <LoadingStatus message="Loading saved images…" />}
+          {imageLibraryError && <LoadError message={imageLibraryError} onRetry={onRefreshImages} />}
+          {imageProviderConfigured && (
+            <>
+              <label htmlFor="image-generation-provider">Image provider</label>
+              <select
+                id="image-generation-provider"
+                value={imageProvider}
+                onChange={(event) =>
+                  onImageProviderChange(event.target.value === 'stability' ? 'stability' : 'openai')
+                }
+              >
+                <option value="openai">OpenAI · GPT Image</option>
+                <option value="stability">Stability AI · Stable Image Core</option>
+              </select>
+              {!imageGenerationConfigured && (
+                <p>Save the selected provider’s key above to enable image generation.</p>
+              )}
+            </>
+          )}
           {imageGenerationConfigured && (
             <>
               <label htmlFor="image-generation-prompt">Generate a league image</label>
               <p>
-                The prompt is sent to OpenAI for generation. GPT Image results are saved in your
-                local data folder; generation may incur API charges.
+                The prompt is sent to {imageProvider === 'openai' ? 'OpenAI' : 'Stability AI'} for
+                generation. Returned image data is saved in your local data folder; generation may
+                incur API charges.
               </p>
               <textarea
                 id="image-generation-prompt"
@@ -257,6 +299,10 @@ export function CredentialsSection({
               ))}
             </div>
           )}
+          {imageGenerationConfigured &&
+            !imageLibraryLoading &&
+            !imageLibraryError &&
+            localImages.length === 0 && <EmptyStatus message="No saved images yet." />}
         </div>
       )}
     </section>

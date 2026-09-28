@@ -21,7 +21,9 @@ async function copyProjectFiles() {
   await mkdir(staging, { recursive: true });
   await cp(join(root, 'apps/desktop/main.mjs'), join(staging, 'main.mjs'));
   await cp(join(root, 'apps/desktop/update-check.mjs'), join(staging, 'update-check.mjs'));
+  await cp(join(root, 'apps/desktop/native-updater.mjs'), join(staging, 'native-updater.mjs'));
   await cp(join(root, 'apps/desktop/background-tray.mjs'), join(staging, 'background-tray.mjs'));
+  await cp(join(root, 'apps/desktop/background-mode.mjs'), join(staging, 'background-mode.mjs'));
   await cp(join(root, 'apps/desktop/tray-icon.png'), join(staging, 'tray-icon.png'));
   await cp(join(root, 'apps/desktop/mcp-endpoint.mjs'), join(staging, 'mcp-endpoint.mjs'));
   await cp(join(root, 'apps/desktop/data-directory.mjs'), join(staging, 'data-directory.mjs'));
@@ -229,6 +231,25 @@ async function smokeCheckPackage(packageRoot) {
   if (mcpResult.status !== 0)
     throw new Error(
       `The packaged MCP smoke check failed (${mcpResult.status ?? mcpResult.signal}).`,
+    );
+
+  const headlessArguments = [
+    join(root, 'scripts', 'packaged-headless-smoke.mjs'),
+    executable,
+    join(staging, '.headless-smoke-data'),
+    ...(useXvfb ? ['--xvfb'] : []),
+    ...sandboxArgs,
+  ];
+  const headlessResult = spawnSync(process.execPath, headlessArguments, {
+    cwd: staging,
+    env: process.env,
+    timeout: 90_000,
+    stdio: 'inherit',
+  });
+  if (headlessResult.error) throw headlessResult.error;
+  if (headlessResult.status !== 0)
+    throw new Error(
+      `The packaged headless desktop smoke check failed (${headlessResult.status ?? headlessResult.signal}).`,
     );
 }
 

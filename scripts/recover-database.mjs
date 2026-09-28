@@ -1,12 +1,30 @@
 import Database from 'better-sqlite3';
+import { spawn, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { chmod, copyFile, mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import {
+  chmod,
+  copyFile,
+  mkdir,
+  open,
+  readdir,
+  rename,
+  rm,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const MAX_DATABASE_BYTES = 50 * 1024 * 1024;
-const BACKUP_NAME = /^before-(?:restore|upgrade)-[\dTZ.-]+(?:-salvage)?-[a-f\d]{8}\.sqlite$/;
+const MAX_RECOVERY_SCRIPT_BYTES = 100 * 1024 * 1024;
+const BACKUP_NAME =
+  /^before-(?:restore|upgrade)-[\dTZ.-]+(?:-page)?(?:-salvage)?-[a-f\d]{8}\.sqlite$/;
+const PAGE_RECOVERY_TIMEOUT_MS = 15_000;
+const SQLITE_CLI_CANDIDATES =
+  process.platform === 'win32'
+    ? ['sqlite3.exe', 'sqlite3']
+    : ['sqlite3', '/usr/bin/sqlite3', '/bin/sqlite3'];
 const DEFAULT_AI_RUNTIME = {
   mode: 'api',
   model: 'gpt-4o-mini',
@@ -65,6 +83,104 @@ export function isValidAppDatabase(path) {
   } finally {
     database?.close();
   }
+}
+
+/** Recover raw pages only when a local SQLite CLI exposes `.recover`; never invoke a shell. */
+export async function recoverSqlitePages(sourcePath, destinationPath) {
+  const executable = findSqliteRecoverExecutable();
+  if (!executable)
+    throw new Error('A local SQLite CLI with raw-page recovery support is unavailable.');
+  let lastFailure;
+
+  let recovery;
+  let importer;
+  let timer;
+  try {
+    await rm(destinationPath, { force: true });
+    // SQLite creates files using the process umask, which may make a recovery copy
+    // readable by other local accounts. Pre-create it with owner-only permissions.
+    const privateDestination = await open(destinationPath, 'wx', 0o600);
+    await privateDestination.close();
+    // --ignore-freelist avoids bringing deleted rows back into the owner's recovered library.
+    recovery = spawn(executable, [sourcePath, '.recover --ignore-freelist'], {
+      stdio: ['ignore', 'pipe', 'ignore'],
+      windowsHide: true,
+    });
+    importer = spawn(executable, [destinationPath], {
+      stdio: ['pipe', 'ignore', 'ignore'],
+      windowsHide: true,
+    });
+    // A parser error may close stdin before `.recover` finishes writing its bounded output.
+    importer.stdin.on('error', () => {});
+
+    let scriptBytes = 0;
+    let exceededLimit = false;
+    recovery.stdout.on('data', (chunk) => {
+      scriptBytes += chunk.length;
+      if (scriptBytes <= MAX_RECOVERY_SCRIPT_BYTES) return;
+      exceededLimit = true;
+      recovery.kill();
+      importer.kill();
+    });
+    recovery.stdout.pipe(importer.stdin);
+    timer = setTimeout(() => {
+      recovery.kill();
+      importer.kill();
+    }, PAGE_RECOVERY_TIMEOUT_MS);
+
+    const [recoveryExit, importerExit] = await Promise.all([
+      waitForProcess(recovery),
+      waitForProcess(importer),
+    ]);
+    if (exceededLimit) throw new Error('SQLite page recovery exceeded its output limit.');
+    if (recoveryExit.code !== 0 || importerExit.code !== 0 || scriptBytes === 0)
+      throw new Error('The installed SQLite CLI could not recover this database.');
+
+    const recovered = await stat(destinationPath);
+    if (!recovered.isFile() || recovered.size === 0 || recovered.size > MAX_DATABASE_BYTES)
+      throw new Error('SQLite page recovery produced an invalid or oversized database.');
+    await chmod(destinationPath, 0o600).catch(() => undefined);
+    return { scriptBytes, recoveredBytes: recovered.size };
+  } catch (error) {
+    lastFailure = error;
+    recovery?.kill();
+    importer?.kill();
+  } finally {
+    if (timer) clearTimeout(timer);
+    recovery?.stdout?.destroy();
+    importer?.stdin?.destroy();
+  }
+
+  throw new Error(
+    lastFailure instanceof Error
+      ? lastFailure.message
+      : 'A SQLite CLI with raw-page recovery support is unavailable.',
+  );
+}
+
+/** Resolve only a local executable that advertises the recovery command. */
+export function findSqliteRecoverExecutable() {
+  for (const executable of SQLITE_CLI_CANDIDATES) {
+    try {
+      const probe = spawnSync(executable, [':memory:', '.help recover'], {
+        encoding: 'utf8',
+        timeout: 2_000,
+        maxBuffer: 16 * 1024,
+        windowsHide: true,
+      });
+      if (probe.status === 0 && probe.stdout.includes('.recover')) return executable;
+    } catch {
+      // A missing candidate should not prevent probing later platform-specific paths.
+    }
+  }
+  return undefined;
+}
+
+function waitForProcess(child) {
+  return new Promise((resolve, reject) => {
+    child.once('error', reject);
+    child.once('close', (code, signal) => resolve({ code, signal }));
+  });
 }
 
 export async function inspectDataDirectory(dataDirectory) {
@@ -246,7 +362,7 @@ export async function moveDamagedDatabaseAside(dataDirectory) {
 }
 
 /** Copy every independently readable and application-valid record into a new safety backup. */
-export async function salvageDamagedDatabase(dataDirectory) {
+export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {}) {
   const servicePortPath = join(dataDirectory, 'service-port');
   if (
     await stat(servicePortPath).then(
@@ -256,7 +372,7 @@ export async function salvageDamagedDatabase(dataDirectory) {
   )
     throw new Error('Stop Sunday Sidekick before salvaging its database.');
 
-  const databasePath = join(dataDirectory, 'state.sqlite');
+  const databasePath = internalRecovery.sourcePath ?? join(dataDirectory, 'state.sqlite');
   try {
     const details = await stat(databasePath);
     if (!details.isFile() || details.size === 0 || details.size > MAX_DATABASE_BYTES)
@@ -265,8 +381,30 @@ export async function salvageDamagedDatabase(dataDirectory) {
     if (error?.code === 'ENOENT') throw new Error('No local database was found to salvage.');
     throw error;
   }
-  if (isValidAppDatabase(databasePath))
-    throw new Error('The current database is valid; no partial-row salvage is needed.');
+  let rawPageRecoveryFailure;
+  if (!internalRecovery.rawPageRecovery) {
+    if (isValidAppDatabase(databasePath))
+      throw new Error('The current database is valid; no partial-row salvage is needed.');
+
+    // Try SQLite's page-aware recovery before row salvage: integrity_check can detect
+    // corruption on pages that ordinary table reads never visit.
+    const recoveredPath = join(dataDirectory, `.page-recovery-${randomUUID()}.sqlite`);
+    try {
+      const pageRecovery = await recoverSqlitePages(databasePath, recoveredPath);
+      return await salvageDamagedDatabase(dataDirectory, {
+        sourcePath: recoveredPath,
+        rawPageRecovery: true,
+        pageRecovery,
+      });
+    } catch (error) {
+      // The local CLI may be absent or unable to recover; continue with row-level salvage.
+      rawPageRecoveryFailure = error;
+    } finally {
+      await rm(recoveredPath, { force: true });
+      await rm(`${recoveredPath}-wal`, { force: true });
+      await rm(`${recoveredPath}-shm`, { force: true });
+    }
+  }
 
   let database;
   let tables;
@@ -366,10 +504,17 @@ export async function salvageDamagedDatabase(dataDirectory) {
         );
       }
     }
-  } catch {
-    throw new Error(
-      'SQLite could not read the database pages. Use a valid safety copy or choose Start fresh from the app recovery prompt.',
-    );
+  } catch (error) {
+    const readError =
+      'SQLite could not read the database pages. Use a valid safety copy or choose Start fresh from the app recovery prompt.';
+    const pageError = internalRecovery.rawPageRecovery ? error : rawPageRecoveryFailure;
+    const detail =
+      pageError instanceof Error
+        ? pageError.message
+        : 'No local SQLite page-recovery tool could recover this file.';
+    throw new Error(`${readError} Raw-page recovery was unavailable or unsuccessful: ${detail}`, {
+      cause: error,
+    });
   } finally {
     database?.close();
   }
@@ -480,11 +625,17 @@ export async function salvageDamagedDatabase(dataDirectory) {
     await mkdir(backupsPath, { recursive: true, mode: 0o700 });
     await chmod(backupsPath, 0o700).catch(() => undefined);
     const timestamp = new Date().toISOString().replaceAll(':', '-');
-    const backupName = `before-restore-${timestamp}-salvage-${randomUUID().slice(0, 8)}.sqlite`;
+    const pageMarker = internalRecovery.rawPageRecovery ? '-page' : '';
+    const backupName = `before-restore-${timestamp}${pageMarker}-salvage-${randomUUID().slice(0, 8)}.sqlite`;
     const backupPath = join(backupsPath, backupName);
     await rename(temporaryDatabase, backupPath);
     await chmod(backupPath, 0o600).catch(() => undefined);
-    return { backupName, counts };
+    return {
+      backupName,
+      counts,
+      rawPageRecovery: internalRecovery.rawPageRecovery === true,
+      ...(internalRecovery.pageRecovery ? { pageRecovery: internalRecovery.pageRecovery } : {}),
+    };
   } finally {
     store?.close();
     await rm(temporaryDirectory, { recursive: true, force: true });

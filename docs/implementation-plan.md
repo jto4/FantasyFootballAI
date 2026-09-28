@@ -6,9 +6,9 @@ This document describes the target product, the current state of this repository
 the work needed to make it a polished project people can install and run. It is a plan,
 not a claim that the features below are already implemented. The dashboard stop control
 has been implemented and exercised against the combined development launcher. The dashboard
-now uses a responsive dark editorial design based on the linked reference's published
-description; the post metadata is visible, but its video does not play in the available
-browser view, so direct visual comparison remains unverified.
+uses a responsive warm editorial design informed by visible frames from the linked “wave +
+gradient” reference: cream surfaces, soft pastel gradients, quiet rules, and serif display
+type. See `docs/design/dashboard-visual-direction.md` for source and adaptation notes.
 
 The repository currently has a working local API and React dashboard, including a focused schedule/history view and tested season-status copy helper, a TypeScript npm
 workspaces structure, initial integrations, SQLite state persistence, MCP tools, and
@@ -18,6 +18,23 @@ draft-only MCP behavior, and a dashboard stop control. This is useful progress, 
 does not make the full product plan complete or release-ready. The current setup is
 appropriate for contributors who already use Node.js and npm; it is not yet an easy
 download-and-run experience for typical league owners.
+
+The Members & Imports dashboard now validates profile, imported-projection, and Resend inbox
+response shapes before rendering them. Malformed responses display retryable errors instead of
+being presented as empty data or reaching list-rendering code.
+Credential CRUD, Twilio/Resend setup checks, AI runtime validation, and API model discovery now
+live behind the injected `apps/api/src/provider-routes.ts` router. Focused tests cover explicit
+email-test confirmation, webhook-token cleanup, malformed credential values, and sanitized
+provider failures. Member profile edit/delete, source export/view, and privacy-preserving response
+shaping now live in `apps/api/src/member-memory-routes.ts`, with focused coverage for profile
+validation and deletion behavior. Both route refactors passed the local full-suite and
+production-build checks.
+Dashboard startup defaults and API state, news, and credential response guards now live in
+`apps/dashboard/src/ui/app-state.ts`, keeping external-state validation out of the top-level UI
+orchestrator; focused validator tests are collected in their own module.
+The RSS parser also excludes publication dates more than five minutes ahead of retrieval after
+a live ESPN response exposed scheduled content; regression coverage and a post-fix five-feed
+smoke are recorded in `docs/reviews/2026-09-28-news-future-publication-dates.md`.
 
 Readiness was reviewed on 2026-09-28. Treat the snapshot below as the current baseline;
 update it only after the workflows have been implemented and verified.
@@ -47,7 +64,7 @@ The packaged desktop app can now close its dashboard window to a system
 tray menu while keeping scheduled work alive; explicit tray Quit shuts down the service.
 Owners can also opt to start hidden at sign-in; Windows and Linux use a launch argument, and
 macOS checks Electron's login-item launch signal with the private preference. Ordinary starts
-stay visible. Tray behavior still needs verification on macOS, Windows, and Linux. Yahoo's installed-app OAuth flow now handles the out-of-band code grant,
+stay visible. The packaged macOS GUI has now been launched locally with an isolated data folder; first-run setup and cited news rendered. A separate isolated run confirmed that closing the window hides it while its loopback API keeps listening, and selecting the tray's Quit command logs `api.stopping` and releases the listener. DMG installation/upgrade and tray/sign-in lifecycle verification on Windows and Linux remain; macOS install/upgrade and sign-in behavior also remain open. Yahoo's installed-app OAuth flow now handles the out-of-band code grant,
 stores and refreshes tokens in the OS credential store, and clearly requires approved
 Fantasy Sports app access. Conversation imports now parse common JSON, CSV, EML, and
 labeled-text exports into per-author profiles while keeping each profile's authored source
@@ -56,13 +73,13 @@ existing import-created profiles, which updates style/context from prior notes o
 analysis is opted in. Exact re-imports are skipped and merged source blocks retain independent
 retention dates; common quoted EML replies are excluded from the sender's style sample.
 Report settings now include owner-controlled profanity and excluded-topic boundaries; import
-analysis still requires explicit opt-in. The linked X post's title and metadata are visible,
-but its video does not play in the available browser view. An indexed design archive describes
-the dark dashboard's near-black palette, oversized type,
-neutral surfaces, and restrained color accents. The responsive redesign is implemented and
-reviewed against that description; see `docs/design/dashboard-visual-direction.md` and its
-generated concept. Exact comparison to the original post remains unverified.
-Member profiles can now be excluded individually from AI prompts or scoped to all or selected leagues, so profile context is limited to the league whose report or chat reply is being generated. Report and group-chat profile context each require a separate owner opt-in. Settings also lists,
+analysis still requires explicit opt-in. The linked X post's visible frames were reviewed in the in-app browser. Per decision 018, the
+implemented dashboard uses the reference's warm cream, soft gradient, quiet-rule, and serif cues
+without copying its product layout. Desktop and narrow-width visual reviews cover empty, loading,
+error, and populated mock-data states; live connected-league and packaged multi-OS rendering
+remain open. See `docs/design/dashboard-visual-direction.md` and
+`docs/reviews/2026-09-28-dashboard-visual-review.md`.
+Member profiles can now be excluded individually from AI prompts or scoped to all or selected leagues, so profile context is limited to the league whose report or chat reply is being generated. Report and group-chat profile context each require a separate owner opt-in. Report generation rechecks the exact current member context after AI runtime setup, after inference, and inside the draft-save transaction; changed context stops the request or discards its result. Settings also lists,
 downloads, and deletes pre-restore safety copies; downloaded backup files remain separate copies
 under the owner's control. Owners can also set short, standard, or long report length targets;
 older local settings default to standard. Startup now creates and integrity-checks a private
@@ -78,19 +95,35 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The current macOS ARM DMG was rebuilt on 2026-09-28 06:24 UTC from the current source with Node.js
-25.9.0/npm 11.12.1 after fixing and testing Resend and group-chat memory-consent races, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
-MCP stdio handshake/tool call passed, and `hdiutil verify` confirmed the image checksum. SHA-256 is
-`45adc6967d0819332c809b263b638a47032961d204304502efc6d957b7da4e32`. It remains unsigned and not
-notarized; Intel Mac and Linux RPM packaging still need hosted verification, and interactive tray
-lifecycle checks remain open.
+The current macOS ARM package was rebuilt on 2026-09-28 from the current source with
+`npm run desktop:make`. The packaged API/dashboard, MCP stdio handshake/tool call, and
+headless API health/clean-shutdown smokes passed. The packaged `app.asar` contains the optimized
+hero WebP asset, verified by its bundled path in the archive. The build produced an architecture-specific
+update ZIP at `apps/desktop/out/make/zip/darwin/arm64/Sunday Sidekick-darwin-arm64-0.1.0.zip`.
+`hdiutil verify` confirmed the DMG at `apps/desktop/out/make/Sunday Sidekick-0.1.0-arm64.dmg`,
+SHA-256 `0a4fa1155e8801eb548d36ea0fd6a926e647d7e33b422e1c2f94e404838f1e09`; the update ZIP
+SHA-256 is `2be26a00661b1ca3a2e34570c44fb83931cb6b5a1abb2af0738b297a4d9f2c47`. The rebuilt
+artifact includes the extracted provider and member-memory API routers. Both are local
+unsigned builds; macOS auto-updates require signed packages. Raw-page CLI availability on
+Windows/Linux, Intel Mac and Linux RPM hosted verification, interactive installation, upgrade,
+and tray/sign-in lifecycle checks remain open. The copied DMG app bundle also passed an
+isolated health and clean-shutdown smoke.
+On 2026-09-28, the current working tree's full `npm test`, `npm run typecheck`, `npm run lint`,
+`npm run format:check`, and `npm run build` checks passed on macOS ARM. The test pipeline
+includes source-service, release-assembly, dependency-maintenance, API-process integration,
+and workspace suites (with platform-specific skips reported by the runner); the API, dashboard,
+core, and integration suites all pass. The expanded 80-profile/4.53 MiB imported-history benchmark now stays
+around 127–130 MiB RSS through ten report saves, after immutable source text was shared across
+state clones and report settings reads stopped cloning full state. A 12:06 UTC repeat measured
+130.2 MiB RSS, 2.75 ms p95 full-state latency, and 60.64 ms p95 synthetic report generation;
+see
+`docs/performance.md` for measurements and remaining cross-platform profiling work.
 
 Group-chat mention replies recheck destination, reply/background-poll switches, selected league,
 and member-context consent synchronously before each model call, including after asynchronous AI
 provider initialization. The focused API test and full local test suite cover the abort-before-model
 behavior; this is a local code change and has not yet been pushed or released.
-The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The polling configuration and restore behavior pass repository checks; live Twilio polling and
-Windows/Linux packaged runtime verification remain open.
+The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The API-process group-chat integration now exercises Twilio and BlueBubbles history sync with mocked credentials/providers, including mixed-author profile persistence and assertions that each opt-in AI analysis prompt excludes every other participant's messages, cursor deduplication, and memory-consent blocking. Live provider-account polling and Windows/Linux packaged runtime verification remain open.
 
 ### Readiness snapshot
 
@@ -111,7 +144,7 @@ dev` remains available for development.
   tasks continue, and explicit tray Quit stops the service. Windows Task Scheduler
   registration, launch, status, stop, and uninstall now run against a temporary task in CI;
   macOS LaunchAgent and Linux systemd service-manager lifecycles now have real runtime checks;
-  actual Windows sign-in execution and headless desktop operation remain unverified.
+  actual Windows sign-in execution and Windows/Linux packaged headless lifecycle verification remain.
 - **Is the entire product plan implemented?** No. Several platform connectors and
   provider paths are partial. Season-aware scheduling, platform verification, recovery edge cases,
   stable packaging dependencies, release packaging, and cross-platform validation remain open.
@@ -136,16 +169,16 @@ selected data.
 
 | Area                 | Current state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Work still needed                                                                                                                                                                                                                                                                                                                                                                               |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Download and install | Public source repository at `github.com/jto4/FantasyFootballAI` with clone-and-run instructions, npm workspaces, per-user service installer, guided setup, and self-contained Electron packages; Apple Silicon macOS DMG and bundled API/dashboard smoke check verified locally; hosted CI run `36375960956` passed source checks on all three operating systems and the Node.js 22.13 minimum check. The new package workflow builds separate Apple Silicon and Intel Mac installers alongside Windows and Linux; Intel Mac hosted verification is pending. macOS and Linux package runtime smokes passed. Windows package CI verifies the executable and now runs packaged MCP handshake and local API-call smoke coverage; interactive Windows GUI launch remains a manual support gate. Desktop Settings can check GitHub for the latest stable release and open its official page for manual download; no public stable release exists yet. Version tags assemble matrix artifacts into a draft release                                                                                                                                                                                                                                                                                                                                                       | Complete interactive Windows install and launch checks, code signing, notarization, automatic installer download/application, and managed desktop startup; publish a release after review                                                                                                                                                                                                       |
-| Run locally          | `npm ci` then `npm start`, `npm run dev`, or `npm run service -- install`; packaged app runs without system Node and can be configured to open visibly or hidden in the tray at sign-in; closing its window leaves scheduled work running until tray Quit; Desktop Settings can move a consistent database copy and safety backups to a user-selected folder; the macOS packaged move-and-restart flow passed an isolated manual check; hosted Windows CI validates recursive copy ACLs for the current user and Linux CI validates POSIX directory/file modes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Complete Windows/Linux packaged Settings move-and-restart checks, headless desktop operation, and production recovery                                                                                                                                                                                                                                                                           |
-| Dashboard            | Responsive near-black dashboard with oversized typography, warm-gray open sections, ruled rows, top-bar league selection, service status, resumable guided setup, provider-specific connection flows, dark forms, shared dismissible action notices, and separately maintained league-management and schedule/history views                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Direct comparison to the unavailable reference media; improve remaining empty/error/status states and add no-terminal installation wizard                                                                                                                                                                                                                                                       |
-| League platforms     | Sleeper, Yahoo, and ESPN current-week matchup scores; all three normalize roster and draft data when available; the dashboard selects an active league for desk views and report generation; Yahoo OAuth, bounded retries, per-league sync guidance, and opt-in 0–3 transient retries for scheduled league refreshes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Live account verification and cross-platform verification; Yahoo app approval is external                                                                                                                                                                                                                                                                                                       |
+| Download and install | Public source repository at `github.com/jto4/FantasyFootballAI` with clone-and-run instructions, npm workspaces, per-user service installer, guided setup, and self-contained Electron packages; Apple Silicon macOS DMG and bundled API/dashboard smoke check verified locally; hosted CI run `36375960956` passed source checks on all three operating systems and the Node.js 22.13 minimum check. The new package workflow builds separate Apple Silicon and Intel Mac installers alongside Windows and Linux; Intel Mac hosted verification is pending. macOS and Linux package runtime smokes passed. Windows package CI verifies the executable and now runs packaged MCP handshake and local API-call smoke coverage; interactive Windows GUI launch remains a manual support gate. Desktop Settings checks the latest stable release; signed macOS and Windows builds can download Electron updates in-app and require owner approval before restart, while Linux continues through package-manager/manual updates. No public stable release exists yet, so update delivery remains unverified. Version-tag drafts include the architecture-specific macOS updater ZIPs, Windows Squirrel `RELEASES` and full package assets, plus `UPDATE-SHA256SUMS`                                                                                                    | Complete interactive Windows install and launch checks, validate credentialed signing on hosted Mac and Windows runners, end-to-end native updater verification against a published signed release, and managed desktop startup checks; publish a release after review                                                                                                                          |
+| Run locally          | `npm ci` then `npm start`, `npm run dev`, or `npm run service -- install`; packaged app runs without system Node and can be configured to open visibly or hidden in the tray at sign-in; closing its window leaves scheduled work running until tray Quit; optional `--sidekick-headless` mode starts the loopback API and scheduled tasks without a dashboard/tray, verified in a packaged Apple Silicon smoke check; Desktop Settings can move a consistent database copy and safety backups to a user-selected folder; the macOS packaged move-and-restart flow passed an isolated manual check; hosted Windows CI validates recursive copy ACLs for the current user and Linux CI validates POSIX directory/file modes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Complete Windows/Linux packaged Settings move-and-restart and headless lifecycle checks, and production recovery                                                                                                                                                                                                                                                                                |
+| Dashboard            | Responsive warm editorial dashboard with cream surfaces, serif display headings, locally bundled gradient-wave art, ruled sections, restrained clay accents, top-bar league selection, service status, resumable guided setup, provider-specific settings, accessible retry feedback, and separated Leagues and Schedule views; empty, delayed, 503, invalid-state, and populated fixture states were visually reviewed at desktop/mobile widths, with no overflow at 320px and 390px and no browser warnings/errors during the latest populated review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Compare populated screens against a connected owner league and verify dashboard rendering in packaged builds for each supported OS                                                                                                                                                                                                                                                              |
+| League platforms     | Sleeper, Yahoo, and ESPN current-week matchup scores; all three normalize roster and draft data when available; Yahoo roster requests use the documented teams/roster collection path for the matchup current week; Yahoo and ESPN current-week values are bounded to weeks 1–30 before supplemental requests, with fixtures for selected positions and invalid-week rejection; the dashboard selects an active league for desk views and report generation; Yahoo OAuth, bounded retries, per-league sync guidance, and opt-in 0–3 transient retries for scheduled league refreshes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Live account verification and cross-platform verification; Yahoo app approval is external                                                                                                                                                                                                                                                                                                       |
 | Fantasy analysis     | Played-season rankings use a comparable metric; preseason rankings can use the newest scoring-confirmed owner projection source only with complete equal-size rosters and unambiguous player matches, with full-roster totals labeled as estimates rather than starter projections or win forecasts, requiring ID matches to agree on normalized name and allowing name-only matches only when unique; all three adapters can provide draft picks and roster data; owners can import up to eight source-attributed season and week-specific projection CSV sets per league; each set requires owner confirmation that point values match league scoring, and unconfirmed/legacy sets are excluded from numeric analysis; draft evidence computes per-team projected surplus only when every logged pick, team, positional starter count, and replacement baseline is available, allocating FLEX/receiver-FLEX/SUPER_FLEX slots to eligible positions by the strongest next projected replacement and withholding unsupported configurations; matchup estimates sum imported weekly values when both sides have a complete starter-ID or normalized active-roster-slot snapshot and matching projections; roster-derived estimates disclose the platform sync time; optional licensed nflverse injury evidence uses exact current-week roster matches and citations | Verified lineup semantics/freshness across platforms, independently verified market ADP, and broader league-format validation remain; owner-imported ADP now supports medians from at least three scoring-confirmed matched source sets, while team process grades still require a complete draft log and positional replacement baselines; imported estimates do not establish actual outcomes |
 | Scheduled content    | Per-action daily/weekly/monthly and one-time local date/time schedules, selected league targeting, persistent one-shot completion, missed-date history, and per-league run outcomes; owners can add single-date league calendar milestones which refresh their league and always save a draft; one shared minute tick processes events serially, skipped daylight-saving local times are rejected, Sleeper, Yahoo, and ESPN draft start timestamps can prefill a draft-hype event in the owner timezone; Settings can apply monthly offseason updates plus suggested Tuesday power rankings and Wednesday matchup previews while preserving each action’s timezone, league scope, and delivery policy; each recurring run refreshes the league and reevaluates report eligibility from the latest season phase without changing the owner-configured cadence; the desk and report guidance recognize Yahoo/Sleeper playoff weeks only when current and start weeks are available, label ESPN-derived playoff status as possible, and mark completed seasons explicitly; event completion and retryable missed/interrupted runs persist across restart                                                                                                                                                                                                              | Yahoo and Sleeper playoff weeks are recognized from platform current-week and start-week fields; ESPN playoff start is estimated only for explicit H2H schedule settings and labeled as inferred; live season-phase data validation remains open                                                                                                                                                |
-| Football news        | Owner-selectable ESPN NFL, PFF, FOX Sports NFL, and CBS Sports NFL feeds, exact allow-listed Markdown citations rendered as clickable inline links, configurable background refresh, manual refresh, request coalescing, stale-cache fallback, partial-feed status, empty successful responses treated as source failures, and FOX Sports terms shown before use; CBS headlines are link-only; `npm run news:smoke` verified ESPN, PFF, FOX Sports, and CBS Sports (10 parseable headlines and citation URLs each) on 2026-09-28 06:19 UTC                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Ongoing repeated live-feed availability verification                                                                                                                                                                                                                                                                                                                                            |
+| Football news        | Owner-selectable ESPN NFL, PFF, FOX Sports NFL, CBS Sports NFL, and Pro Football Talk feeds, exact allow-listed Markdown citations rendered as clickable inline links, configurable background refresh, manual refresh, request coalescing, stale-cache fallback, partial-feed status, transient GET retries, empty successful responses treated as source failures, and RSS publication times more than five minutes ahead of retrieval are filtered, and FOX Sports terms shown before use; CBS headlines are link-only; `npm run news:smoke` verified ESPN, PFF, FOX Sports, and CBS Sports (10 parseable headlines and citation URLs each) on 2026-09-28 07:50 UTC; 2026-09-28 08:08 UTC and 08:32 UTC follow-ups verified Pro Football Talk and repeated all five feeds; the 12:02 UTC post-filter sample returned six ESPN headlines and ten from each other feed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Ongoing repeated live-feed availability verification; NFL.com’s `?service=rss` news page returned HTML during inspection rather than a usable RSS feed, so no NFL.com feed adapter is included                                                                                                                                                                                                  |
 | AI runtimes          | OpenAI-compatible API and local CLI adapters, with a save-and-test action using a data-free prompt; owners can explicitly discover bounded model IDs from the configured API endpoint; generic CLI stderr is discarded, stdin pipe failures are contained, and quoted argument values are passed without shell evaluation; macOS offers Apple's `fm respond` CLI with separate instructions and prompt arguments and documents argv visibility; API reports retain returned input/output token usage and show approximate cost when owners enter both token prices                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Live `fm` verification requires macOS 27+ (the local host is macOS 26.6); estimates exclude provider discounts, cached-token rates, and other billing adjustments; provider-specific request parameters beyond temperature/output limit and consistent external tool interfaces                                                                                                                 |
-| Image generation     | Settings accepts an image-generation API key in the OS credential manager; GPT Image base64 output is stored as private files in the local data folder with list, preview, download, delete, and desktop data-folder move support; Settings exports a bounded ZIP backup containing both SQLite state and generated images and restores it with archive path validation and a coupled rollback; legacy SQLite-only backups remain supported; secure hosted-image URLs remain session-only                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Additional providers and live provider verification                                                                                                                                                                                                                                                                                                                                             |
-| Messaging and email  | Resend/Twilio SMS plus owner-addressed delivery and manual paginated history import for existing Twilio Conversations groups, per-action settings, manual Resend replies, persisted attempt receipts, Resend idempotency on retries, atomic SQLite delivery claims, read-only Twilio credential validation, explicitly confirmed data-free Resend test emails, BlueBubbles group delivery, owner-triggered plus opt-in 5/15/30/60-minute polling of up to 200 recent messages with a deduplication cursor, plus revocable one-time-displayed webhook URLs whose new-message events trigger the same bounded history sync; Twilio Conversations history also supports off-by-default 5/15/30/60-minute polling through the bounded page importer; owner-triggered Resend received-email import without public webhooks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Twilio SMS/Conversations send idempotency (not documented for these send endpoints), live platform verification, and runtime exercise of Twilio polling                                                                                                                                                                                                                                         |
+| Image generation     | Settings accepts separate OpenAI and Stability AI image API keys in the OS credential manager and lets owners select GPT Image or Stable Image Core; the provider choice is remembered in local browser storage; GPT Image base64 and Stability AI binary output are stored as private files in the local data folder with list, preview, download, delete, and desktop data-folder move support; Settings exports a bounded ZIP backup containing both SQLite state and generated images and restores it with archive path validation and a coupled rollback; legacy SQLite-only backups remain supported; secure hosted-image URLs from OpenAI-compatible models remain session-only                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Live provider-account verification                                                                                                                                                                                                                                                                                                                                                              |
+| Messaging and email  | Resend/Twilio SMS plus owner-addressed delivery and manual paginated history import for existing Twilio Conversations groups, per-action settings, manual Resend replies, persisted attempt receipts, Resend idempotency on retries, atomic SQLite delivery claims, read-only Twilio credential validation, explicitly confirmed data-free Resend test emails, BlueBubbles group delivery, owner-triggered plus opt-in 5/15/30/60-minute polling of up to 200 recent messages with a deduplication cursor, plus revocable one-time-displayed webhook URLs whose new-message events trigger the same bounded history sync; Twilio Conversations history also supports off-by-default 5/15/30/60-minute polling through the bounded page importer, now covered by an API-process mocked runtime check for provider-error retry without cursor/profile mutation, profile persistence, cursor deduplication, and memory-consent blocking; owner-triggered Resend received-email import without public webhooks                                                                                                                                                                                                                                                                                                                                                         | Twilio SMS/Conversations send idempotency (not documented for these send endpoints) and live platform verification                                                                                                                                                                                                                                                                              |
 | Memory and style     | Local JSON/CSV/EML/labeled-text, BlueBubbles history, and paginated Twilio Conversations history imports, author preview, explicit author-to-profile mapping, opted-in AI note updates from prior notes, exact re-import deduplication, and independent source retention dates; per-author editable profiles and banter preferences, per-member report-prompt exclusion, per-league profile scopes, configurable report length, four built-in voices plus up to 20 locally saved owner-named style presets with apply/replace/delete controls, source review/export/deletion, master pause, opt-in AI analysis with import-screen disclosure, email/SMS export fixtures, common EML quote separation, clearable style/context notes, message-level retention for live chat, explicit backup-copy retention guidance, and a 32,000-character aggregate report-context cap with an explicit omission note. API and persisted-state boundaries validate preset count, names, uniqueness, and content size                                                                                                                                                                                                                                                                                                                                                             | No known gaps in the listed import, review, deletion, and retention workflows; generated prose adherence remains probabilistic                                                                                                                                                                                                                                                                  |
 | Persistence          | Versioned SQLite tables, dashboard backup/restore, private pre-restore and automatic pre-upgrade safety copies, OS-backed credential storage, an offline integrity check/validated safety-copy restore command, and packaged-app startup recovery that salvages independently valid rows into a labeled backup or preserves unreadable files before starting an empty library                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Raw-page salvage, professional recovery without a valid backup, and cross-platform verification                                                                                                                                                                                                                                                                                                 |
 | Project operations   | Docs, tests, lint/format, separate manual code and security release checklists in `SECURITY.md`, contributor guide, a support matrix that separates implemented paths from verified support, an on-demand/tag-triggered OS-matrix package workflow with installation guide and license attached to release assets and included in each ZIP, and a local Settings viewer for bounded filtered desktop and installed source-service API logs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Manual publication after review, signing, upgrade path, ongoing checklist completion, owner review of support claims, and verified supported platforms                                                                                                                                                                                                                                          |
@@ -172,20 +205,19 @@ npm run service -- status
 
 The dashboard now applies the linked post's visual direction:
 [Bakers Studio, “wave + gradient”](https://x.com/studiobakers/status/2101998189889122451?s=46).
-The post's “wave + gradient” title and metadata are visible, but its video does not play in
-the available browser view. An [indexed reference description](https://selectedscreens.com/s/bakers-branch/)
-describes the dark surface, oversized type, soft-focus imagery, and small modular accents.
-The implementation uses those broad visual cues without claiming exact layout fidelity or
-copying the source imagery. See `docs/design/dashboard-visual-direction.md`.
+Visible frames show a warm cream canvas, soft pastel gradients, quiet floating surfaces,
+and editorial serif type. The implementation adapts that mood without copying the layout.
+See `docs/design/dashboard-visual-direction.md`.
 
-The result is a dark editorial fantasy-football league desk that keeps core tasks,
+The result is a warm editorial fantasy-football league desk that keeps core tasks,
 matchups, rankings, reports, and news fast to scan. The linked reference is inspiration,
-not an asset or a layout to copy.
+not a layout to copy. Generated hero background artwork is bundled locally.
 
 Design goals:
 
 - Establish a cohesive visual system for the dashboard shell and league views, with a
-  near-black base, oversized type, neutral surfaces, thin rules, and restrained accents.
+  warm off-white base, editorial display type, neutral surfaces, thin rules, and restrained
+  clay and pastel accents.
 - Keep scores, controls, and dense league information stable and legible; respect reduced
   motion in remaining animated controls.
 - Make the next league event, this week's matchups, recent reports, and news easy to find.
@@ -197,9 +229,8 @@ Design goals:
 
 Design acceptance criteria:
 
-- The redesign follows the available reference description and records which reference
-  details remain unverified.
-- The finished dashboard has a cohesive dark identity without harming text contrast or
+- The redesign follows visible frames from the reference and records its adaptation.
+- The finished dashboard has a cohesive warm identity without harming text contrast or
   data scanability.
 - League tasks remain easy to locate on desktop and narrow screens; motion never blocks
   content or controls and respects `prefers-reduced-motion`.
@@ -216,7 +247,10 @@ Design acceptance criteria:
 - Sleeper rosters now retain player IDs and resolve names, positions, NFL teams, and status
   through a bounded player catalog download. The catalog is shared in memory and refreshed
   no more than once per day; an outage preserves the league connection with IDs and roster
-  sizes. Standings combine `fpts` with the documented two-digit `fpts_decimal` component, so
+  sizes. The 2026-09-28 public-catalog smoke measured a 14,661,302-byte decoded response and
+  12,229 normalized players; the 20 MB cap now accommodates this current catalog, and known
+  player IDs/names/positions passed. Standings combine `fpts` with the documented two-digit
+  `fpts_decimal` component, so
   power rankings retain fractional points. [Sleeper documents roster points fields and the
   catalog as roughly 5 MB, and requests no more than daily
   retrieval](https://docs.sleeper.com/#players).
@@ -272,12 +306,12 @@ Design acceptance criteria:
   coupling the core product to one model or agent runtime.
 - Retrieve relevant football news from the internet, summarize it with source citations,
   and make source links visible in generated reports. Owners can select the built-in ESPN
-  NFL, PFF, FOX Sports NFL, and CBS Sports NFL feeds independently; clearing all prevents external news
+  NFL, PFF, FOX Sports NFL, CBS Sports NFL, and Pro Football Talk feeds independently; clearing all prevents external news
   requests. FOX Sports requires attribution and limits free feed use to individual or nonprofit
   noncommercial use; Settings shows that condition before it is enabled. Feed information is
   available from [ESPN](https://www.espn.com/espn/news/story?page=rssinfo), the
   [PFF RSS feed list](https://www.pff.com/pff-rss), and the
-  [FOX Sports RSS directory](https://www.foxsports.com/rss-feeds), and the [CBS Sports NFL RSS feed](https://www.cbssports.com/rss/headlines/nfl/). CBS stories are presented as attributed headline links; the app does not fetch their article text.
+  [FOX Sports RSS directory](https://www.foxsports.com/rss-feeds), the [CBS Sports NFL RSS feed](https://www.cbssports.com/rss/headlines/nfl/), and [NBC Sports' Pro Football Talk RSS feed](https://www.nbcsports.com/profootballtalk.rss). CBS and Pro Football Talk stories are presented as attributed headline links; the app does not fetch article text.
 - Reports include a news citation only when the generated body links an exact URL from the
   bounded story list supplied to the AI; unused articles and invented URLs are not attached
   as supporting citations.
@@ -308,7 +342,11 @@ Design acceptance criteria:
   deletable. Show which imported source contributed to a memory.
 - Keep imported-conversation analysis and member-context sharing with AI disabled by
   default. Report sharing and group-chat reply sharing each have a separate owner opt-in;
-  explain which reviewed profile notes are sent for each use.
+  explain which reviewed profile notes are sent for each use. Conversation-import AI analysis
+  rechecks consent after provider setup, before each participant prompt, after each model
+  response, and when committing notes so revocation stops subsequent disclosures and prevents
+  stale analysis from being saved. Report generation also revalidates the exact member context
+  before model use, after inference, and at draft persistence.
 - Support league-specific context and per-member preferences. A master switch now pauses
   imports and all AI use of member memory without erasing saved profiles; owners can delete
   all profiles and their imported source messages from the memory page. Owners can exclude
@@ -331,8 +369,9 @@ Design acceptance criteria:
       dashboard lists at most 50 bounded message headers, fetches a selected body only after an owner
       action, strips quoted history, deduplicates by Resend message ID, merges into a sender profile,
       honors per-message retention, and never derives an outbound recipient or sends a reply. Focused
-      router tests cover local-only import, duplicate detection, memory and AI opt-ins, and sanitized
-      credential/provider failures; provider adapter tests cover response bounds and malformed data.
+      router tests cover local-only import, duplicate detection, memory and AI opt-ins, consent
+      revocation during runtime setup, inference, and persistence, and sanitized credential/provider
+      failures; provider adapter tests cover response bounds and malformed data.
 - [~] Add iMessage through the documented BlueBubbles bridge; outbound group delivery,
   owner-triggered history sync, optional interval polling, and revocable webhook URLs are
   available with an owner-managed Mac bridge, secure credentials, HTTPS requirements, existing
@@ -370,11 +409,14 @@ Design acceptance criteria:
   pre-upgrade safety copies use private filesystem permissions but are not passphrase-encrypted.
   Preserve explicit export and deletion operations.
 - Validate imported files and remote responses with size limits, timeouts, and safe
-  parsing. Treat imported conversation text as data, never as executable instructions.
+  parsing. Treat imported conversation text as data, never as executable instructions; AI prompts
+  now place imported, live chat, report, and league evidence inside 96 KB-limited JSON data blocks with
+  escaped markup delimiters and system guidance not to follow embedded instructions. Adversarial
+  input cases cover imported and chat prompts; generated text still requires owner review.
 - Provide a security policy and release checklist. Keep CI focused on type checks, lint,
   formatting, tests, and builds; perform documented manual code and security reviews before
-  releases. Do not add or run automated security scans.
-- Schedule periodic refactoring to reduce duplication and maintain clear package
+  releases. Do not add or run automated security scans. `.github/workflows/quarterly-maintenance.yml` opens one checklist issue on January, April, July, and October 7, deduplicating an already-open issue for that quarter; `scripts/quarterly-maintenance.mjs` tests quarter naming, duplicate suppression, issue creation, and repository validation. Maintainers record findings and complete manual review items in the issue.
+- Review refactoring opportunities quarterly and before each release to reduce duplication and maintain clear package
   boundaries; record architecture changes in decision notes. The first refactoring pass moved the platform adapters behind the integrations barrel
   (decision 009); a follow-up separated Sleeper, Yahoo, and ESPN into focused modules with
   shared parsing helpers (decision 011). Continue this review during every release cycle.
@@ -383,28 +425,45 @@ Design acceptance criteria:
 
 ### Phase 1: Easy setup and dashboard redesign
 
-- [~] Resolve the dashboard reference: the X image is unavailable, so the current design
-  follows its indexed public description; exact frame review remains unverified.
-- [~] Apply a coherent responsive dark dashboard shell, league desk, typography, top-bar
-  league selector, and open ruled sections based on the available Bakers Studio reference
-  description; direct comparison with the unavailable original media remains.
-- Add guided first-run setup for data directory, league source, AI runtime, and optional
+- [x] Review the linked dashboard reference frames and record its visual direction and
+      adaptation in `docs/design/dashboard-visual-direction.md`.
+- [x] Apply a warm responsive dashboard shell and hero treatment with locally bundled
+      generated gradient artwork while retaining league controls and status.
+- [x] Review the redesigned dashboard at desktop and narrow widths, including key
+      empty/loading/error states. Desktop home and Settings plus 390px first-run, Settings,
+      Leagues, Schedule, Imports, and Members & Memory pages were inspected; a 320px Leagues view
+      has no horizontal overflow. The review caught and corrected page-heading, Settings-label,
+      form-field, and brand contrast. Empty states are visible and readable; loading/error states
+      have component tests; the 503 error state was also forced and checked at desktop and mobile,
+      including successful recovery through **Try again**. The initial loading state was held at
+      desktop and mobile and released successfully. A mocked invalid `200` state response was also
+      held at desktop and mobile; the mobile retry button initially spilled outside its alert, so the
+      alert layout was corrected and rechecked before retry successfully restored the dashboard. Populated home, Leagues, and Schedule views were also reviewed at 390px using an in-memory
+      fixture; the page and body widths matched the viewport and there were no browser warnings or
+      errors. This does not replace live-provider verification. The current review is recorded in
+      `docs/reviews/2026-09-28-dashboard-visual-review.md`.
+- [~] Add guided first-run setup for data directory, league source, AI runtime, and optional
   delivery providers. The dashboard now offers a resumable three-step guide that opens the
   existing league connection and AI/style settings screens, plus direct optional jumps to
-  delivery credentials and the local data-folder setting in the packaged desktop app. Desktop Settings now allows a
-  user-selected data directory with a consistent SQLite copy, safety-backup copy, and restart;
-  the original location remains as a rollback copy. No-terminal provider setup remains.
-- Check Node.js 22.13+ before the main start, dev, build, and service commands, and make
-  missing runtime prerequisites and connection failures actionable.
+  delivery credentials and the local data-folder setting in the packaged desktop app. The API
+  runtime card now reports whether its key is saved and jumps directly to the credential editor.
+  Desktop Settings now allows a user-selected data directory with a consistent SQLite copy,
+  safety-backup copy, and restart;
+  the original location remains as a rollback copy. Downloadable public installs and remaining
+  no-terminal provider onboarding still need completion.
+- [x] Check Node.js 22.13+ before the main start, dev, build, and service commands, and make
+      missing runtime prerequisites and connection failures actionable.
 - [x] Establish a single production-style local launch command (`npm start`) that builds,
       waits for service health, opens the dashboard, and exits after dashboard shutdown.
 - [~] Add source-checkout per-user background service install/start/stop/status/uninstall
   commands for macOS, Windows, and Linux; packaged Settings registers launch at sign-in and
-  can start hidden in the tray on the next sign-in. A bundled Electron runtime has a local
-  macOS ARM installer path, while headless desktop operation and on-device platform
-  verification remain.
-- Add an obvious dashboard stop control with confirmation, graceful scheduler/API
-  shutdown, and clear instructions for starting the app again.
+  can start hidden in the tray on the next sign-in. Packaged `--sidekick-headless` mode starts
+  the loopback API and scheduled work without a window or tray, and SIGTERM shuts it down
+  cleanly on macOS. The Apple Silicon package workflow now smoke-checks API health and shutdown
+  alongside dashboard and MCP behavior. Headless operation is implemented; Windows/Linux
+  packaged execution and interactive lifecycle verification remain.
+- [x] Add an obvious dashboard stop control with confirmation, graceful scheduler/API
+      shutdown, and clear instructions for starting the app again.
 - [x] Respect reduced-motion preferences globally for animations, transitions, scrolling,
       decorative waves, and loading indicators.
 
@@ -417,15 +476,16 @@ runtime bundling, first-run configuration, and background-service setup.
 
 - [x] Replace the state file with SQLite, schema migration tracking, separate domain tables, transactional persistence, and one-time import of legacy JSON state.
 - [x] Save an integrity-checked private copy of a recognized existing database before schema migration; expose the copy in local backup management.
-- [~] Add an offline database recovery command and packaged-app startup recovery prompt. Both inspect integrity and required state rows, validate selected safety copies, preserve the previous database and SQLite journals, and reset saved automatic sends/custom runtimes for owner review. Startup salvages independently readable and application-valid normalized rows into a labeled backup; offline `--salvage` mode does the same without replacing the damaged source. With no recoverable records or backup, owners can preserve unreadable files and start an empty library; raw-page salvage and professional recovery without a valid backup remain.
+- [~] Add an offline database recovery command and packaged-app startup recovery prompt. Both inspect integrity and required state rows, validate selected safety copies, preserve the previous database and SQLite journals, and reset saved automatic sends/custom runtimes for owner review. Salvage first attempts SQLite `.recover --ignore-freelist` when an installed local CLI exposes the command, then validates and salvages application rows into a labeled backup; if raw recovery is unavailable or fails, it salvages independently readable normalized rows. Raw-page recovery pre-creates its intermediate database with owner-only permissions rather than relying on the host process umask. Offline `--salvage` does not replace the damaged source. The SQLite CLI is not bundled, so raw-page recovery availability depends on local tools; professional recovery without a valid backup remains.
 - [~] Add encrypted portable backup download and validated dashboard restore with a pre-restore safety copy; `.ssb` archives use AES-256-GCM and a 12–200-character owner passphrase with a per-file scrypt key, ZIP archives and legacy SQLite-only backups remain supported, and failed image replacement rolls the database back. Local safety copies remain private by filesystem permissions but unencrypted.
 - [~] Let owners inspect, download, and delete pre-restore safety copies from Settings; downloaded copies remain under the owner's control and need separate deletion.
 - [~] Add structured logs, health status, and graceful shutdown/restart behavior. The API
   emits allowlisted JSON events, desktop installs and source-installed services retain the
   output in local private log files, and Settings can display a bounded, filtered tail of the
-  active API log. Direct source runs still log to the terminal. The recovery tool salvages
-  valid rows where SQLite can still read them but cannot reconstruct unreadable SQLite pages
-  or recover data without a valid record or backup.
+  active API log. Direct source runs still log to the terminal. Startup recovery can use an
+  installed SQLite CLI with `.recover` to reconstruct pages before validated row salvage;
+  platform availability remains unverified and recovery without usable local tools, valid
+  records, or a backup remains limited.
 - Harden settings and provider configuration validation; verify every credential stays
   in the OS credential store.
 - [~] Add connector health checks, sync timestamps, bounded HTTP retries, safe manual failure
@@ -449,13 +509,14 @@ visible; backup and restore are documented and exercised.
 - Build representative fixtures for league formats, scoring rules, team counts, and
   access errors. Mocked contract fixtures now cover these areas for all three adapters,
   including owner-authorized ESPN cookies, Yahoo OAuth failures, ESPN OP-lineup and non-H2H
-  formats, unknown ESPN lineup slots, and unavailable supplemental data; live account
-  verification and broader cross-platform fixtures remain.
+  formats, unknown ESPN lineup slots (which now remain unlabeled on player records so
+  incomplete lineups cannot be mistaken for recognized slots), and unavailable supplemental data;
+  live account verification and broader cross-platform fixtures remain.
 - [~] Add comparable-metric standings rankings and per-report evidence limits so missing
   draft picks, projections, or matchups are stated; owner-imported season projections now
   support cautious per-pick/per-team replacement evidence, and imported week-specific
   projections can produce matchup sums from explicit starter lists without empty slots or duplicate IDs or a complete roster whose reported size matches and whose player slots are all recognized; incomplete or unfamiliar roster data withholds estimates;
-  up to eight owner-imported source sets are retained per league; same-name/URL imports replace only that set, and the newest eligible scoring-confirmed set supplies projection values. Draft reviews now compare picks with an owner-supplied median ADP only when each player is unambiguously matched across at least three distinct scoring-confirmed source sets; team timing and tentative process grades still require complete draft coverage and positional replacement evidence. Source independence and accuracy are not verified. Optional licensed nflverse current-week injury evidence is available with exact roster matching. Verified Yahoo/ESPN starter semantics and broader league-format coverage remain.
+  up to eight owner-imported source sets are retained per league; same-name/URL imports replace only that set, and the newest eligible scoring-confirmed set supplies projection values. Standings use points-for as a wins tiebreaker only when every team has a finite value; otherwise equal records remain visibly tied and report guidance says why. Draft reviews now compare picks with an owner-supplied median ADP only when each player is unambiguously matched across at least three distinct scoring-confirmed source sets; team timing and tentative process grades still require complete draft coverage and positional replacement evidence. Source independence and accuracy are not verified. Optional licensed nflverse current-week injury evidence is available with exact roster matching. Verified Yahoo/ESPN starter semantics and broader league-format coverage remain.
 - Display source data freshness and citations wherever relevant.
 
 **Exit criteria:** each supported platform has a verified connection path and analysis
@@ -468,7 +529,9 @@ tests across representative league configurations.
       recurring reports after each league refresh; all channel and automatic-delivery settings
       remain owner-controlled.
 - [x] Add owner-configurable daily/weekly/monthly report schedules with timezone selection and
-      graceful scheduler shutdown.
+      graceful scheduler shutdown. Recurring runs persist their local-date occurrence key, so
+      the repeated wall-clock minute during daylight-saving fall-back cannot duplicate a report
+      after settings reconciliation or an app restart.
 - [x] Allow each scheduled action to target selected connected leagues; omitted selections
       continue to include all leagues for compatibility with existing settings.
 - [~] Add one-time date/time schedules with timezone-aware due checks, persisted completion
@@ -495,7 +558,7 @@ tests across representative league configurations.
   export, and deletion are owner-controlled. Custom presets have name/content bounds, are
   validated in API requests and local backups, and stay inside local settings; generated prose
   cannot be guaranteed to honor every style or boundary).
-- [~] Add source-backed football news refresh and reports with citations; selectable ESPN/PFF/FOX Sports feeds, background refresh cadence, manual refresh, source-change cache invalidation, stale-cache fallback, partial-feed status, and FOX Sports attribution/usage notice are implemented; additional source choices and live feed-availability verification remain.
+- [~] Add source-backed football news refresh and reports with citations; selectable ESPN/PFF/FOX Sports/CBS/Pro Football Talk feeds, background refresh cadence, manual refresh, source-change cache invalidation, stale-cache fallback, partial-feed status, up to three bounded idempotent HTTP attempts, and FOX Sports attribution/usage notice are implemented; ongoing live feed-availability verification remains.
 - [~] Add banter settings, boundaries, opt-outs, and send/review policies (per-member
   preferences, global and channel-specific excluded topics, profanity, league scope, memory
   opt-in, and per-action/per-channel review or automatic delivery controls are implemented;
@@ -507,11 +570,13 @@ their sources, and remain drafts unless the owner explicitly enables automatic s
 ### Phase 5: Messaging, email, images, and MCP
 
 - [~] Complete Resend delivery and reply/thread behavior, Twilio SMS plus existing Conversations group delivery/history import, setup, and delivery states;
-  GPT Image generation now stores base64 results in a private local image library with Settings
+  OpenAI GPT Image and Stability AI Stable Image Core generation now store provider output in a
+  private local image library with a remembered owner provider choice in Settings. Separate API
+  keys use the OS credential store. Settings provide
   list, preview, download, and delete controls. Portable ZIP backups include generated images
   beside the database, validate archive paths and expanded sizes, and keep image replacement in
-  the validated database restore transaction. Legacy SQLite files remain restorable. Additional
-  image providers and live provider verification remain.
+  the validated database restore transaction. Legacy SQLite files remain restorable. Live
+  provider-account verification remains.
 - [~] Implement supported iMessage bridge options only where platform and privacy rules
   permit; BlueBubbles outbound group delivery, owner-triggered sync, optional polling, and
   revocable webhook URLs are available with an owner-managed Mac bridge, secure credentials,
@@ -520,14 +585,17 @@ their sources, and remain drafts unless the owner explicitly enables automatic s
   remains.
 - [~] Let the agent participate in configured group chats: when explicitly enabled, a direct
   first-line name or `@name` mention in new Twilio Conversations or BlueBubbles history creates
-  a local reply draft using selected league context. A sync creates at most three replies,
+  a local reply draft using selected league context. A sync deduplicates repeated provider
+  message IDs before creating at most three replies,
   retains its cursor if generation fails, and defaults to review; a separate explicit owner
   opt-in can send directly to the originating group using persisted delivery claims and receipts.
   Initial history sync establishes a baseline rather than replying to old mentions, and restore
   disables reply and automatic-reply settings. History sync rechecks member-memory consent, the
   selected destination, and background polling after provider fetches and before AI stages;
-  per-member analysis stops if its separate opt-in is turned off. Live provider and account
-  verification remains.
+  group-chat member analysis rechecks its separate opt-in after provider setup, before each
+  author prompt, after each model response, and before saving notes; mention-reply context
+  consent is checked before and after generation. Live provider and account verification
+  remains.
 - MCP now exposes league summaries/detail, news, report listing/detail, draft generation, and
   sending a selected existing draft when the owner enables MCP delivery in Settings. Each tool
   invocation approves one send, uncertain outcomes cannot be retried through MCP, and email
@@ -549,22 +617,27 @@ permissions; MCP tools state their side effects and never send without authoriza
 ### Phase 6: Cross-platform release and maintenance
 
 - [~] Package Apple Silicon and Intel macOS, Windows, and Linux versions; an Apple Silicon DMG and packaged runtime
-  smoke check are verified locally. The hosted run `36375960956` passed the macOS, Windows, and Linux package jobs: macOS/Linux completed desktop runtime smokes, while Windows verified the executable and now runs a packaged MCP handshake plus local API call because the hosted GUI process does not reach Electron ready state. The new Windows MCP check awaits a hosted run. Signing and public release publication remain. A version tag assembles successful matrix
+  smoke check are verified locally. The hosted run `36377266321` passed all macOS, Windows, and Linux source and package jobs. Its Windows package smoke includes a packaged MCP handshake and local API call; the hosted GUI itself still cannot reach Electron ready state. The newer local headless package smoke is not covered by that run. Linux RPM publication verification and Intel Mac packaging remain open. Version-tag builds now require Apple Developer ID certificate and notarization secrets, import the certificate into an ephemeral keychain, and configure Electron Forge signing/notarization for both Mac architectures; before upload, the workflow now mounts each tagged Mac DMG and verifies the Developer ID team, deep app signature, stapled ticket, and Gatekeeper acceptance. Three deterministic verifier tests cover success, wrong-team rejection, cleanup, and runner/artifact preconditions. Credentialed hosted signing and notarization remain unverified. Tagged Windows package jobs also require a password-protected PFX and signing password, enable Squirrel signing only for version tags, and verify the setup executable's Authenticode status, signer thumbprint, and code-signing usage before upload; the runner removes the PFX after packaging. Local and manual-dispatch builds remain unsigned, and a credentialed Windows run remains unverified. A version tag assembles successful matrix
   artifacts and an adjacent SHA-256 manifest into a draft release so an owner can review and
   publish the packages; the assembly job checks out the tagged source for its documentation and
-  license assets, which are also included in each platform ZIP. The shared assembly script requires
+  license assets, which are also included in each platform ZIP. Version tags are rejected unless
+  their commit is reachable from `main`; a Forge configuration test verifies the default remains
+  unsigned and that Apple credentials are passed only after explicit opt-in. The credential-handling path has a manual review record
+  in `docs/reviews/2026-09-28-macos-signing-workflow.md`. The shared assembly script requires
   native installers for Debian/Ubuntu (`.deb`), Fedora/RHEL (`.rpm`), Windows, Apple Silicon
   Mac, and Intel Mac; `npm run test:release` verifies each OS/architecture archive, both Linux
   package formats, and the checksum manifest. Assembly uses per-run staging copies, rejects
   symlinks and special files in downloaded artifacts, and leaves the output directory empty on
   invalid input
-  on POSIX hosts with the needed utilities. Hosted run `36375960956` passed the source and package matrices. Checksums detect
+  on POSIX hosts with the needed utilities. Regression tests also verify both release-create and
+  existing-draft upload commands include the architecture-specific Mac ZIPs, Windows Squirrel
+  files, and `UPDATE-SHA256SUMS`. Hosted run `36375960956` passed the source and package matrices. Checksums detect
   transfer corruption but do not authenticate the publisher. The desktop build now uses
   stable Electron Forge 7.11.2 and maintains an `@electron/rebuild` `^4.0.1` override, resolving
   the older Forge 7 dependency path without relying on the Forge 8 alpha release; a macOS ARM
   package smoke passes with this combination. Electron build tools now install only inside the
   isolated package staging directory, keeping them out of a contributor's normal workspace
-  install; a clean root `npm ci` passed on macOS ARM. Hosted macOS, Windows, and Linux package jobs passed in run `36375960956`; the Windows job only verifies the generated executable because the GUI cannot run in that hosted session. Revisit the override when stable Forge 8 is released. Upstream describes the
+  install; a clean root `npm ci` passed on macOS ARM. Hosted macOS, Windows, and Linux package jobs passed in run `36377266321`; Windows also passed the packaged MCP handshake and local API call. The GUI cannot run in that hosted session. Revisit the override when stable Forge 8 is released. Upstream describes the
   current Forge 8 alpha as not ready for general consumption ([releases](https://github.com/electron/forge/releases),
   [Forge 8 release guidance](https://github.com/electron/forge/issues/4082),
   [Forge 7 rebuild dependency discussion](https://github.com/electron/forge/issues/4228)).
@@ -586,10 +659,11 @@ permissions; MCP tools state their side effects and never send without authoriza
 - Publish release notes, supported integration matrix, troubleshooting guidance, and
   supported-platform guidance for the public GitHub repository. The troubleshooting guide
   and current integration/OS matrix are in `docs/troubleshooting.md` and
-  `docs/support-matrix.md`; the owner must review support claims before public release.
+  `docs/support-matrix.md`; the owner must review support claims before public release. Maintainer setup for Apple signing, notarization, and draft review is documented in `docs/release-process.md`.
   A desktop installation guide and MIT license ship as standalone release assets and inside each
-  OS archive; release notes and verified support claims remain. Contribution setup and PR checks
-  are documented in `CONTRIBUTING.md`.
+  OS archive. GitHub generates draft release notes from the tag's commit range; a maintainer
+  must review and edit those notes together with support claims before publishing. Contribution
+  setup and PR checks are documented in `CONTRIBUTING.md`.
 - Run manual code and security reviews, performance checks, and a refactoring review
   before each release; do not run automated security scans.
 
@@ -625,32 +699,40 @@ The repository has selected the following architecture and initial scope; these 
 - Electron Forge for self-contained desktop packaging, plus an optional per-user background
   service for source checkouts. The packaged app can open at sign-in, hide to the system tray
   when its window closes, and continue scheduled actions until the owner chooses Quit. A
-  headless desktop mode and cross-platform interactive lifecycle verification remain open.
+  `--sidekick-headless` launch starts scheduled work without a dashboard or tray; regular
+  launch can open the dashboard in that existing process. The Apple Silicon package smoke
+  verifies its API and clean macOS signal shutdown. Cross-platform lifecycle verification
+  remains open.
 - Sleeper, Yahoo, and ESPN as the initial fantasy platforms, accessed through public or
   owner-authorized paths. ESPN's session-cookie endpoint is undocumented and remains a
   compatibility risk; access controls must not be bypassed.
-- ESPN NFL, PFF, FOX Sports NFL, and CBS Sports NFL as selectable news feeds, with source attribution
+- ESPN NFL, PFF, FOX Sports NFL, CBS Sports NFL, and Pro Football Talk as selectable news feeds, with source attribution
   and FOX Sports usage limits.
 
 The remaining decisions and release gates are:
 
-- The repository uses the MIT License. Published packages and a verified support matrix remain
+- The owner selected MIT; the repository's `LICENSE` and packaged release assets use that license. Published packages and a verified support matrix remain
   open before the project can be described as fully ready for public use.
 - Windows and Linux interactive desktop installs, packaged database-folder move/restart, tray and
   login startup, and owner review of support claims need device verification. Hosted CI already
   checks native Windows ACLs and Linux POSIX modes for recursive data copies, plus the source
-  background-service lifecycle. Signing, public release publication, and automatic update
-  installation are open; an in-app stable-release check and official download-page link are
-  implemented.
+  background-service lifecycle. The version-tag workflow has credential-gated macOS
+  signing/notarization and Windows Authenticode signing paths, but credentialed hosted runs and
+  clean-machine signature/install validation,
+  public release publication, and end-to-end update verification against a published signed
+  release are open; the in-app native updater is implemented for macOS and Windows, with
+  package-manager/manual updates documented for Linux.
 - Yahoo Fantasy Sports application approval belongs to each owner. Live account verification
   across Yahoo, ESPN, and Sleeper remains necessary; ESPN response compatibility should be
   revisited when its public interface changes.
 - Broader league-format fixtures, verified Yahoo/ESPN starter semantics, independently verified market ADP, additional AI/image
   providers, provider-specific pricing catalogs, and CLI token-usage support remain outside the
   verified launch scope. API cost estimates use owner-entered rates and are explicitly approximate.
-- Direct comparison with the original dashboard video remains open because it does not play
-  in the available browser view; current visual cues and the generated concept are documented
-  in `docs/design`.
+- The linked post's video and carousel frames were reviewed in the in-app browser on
+  2026-09-28. The warm palette and soft wave/gradient cues are documented in `docs/design`;
+  the adapted dashboard has desktop and narrow-width reviews across all main pages, including
+  empty, loading, 503, invalid-state, and populated mock-data views. Live connected-league and
+  packaged multi-OS rendering review remain.
 - Yahoo and Sleeper playoff status is recognized when both platform fields are available; ESPN
   H2H playoff start is inferred from schedule settings and labeled as uncertain. Each recurring
   schedule reevaluates report eligibility after refreshing league phase, but does not infer or

@@ -236,11 +236,42 @@ describe('Yahoo league connector', () => {
               ],
             },
           });
+        if (url.includes('/league/nfl.l.123/teams/roster;week=5'))
+          return json({
+            fantasy_content: {
+              league: [
+                {
+                  teams: {
+                    0: {
+                      team: [
+                        { team_key: 'nfl.l.123.t.1', team_id: '1', name: 'Team One' },
+                        {
+                          roster: {
+                            players: {
+                              0: {
+                                player: [
+                                  { player_key: 'nfl.p.1', name: { full: 'Quarterback One' } },
+                                  { selected_position: [{ position: 'QB' }] },
+                                  { primary_position: [{ position: 'QB' }] },
+                                ],
+                              },
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+          });
         return json({ error: 'optional data unavailable' }, 404);
       }),
     );
 
     const league = await new YahooConnector('oauth-test-token').fetchLeague('123');
+    const calls = vi.mocked(fetch).mock.calls;
+    expect(calls.map(([input]) => String(input)).join('\n')).toContain('/teams/roster;week=5');
 
     expect(league).toMatchObject({
       platform: 'yahoo',
@@ -254,16 +285,59 @@ describe('Yahoo league connector', () => {
         playoffStartWeek: 16,
       }),
       teams: [
-        expect.objectContaining({ id: '1', owner: 'Ada', wins: 4, pointsFor: 501.75 }),
+        expect.objectContaining({
+          id: '1',
+          owner: 'Ada',
+          wins: 4,
+          pointsFor: 501.75,
+          roster: [
+            expect.objectContaining({
+              id: 'nfl.p.1',
+              name: 'Quarterback One',
+              rosterPosition: 'QB',
+            }),
+          ],
+        }),
         expect.objectContaining({ id: '2', owner: 'Linus', losses: 2, pointsFor: 477.5 }),
       ],
     });
     expect(league.settings).not.toHaveProperty('private_cookie');
-    const calls = vi.mocked(fetch).mock.calls;
     expect(calls.length).toBeGreaterThan(1);
+    expect(calls.some(([input]) => String(input).includes('/teams/roster;week=5'))).toBe(true);
     for (const [, init] of calls) {
       expect(new Headers(init?.headers).get('authorization')).toBe('Bearer oauth-test-token');
     }
+  });
+
+  it('does not use out-of-range Yahoo week values for matchup or roster requests', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.includes('/league/nfl.l.456;out=settings,standings'))
+          return json({
+            fantasy_content: {
+              league: [
+                {
+                  league_key: 'nfl.l.456',
+                  name: 'Bounded week league',
+                  season: '2026',
+                  num_teams: 2,
+                  current_week: 9999,
+                },
+                { settings: { scoring_type: 'head' }, standings: { teams: [] } },
+              ],
+            },
+          });
+        return json({ error: 'optional resource unavailable' }, 404);
+      }),
+    );
+
+    const league = await new YahooConnector('oauth-test-token').fetchLeague('456');
+    const urls = vi.mocked(fetch).mock.calls.map(([input]) => String(input));
+    expect(league.settings).not.toHaveProperty('currentWeek');
+    expect(urls.some((url) => url.includes('/scoreboard;week='))).toBe(false);
+    expect(urls.some((url) => url.includes('/teams/roster;week='))).toBe(false);
   });
 
   it('explains expired or rejected credentials', async () => {
@@ -422,6 +496,41 @@ describe('ESPN league connector', () => {
     expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).get('cookie')).toBeNull();
   });
 
+  it('ignores out-of-range ESPN matchup weeks before requesting supplemental data', async () => {
+    const urls: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        urls.push(url);
+        if (url.includes('view=mTeam'))
+          return json({
+            id: 77,
+            seasonId: 2026,
+            name: 'Bounded week league',
+            status: { currentMatchupPeriod: 9999 },
+            settings: {
+              scoringSettings: { scoringType: 'H2H_POINTS', scoringItems: [] },
+            },
+            teams: [
+              { id: 1, name: 'One' },
+              { id: 2, name: 'Two' },
+            ],
+            schedule: [{ matchupPeriodId: 9999, home: { teamId: 1 }, away: { teamId: 2 } }],
+          });
+        if (url.includes('view=mRoster')) return json({ teams: [] });
+        throw new Error(`Unexpected ESPN request: ${url}`);
+      }),
+    );
+
+    const league = await new EspnConnector(undefined, 2026).fetchLeague('77');
+    const supplementalUrl = urls.find((url) => url.includes('view=mRoster'));
+    expect(league.settings).not.toHaveProperty('currentWeek');
+    expect(league.matchups).toBeUndefined();
+    expect(supplementalUrl).toContain('scoringPeriodId=1');
+    expect(supplementalUrl).not.toContain('scoringPeriodId=9999');
+  });
+
   it('withholds unsupported roster slots and does not infer playoffs for a non-H2H format', async () => {
     vi.stubGlobal(
       'fetch',
@@ -442,7 +551,25 @@ describe('ESPN league connector', () => {
               scoringSettings: { scoringType: 'ROTISSERIE', scoringItems: [] },
             },
           });
-        if (url.includes('view=mRoster')) return json({ teams: [] });
+        if (url.includes('view=mRoster'))
+          return json({
+            teams: [
+              {
+                id: 1,
+                roster: {
+                  entries: [
+                    {
+                      playerId: 44,
+                      lineupSlotId: 99,
+                      playerPoolEntry: {
+                        player: { fullName: 'Unmapped Player', defaultPositionId: 2 },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          });
         throw new Error(`Unexpected ESPN request: ${url}`);
       }),
     );
@@ -452,5 +579,11 @@ describe('ESPN league connector', () => {
     expect(league.settings.scoringType).toBe('ROTISSERIE');
     expect(league.settings).not.toHaveProperty('roster_positions');
     expect(league.settings).not.toHaveProperty('playoffStartWeek');
+    expect(league.teams[0]?.roster?.[0]).toMatchObject({
+      id: '44',
+      name: 'Unmapped Player',
+      position: 'RB',
+    });
+    expect(league.teams[0]?.roster?.[0]).not.toHaveProperty('rosterPosition');
   });
 });

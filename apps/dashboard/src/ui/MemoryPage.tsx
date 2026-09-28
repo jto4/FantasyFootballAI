@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, FileUp, Save, Trash2 } from 'lucide-react';
-import type { MemberMemory } from '@sidekick/core';
-
-type SavedMemory = Omit<MemberMemory, 'sourceText' | 'sourceAuthorId'> & {
-  sourceLength: number;
-  canMergeImportedConversation?: boolean;
-};
+import { LoadError, LoadingStatus } from './LoadFeedback.js';
+import {
+  isProjectionSummaryList,
+  isReceivedEmailList,
+  isSavedMemoryList,
+  type ProjectionSummary,
+  type ReceivedEmail,
+  type SavedMemory,
+} from './memory-page-data.js';
 type MemberProfileEdit = {
   name: string;
   styleNotes: string;
@@ -15,23 +18,6 @@ type MemberProfileEdit = {
   includeInReports: boolean;
   includeAllLeagues: boolean;
   leagueIds: string[];
-};
-type ProjectionSummary = {
-  leagueId: string;
-  sourceId: string;
-  count: number;
-  adpCount: number;
-  scoringMatched?: boolean;
-  sourceName: string;
-  sourceUrl?: string;
-  importedAt: string;
-};
-type ReceivedEmail = {
-  id: string;
-  from: string;
-  subject: string;
-  createdAt: string;
-  imported: boolean;
 };
 type ImportParticipant = { name: string; messageCount: number };
 
@@ -70,6 +56,10 @@ export function MemoryPage({
   const [projectionSourceUrl, setProjectionSourceUrl] = useState('');
   const [projectionScoringMatched, setProjectionScoringMatched] = useState(false);
   const [projectionSets, setProjectionSets] = useState<ProjectionSummary[]>([]);
+  const [projectionSetsLoading, setProjectionSetsLoading] = useState(mode === 'imports');
+  const [projectionSetsError, setProjectionSetsError] = useState('');
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [profilesError, setProfilesError] = useState('');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [edits, setEdits] = useState<Record<string, MemberProfileEdit>>({});
@@ -77,29 +67,43 @@ export function MemoryPage({
   const previewRequestId = useRef(0);
 
   async function refresh() {
-    const response = await fetch('/api/state');
-    const state = (await response.json()) as {
-      memories?: (Omit<MemberMemory, 'sourceText' | 'sourceAuthorId'> & { sourceLength: number })[];
-    };
-    const memories = state.memories ?? [];
-    setProfiles(memories);
-    setEdits(
-      Object.fromEntries(
-        memories.map((profile) => [
-          profile.id,
-          {
-            name: profile.name,
-            styleNotes: profile.styleNotes,
-            contextNotes: profile.contextNotes,
-            banterPreference: profile.banterPreference ?? '',
-            avoidTopics: profile.avoidTopics ?? '',
-            includeInReports: profile.includeInReports !== false,
-            includeAllLeagues: profile.leagueIds === undefined,
-            leagueIds: profile.leagueIds ?? [],
-          },
-        ]),
-      ),
-    );
+    setProfilesLoading(true);
+    setProfilesError('');
+    try {
+      const response = await fetch('/api/state');
+      if (!response.ok) throw new Error(`Could not load member profiles (${response.status}).`);
+      const state: unknown = await response.json();
+      if (
+        !state ||
+        typeof state !== 'object' ||
+        !('memories' in state) ||
+        !isSavedMemoryList(state.memories)
+      )
+        throw new Error('The local service returned an invalid member profile list.');
+      const memories = state.memories;
+      setProfiles(memories);
+      setEdits(
+        Object.fromEntries(
+          memories.map((profile) => [
+            profile.id,
+            {
+              name: profile.name,
+              styleNotes: profile.styleNotes,
+              contextNotes: profile.contextNotes,
+              banterPreference: profile.banterPreference ?? '',
+              avoidTopics: profile.avoidTopics ?? '',
+              includeInReports: profile.includeInReports !== false,
+              includeAllLeagues: profile.leagueIds === undefined,
+              leagueIds: profile.leagueIds ?? [],
+            },
+          ]),
+        ),
+      );
+    } catch (error) {
+      setProfilesError(error instanceof Error ? error.message : 'Could not load member profiles.');
+    } finally {
+      setProfilesLoading(false);
+    }
   }
   useEffect(() => {
     void refresh();
@@ -112,10 +116,23 @@ export function MemoryPage({
   }, [leagues, projectionLeagueId]);
 
   async function refreshProjectionSets() {
-    const response = await fetch('/api/projections');
-    if (!response.ok) return;
-    const summaries = (await response.json()) as ProjectionSummary[];
-    setProjectionSets(summaries);
+    setProjectionSetsLoading(true);
+    setProjectionSetsError('');
+    try {
+      const response = await fetch('/api/projections');
+      if (!response.ok)
+        throw new Error(`Could not load imported projection sources (${response.status}).`);
+      const summaries: unknown = await response.json();
+      if (!isProjectionSummaryList(summaries))
+        throw new Error('The local service returned an invalid projection source list.');
+      setProjectionSets(summaries);
+    } catch (error) {
+      setProjectionSetsError(
+        error instanceof Error ? error.message : 'Could not load imported projection sources.',
+      );
+    } finally {
+      setProjectionSetsLoading(false);
+    }
   }
 
   async function importFile(event: React.FormEvent) {
@@ -336,7 +353,9 @@ export function MemoryPage({
       const response = await fetch('/api/email/received');
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? 'Could not read the Resend inbox.');
-      setReceivedEmails(result as ReceivedEmail[]);
+      if (!isReceivedEmailList(result))
+        throw new Error('The local service returned an invalid Resend inbox list.');
+      setReceivedEmails(result);
       setNotice('Resend inbox refreshed. Email bodies are fetched only when you choose Import.');
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'Could not read the Resend inbox.');
@@ -549,6 +568,12 @@ export function MemoryPage({
               {busy ? 'Importing…' : 'Import projections'} <span>→</span>
             </button>
           </form>
+          {projectionSetsLoading && (
+            <LoadingStatus message="Loading imported projection sources…" />
+          )}
+          {projectionSetsError && (
+            <LoadError message={projectionSetsError} onRetry={() => void refreshProjectionSets()} />
+          )}
           {projectionSets
             .filter((set) => set.leagueId === projectionLeagueId)
             .map((set) => (
@@ -983,7 +1008,9 @@ export function MemoryPage({
             </article>
           );
         })}
-        {profiles.length === 0 && (
+        {profilesLoading && <LoadingStatus message="Loading member profiles…" />}
+        {profilesError && <LoadError message={profilesError} onRetry={() => void refresh()} />}
+        {!profilesLoading && !profilesError && profiles.length === 0 && (
           <div className="empty-state">
             <FileUp size={23} />
             <strong>No imported profiles.</strong>

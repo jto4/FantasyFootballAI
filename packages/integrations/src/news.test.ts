@@ -9,7 +9,10 @@ const headline = {
 };
 
 describe('football news cache', () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
 
   it('reuses fresh feed results and exposes their refresh time', async () => {
     let now = Date.parse('2026-07-20T12:00:00.000Z');
@@ -86,6 +89,30 @@ describe('football news cache', () => {
     ]);
   });
 
+  it('filters publication times too far in the future while tolerating small feed clock skew', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-28T12:00:00.000Z'));
+    const rss = `<rss><channel>
+      <item><title>Recently published</title><link>https://example.com/recent</link><pubDate>Mon, 28 Sep 2026 11:55:00 GMT</pubDate></item>
+      <item><title>Minor publisher clock skew</title><link>https://example.com/skew</link><pubDate>Mon, 28 Sep 2026 12:04:00 GMT</pubDate></item>
+      <item><title>Scheduled for later</title><link>https://example.com/future</link><pubDate>Mon, 28 Sep 2026 12:06:00 GMT</pubDate></item>
+    </channel></rss>`;
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(rss, { status: 200 })));
+
+    const stories = await fetchFootballNews(['espn']);
+
+    expect(stories.map(({ url }) => url)).toEqual([
+      'https://example.com/skew',
+      'https://example.com/recent',
+    ]);
+
+    const futureOnly = `<rss><channel><item><title>Scheduled for later</title><link>https://example.com/future</link><pubDate>Mon, 28 Sep 2026 12:30:00 GMT</pubDate></item></channel></rss>`;
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(futureOnly, { status: 200 })));
+    await expect(fetchFootballNewsWithStatus(['espn'])).rejects.toThrow(
+      'All selected football news sources failed (ESPN).',
+    );
+  });
+
   it('merges selected feeds, labels citations by source, and de-duplicates URLs', async () => {
     const rss = (title: string, url: string, date: string) =>
       `<rss><channel><item><title>${title}</title><link>${url}</link><pubDate>${date}</pubDate></item></channel></rss>`;
@@ -150,6 +177,26 @@ describe('football news cache', () => {
     ]);
   });
 
+  it('loads Pro Football Talk stories as attributed headline links', async () => {
+    const rss = `<rss><channel><item><title>Sunday Night Football recap</title><link>https://www.nbcsports.com/nfl/profootballtalk/story</link><pubDate>Mon, 28 Sep 2026 00:13:31 -0400</pubDate></item></channel></rss>`;
+    const fetchMock = vi.fn().mockResolvedValue(new Response(rss, { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const stories = await fetchFootballNews(['pft']);
+
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      'https://www.nbcsports.com/profootballtalk.rss',
+    );
+    expect(stories).toMatchObject([
+      {
+        title: 'Sunday Night Football recap',
+        source: 'Pro Football Talk',
+        url: 'https://www.nbcsports.com/nfl/profootballtalk/story',
+        publishedAt: '2026-09-28T04:13:31.000Z',
+      },
+    ]);
+  });
+
   it('reports partial feed failures while keeping available headlines and cached status', async () => {
     const rss = `<rss><channel><item><title>ESPN headline</title><link>https://example.com/espn</link><pubDate>Mon, 20 Jul 2026 12:00:00 GMT</pubDate></item></channel></rss>`;
     vi.stubGlobal(
@@ -185,6 +232,20 @@ describe('football news cache', () => {
     await expect(fetchFootballNewsWithStatus(['espn'])).rejects.toThrow(
       'All selected football news sources failed (ESPN).',
     );
+  });
+
+  it('retries a transient feed connection failure before reporting news unavailable', async () => {
+    const rss = `<rss><channel><item><title>Recovered feed</title><link>https://example.com/recovered</link><pubDate>Mon, 20 Jul 2026 12:00:00 GMT</pubDate></item></channel></rss>`;
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('temporary network failure'))
+      .mockResolvedValueOnce(new Response(rss, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+
+    await expect(fetchFootballNews(['espn'])).resolves.toMatchObject([
+      { title: 'Recovered feed', source: 'ESPN' },
+    ]);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('invalidates cached headlines when sources change and makes no requests when disabled', async () => {

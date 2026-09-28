@@ -37,7 +37,9 @@ afterEach(async () => {
   );
 });
 
-async function startServer(overrides: Partial<ReceivedEmailRouteDependencies> = {}) {
+async function startServer(
+  overrides: Partial<ReceivedEmailRouteDependencies> & { beforeUpdate?: () => void } = {},
+) {
   const state = {
     settings: { memoryEnabled: true, analyzeImportsWithAI: false },
     memories: [],
@@ -45,6 +47,7 @@ async function startServer(overrides: Partial<ReceivedEmailRouteDependencies> = 
   const store = {
     snapshot: vi.fn(() => state),
     update: vi.fn(async (mutate: (current: AppState) => void) => {
+      overrides.beforeUpdate?.();
       mutate(state);
       return state;
     }),
@@ -186,5 +189,87 @@ describe('Resend received-email routes', () => {
     const prompt = (provider.generate as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
     expect(prompt?.prompt).toContain('This lineup is a mess.');
     expect(prompt?.prompt).not.toContain('Last week was worse.');
+  });
+
+  it('does not invoke AI when import-analysis consent is revoked during runtime setup', async () => {
+    const provider: AIProvider = {
+      id: 'test-ai',
+      generate: vi.fn(async () => 'Writing style:\nPRIVATE\nLeague context:\nPRIVATE'),
+    };
+    const setup = await startServer({
+      configuredAI: vi.fn(async () => {
+        setup.state.settings.analyzeImportsWithAI = false;
+        return provider;
+      }),
+    });
+    setup.state.settings.analyzeImportsWithAI = true;
+
+    const response = await fetch(`${setup.url}/api/email/received/${email.id}/import`, {
+      method: 'POST',
+    });
+
+    expect(response.status).toBe(201);
+    expect(provider.generate).not.toHaveBeenCalled();
+    expect(setup.state.memories[0]?.styleNotes).toContain('opt-in changed');
+  });
+
+  it('discards in-flight AI notes when import-analysis consent is revoked', async () => {
+    const setup = await startServer();
+    setup.state.settings.analyzeImportsWithAI = true;
+    const provider: AIProvider = {
+      id: 'test-ai',
+      generate: vi.fn(async () => {
+        setup.state.settings.analyzeImportsWithAI = false;
+        return 'Writing style:\nPRIVATE\nLeague context:\nPRIVATE';
+      }),
+    };
+    (setup.dependencies.configuredAI as ReturnType<typeof vi.fn>).mockResolvedValue(provider);
+
+    const response = await fetch(`${setup.url}/api/email/received/${email.id}/import`, {
+      method: 'POST',
+    });
+
+    expect(response.status).toBe(201);
+    expect(provider.generate).toHaveBeenCalledOnce();
+    expect(setup.state.memories[0]?.styleNotes).toContain('opt-in changed');
+    expect(setup.state.memories[0]?.styleNotes).not.toContain('PRIVATE');
+    expect(setup.state.memories[0]?.contextNotes).toBe('');
+  });
+
+  it('preserves existing notes when consent is revoked before persistence', async () => {
+    const setup = await startServer({
+      beforeUpdate: () => {
+        setup.state.settings.analyzeImportsWithAI = false;
+      },
+    });
+    setup.state.settings.analyzeImportsWithAI = true;
+    setup.state.memories.push({
+      id: 'alex',
+      name: 'Alex Manager',
+      sourceName: 'Resend received email',
+      sourceAuthorId: 'resend:alex@example.com',
+      importedAt: email.createdAt,
+      sourceText: 'Earlier local email notes.',
+      styleNotes: 'Preserve this style.',
+      contextNotes: 'Preserve this context.',
+      banterPreference: '',
+      avoidTopics: '',
+    });
+    const provider: AIProvider = {
+      id: 'test-ai',
+      generate: vi.fn(async () => 'Writing style:\nPRIVATE\nLeague context:\nPRIVATE'),
+    };
+    (setup.dependencies.configuredAI as ReturnType<typeof vi.fn>).mockResolvedValue(provider);
+
+    const response = await fetch(`${setup.url}/api/email/received/${email.id}/import`, {
+      method: 'POST',
+    });
+
+    expect(response.status).toBe(201);
+    expect(setup.state.memories[0]).toMatchObject({
+      styleNotes: 'Preserve this style.',
+      contextNotes: 'Preserve this context.',
+    });
+    expect(setup.state.memories[0]?.sourceText).toContain('This lineup is a mess.');
   });
 });

@@ -11,6 +11,7 @@ const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 const apiEntry = join(repositoryRoot, 'apps', 'api', 'dist', 'index.js');
 const sampleCount = 30;
 const reportSampleCount = 10;
+const representativeSourceText = `Example local conversation context. ${'League chat sentence. '.repeat(2_700)}`;
 
 async function reservePort() {
   const server = createServer();
@@ -45,6 +46,11 @@ function processRssBytes(pid) {
   const value = Number(result.stdout.trim());
   if (!Number.isFinite(value) || value <= 0) return undefined;
   return process.platform === 'win32' ? value : value * 1024;
+}
+
+function processRssMiB(pid) {
+  const bytes = processRssBytes(pid);
+  return bytes ? Number((bytes / 1024 / 1024).toFixed(1)) : null;
 }
 
 async function waitForExit(child, timeoutMs) {
@@ -110,7 +116,7 @@ async function seedRepresentativeState(databasePath, fakeAIPath) {
         name: `Manager ${profileIndex}`,
         sourceName: 'benchmark-import.txt',
         importedAt: new Date().toISOString(),
-        sourceText: `Example local conversation context. ${'League chat sentence. '.repeat(100)}`,
+        sourceText: representativeSourceText,
         styleNotes: 'Direct, playful, and concise.',
         contextNotes: 'Prefers fantasy football banter.',
         banterPreference: 'Keep jokes about fantasy decisions.',
@@ -187,6 +193,7 @@ try {
   }
   assert.equal(ready, true, 'benchmark API did not become healthy');
   const startupMs = performance.now() - startupStartedAt;
+  const workingSetCheckpoints = [{ stage: 'after-startup', rssMiB: processRssMiB(child.pid) }];
 
   const healthLatencies = [];
   const stateLatencies = [];
@@ -206,6 +213,7 @@ try {
     statePayloadBytes = payload.byteLength;
     stateLatencies.push(performance.now() - startedAt);
   }
+  workingSetCheckpoints.push({ stage: 'after-state-reads', rssMiB: processRssMiB(child.pid) });
 
   for (let index = 0; index < reportSampleCount; index += 1) {
     const startedAt = performance.now();
@@ -224,6 +232,12 @@ try {
     assert.equal(report.status, 'draft');
     assert.equal(report.body, 'Synthetic benchmark report.');
     reportGenerationLatencies.push(performance.now() - startedAt);
+    if ([0, 4, reportSampleCount - 1].includes(index)) {
+      workingSetCheckpoints.push({
+        stage: `after-report-${index + 1}`,
+        rssMiB: processRssMiB(child.pid),
+      });
+    }
   }
 
   const htmlStartedAt = performance.now();
@@ -246,7 +260,15 @@ try {
     benchmark: 'local-api-and-dashboard-smoke',
     os: `${process.platform}-${process.arch}`,
     node: process.version,
-    fixture: { leagues: 8, teams: 96, memberProfiles: 80, reports: 300 },
+    fixture: {
+      leagues: 8,
+      teams: 96,
+      memberProfiles: 80,
+      memberSourceTextMiB: Number(
+        ((80 * Buffer.byteLength(representativeSourceText)) / 1024 / 1024).toFixed(2),
+      ),
+      reports: 300,
+    },
     samples: sampleCount,
     startupMs: Math.round(startupMs),
     healthLatencyMs: {
@@ -267,6 +289,7 @@ try {
     dashboardShellAndAssetsMs: Math.round(dashboardLoadMs),
     dashboardAssetsKiB: Number((assetBytes / 1024).toFixed(1)),
     apiWorkingSetMiB: rssBytes ? Number((rssBytes / 1024 / 1024).toFixed(1)) : null,
+    workingSetCheckpoints,
     note: 'Synthetic local fixture; excludes live provider sync and browser paint timing.',
   };
   const serializedReport = JSON.stringify(report, null, 2);
