@@ -413,7 +413,7 @@ describe('local SQLite store', () => {
       state.settings.customWritingStylePresets = [
         { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
       ];
-      state.settings.newsSources = ['fox'];
+      state.settings.newsSources = ['fox', 'cbs'];
       state.settings.leagueStaleAfterHours = 72;
       state.leagues.push({
         id: 'league-1',
@@ -433,7 +433,7 @@ describe('local SQLite store', () => {
     expect(reopened.snapshot().settings.customWritingStylePresets).toEqual([
       { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
     ]);
-    expect(reopened.snapshot().settings.newsSources).toEqual(['fox']);
+    expect(reopened.snapshot().settings.newsSources).toEqual(['fox', 'cbs']);
     expect(reopened.snapshot().settings.leagueStaleAfterHours).toBe(72);
 
     const database = new Database(file, { readonly: true });

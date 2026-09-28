@@ -1203,9 +1203,9 @@ describe('league analysis', () => {
 
   it('limits saved news sources to the supported feed identifiers', () => {
     expect(normalizeNewsSources(undefined)).toEqual(defaultNewsSources);
-    expect(normalizeNewsSources(['pff', 'espn', 'fox', 'pff', 'https://example.test/rss'])).toEqual(
-      ['pff', 'espn', 'fox'],
-    );
+    expect(
+      normalizeNewsSources(['pff', 'espn', 'fox', 'cbs', 'pff', 'https://example.test/rss']),
+    ).toEqual(['pff', 'espn', 'fox', 'cbs']);
     expect(normalizeNewsSources([])).toEqual([]);
   });
 

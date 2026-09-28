@@ -10,11 +10,12 @@ export function isValidEspnSeason(value: unknown): value is number {
   );
 }
 
-export type NewsSourceId = 'espn' | 'pff' | 'fox';
+export type NewsSourceId = 'espn' | 'pff' | 'fox' | 'cbs';
 export const supportedNewsSources: Array<{ id: NewsSourceId; name: string }> = [
   { id: 'espn', name: 'ESPN NFL' },
   { id: 'pff', name: 'PFF football' },
   { id: 'fox', name: 'FOX Sports NFL' },
+  { id: 'cbs', name: 'CBS Sports NFL' },
 ];
 export const defaultNewsSources = ['espn'] as const satisfies readonly NewsSourceId[];
 export type ReportKind =
@@ -1547,7 +1548,8 @@ export function normalizeNewsSources(input: unknown): NewsSourceId[] {
   return [
     ...new Set(
       input.filter(
-        (value): value is NewsSourceId => value === 'espn' || value === 'pff' || value === 'fox',
+        (value): value is NewsSourceId =>
+          value === 'espn' || value === 'pff' || value === 'fox' || value === 'cbs',
       ),
     ),
   ];

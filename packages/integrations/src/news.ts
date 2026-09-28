@@ -15,6 +15,7 @@ const sourceDetails: Record<NewsSourceId, { name: string; url: string }> = {
     name: 'FOX Sports',
     url: 'https://api.foxsports.com/v2/content/optimized-rss?partnerKey=MB0Wehpmuj2lUhuRhQaafhBjAJqaPU244mlTDK1i&size=30&tags=fs%2Fnfl',
   },
+  cbs: { name: 'CBS Sports', url: 'https://www.cbssports.com/rss/headlines/nfl/' },
 };
 
 export interface FootballNewsSnapshot {

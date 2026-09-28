@@ -131,6 +131,25 @@ describe('football news cache', () => {
     expect(stories.some((story) => story.url.endsWith('/parlay'))).toBe(false);
   });
 
+  it('loads and attributes the selected CBS Sports NFL RSS feed', async () => {
+    const rss = `<rss><channel><item><title>CBS injury roundup</title><link>https://www.cbssports.com/nfl/news/injury-roundup/</link><pubDate>Mon, 28 Sep 2026 06:00:00 GMT</pubDate></item></channel></rss>`;
+    const fetchMock = vi.fn().mockResolvedValue(new Response(rss, { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const stories = await fetchFootballNews(['cbs']);
+
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      'https://www.cbssports.com/rss/headlines/nfl/',
+    );
+    expect(stories).toMatchObject([
+      {
+        title: 'CBS injury roundup',
+        source: 'CBS Sports',
+        url: 'https://www.cbssports.com/nfl/news/injury-roundup/',
+      },
+    ]);
+  });
+
   it('reports partial feed failures while keeping available headlines and cached status', async () => {
     const rss = `<rss><channel><item><title>ESPN headline</title><link>https://example.com/espn</link><pubDate>Mon, 20 Jul 2026 12:00:00 GMT</pubDate></item></channel></rss>`;
     vi.stubGlobal(

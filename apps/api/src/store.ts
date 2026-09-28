@@ -872,7 +872,7 @@ export function validateState(input: unknown): AppState {
     (rawSettings.newsSources !== undefined &&
       (!Array.isArray(rawSettings.newsSources) ||
         !rawSettings.newsSources.every(
-          (source) => source === 'espn' || source === 'pff' || source === 'fox',
+          (source) => source === 'espn' || source === 'pff' || source === 'fox' || source === 'cbs',
         ))) ||
     (rawSettings.nflInjuryReportsEnabled !== undefined &&
       typeof rawSettings.nflInjuryReportsEnabled !== 'boolean')

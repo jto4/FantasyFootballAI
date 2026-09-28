@@ -13,3 +13,18 @@ citation URL.
 This is a point-in-time availability and parsing check. It does not establish continued
 feed availability, source independence, factual accuracy, or permission beyond each source's
 published terms.
+
+## Repeat check at 06:16 UTC
+
+`npm run news:smoke` again returned 10 parseable headlines and a citation URL from each feed:
+ESPN, PFF, and FOX Sports. The first returned citation URLs matched the links in the earlier
+table. This second result is a separate availability sample, not evidence of long-term uptime
+or independent corroboration.
+
+## Four-feed check at 06:19 UTC
+
+After adding CBS Sports NFL, `npm run news:smoke` returned 10 parseable headlines and a
+citation URL from all four selectable feeds. The returned CBS citation was
+[an NFL Week 3 grades story](https://www.cbssports.com/nfl/news/nfl-week-3-grades-patriots-stumble-commanders-shine/).
+ESPN, PFF, and FOX Sports also returned 10 each. CBS is presented as a headline and
+attributed link; the app does not retrieve its article text. This is a point-in-time check.

@@ -1037,7 +1037,7 @@ app.put('/api/settings', async (req, res) => {
     (newsSources !== undefined &&
       (!Array.isArray(newsSources) ||
         !newsSources.every(
-          (source) => source === 'espn' || source === 'pff' || source === 'fox',
+          (source) => source === 'espn' || source === 'pff' || source === 'fox' || source === 'cbs',
         ))) ||
     typeof newsRefreshMinutes !== 'number' ||
     !Number.isInteger(newsRefreshMinutes) ||
