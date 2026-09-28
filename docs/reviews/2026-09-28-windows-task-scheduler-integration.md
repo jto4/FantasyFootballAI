@@ -17,3 +17,9 @@ The service manager's task-name override is an internal injection point for test
 the public CLI continues to use the fixed `Sunday Sidekick` task name. The task is created
 without elevation under the current CI user. No automated security scan was run. This review
 does not cover a release candidate or native macOS/Linux service-manager behavior.
+
+Hosted CI run `36372505755` passed the integration test on Windows. The first run exposed an
+incorrect assertion that expected the verbose task listing to include the trigger name; the
+test now reads the scheduler XML for the trigger and checks the successful last-run result
+from the verbose listing. The task executable and quoted spaced-path fixture both ran on the
+Windows runner, and the complete cross-platform workflow passed.
