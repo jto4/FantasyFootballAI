@@ -7,8 +7,9 @@
 
 The real Ubuntu systemd test showed that quoting the `WorkingDirectory` value made
 systemd treat the quote characters as part of the path and reject the unit. The renderer
-now emits systemd C-style escapes for spaces, quotes, backslashes, percent specifiers,
-and whitespace in that path. A renderer test covers spaces and percent characters, and
+now emits systemd C-style UTF-8 byte escapes for spaces, quotes, backslashes, percent
+specifiers, and whitespace in that path. Renderer tests cover ordinary and Unicode
+whitespace plus percent characters, and
 the hosted lifecycle test confirms systemd accepts the resulting unit when it starts the
 built API from the checkout path.
 

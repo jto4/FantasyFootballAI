@@ -89,9 +89,11 @@ function systemdEscape(value) {
 }
 
 function systemdPathEscape(value) {
-  return value.replace(/[\\"%\s]/g, (character) => {
+  return value.replace(/[\\"%\s]/gu, (character) => {
     if (character === '%') return '%%';
-    const codePoint = character.codePointAt(0).toString(16).padStart(2, '0');
-    return `\\x${codePoint}`;
+    return Array.from(
+      Buffer.from(character, 'utf8'),
+      (byte) => `\\x${byte.toString(16).padStart(2, '0')}`,
+    ).join('');
   });
 }
