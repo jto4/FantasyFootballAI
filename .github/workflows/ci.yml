@@ -97,6 +97,25 @@ jobs:
       - name: Build production app
         run: npm run build
 
+      - name: Start Linux user systemd manager
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          sudo systemctl start "user@$(id -u).service"
+          systemctl --user daemon-reload >/dev/null
+
+      - name: Exercise built service through Linux systemd
+        if: runner.os == 'Linux'
+        env:
+          SIDEKICK_LINUX_SERVICE_SMOKE: '1'
+        run: npm run test:linux-service
+
+      - name: Stop Linux user systemd manager
+        if: always() && runner.os == 'Linux'
+        run: |
+          sudo loginctl disable-linger "$(id -un)"
+          sudo systemctl stop "user@$(id -u).service" || true
+
       - name: Exercise built service through Windows Task Scheduler
         if: runner.os == 'Windows'
         env:

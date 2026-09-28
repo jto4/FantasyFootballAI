@@ -33,12 +33,14 @@ describe('background service configuration', () => {
       nodePath: '/opt/Node $RUNTIME/node',
       repositoryRoot: '/home/league/100% ready/app',
       serviceScript: '/home/league/100% ready/app/scripts/service-runner.mjs',
+      servicePort: 4321,
     });
     assert.match(config, /Restart=on-failure/);
     assert.match(config, /UMask=0077/);
     assert.match(config, /WantedBy=default.target/);
     assert.match(config, /ExecStart="\/opt\/Node \$\$RUNTIME\/node"/);
     assert.match(config, /WorkingDirectory="\/home\/league\/100%% ready\/app"/);
+    assert.match(config, /Environment=SIDEKICK_PORT=4321/);
   });
 
   it('quotes Windows executable and runner paths for Task Scheduler', () => {

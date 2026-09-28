@@ -28,6 +28,8 @@ export function createServiceManager({
   logger = console,
 } = {}) {
   const paths = servicePaths(home, repositoryRoot);
+  if (!Number.isInteger(servicePort) || servicePort < 1 || servicePort > 65_535)
+    throw new Error('Background service port must be a valid TCP port.');
 
   async function execute(command) {
     if (command === 'install' || command === 'update') await installService();
@@ -76,7 +78,12 @@ export function createServiceManager({
   async function installSystemdUnit() {
     await secureWrite(
       paths.systemdUnit,
-      renderSystemdUnit({ nodePath, repositoryRoot, serviceScript: paths.serviceScript }),
+      renderSystemdUnit({
+        nodePath,
+        repositoryRoot,
+        serviceScript: paths.serviceScript,
+        servicePort,
+      }),
     );
     invoke('systemctl', ['--user', 'daemon-reload']);
     invoke('systemctl', ['--user', 'enable', '--now', 'sunday-sidekick.service']);

@@ -48,7 +48,7 @@ export function renderLaunchAgent({
 `;
 }
 
-export function renderSystemdUnit({ nodePath, repositoryRoot, serviceScript }) {
+export function renderSystemdUnit({ nodePath, repositoryRoot, serviceScript, servicePort = 4173 }) {
   return `[Unit]
 Description=Sunday Sidekick fantasy football companion
 After=default.target
@@ -57,6 +57,7 @@ After=default.target
 Type=simple
 WorkingDirectory=${systemdEscape(repositoryRoot)}
 ExecStart=${systemdEscape(nodePath)} ${systemdEscape(serviceScript)}
+Environment=SIDEKICK_PORT=${servicePort}
 Restart=on-failure
 RestartSec=5
 UMask=0077
