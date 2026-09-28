@@ -22,6 +22,7 @@ export function createServiceManager({
   nodePath = process.execPath,
   userId = process.getuid?.(),
   windowsTaskName = serviceName,
+  servicePort = 4173,
   runCommand = spawnCommand,
   fetchImpl = globalThis.fetch,
   logger = console,
@@ -147,7 +148,7 @@ export function createServiceManager({
   async function stopWindowsTaskGracefully() {
     let isSidekickService = false;
     try {
-      const response = await fetchImpl('http://127.0.0.1:4173/api/health', {
+      const response = await fetchImpl(`http://127.0.0.1:${servicePort}/api/health`, {
         signal: AbortSignal.timeout(1_000),
       });
       if (response.ok) {
@@ -158,7 +159,7 @@ export function createServiceManager({
       // The task may already have stopped; Task Scheduler below remains authoritative.
     }
     if (isSidekickService) {
-      await fetchImpl('http://127.0.0.1:4173/api/shutdown', {
+      await fetchImpl(`http://127.0.0.1:${servicePort}/api/shutdown`, {
         method: 'POST',
         signal: AbortSignal.timeout(2_000),
       }).catch(() => undefined);
@@ -166,7 +167,7 @@ export function createServiceManager({
       while (Date.now() < deadline) {
         await new Promise((resolve) => setTimeout(resolve, 200));
         try {
-          await fetchImpl('http://127.0.0.1:4173/api/health', {
+          await fetchImpl(`http://127.0.0.1:${servicePort}/api/health`, {
             signal: AbortSignal.timeout(500),
           });
         } catch {

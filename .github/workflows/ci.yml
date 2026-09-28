@@ -97,6 +97,12 @@ jobs:
       - name: Build production app
         run: npm run build
 
+      - name: Exercise built service through Windows Task Scheduler
+        if: runner.os == 'Windows'
+        env:
+          SIDEKICK_WINDOWS_SERVICE_SMOKE: '1'
+        run: npm run test:windows-service
+
   package:
     name: Smoke-check desktop package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
