@@ -31,7 +31,10 @@ describe('local generated-image library', () => {
       mimeType: 'image/png',
     });
     const imagePath = join(directory, 'images', `${saved.id}.png`);
-    expect((await lstat(imagePath)).mode & 0o777).toBe(0o600);
+    // NTFS access is controlled by the user-profile ACL, not POSIX mode bits.
+    if (process.platform !== 'win32') {
+      expect((await lstat(imagePath)).mode & 0o777).toBe(0o600);
+    }
     expect(await listLocalImages(databasePath)).toEqual([saved]);
     expect((await readLocalImage(databasePath, saved.id))?.contents).toEqual(contents);
     expect(await deleteLocalImage(databasePath, saved.id)).toBe(true);
