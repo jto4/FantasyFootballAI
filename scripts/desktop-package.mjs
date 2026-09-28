@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createDesktopSmokePlan } from './desktop-smoke-plan.mjs';
 import { makeInternalSymlinksRelative } from './portable-symlinks.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -157,7 +158,10 @@ async function smokeCheckPackage(packageRoot) {
           packageDirectory,
           process.platform === 'win32' ? 'Sunday Sidekick.exe' : 'Sunday Sidekick',
         );
-  const skipGuiSmoke = process.platform === 'win32' && process.env.CI === 'true';
+  const { skipGuiSmoke, useXvfb, sandboxArgs } = createDesktopSmokePlan(
+    process.platform,
+    process.env.CI === 'true',
+  );
   if (skipGuiSmoke) {
     const details = await lstat(executable);
     if (!details.isFile() || details.size === 0)
@@ -166,9 +170,7 @@ async function smokeCheckPackage(packageRoot) {
       'Windows package executable is present; GUI launch remains an interactive Windows check. Running the packaged MCP runtime smoke.',
     );
   }
-  const useXvfb = process.platform === 'linux' && process.env.CI === 'true';
   // Hosted Linux runners cannot set Electron's SUID sandbox ownership; this is smoke-only.
-  const sandboxArgs = useXvfb ? ['--no-sandbox'] : [];
   if (!skipGuiSmoke) {
     const smokeData = join(staging, '.smoke-data');
     const command = useXvfb ? 'xvfb-run' : executable;

@@ -523,9 +523,11 @@ their sources, and remain drafts unless the owner explicitly enables automatic s
   Packaged desktop users can launch `--sidekick-mcp`, which attaches to the running local API
   without creating a second scheduler. The packaging smoke check now completes MCP stdio
   initialization, discovers tools, and calls `list_leagues` against a temporary loopback API;
-  this passes locally for macOS ARM and in Linux CI. An in-memory protocol test exercises all seven
-  documented tools, draft-only creation, send permission errors, and loopback-only URL validation;
-  Windows GUI launch remains unverified because the hosted runner does not reach Electron ready state.
+  this passes locally for macOS ARM and in Linux CI. Windows CI is configured to run the packaged
+  MCP handshake and API call while skipping only its unavailable GUI smoke; platform smoke
+  selection has unit coverage, and the new Windows path awaits a hosted run. An in-memory protocol
+  test exercises all seven documented tools, draft-only creation, send permission errors, and
+  loopback-only URL validation; interactive Windows GUI launch remains unverified.
 - [x] Add conversation exports, per-member context controls, deletion, and data portability.
 
 **Exit criteria:** each provider has setup guidance, errors, tests, and owner-controlled
