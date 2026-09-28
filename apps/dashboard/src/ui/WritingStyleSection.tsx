@@ -1,16 +1,24 @@
-import type { RefObject } from 'react';
+import { useState, type RefObject } from 'react';
 import { ShieldCheck } from 'lucide-react';
-import { supportedMessageChannels, type AppSettings } from '@sidekick/core';
+import {
+  isValidWritingStylePresets,
+  supportedMessageChannels,
+  type AppSettings,
+  type WritingStylePreset,
+} from '@sidekick/core';
 
 type MessageChannel = (typeof supportedMessageChannels)[number];
 type WritingStyleSectionProps = {
   headingRef: RefObject<HTMLHeadingElement | null>;
   writingStyle: string;
+  customPresets: WritingStylePreset[];
   reportLength: NonNullable<AppSettings['reportLength']>;
   allowProfanity: boolean;
   excludedTopics: string;
   channelBoundaries: NonNullable<AppSettings['channelBoundaries']>;
   onWritingStyleChange: (value: string) => void;
+  onSaveCustomPreset: (preset: WritingStylePreset) => void;
+  onDeleteCustomPreset: (name: string) => void;
   onReportLengthChange: (value: NonNullable<AppSettings['reportLength']>) => void;
   onProfanityChange: (value: boolean) => void;
   onExcludedTopicsChange: (value: string) => void;
@@ -46,16 +54,31 @@ const writingStylePresets = [
 export function WritingStyleSection({
   headingRef,
   writingStyle,
+  customPresets,
   reportLength,
   allowProfanity,
   excludedTopics,
   channelBoundaries,
   onWritingStyleChange,
+  onSaveCustomPreset,
+  onDeleteCustomPreset,
   onReportLengthChange,
   onProfanityChange,
   onExcludedTopicsChange,
   onChannelBoundaryChange,
 }: WritingStyleSectionProps) {
+  const [presetName, setPresetName] = useState('');
+  const selectedSavedPreset = customPresets.find((preset) => preset.value === writingStyle);
+  const selectedBuiltInPreset = writingStylePresets.find((preset) => preset.value === writingStyle);
+  const candidatePreset = { name: presetName.trim(), value: writingStyle };
+  const existingPresetIndex = customPresets.findIndex(
+    (preset) => preset.name.toLowerCase() === candidatePreset.name.toLowerCase(),
+  );
+  const candidatePresets = [...customPresets];
+  if (existingPresetIndex >= 0) candidatePresets[existingPresetIndex] = candidatePreset;
+  else candidatePresets.push(candidatePreset);
+  const canSavePreset = isValidWritingStylePresets(candidatePresets);
+
   return (
     <section className="settings-card">
       <div className="settings-card-title">
@@ -71,17 +94,33 @@ export function WritingStyleSection({
         STARTING STYLE
         <select
           value={
-            writingStylePresets.find((preset) => preset.value === writingStyle)?.name ?? 'Custom'
+            selectedSavedPreset
+              ? `saved:${selectedSavedPreset.name}`
+              : selectedBuiltInPreset
+                ? `builtin:${selectedBuiltInPreset.name}`
+                : 'custom'
           }
           onChange={(event) => {
-            const preset = writingStylePresets.find((item) => item.name === event.target.value);
+            const selectedValue = event.target.value;
+            const preset = selectedValue.startsWith('saved:')
+              ? customPresets.find((item) => item.name === selectedValue.slice('saved:'.length))
+              : selectedValue.startsWith('builtin:')
+                ? writingStylePresets.find(
+                    (item) => item.name === selectedValue.slice('builtin:'.length),
+                  )
+                : undefined;
             if (preset) onWritingStyleChange(preset.value);
           }}
         >
-          <option value="Custom">Custom style</option>
+          <option value="custom">Custom style</option>
           {writingStylePresets.map((preset) => (
-            <option key={preset.name} value={preset.name}>
+            <option key={`builtin:${preset.name}`} value={`builtin:${preset.name}`}>
               {preset.name}
+            </option>
+          ))}
+          {customPresets.map((preset) => (
+            <option key={`saved:${preset.name}`} value={`saved:${preset.name}`}>
+              {preset.name} · saved
             </option>
           ))}
         </select>
@@ -96,6 +135,43 @@ export function WritingStyleSection({
         Choose a starting voice, then edit every word. Use fantasy decisions as the target of jokes.
         Excluded topics are passed to the AI as boundaries for every generated report.
       </small>
+      <div className="custom-style-presets">
+        <label>
+          SAVE THIS VOICE AS
+          <input
+            value={presetName}
+            maxLength={40}
+            onChange={(event) => setPresetName(event.target.value)}
+            placeholder="e.g. Playoff chaos"
+          />
+        </label>
+        <button
+          type="button"
+          className="small-button"
+          disabled={!canSavePreset}
+          onClick={() => {
+            onSaveCustomPreset(candidatePreset);
+            setPresetName('');
+          }}
+        >
+          Save style preset
+        </button>
+        {customPresets.map((preset) => (
+          <button
+            key={preset.name}
+            type="button"
+            className="small-button danger"
+            aria-label={`Delete saved style ${preset.name}`}
+            onClick={() => onDeleteCustomPreset(preset.name)}
+          >
+            Delete {preset.name}
+          </button>
+        ))}
+        <small>
+          Saved voices stay in local settings and are limited to 20 presets. Click Save Settings to
+          keep preset changes.
+        </small>
+      </div>
       <label className="report-length-setting">
         REPORT LENGTH
         <select

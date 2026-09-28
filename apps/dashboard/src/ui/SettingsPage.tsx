@@ -75,6 +75,7 @@ export function SettingsPage({
   const [dataDirectory, setDataDirectory] = useState<string | null>(null);
   const [form, setForm] = useState<AppSettings>({
     ...settings,
+    customWritingStylePresets: settings.customWritingStylePresets ?? [],
     calendarEvents: settings.calendarEvents ?? [],
     actions: normalizeActionSettings(settings.actions),
     reportLength: settings.reportLength ?? 'standard',
@@ -719,12 +720,33 @@ export function SettingsPage({
       <WritingStyleSection
         headingRef={voiceHeadingRef}
         writingStyle={form.writingStyle}
+        customPresets={form.customWritingStylePresets ?? []}
         reportLength={form.reportLength ?? 'standard'}
         allowProfanity={form.allowProfanity}
         excludedTopics={form.excludedTopics}
         channelBoundaries={normalizeChannelBoundaries(form.channelBoundaries)}
         onWritingStyleChange={(writingStyle) =>
           setForm((current) => ({ ...current, writingStyle }))
+        }
+        onSaveCustomPreset={(preset) =>
+          setForm((current) => {
+            const presets = current.customWritingStylePresets ?? [];
+            const existingIndex = presets.findIndex(
+              (item) => item.name.toLowerCase() === preset.name.toLowerCase(),
+            );
+            const updated = [...presets];
+            if (existingIndex >= 0) updated[existingIndex] = preset;
+            else updated.push(preset);
+            return { ...current, customWritingStylePresets: updated };
+          })
+        }
+        onDeleteCustomPreset={(name) =>
+          setForm((current) => ({
+            ...current,
+            customWritingStylePresets: (current.customWritingStylePresets ?? []).filter(
+              (preset) => preset.name !== name,
+            ),
+          }))
         }
         onReportLengthChange={(reportLength) =>
           setForm((current) => ({ ...current, reportLength }))

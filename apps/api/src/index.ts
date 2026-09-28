@@ -11,6 +11,7 @@ import {
   defaultLeagueStaleAfterHours,
   isLeagueStaleAfterHours,
   isValidEspnSeason,
+  isValidWritingStylePresets,
   isValidChannelBoundaries,
   leaguesForAction,
   isValidLeagueCalendarEvent,
@@ -911,6 +912,7 @@ app.delete('/api/leagues/:id', async (req, res) => {
 app.put('/api/settings', async (req, res) => {
   const {
     writingStyle,
+    customWritingStylePresets,
     reportLength,
     allowProfanity,
     excludedTopics,
@@ -942,6 +944,7 @@ app.put('/api/settings', async (req, res) => {
     newsSources,
   } = req.body as {
     writingStyle?: unknown;
+    customWritingStylePresets?: unknown;
     reportLength?: unknown;
     allowProfanity?: unknown;
     excludedTopics?: unknown;
@@ -975,6 +978,8 @@ app.put('/api/settings', async (req, res) => {
   if (
     typeof writingStyle !== 'string' ||
     writingStyle.length > 1000 ||
+    (customWritingStylePresets !== undefined &&
+      !isValidWritingStylePresets(customWritingStylePresets)) ||
     (reportLength !== undefined && !['short', 'standard', 'long'].includes(String(reportLength))) ||
     (allowProfanity !== undefined && typeof allowProfanity !== 'boolean') ||
     (excludedTopics !== undefined &&
@@ -1044,6 +1049,12 @@ app.put('/api/settings', async (req, res) => {
   const state = await store.update((current) => {
     current.settings = {
       writingStyle,
+      customWritingStylePresets: isValidWritingStylePresets(customWritingStylePresets)
+        ? customWritingStylePresets.map((preset) => ({
+            name: preset.name.trim(),
+            value: preset.value,
+          }))
+        : (current.settings.customWritingStylePresets ?? []),
       reportLength: reportLength === 'short' || reportLength === 'long' ? reportLength : 'standard',
       allowProfanity: allowProfanity === true,
       excludedTopics: typeof excludedTopics === 'string' ? excludedTopics : '',

@@ -10,6 +10,7 @@ import {
   defaultNewsSources,
   scheduleRecommendations,
   defaultLeagueStaleAfterHours,
+  isValidWritingStylePresets,
   isLeagueStaleAfterHours,
   leagueSyncFreshness,
   leagueSeasonPhase,
@@ -45,6 +46,30 @@ const league: LeagueConnection = {
   ],
   connectedAt: '2026-01-01',
 };
+
+describe('writing style presets', () => {
+  it('validates bounded, uniquely named reusable writing styles', () => {
+    expect(isValidWritingStylePresets([{ name: 'Draft Night', value: 'Fast and dramatic.' }])).toBe(
+      true,
+    );
+    expect(
+      isValidWritingStylePresets([
+        { name: 'Draft Night', value: 'Fast.' },
+        { name: 'draft night', value: 'Dramatic.' },
+      ]),
+    ).toBe(false);
+    expect(isValidWritingStylePresets([{ name: '   ', value: 'A voice.' }])).toBe(false);
+    expect(isValidWritingStylePresets([{ name: 'Valid', value: ' ' }])).toBe(false);
+    expect(
+      isValidWritingStylePresets(
+        Array.from({ length: 21 }, (_, index) => ({
+          name: `Voice ${index}`,
+          value: 'A distinct voice.',
+        })),
+      ),
+    ).toBe(false);
+  });
+});
 
 describe('ESPN fantasy season bounds', () => {
   it('accepts only integer season years in the supported range', () => {

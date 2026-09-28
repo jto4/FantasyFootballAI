@@ -825,6 +825,7 @@ body {
 .action-row select,
 .schedule-fields input,
 .schedule-fields select,
+.custom-style-presets input,
 .profile-card textarea,
 .connect-modal input,
 .connect-modal select {
@@ -837,6 +838,7 @@ body {
 .settings-fields label,
 .report-length-setting,
 .schedule-fields label,
+.custom-style-presets label,
 .settings-fields .profile-optout,
 .schedule-toggle {
   color: #aaa39c;

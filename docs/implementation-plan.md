@@ -478,13 +478,15 @@ tests across representative league configurations.
   previews without changing delivery policy. A post-draft review and a separate power-ranking event can be prefilled for the day after a platform-reported draft at 9 AM;
   playoff weeks can use the same weekly in-season cadence.
 - [~] Add writing-style presets, owner-defined styles, member profiles, and reviewable
-  import-based learning (Settings provides four editable starting voices plus free-form style,
+  import-based learning (Settings provides four editable starting voices plus up to 20 locally
+  saved, named owner voices that can be applied, replaced, and deleted; free-form style,
   tone, humor, report length, profanity, global/channel topic boundaries, and per-member
   banter controls; imported email/text sources are previewed and explicitly mapped to
   profiles before optional AI analysis; source text retention, separate report and chat
   memory-sharing opt-ins, edits,
-  export, and deletion are owner-controlled. Preset coverage is currently limited to the four
-  built-in voices, and generated prose cannot be guaranteed to honor every style or boundary).
+  export, and deletion are owner-controlled. Custom presets have name/content bounds, are
+  validated in API requests and local backups, and stay inside local settings; generated prose
+  cannot be guaranteed to honor every style or boundary).
 - [~] Add source-backed football news refresh and reports with citations; selectable ESPN/PFF/FOX Sports feeds, background refresh cadence, manual refresh, source-change cache invalidation, stale-cache fallback, partial-feed status, and FOX Sports attribution/usage notice are implemented; additional source choices and live feed-availability verification remain.
 - [~] Add banter settings, boundaries, opt-outs, and send/review policies (per-member
   preferences, global and channel-specific excluded topics, profanity, league scope, memory

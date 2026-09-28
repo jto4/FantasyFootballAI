@@ -20,6 +20,35 @@ export const defaultNewsSources = ['espn'] as const satisfies readonly NewsSourc
 export type ReportKind =
   'offseason-update' | 'draft-hype' | 'draft-review' | 'power-rankings' | 'matchup-preview';
 export type ReportLength = 'short' | 'standard' | 'long';
+export interface WritingStylePreset {
+  name: string;
+  value: string;
+}
+
+/** Keep reusable owner-authored voices bounded and unambiguous at persistence boundaries. */
+export function isValidWritingStylePresets(value: unknown): value is WritingStylePreset[] {
+  if (!Array.isArray(value) || value.length > 20) return false;
+  const names = new Set<string>();
+  for (const item of value) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+    const preset = item as Record<string, unknown>;
+    if (
+      typeof preset.name !== 'string' ||
+      preset.name.trim().length === 0 ||
+      preset.name.length > 40 ||
+      /[\u0000-\u001f\u007f]/.test(preset.name) ||
+      typeof preset.value !== 'string' ||
+      preset.value.trim().length === 0 ||
+      preset.value.length > 1000
+    )
+      return false;
+    const normalizedName = preset.name.trim().toLowerCase();
+    if (names.has(normalizedName)) return false;
+    names.add(normalizedName);
+  }
+  return true;
+}
+
 export const reportLengthGuidance: Record<ReportLength, string> = {
   short: 'Keep the report to about 120–180 words. Prioritize the strongest league-specific point.',
   standard: 'Aim for about 250–400 words. Balance useful analysis with a few sharp jokes.',
@@ -280,6 +309,8 @@ export interface LeagueCalendarEvent {
 }
 export interface AppSettings {
   writingStyle: string;
+  /** Locally stored owner-named voices that can be applied to the active writing style. */
+  customWritingStylePresets?: WritingStylePreset[];
   reportLength: ReportLength;
   allowProfanity: boolean;
   excludedTopics: string;

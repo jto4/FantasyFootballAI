@@ -19,6 +19,7 @@ import {
   defaultLeagueStaleAfterHours,
   defaultNewsSources,
   isLeagueStaleAfterHours,
+  isValidWritingStylePresets,
   normalizeActionSettings,
   normalizeChannelBoundaries,
   normalizeLeagueCalendarEvents,
@@ -124,6 +125,7 @@ const initialState: AppState = {
     actions: structuredClone(defaultActionSettings),
     calendarEvents: [],
     writingStyle: 'Funny, sharp league banter',
+    customWritingStylePresets: [],
     reportLength: 'standard',
     leagueStaleAfterHours: defaultLeagueStaleAfterHours,
     allowProfanity: false,
@@ -812,6 +814,8 @@ export function validateState(input: unknown): AppState {
     Array.isArray(rawSettings) ||
     (rawSettings.writingStyle !== undefined &&
       (typeof rawSettings.writingStyle !== 'string' || rawSettings.writingStyle.length > 1000)) ||
+    (rawSettings.customWritingStylePresets !== undefined &&
+      !isValidWritingStylePresets(rawSettings.customWritingStylePresets)) ||
     (rawSettings.reportLength !== undefined &&
       !['short', 'standard', 'long'].includes(String(rawSettings.reportLength))) ||
     (rawSettings.leagueStaleAfterHours !== undefined &&

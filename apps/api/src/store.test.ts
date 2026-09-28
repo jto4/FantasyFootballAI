@@ -110,6 +110,18 @@ describe('local SQLite store', () => {
     expect(() => validateState(candidate)).toThrow('Invalid settings in local state.');
   });
 
+  it('rejects malformed saved writing style presets in local state', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-writing-presets-'));
+    const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
+    await store.load();
+    const candidate = structuredClone(store.snapshot());
+    candidate.settings.customWritingStylePresets = [
+      { name: 'Commissioner', value: 'Concise.' },
+      { name: 'commissioner', value: 'With more sarcasm.' },
+    ];
+    expect(() => validateState(candidate)).toThrow('Invalid settings in local state.');
+  });
+
   it('validates opt-in Twilio Conversations polling settings', async () => {
     directory = await mkdtemp(join(tmpdir(), 'sidekick-twilio-polling-'));
     const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
@@ -395,8 +407,12 @@ describe('local SQLite store', () => {
     expect(store.snapshot().settings.newsRefreshMinutes).toBe(15);
     expect(store.snapshot().settings.reportLength).toBe('standard');
     expect(store.snapshot().settings.leagueStaleAfterHours).toBe(24);
+    expect(store.snapshot().settings.customWritingStylePresets).toEqual([]);
     await store.update((state) => {
       state.settings.writingStyle = 'Dry and kind';
+      state.settings.customWritingStylePresets = [
+        { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
+      ];
       state.settings.newsSources = ['fox'];
       state.settings.leagueStaleAfterHours = 72;
       state.leagues.push({
@@ -414,6 +430,9 @@ describe('local SQLite store', () => {
     const reopened = openStore(file, join(directory, 'missing-legacy.json'));
     await reopened.load();
     expect(reopened.snapshot().settings.writingStyle).toBe('Dry and kind');
+    expect(reopened.snapshot().settings.customWritingStylePresets).toEqual([
+      { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
+    ]);
     expect(reopened.snapshot().settings.newsSources).toEqual(['fox']);
     expect(reopened.snapshot().settings.leagueStaleAfterHours).toBe(72);
 
