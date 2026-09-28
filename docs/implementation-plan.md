@@ -542,8 +542,11 @@ permissions; MCP tools state their side effects and never send without authoriza
   injected runner. Windows CI also creates and runs a real per-user task from paths containing
   spaces, checks its XML logon trigger and successful exit, then launches the built local API
   under a second isolated task and verifies its health, SQLite data path, graceful stop,
-  restart, and removal. Actual ONLOGON execution at sign-in and launchd/systemd behavior
-  remain unverified.
+  restart, and removal. Ubuntu CI now also launches the built service through a real systemd
+  user unit, checks local API health and SQLite persistence, and verifies status, stop/restart,
+  and uninstall. This caught and fixed systemd's rejection of a quoted `WorkingDirectory`;
+  checkout paths with spaces use C-style escapes. Actual ONLOGON execution at sign-in and
+  launchd behavior remain unverified.
 - Test clean installation, upgrade, uninstall, persistence, and credential storage on
   all supported operating systems.
 - Publish release notes, supported integration matrix, troubleshooting guidance, and
