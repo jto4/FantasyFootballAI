@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,6 +54,10 @@ test('release archive assembly includes each native package and verifies assets'
     assert.equal(result.status, 0, result.stderr || result.stdout);
 
     for (const item of packages) {
+      const sourceEntries = await readdir(join(input, item.name));
+      assert.ok(!sourceEntries.includes('INSTALL.md'));
+      assert.ok(!sourceEntries.includes('LICENSE'));
+
       const archive = join(output, `${item.name}-v1.2.3.zip`);
       const listing = spawnSync('unzip', ['-Z1', archive], { encoding: 'utf8' });
       assert.equal(listing.status, 0, listing.stderr);
@@ -150,6 +154,28 @@ test('release archive assembly includes each native package and verifies assets'
     assert.equal(missingRpm.status, 1);
     assert.match(missingRpm.stderr, /Native installer \(\*\.rpm\) is missing/);
     assert.deepEqual(await readdir(missingRpmOutput), []);
+
+    const symlinkInput = join(directory, 'symlink-input');
+    const symlinkOutput = join(directory, 'symlink-output');
+    const outsideFile = join(directory, 'outside.txt');
+    await writeFile(outsideFile, 'leave this file alone');
+    for (const item of packages) {
+      const packageDirectory = join(symlinkInput, item.name);
+      await mkdir(packageDirectory, { recursive: true });
+      for (const installer of item.installers ?? [item.installer]) {
+        await writeFile(join(packageDirectory, installer), 'native package');
+      }
+    }
+    await symlink(outsideFile, join(symlinkInput, packages[0].name, 'INSTALL.md'));
+    const symlinkRejected = spawnSync(
+      'bash',
+      [assemblyScript, symlinkInput, symlinkOutput, 'v1.2.3'],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    assert.equal(symlinkRejected.status, 1);
+    assert.match(symlinkRejected.stderr, /Artifact contains a symlink or special file/);
+    assert.deepEqual(await readdir(symlinkOutput), []);
+    assert.equal(await readFile(outsideFile, 'utf8'), 'leave this file alone');
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

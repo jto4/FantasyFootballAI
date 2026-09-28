@@ -35,6 +35,9 @@ if [[ -n "$(find "$release_assets" -mindepth 1 -maxdepth 1 -print -quit)" ]]; th
 fi
 
 staging_dir="$(mktemp -d "$release_assets/.assembly.XXXXXX")"
+archives_dir="$staging_dir/archives"
+packages_dir="$staging_dir/packages"
+mkdir -p "$archives_dir" "$packages_dir"
 cleanup_staging() {
   if [[ -n "$staging_dir" && -d "$staging_dir" ]]; then
     rm -r "$staging_dir"
@@ -91,6 +94,10 @@ for artifact_dir in "${artifacts[@]}"; do
     echo "Native installer ($installer_pattern) is missing from $artifact_name." >&2
     exit 1
   fi
+  if [[ -n "$(find "$artifact_dir" ! -type f ! -type d -print -quit)" ]]; then
+    echo "Artifact contains a symlink or special file: $artifact_name" >&2
+    exit 1
+  fi
   if [[ "$artifact_name" == sunday-sidekick-Linux-* ]] &&
     [[ -z "$(find "$artifact_dir" -type f -iname '*.rpm' -print -quit)" ]]; then
     echo "Native installer (*.rpm) is missing from $artifact_name." >&2
@@ -98,11 +105,14 @@ for artifact_dir in "${artifacts[@]}"; do
   fi
 
   archive_name="${artifact_name}-${release_tag}.zip"
-  cp "$repository_root/docs/release-install.md" "$artifact_dir/INSTALL.md"
-  cp "$repository_root/LICENSE" "$artifact_dir/LICENSE"
+  package_dir="$packages_dir/$artifact_name"
+  mkdir "$package_dir"
+  cp -R "$artifact_dir/." "$package_dir/"
+  cp "$repository_root/docs/release-install.md" "$package_dir/INSTALL.md"
+  cp "$repository_root/LICENSE" "$package_dir/LICENSE"
   (
-    cd "$artifact_dir"
-    zip -qr "$staging_dir/$archive_name" . -x '.DS_Store' '*/.DS_Store'
+    cd "$package_dir"
+    zip -qr "$archives_dir/$archive_name" . -x '.DS_Store' '*/.DS_Store'
   )
 done
 
@@ -114,16 +124,18 @@ fi
 cp "$repository_root/docs/release-install.md" "$staging_dir/INSTALL.md"
 cp "$repository_root/LICENSE" "$staging_dir/LICENSE"
 (
-  cd "$staging_dir"
+  cd "$archives_dir"
   if command -v sha256sum >/dev/null 2>&1; then
-    sha256sum ./*.zip > SHA256SUMS
-    sha256sum --check SHA256SUMS
+    sha256sum ./*.zip > "$staging_dir/SHA256SUMS"
+    sha256sum --check "$staging_dir/SHA256SUMS"
   else
-    shasum -a 256 ./*.zip > SHA256SUMS
-    shasum -a 256 --check SHA256SUMS
+    shasum -a 256 ./*.zip > "$staging_dir/SHA256SUMS"
+    shasum -a 256 --check "$staging_dir/SHA256SUMS"
   fi
 )
 
-mv "$staging_dir"/* "$release_assets/"
+mv "$archives_dir"/*.zip "$staging_dir/INSTALL.md" "$staging_dir/LICENSE" \
+  "$staging_dir/SHA256SUMS" "$release_assets/"
+rm -r "$packages_dir" "$archives_dir"
 rmdir "$staging_dir"
 staging_dir=''

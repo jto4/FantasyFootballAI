@@ -538,7 +538,9 @@ permissions; MCP tools state their side effects and never send without authoriza
   license assets, which are also included in each platform ZIP. The shared assembly script requires
   native installers for Debian/Ubuntu (`.deb`), Fedora/RHEL (`.rpm`), Windows, Apple Silicon
   Mac, and Intel Mac; `npm run test:release` verifies each OS/architecture archive, both Linux
-  package formats, and the checksum manifest
+  package formats, and the checksum manifest. Assembly uses per-run staging copies, rejects
+  symlinks and special files in downloaded artifacts, and leaves the output directory empty on
+  invalid input
   on POSIX hosts with the needed utilities. Hosted run `36375960956` passed the source and package matrices. Checksums detect
   transfer corruption but do not authenticate the publisher. The desktop build now uses
   stable Electron Forge 7.11.2 and maintains an `@electron/rebuild` `^4.0.1` override, resolving
