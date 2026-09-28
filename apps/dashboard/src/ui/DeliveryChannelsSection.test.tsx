@@ -40,6 +40,8 @@ describe('delivery channel settings section', () => {
 
     expect(markup).toContain('EMAIL RECIPIENT');
     expect(markup).toContain('SMS RECIPIENT OR TWILIO GROUP SID');
+    expect(markup).toContain('BlueBubbles runs on a Mac signed into Messages.');
+    expect(markup).toContain('Sunday Sidekick can run on macOS, Windows, or Linux');
     expect(markup).toContain('Live message webhook');
     expect(markup).toContain('Draft a reply when someone directly addresses the agent');
     expect(markup).toContain('Send generated chat replies automatically');

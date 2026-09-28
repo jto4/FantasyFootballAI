@@ -82,8 +82,9 @@ export function DeliveryChannelsSection({
             placeholder="iMessage chat GUID from BlueBubbles"
           />
           <small>
-            Connect a BlueBubbles server below, then use its chat GUID for the group you want to
-            receive reports.
+            BlueBubbles runs on a Mac signed into Messages. Sunday Sidekick can run on macOS,
+            Windows, or Linux; its local service must be able to reach that server. Use the chat
+            GUID for the group you want to receive reports.
           </small>
         </label>
         <label>

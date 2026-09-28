@@ -322,10 +322,12 @@ Design acceptance criteria:
 - Support dashboard drafts, Resend email, and Twilio SMS with clear delivery status.
 - [x] Allow reviewed Resend sends to specify a thread Message-ID and matching subject;
       validate both before creating outgoing headers.
-- Add owner-triggered Resend inbox polling and per-message local import. Keep the service
-  loopback-only; bound responses and bodies, strip quoted history, deduplicate by Resend
-  message ID, merge by sender, honor source retention, and never derive an outbound recipient
-  from inbound email.
+- [x] Add owner-triggered Resend inbox polling and per-message local import. The loopback-only
+      dashboard lists at most 50 bounded message headers, fetches a selected body only after an owner
+      action, strips quoted history, deduplicates by Resend message ID, merges into a sender profile,
+      honors per-message retention, and never derives an outbound recipient or sends a reply. Focused
+      router tests cover local-only import, duplicate detection, memory and AI opt-ins, and sanitized
+      credential/provider failures; provider adapter tests cover response bounds and malformed data.
 - [~] Add iMessage through the documented BlueBubbles bridge; outbound group delivery,
   owner-triggered history sync, optional interval polling, and revocable webhook URLs are
   available with an owner-managed Mac bridge, secure credentials, HTTPS requirements, existing
