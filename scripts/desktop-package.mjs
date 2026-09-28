@@ -191,16 +191,20 @@ async function smokeCheckPackage(packageRoot) {
   if (!events.includes('api.started') || !events.includes('api.stopping'))
     throw new Error('The packaged app did not flush its structured startup and shutdown logs.');
 
-  const mcpResult = spawnSync(
-    process.execPath,
-    [
-      join(root, 'scripts', 'packaged-mcp-smoke.mjs'),
-      executable,
-      join(staging, '.mcp-smoke-data'),
-      ...sandboxArgs,
-    ],
-    { cwd: staging, env: process.env, timeout: 30_000, stdio: 'inherit' },
-  );
+  const mcpCommand = useXvfb ? 'xvfb-run' : process.execPath;
+  const mcpArguments = [
+    ...(useXvfb ? ['-a', process.execPath] : []),
+    join(root, 'scripts', 'packaged-mcp-smoke.mjs'),
+    executable,
+    join(staging, '.mcp-smoke-data'),
+    ...sandboxArgs,
+  ];
+  const mcpResult = spawnSync(mcpCommand, mcpArguments, {
+    cwd: staging,
+    env: process.env,
+    timeout: 30_000,
+    stdio: 'inherit',
+  });
   if (mcpResult.error) throw mcpResult.error;
   if (mcpResult.status !== 0)
     throw new Error(
