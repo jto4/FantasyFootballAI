@@ -82,6 +82,7 @@ import { replaceLocalImages } from './image-library.js';
 import { createImageRouter } from './image-routes.js';
 import { createReceivedEmailRouter } from './received-email-routes.js';
 import { groupChatSyncBlockReason } from './group-chat-sync-guard.js';
+import { assertChatReplyConsent } from './chat-reply-consent.js';
 import {
   createPortableBackup,
   decryptPortableBackup,
@@ -91,7 +92,6 @@ import {
 } from './backup-archive.js';
 import {
   isValidMemberLeagueIds,
-  memberContextForChatReply,
   memberContextForReport,
   shouldAnalyzeImportedMessages,
   splitMemoryAnalysis,
@@ -1525,28 +1525,14 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
       () => configuredAI(replyState.settings),
       {
         beforeGenerate: ({ memberContext }) => {
-          const latest = store.snapshot();
-          const blocked = groupChatSyncBlockReason(
-            latest.settings,
-            'imessage',
-            chatGuid,
+          assertChatReplyConsent({
+            currentState: store.snapshot(),
+            expectedLeagueId: replyState.settings.chatReplyLeagueId,
+            memberContext,
+            channel: 'imessage',
+            target: chatGuid,
             isBackgroundPoll,
-          );
-          if (blocked) throw new Error(blocked);
-          if (!latest.settings.chatRepliesEnabled)
-            throw new Error('Group chat replies were disabled before AI generation.');
-          if (latest.settings.chatReplyLeagueId !== replyState.settings.chatReplyLeagueId)
-            throw new Error(
-              'The selected chat reply league changed before AI generation. Try again.',
-            );
-          const latestLeague =
-            latest.leagues.find((item) => item.id === latest.settings.chatReplyLeagueId) ??
-            latest.leagues[0];
-          if (
-            memberContextForChatReply(latest.settings, latest.memories, latestLeague?.id) !==
-            memberContext
-          )
-            throw new Error('Group chat memory sharing changed before AI generation. Try again.');
+          });
         },
       },
     );
@@ -1710,28 +1696,14 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
       () => configuredAI(replyState.settings),
       {
         beforeGenerate: ({ memberContext }) => {
-          const latest = store.snapshot();
-          const blocked = groupChatSyncBlockReason(
-            latest.settings,
-            'sms',
-            conversationSid,
+          assertChatReplyConsent({
+            currentState: store.snapshot(),
+            expectedLeagueId: replyState.settings.chatReplyLeagueId,
+            memberContext,
+            channel: 'sms',
+            target: conversationSid,
             isBackgroundPoll,
-          );
-          if (blocked) throw new Error(blocked);
-          if (!latest.settings.chatRepliesEnabled)
-            throw new Error('Group chat replies were disabled before AI generation.');
-          if (latest.settings.chatReplyLeagueId !== replyState.settings.chatReplyLeagueId)
-            throw new Error(
-              'The selected chat reply league changed before AI generation. Try again.',
-            );
-          const latestLeague =
-            latest.leagues.find((item) => item.id === latest.settings.chatReplyLeagueId) ??
-            latest.leagues[0];
-          if (
-            memberContextForChatReply(latest.settings, latest.memories, latestLeague?.id) !==
-            memberContext
-          )
-            throw new Error('Group chat memory sharing changed before AI generation. Try again.');
+          });
         },
       },
     );

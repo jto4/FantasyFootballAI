@@ -78,10 +78,10 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The current macOS ARM DMG was rebuilt on 2026-09-28 06:09 UTC from the current source with Node.js
+The current macOS ARM DMG was rebuilt on 2026-09-28 06:14 UTC from the current source with Node.js
 25.9.0/npm 11.12.1 after fixing and testing Resend and group-chat memory-consent races, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
 MCP stdio handshake/tool call passed, and `hdiutil verify` confirmed the image checksum. SHA-256 is
-`bf13312692b91b0b4fd801b0897fb8f722f5b30c84c3ef74a7760eb6b0bf2f81`. It remains unsigned and not
+`a587d24242c2289d0ac91a172c4ea099b7c0726774a36fe6b5e0804e15b5f7f8`. It remains unsigned and not
 notarized; Intel Mac and Linux RPM packaging still need hosted verification, and interactive tray
 lifecycle checks remain open.
 

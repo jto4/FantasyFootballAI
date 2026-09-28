@@ -26,12 +26,14 @@ and privacy review; no automated security scan was run.
   stores imported text, advances cursors, or saves drafts. This prevents an in-flight request
   from persisting after an owner disables its settings.
 - A shared pure guard is covered for enabled manual sync, memory opt-out, target changes, and
-  disabled background polling.
+  disabled background polling. A second shared guard now covers the final pre-generation
+  check for reply opt-out, target and background-poll changes, selected-league changes, and
+  changes to member-context sharing; both iMessage and Twilio use this same implementation.
 
 ## Validation
 
 - `npm run typecheck --workspace @sidekick/api`
-- `npm run test --workspace @sidekick/api -- src/chat-replies.test.ts`
+- `npm run test --workspace @sidekick/api -- src/chat-reply-consent.test.ts src/chat-replies.test.ts`
 - Full `npm test`, `npm run typecheck`, `npm run lint`, and `npm run format:check`
 - Full project tests, lint, format check, production build, and packaged smoke checks are
   recorded separately in `docs/tasks.md`.
