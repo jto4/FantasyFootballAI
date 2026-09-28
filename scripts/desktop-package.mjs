@@ -58,6 +58,7 @@ async function copyProjectFiles() {
   const stagedPackage = {
     name: 'sunday-sidekick-desktop',
     productName: 'Sunday Sidekick',
+    description: rootPackage.description,
     version: rootPackage.version,
     private: true,
     type: 'module',

@@ -2,6 +2,17 @@
 
 Sunday Sidekick is a local-first fantasy football companion for league commissioners. It is designed to run on the commissioner's computer, keep league context on that machine, and send updates through integrations the commissioner configures.
 
+**Public repository:** [github.com/jto4/FantasyFootballAI](https://github.com/jto4/FantasyFootballAI)
+
+Clone and run the local app:
+
+```sh
+git clone https://github.com/jto4/FantasyFootballAI.git
+cd FantasyFootballAI
+npm ci
+npm start
+```
+
 > **Showcase:** Sunday Sidekick is featured on Jimmy's project site at [sdeqst.app/projects/sunday-sidekick](https://www.sdeqst.app/projects/sunday-sidekick), with an overview, screenshots, and setup steps.
 
 > Early development: a desktop packaging pipeline now creates a bundled macOS, Windows, or Linux app, and the macOS ARM build has passed a packaged runtime smoke check. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, Windows/Linux runtime checks, and platform lifecycle verification are still open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
