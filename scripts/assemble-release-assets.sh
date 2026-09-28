@@ -91,6 +91,11 @@ for artifact_dir in "${artifacts[@]}"; do
     echo "Native installer ($installer_pattern) is missing from $artifact_name." >&2
     exit 1
   fi
+  if [[ "$artifact_name" == sunday-sidekick-Linux-* ]] &&
+    [[ -z "$(find "$artifact_dir" -type f -iname '*.rpm' -print -quit)" ]]; then
+    echo "Native installer (*.rpm) is missing from $artifact_name." >&2
+    exit 1
+  fi
 
   archive_name="${artifact_name}-${release_tag}.zip"
   cp "$repository_root/docs/release-install.md" "$artifact_dir/INSTALL.md"

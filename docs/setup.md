@@ -47,6 +47,10 @@ dashboard, tray icon, and MCP client before keeping the artifact. The MCP check 
 stdio handshake, discovers tools, and calls `list_leagues` against a temporary loopback API.
 These checks do not replace interactive OS install and lifecycle checks.
 
+Linux packaging produces both Debian `.deb` and Fedora/RHEL `.rpm` packages. On Debian or
+Ubuntu build hosts, install `fakeroot`, `dpkg-dev`, `rpm`, and `xvfb` before running the
+desktop packaging command. Electron Forge documents the RPM maker's [RPM build requirement](https://www.electronforge.io/config/makers/rpm).
+
 The desktop app writes its SQLite database under Electron's per-user application data
 directory and stores secrets in the operating system credential manager. Use the in-app
 backup and restore screen to move an existing SQLite backup between the source-checkout

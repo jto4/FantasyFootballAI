@@ -15,7 +15,7 @@ npm start
 
 > **Showcase:** Sunday Sidekick is featured on Jimmy's project site at [sdeqst.app/projects/sunday-sidekick](https://www.sdeqst.app/projects/sunday-sidekick), with an overview, screenshots, and setup steps.
 
-> Early development: desktop packages include a bundled runtime for Apple Silicon and Intel Macs, Windows, and Linux. The Apple Silicon Mac, Windows, and Linux builds have passed hosted or local smoke checks; Intel Mac packaging is now in the release workflow and needs hosted verification. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, Windows/Linux interactive verification, and platform lifecycle checks remain open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
+> Early development: desktop packages include a bundled runtime for Apple Silicon and Intel Macs, Windows, Debian/Ubuntu, and Fedora/RHEL. Apple Silicon Mac, Windows, and Debian Linux builds have passed hosted or local smoke checks; Intel Mac and RPM packaging still need hosted verification. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, interactive OS verification, and platform lifecycle checks remain open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
 
 ## Requirements
 

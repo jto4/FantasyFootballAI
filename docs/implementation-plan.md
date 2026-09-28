@@ -531,7 +531,9 @@ permissions; MCP tools state their side effects and never send without authoriza
   artifacts and an adjacent SHA-256 manifest into a draft release so an owner can review and
   publish the packages; the assembly job checks out the tagged source for its documentation and
   license assets, which are also included in each platform ZIP. The shared assembly script requires
-  native installers for Linux, Windows, Apple Silicon Mac, and Intel Mac; `npm run test:release` verifies each architecture-specific archive and the checksum manifest
+  native installers for Debian/Ubuntu (`.deb`), Fedora/RHEL (`.rpm`), Windows, Apple Silicon
+  Mac, and Intel Mac; `npm run test:release` verifies each OS/architecture archive, both Linux
+  package formats, and the checksum manifest
   on POSIX hosts with the needed utilities. Hosted run `36375960956` passed the source and package matrices. Checksums detect
   transfer corruption but do not authenticate the publisher. The desktop build now uses
   stable Electron Forge 7.11.2 and maintains an `@electron/rebuild` `^4.0.1` override, resolving

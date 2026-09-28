@@ -29,7 +29,10 @@ test('release archive assembly includes each native package and verifies assets'
   const input = join(directory, 'input');
   const output = join(directory, 'output');
   const packages = [
-    { name: 'sunday-sidekick-Linux-X64', installer: 'SundaySidekick.deb' },
+    {
+      name: 'sunday-sidekick-Linux-X64',
+      installers: ['SundaySidekick.deb', 'sunday-sidekick.rpm'],
+    },
     { name: 'sunday-sidekick-Windows-X64', installer: 'Setup.exe' },
     { name: 'sunday-sidekick-macOS-ARM64', installer: 'Sunday Sidekick-arm64.dmg' },
     { name: 'sunday-sidekick-macOS-X64', installer: 'Sunday Sidekick-x64.dmg' },
@@ -39,7 +42,9 @@ test('release archive assembly includes each native package and verifies assets'
     for (const [index, item] of packages.entries()) {
       const packageDirectory = join(input, item.name);
       await mkdir(packageDirectory, { recursive: true });
-      await writeFile(join(packageDirectory, item.installer), `native package ${index}`);
+      for (const installer of item.installers ?? [item.installer]) {
+        await writeFile(join(packageDirectory, installer), `native package ${index}`);
+      }
     }
 
     const result = spawnSync('bash', [assemblyScript, input, output, 'v1.2.3'], {
@@ -52,7 +57,9 @@ test('release archive assembly includes each native package and verifies assets'
       const archive = join(output, `${item.name}-v1.2.3.zip`);
       const listing = spawnSync('unzip', ['-Z1', archive], { encoding: 'utf8' });
       assert.equal(listing.status, 0, listing.stderr);
-      assert.ok(listing.stdout.split(/\r?\n/).includes(item.installer));
+      for (const installer of item.installers ?? [item.installer]) {
+        assert.ok(listing.stdout.split(/\r?\n/).includes(installer));
+      }
       assert.ok(listing.stdout.split(/\r?\n/).includes('INSTALL.md'));
       assert.ok(listing.stdout.split(/\r?\n/).includes('LICENSE'));
 
@@ -88,7 +95,12 @@ test('release archive assembly includes each native package and verifies assets'
       const packageDirectory = join(invalidInput, item.name);
       await mkdir(packageDirectory, { recursive: true });
       const filename = item.name.includes('Windows') ? 'Setup.txt' : item.installer;
-      await writeFile(join(packageDirectory, filename), `sample ${index}`);
+      for (const installer of item.installers ?? [item.installer]) {
+        await writeFile(
+          join(packageDirectory, filename === 'Setup.txt' ? filename : installer),
+          `sample ${index}`,
+        );
+      }
     }
 
     const rejected = spawnSync('bash', [assemblyScript, invalidInput, invalidOutput, 'v1.2.3'], {
@@ -104,7 +116,9 @@ test('release archive assembly includes each native package and verifies assets'
     for (const item of packages.filter((item) => item.name !== 'sunday-sidekick-macOS-X64')) {
       const packageDirectory = join(missingIntelInput, item.name);
       await mkdir(packageDirectory, { recursive: true });
-      await writeFile(join(packageDirectory, item.installer), 'native package');
+      for (const installer of item.installers ?? [item.installer]) {
+        await writeFile(join(packageDirectory, installer), 'native package');
+      }
     }
     const missingIntel = spawnSync(
       'bash',
@@ -117,6 +131,25 @@ test('release archive assembly includes each native package and verifies assets'
       /Expected packages from Linux, Windows, and both macOS architectures/,
     );
     assert.deepEqual(await readdir(missingIntelOutput), []);
+
+    const missingRpmInput = join(directory, 'missing-rpm-input');
+    const missingRpmOutput = join(directory, 'missing-rpm-output');
+    for (const item of packages) {
+      const packageDirectory = join(missingRpmInput, item.name);
+      await mkdir(packageDirectory, { recursive: true });
+      for (const installer of item.installers ?? [item.installer]) {
+        if (installer.endsWith('.rpm')) continue;
+        await writeFile(join(packageDirectory, installer), 'native package');
+      }
+    }
+    const missingRpm = spawnSync(
+      'bash',
+      [assemblyScript, missingRpmInput, missingRpmOutput, 'v1.2.3'],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    assert.equal(missingRpm.status, 1);
+    assert.match(missingRpm.stderr, /Native installer \(\*\.rpm\) is missing/);
+    assert.deepEqual(await readdir(missingRpmOutput), []);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

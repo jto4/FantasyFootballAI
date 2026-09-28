@@ -18,8 +18,8 @@ native installer artifacts for that platform.
   A signed and notarized release is required for the normal Gatekeeper flow.
 - **Windows:** Run `Setup.exe` from the extracted package. The Squirrel installer installs
   the app for the current user.
-- **Linux:** For Debian or Ubuntu, open the `.deb` package with the desktop package installer.
-  Other Linux distributions are not yet verified.
+- **Linux:** Choose the `.deb` package for Debian or Ubuntu, or the `.rpm` package for Fedora
+  or RHEL-compatible distributions. Other Linux distributions are not yet verified.
 
 The package checksum detects accidental corruption or incomplete downloads, but it does not
 authenticate the publisher. Compare the selected ZIP against its entry in `SHA256SUMS` using

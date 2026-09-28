@@ -28,5 +28,9 @@ module.exports = {
         },
       },
     },
+    {
+      name: '@electron-forge/maker-rpm',
+      platforms: ['linux'],
+    },
   ],
 };
