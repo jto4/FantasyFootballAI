@@ -423,6 +423,29 @@ export function SettingsPage({
     }
   }
 
+  async function testEspnCredentials() {
+    setCredentialTestBusy(true);
+    setMessage('Checking the saved ESPN session with a connected league…');
+    try {
+      const response = await fetch('/api/credentials/espn/test', { method: 'POST' });
+      const result = (await response.json()) as {
+        connected?: boolean;
+        league?: string;
+        season?: number;
+        error?: string;
+      };
+      if (!response.ok || result.connected !== true)
+        throw new Error(result.error ?? 'ESPN session check failed.');
+      setMessage(
+        `ESPN access verified for ${result.league ?? 'the connected league'}${result.season ? ` (${result.season})` : ''}. No league data was changed.`,
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'ESPN session check failed.');
+    } finally {
+      setCredentialTestBusy(false);
+    }
+  }
+
   async function testResendCredentials() {
     const recipient = resendTestRecipient.trim();
     if (!recipient || !window.confirm(`Send a data-free test email to ${recipient}?`)) return;
@@ -983,7 +1006,9 @@ export function SettingsPage({
         }
         onSaveSecret={(provider) => void saveSecret(provider)}
         onRemoveSecret={(provider) => void removeSecret(provider)}
+        espnTestAvailable={leagues.some((league) => league.platform === 'espn')}
         credentialTestBusy={credentialTestBusy}
+        onTestEspn={() => void testEspnCredentials()}
         resendTestRecipient={resendTestRecipient}
         onResendTestRecipientChange={setResendTestRecipient}
         onTestTwilio={() => void testTwilioCredentials()}

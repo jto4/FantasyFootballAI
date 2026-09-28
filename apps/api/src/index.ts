@@ -118,6 +118,7 @@ import { buildMentionReplyDrafts } from './chat-replies.js';
 import { isValidAction, isValidRuntime } from './settings-validation.js';
 import { createStateRouter } from './state-routes.js';
 import { createProjectionRouter } from './projection-routes.js';
+import { createCredentialHealthRouter } from './credential-health-routes.js';
 
 const host = '127.0.0.1';
 const port = Number(process.env.SIDEKICK_PORT ?? 4173);
@@ -205,6 +206,16 @@ app.use((req, res, next) => {
 });
 app.use(createStateRouter({ snapshot: () => store.snapshot() }));
 app.use(createProjectionRouter({ store }));
+app.use(
+  createCredentialHealthRouter({
+    readEspnCredential: () => readCredential('espn'),
+    connectedEspnLeague: () =>
+      store.snapshot().leagues.find((league) => league.platform === 'espn'),
+    verifyEspnLeagueAccess: async (league, sessionCookie) => {
+      await connectorFor('espn', sessionCookie, league.season).fetchLeague(league.id);
+    },
+  }),
+);
 
 app.get('/api/bluebubbles/webhook', async (_req, res) => {
   try {

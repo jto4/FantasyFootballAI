@@ -43,7 +43,9 @@ type Props = {
   onSecretValueChange: (provider: string, value: string) => void;
   onSaveSecret: (provider: string) => void;
   onRemoveSecret: (provider: string) => void;
+  espnTestAvailable: boolean;
   credentialTestBusy: boolean;
+  onTestEspn: () => void;
   resendTestRecipient: string;
   onResendTestRecipientChange: (recipient: string) => void;
   onTestTwilio: () => void;
@@ -66,7 +68,9 @@ export function CredentialsSection({
   onSecretValueChange,
   onSaveSecret,
   onRemoveSecret,
+  espnTestAvailable,
   credentialTestBusy,
+  onTestEspn,
   resendTestRecipient,
   onResendTestRecipientChange,
   onTestTwilio,
@@ -136,6 +140,16 @@ export function CredentialsSection({
                     onClick={onTestTwilio}
                   >
                     {credentialTestBusy ? 'Testing…' : 'Test credentials'}
+                  </button>
+                )}
+                {secret.id === 'espn' && configured && espnTestAvailable && (
+                  <button
+                    type="button"
+                    className="small-button"
+                    disabled={credentialTestBusy}
+                    onClick={onTestEspn}
+                  >
+                    {credentialTestBusy ? 'Testing…' : 'Test access'}
                   </button>
                 )}
                 {configured && (

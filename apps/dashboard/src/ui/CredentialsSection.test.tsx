@@ -9,6 +9,7 @@ const callbacks = {
   onRemoveSecret: vi.fn(),
   onResendTestRecipientChange: vi.fn(),
   onTestTwilio: vi.fn(),
+  onTestEspn: vi.fn(),
   onTestResend: vi.fn(),
   onImagePromptChange: vi.fn(),
   onCreateImage: vi.fn(),
@@ -23,10 +24,12 @@ describe('credentials settings section', () => {
         credentialStoreAvailable: true,
         secretState: [
           { provider: 'openai', configured: true },
+          { provider: 'espn', configured: true },
           { provider: 'resend', configured: false },
         ],
         secretValues: {},
         credentialTestBusy: false,
+        espnTestAvailable: true,
         resendTestRecipient: '',
         imageGenerationConfigured: true,
         imagePrompt: '',
@@ -40,6 +43,7 @@ describe('credentials settings section', () => {
     expect(markup).toContain('AI API key');
     expect(markup).toContain('CONFIGURED');
     expect(markup).toContain('NOT SET');
+    expect(markup).toContain('Test access');
     expect(markup).toContain('placeholder="Enter to replace"');
     expect(markup).toContain('Generate a league image');
     expect(markup).toContain('generation may incur API charges');
