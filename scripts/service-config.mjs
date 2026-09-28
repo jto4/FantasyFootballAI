@@ -55,7 +55,7 @@ After=default.target
 
 [Service]
 Type=simple
-WorkingDirectory=${systemdEscape(repositoryRoot)}
+WorkingDirectory=${systemdPathEscape(repositoryRoot)}
 ExecStart=${systemdEscape(nodePath)} ${systemdEscape(serviceScript)}
 Environment=SIDEKICK_PORT=${servicePort}
 Restart=on-failure
@@ -86,4 +86,12 @@ function systemdEscape(value) {
     .replaceAll('"', '\\"')
     .replaceAll('%', '%%')
     .replaceAll('$', () => '$$')}"`;
+}
+
+function systemdPathEscape(value) {
+  return value.replace(/[\\"%\s]/g, (character) => {
+    if (character === '%') return '%%';
+    const codePoint = character.codePointAt(0).toString(16).padStart(2, '0');
+    return `\\x${codePoint}`;
+  });
 }

@@ -39,7 +39,7 @@ describe('background service configuration', () => {
     assert.match(config, /UMask=0077/);
     assert.match(config, /WantedBy=default.target/);
     assert.match(config, /ExecStart="\/opt\/Node \$\$RUNTIME\/node"/);
-    assert.match(config, /WorkingDirectory="\/home\/league\/100%% ready\/app"/);
+    assert.match(config, /WorkingDirectory=\/home\/league\/100%%\\x20ready\/app/);
     assert.match(config, /Environment=SIDEKICK_PORT=4321/);
   });
 
