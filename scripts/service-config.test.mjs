@@ -79,8 +79,8 @@ describe('background service configuration', () => {
       {
         PATH: '/bin',
         SIDEKICK_SERVICE: '1',
-        SIDEKICK_DATABASE_FILE: '/Users/League Owner/.sidekick/state.sqlite',
-        SIDEKICK_DATA_FILE: '/Users/League Owner/.sidekick/state.json',
+        SIDEKICK_DATABASE_FILE: path.join(paths.dataDirectory, 'state.sqlite'),
+        SIDEKICK_DATA_FILE: path.join(paths.dataDirectory, 'state.json'),
         SIDEKICK_USER_DATA_DIR: paths.dataDirectory,
       },
     );
