@@ -1,0 +1,15 @@
+{
+  "name": "@sidekick/desktop",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "make": "node ../../scripts/desktop-package.mjs"
+  },
+  "buildDependencies": {
+    "electron": "^44.4.5",
+    "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-deb": "7.11.2",
+    "@electron-forge/maker-dmg": "7.11.2",
+    "@electron-forge/maker-squirrel": "7.11.2"
+  }
+}

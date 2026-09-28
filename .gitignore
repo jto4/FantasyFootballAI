@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.env*
+!.env.example
+.sidekick/
+*.sqlite*
+*.tsbuildinfo
+.bundle/
+out/
+apps/desktop/out/
+.DS_Store
