@@ -135,3 +135,25 @@ All runners reported a 465.0–465.1 KiB state response and 409.4 KiB of JavaScr
 assets. The ten-report p95 spread, especially on macOS ARM, shows why hosted measurements
 should guide investigation rather than trigger timing thresholds. Download the named JSON
 artifacts from the workflow run to inspect medians and the full benchmark metadata.
+
+## Current-tree repeat sample recorded on 2026-09-28 05:45 UTC
+
+The current committed tree was rebuilt and measured on macOS ARM under Node.js 25.9.0
+with the same synthetic fixture after adding reusable writing-style presets:
+
+| Measurement                                      |           Result |
+| ------------------------------------------------ | ---------------: |
+| Cold API startup to healthy                      |           186 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.29 / 1.04 ms |
+| Full local state p50 / p95 (30 samples)          |   1.78 / 2.98 ms |
+| Full state response                              |        465.2 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 49.71 / 59.94 ms |
+| Dashboard shell and built assets                 |             3 ms |
+| Dashboard JavaScript and CSS assets              |        415.5 KiB |
+| API process working set                          |        117.2 MiB |
+
+This is consistent with previous API and synthetic report timing samples. The built
+dashboard assets grew by about 6 KiB from the earlier 409.4 KiB sample with the saved
+voice controls. The benchmark shut down its temporary API and removed its synthetic data.
+It excludes model inference, live provider sync, browser paint, long-running scheduler use,
+and lower-powered hardware; this one-host result is not a release performance guarantee.
