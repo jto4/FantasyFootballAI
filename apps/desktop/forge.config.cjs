@@ -58,6 +58,11 @@ module.exports = {
     {
       name: '@electron-forge/maker-rpm',
       platforms: ['linux'],
+      config: {
+        options: {
+          bin: 'Sunday Sidekick',
+        },
+      },
     },
   ],
 };

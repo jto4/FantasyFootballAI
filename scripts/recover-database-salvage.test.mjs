@@ -12,11 +12,32 @@ import {
   recoverSqlitePages,
   recoveryStoreModulePaths,
   salvageDamagedDatabase,
+  supportsSqlitePageRecovery,
 } from './recover-database.mjs';
 
 function addRow(database, table, id, value) {
   database.prepare(`INSERT INTO ${table} (id, payload) VALUES (?, ?)`).run(id, value);
 }
+
+await test('SQLite recovery detection requires a successful functional probe', () => {
+  const help = { status: 0, stdout: '.recover Recover as much data as possible from corrupt db.' };
+  assert.equal(
+    supportsSqlitePageRecovery(help, { status: 1, stdout: '' }),
+    false,
+    'help text alone must not claim the recovery module works',
+  );
+  assert.equal(
+    supportsSqlitePageRecovery(help, { status: 0, stdout: 'BEGIN TRANSACTION; COMMIT;' }),
+    true,
+  );
+  assert.equal(
+    supportsSqlitePageRecovery(
+      { status: 0, stdout: "Nothing matches 'recover'" },
+      { status: 0, stdout: '' },
+    ),
+    false,
+  );
+});
 
 await test('page recovery uses a supported local SQLite CLI without changing its source', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'sidekick-db-page-recovery-'));

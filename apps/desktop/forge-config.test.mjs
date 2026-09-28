@@ -40,6 +40,8 @@ test('keeps local desktop packaging unsigned by default', () => {
   const squirrel = makers.find((maker) => maker.name === '@electron-forge/maker-squirrel');
   assert.equal('certificateFile' in squirrel.config, false);
   assert.equal('certificatePassword' in squirrel.config, false);
+  const rpm = makers.find((maker) => maker.name === '@electron-forge/maker-rpm');
+  assert.equal(rpm.config.options.bin, 'Sunday Sidekick');
 });
 
 test('maps Windows signing credentials only after explicit signing opt-in', () => {

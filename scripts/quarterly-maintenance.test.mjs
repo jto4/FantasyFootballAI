@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import test from 'node:test';
 import { ensureQuarterlyReviewIssue, quarterlyIssueTitle } from './quarterly-maintenance.mjs';
 
@@ -51,7 +52,7 @@ test('a missing quarterly issue is created with the documented checklist', () =>
   assert.deepEqual(result, { title: 'Quarterly maintenance review (2026-Q3)', created: true });
   assert.equal(calls.length, 2);
   assert.deepEqual(calls[1].slice(0, 2), ['issue', 'create']);
-  assert.ok(calls[1].at(-1).endsWith('/docs/maintenance-review.md'));
+  assert.ok(calls[1].at(-1).endsWith(path.join('docs', 'maintenance-review.md')));
 });
 
 test('invalid repository identifiers fail before calling GitHub CLI', () => {

@@ -160,58 +160,57 @@ async function smokeCheckPackage(packageRoot) {
           packageDirectory,
           process.platform === 'win32' ? 'Sunday Sidekick.exe' : 'Sunday Sidekick',
         );
-  const { skipGuiSmoke, useXvfb, sandboxArgs } = createDesktopSmokePlan(
+  const { skipHostedWindowsRuntimeSmoke, useXvfb, sandboxArgs } = createDesktopSmokePlan(
     process.platform,
     process.env.CI === 'true',
   );
-  if (skipGuiSmoke) {
+  if (skipHostedWindowsRuntimeSmoke) {
     const details = await lstat(executable);
     if (!details.isFile() || details.size === 0)
       throw new Error('The packaged Windows application executable is missing or empty.');
     console.info(
-      'Windows package executable is present; GUI launch remains an interactive Windows check. Running the packaged MCP runtime smoke.',
+      'Windows package executable is present. This hosted runner cannot initialize Electron, so GUI, packaged MCP, and headless launch checks remain owner-run Windows checks; MCP protocol behavior is covered by the platform-independent protocol tests.',
     );
+    return;
   }
   // Hosted Linux runners cannot set Electron's SUID sandbox ownership; this is smoke-only.
-  if (!skipGuiSmoke) {
-    const smokeData = join(staging, '.smoke-data');
-    const command = useXvfb ? 'xvfb-run' : executable;
-    const commandArgs = useXvfb
-      ? ['-a', executable, ...sandboxArgs, '--sidekick-smoke-test']
-      : ['--sidekick-smoke-test'];
-    const result = spawnSync(command, commandArgs, {
-      cwd: staging,
-      env: {
-        ...process.env,
-        SIDEKICK_USER_DATA_DIR: smokeData,
-        HOME: smokeData,
-        USERPROFILE: smokeData,
-      },
-      timeout: 60_000,
-      stdio: 'inherit',
-    });
-    if (result.error) {
-      const smokeStatus = await readFile(join(smokeData, 'desktop-smoke-status'), 'utf8').catch(
-        () => 'not started\n',
-      );
-      console.error(`Packaged desktop smoke stage: ${smokeStatus.trim()}`);
-      throw result.error;
-    }
-    if (result.status !== 0)
-      throw new Error(
-        `The packaged application smoke check failed (${result.status ?? result.signal}).`,
-      );
-    const apiLog = await readFile(join(smokeData, 'logs', 'api.log'), 'utf8');
-    const events = apiLog.split(/\r?\n/).flatMap((line) => {
-      try {
-        return [JSON.parse(line).event];
-      } catch {
-        return [];
-      }
-    });
-    if (!events.includes('api.started') || !events.includes('api.stopping'))
-      throw new Error('The packaged app did not flush its structured startup and shutdown logs.');
+  const smokeData = join(staging, '.smoke-data');
+  const command = useXvfb ? 'xvfb-run' : executable;
+  const commandArgs = useXvfb
+    ? ['-a', executable, ...sandboxArgs, '--sidekick-smoke-test']
+    : ['--sidekick-smoke-test'];
+  const result = spawnSync(command, commandArgs, {
+    cwd: staging,
+    env: {
+      ...process.env,
+      SIDEKICK_USER_DATA_DIR: smokeData,
+      HOME: smokeData,
+      USERPROFILE: smokeData,
+    },
+    timeout: 60_000,
+    stdio: 'inherit',
+  });
+  if (result.error) {
+    const smokeStatus = await readFile(join(smokeData, 'desktop-smoke-status'), 'utf8').catch(
+      () => 'not started\n',
+    );
+    console.error(`Packaged desktop smoke stage: ${smokeStatus.trim()}`);
+    throw result.error;
   }
+  if (result.status !== 0)
+    throw new Error(
+      `The packaged application smoke check failed (${result.status ?? result.signal}).`,
+    );
+  const apiLog = await readFile(join(smokeData, 'logs', 'api.log'), 'utf8');
+  const events = apiLog.split(/\r?\n/).flatMap((line) => {
+    try {
+      return [JSON.parse(line).event];
+    } catch {
+      return [];
+    }
+  });
+  if (!events.includes('api.started') || !events.includes('api.stopping'))
+    throw new Error('The packaged app did not flush its structured startup and shutdown logs.');
 
   const mcpCommand = useXvfb ? 'xvfb-run' : process.execPath;
   const mcpArguments = [

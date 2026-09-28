@@ -1,9 +1,9 @@
 export function createDesktopSmokePlan(platform, isCi) {
-  const skipGuiSmoke = platform === 'win32' && isCi;
+  const skipHostedWindowsRuntimeSmoke = platform === 'win32' && isCi;
   const useXvfb = platform === 'linux' && isCi;
 
   return {
-    skipGuiSmoke,
+    skipHostedWindowsRuntimeSmoke,
     useXvfb,
     sandboxArgs: useXvfb ? ['--no-sandbox'] : [],
   };

@@ -168,12 +168,32 @@ export function findSqliteRecoverExecutable() {
         maxBuffer: 16 * 1024,
         windowsHide: true,
       });
-      if (probe.status === 0 && probe.stdout.includes('.recover')) return executable;
+      if (probe.status !== 0 || !probe.stdout.includes('.recover')) continue;
+
+      // Some packaged SQLite CLIs list `.recover` but omit its dbpage recovery module.
+      const recoveryProbe = spawnSync(executable, [':memory:', '.recover --ignore-freelist'], {
+        encoding: 'utf8',
+        timeout: 2_000,
+        maxBuffer: 16 * 1024,
+        windowsHide: true,
+      });
+      if (supportsSqlitePageRecovery(probe, recoveryProbe)) return executable;
     } catch {
       // A missing candidate should not prevent probing later platform-specific paths.
     }
   }
   return undefined;
+}
+
+export function supportsSqlitePageRecovery(helpProbe, recoveryProbe) {
+  return (
+    helpProbe.status === 0 &&
+    typeof helpProbe.stdout === 'string' &&
+    helpProbe.stdout.includes('.recover') &&
+    recoveryProbe.status === 0 &&
+    typeof recoveryProbe.stdout === 'string' &&
+    /\bBEGIN(?: TRANSACTION)?;/i.test(recoveryProbe.stdout)
+  );
 }
 
 function waitForProcess(child) {
