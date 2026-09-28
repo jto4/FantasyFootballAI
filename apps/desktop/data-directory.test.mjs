@@ -193,7 +193,10 @@ if (process.platform === 'win32') {
         path.join(destination, 'nested', 'backup.zip'),
       ]) {
         const acl = execFileSync('icacls.exe', [target], { encoding: 'utf8' });
-        const entries = acl.split(/\r?\n/).filter((line) => /:\(/.test(line));
+        const entries = acl
+          .split(/\r?\n/)
+          .filter((line) => /:\(/.test(line))
+          .map((line) => line.replace(target, '').trim());
         const principals = entries.map((line) => line.split(':(')[0].trim().toLowerCase());
         assert.deepEqual([...principals].sort(), [...trustedPrincipals].sort(), acl);
         assert.ok(
