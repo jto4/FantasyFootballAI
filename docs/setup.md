@@ -72,7 +72,8 @@ SHA256` and compare its `Hash` value with that archive's line in `SHA256SUMS`. C
 do not authenticate who published the files. Apple Silicon is the only Mac installer build
 verified locally. Push and pull-request CI smoke-checks Apple Silicon macOS, Windows, and
 Linux packages; the on-demand and tag release workflow now also builds Intel Mac packages,
-which still need hosted verification. Successful runner results and interactive installation
+and both Linux workflows include RPM tooling for Fedora/RHEL packages. Intel Mac and RPM
+hosted verification is pending. Successful runner results and interactive installation
 checks on each OS are still required before claiming support.
 
 On the League desk, choose **Guided setup** to walk through league connection, AI runtime

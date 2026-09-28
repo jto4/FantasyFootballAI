@@ -11,7 +11,8 @@ release-candidate approval.
 - The previous Linux release included a Debian `.deb` only, leaving Fedora/RHEL users without
   a native package.
 - Added Electron Forge's official `@electron-forge/maker-rpm` alongside the existing Debian
-  maker. The Linux package job installs `rpm`, the documented tool required by that maker.
+  maker. Both Linux smoke-check and on-demand/tag release jobs install `rpm`, the documented
+  tool required by that maker.
 - Release assembly now requires both `.deb` and `.rpm` files in the single Linux artifact;
   the Linux ZIP contains both. The installation guide directs users by distribution.
 - The release fixture covers both package files and confirms a missing RPM is rejected before

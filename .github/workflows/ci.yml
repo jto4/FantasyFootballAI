@@ -165,7 +165,7 @@ jobs:
 
       - name: Install Linux package tools
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install --yes fakeroot dpkg-dev xvfb libsecret-1-dev
+        run: sudo apt-get update && sudo apt-get install --yes fakeroot dpkg-dev rpm xvfb libsecret-1-dev
 
       - name: Install dependencies
         run: npm ci
