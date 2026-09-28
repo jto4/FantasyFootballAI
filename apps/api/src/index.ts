@@ -109,14 +109,12 @@ import {
   twilioConversationMemorySource,
   unseenTwilioConversationMessages,
 } from './twilio-conversation-memory.js';
-import { summarizeLeagues, summarizeReports } from './mcp-data.js';
 import { citedNews } from './news-citations.js';
 import {
   isValidProjectionSourceUrl,
   normalizeProjectionSourceName,
   parseProjectionCsv,
   projectionSourceId,
-  summarizeProjectionSources,
 } from './projections.js';
 import { errorName, logEvent } from './logger.js';
 import { readApiLogTail } from './diagnostic-logs.js';
@@ -124,6 +122,7 @@ import { isRelevantBlueBubblesMessageEvent, sameWebhookToken } from './bluebubbl
 import { startIntervalPoll } from './interval-poll.js';
 import { buildMentionReplyDrafts } from './chat-replies.js';
 import { isValidAction, isValidRuntime } from './settings-validation.js';
+import { createStateRouter } from './state-routes.js';
 
 const host = '127.0.0.1';
 const port = Number(process.env.SIDEKICK_PORT ?? 4173);
@@ -209,6 +208,7 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
   next();
 });
+app.use(createStateRouter({ snapshot: () => store.snapshot() }));
 
 app.get('/api/bluebubbles/webhook', async (_req, res) => {
   try {
@@ -416,26 +416,6 @@ app.put(
     }
   },
 );
-app.get('/api/state', (_req, res) => {
-  const state = store.snapshot();
-  const { playerProjections: _projections, ...dashboardState } = state;
-  void _projections;
-  res.json({
-    ...dashboardState,
-    memories: dashboardState.memories.map(({ sourceText, ...profile }) => {
-      const publicProfile = { ...profile };
-      delete publicProfile.sourceAuthorId;
-      return {
-        ...publicProfile,
-        canMergeImportedConversation: !profile.sourceAuthorId,
-        sourceLength: sourceText.length,
-      };
-    }),
-  });
-});
-app.get('/api/projections', (_req, res) => {
-  res.json(summarizeProjectionSources(store.snapshot().playerProjections));
-});
 app.post('/api/projections/import', async (req, res) => {
   const body = req.body as {
     leagueId?: unknown;
@@ -534,35 +514,6 @@ app.delete('/api/projections/:leagueId', async (req, res) => {
     );
   });
   res.status(204).end();
-});
-app.get('/api/leagues', (_req, res) => {
-  res.json(summarizeLeagues(store.snapshot().leagues));
-});
-app.get('/api/leagues/:id', (req, res) => {
-  const league = store.snapshot().leagues.find((item) => item.id === req.params.id);
-  if (!league) return res.status(404).json({ error: 'League not found.' });
-  res.json(league);
-});
-app.get('/api/reports', (req, res) => {
-  const rawLeagueId = req.query.leagueId;
-  const rawLimit = req.query.limit;
-  if (
-    (rawLeagueId !== undefined && typeof rawLeagueId !== 'string') ||
-    (rawLimit !== undefined && typeof rawLimit !== 'string')
-  )
-    return res.status(400).json({ error: 'Invalid report query.' });
-  const limit = rawLimit === undefined ? 10 : Number(rawLimit);
-  if (!Number.isInteger(limit) || limit < 1 || limit > 50)
-    return res.status(400).json({ error: 'Report limit must be from 1 to 50.' });
-  res.json(summarizeReports(store.snapshot().reports, rawLeagueId, limit));
-});
-app.get('/api/reports/:id', (req, res) => {
-  const report = store.snapshot().reports.find((item) => item.id === req.params.id);
-  if (!report) return res.status(404).json({ error: 'Report not found.' });
-  res.json(report);
-});
-app.get('/api/scheduled-runs', (_req, res) => {
-  res.json(store.snapshot().scheduledRuns);
 });
 app.post('/api/scheduled-runs/:id/retry', async (req, res) => {
   const original = store.snapshot().scheduledRuns.find((run) => run.id === req.params.id);
