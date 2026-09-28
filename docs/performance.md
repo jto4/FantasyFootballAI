@@ -6,6 +6,11 @@ temporary SQLite database, seeds representative synthetic league and report data
 health and full-state API latency, downloads the built dashboard shell and assets, records
 the API process working set, and stops the process and removes the temporary data.
 
+The CI matrix also runs the already-built benchmark on macOS, Windows, and Linux, plus the
+minimum supported Node.js 22.13 runtime on macOS. Each run writes the same JSON measurements
+to a downloadable, run-scoped artifact so maintainers can compare OS and runtime samples
+without treating noisy hosted-runner timings as fixed performance thresholds.
+
 ## Baseline recorded on 2026-09-27
 
 Local macOS ARM, Node.js 25.9.0; synthetic fixture of 8 leagues, 96 teams, 80 member

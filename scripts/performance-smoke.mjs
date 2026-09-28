@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { LocalStore } from '../apps/api/dist/store.js';
@@ -242,39 +242,40 @@ try {
   const dashboardLoadMs = performance.now() - htmlStartedAt;
   const rssBytes = processRssBytes(child.pid);
 
-  console.log(
-    JSON.stringify(
-      {
-        benchmark: 'local-api-and-dashboard-smoke',
-        os: `${process.platform}-${process.arch}`,
-        node: process.version,
-        fixture: { leagues: 8, teams: 96, memberProfiles: 80, reports: 300 },
-        samples: sampleCount,
-        startupMs: Math.round(startupMs),
-        healthLatencyMs: {
-          p50: Number(percentile(healthLatencies, 0.5).toFixed(2)),
-          p95: Number(percentile(healthLatencies, 0.95).toFixed(2)),
-        },
-        stateLatencyMs: {
-          p50: Number(percentile(stateLatencies, 0.5).toFixed(2)),
-          p95: Number(percentile(stateLatencies, 0.95).toFixed(2)),
-        },
-        syntheticReportGenerationMs: {
-          samples: reportSampleCount,
-          p50: Number(percentile(reportGenerationLatencies, 0.5).toFixed(2)),
-          p95: Number(percentile(reportGenerationLatencies, 0.95).toFixed(2)),
-          note: 'Includes prompt preparation, local CLI process startup, and SQLite persistence; excludes model inference.',
-        },
-        statePayloadKiB: Number((statePayloadBytes / 1024).toFixed(1)),
-        dashboardShellAndAssetsMs: Math.round(dashboardLoadMs),
-        dashboardAssetsKiB: Number((assetBytes / 1024).toFixed(1)),
-        apiWorkingSetMiB: rssBytes ? Number((rssBytes / 1024 / 1024).toFixed(1)) : null,
-        note: 'Synthetic local fixture; excludes live provider sync and browser paint timing.',
-      },
-      null,
-      2,
-    ),
-  );
+  const report = {
+    benchmark: 'local-api-and-dashboard-smoke',
+    os: `${process.platform}-${process.arch}`,
+    node: process.version,
+    fixture: { leagues: 8, teams: 96, memberProfiles: 80, reports: 300 },
+    samples: sampleCount,
+    startupMs: Math.round(startupMs),
+    healthLatencyMs: {
+      p50: Number(percentile(healthLatencies, 0.5).toFixed(2)),
+      p95: Number(percentile(healthLatencies, 0.95).toFixed(2)),
+    },
+    stateLatencyMs: {
+      p50: Number(percentile(stateLatencies, 0.5).toFixed(2)),
+      p95: Number(percentile(stateLatencies, 0.95).toFixed(2)),
+    },
+    syntheticReportGenerationMs: {
+      samples: reportSampleCount,
+      p50: Number(percentile(reportGenerationLatencies, 0.5).toFixed(2)),
+      p95: Number(percentile(reportGenerationLatencies, 0.95).toFixed(2)),
+      note: 'Includes prompt preparation, local CLI process startup, and SQLite persistence; excludes model inference.',
+    },
+    statePayloadKiB: Number((statePayloadBytes / 1024).toFixed(1)),
+    dashboardShellAndAssetsMs: Math.round(dashboardLoadMs),
+    dashboardAssetsKiB: Number((assetBytes / 1024).toFixed(1)),
+    apiWorkingSetMiB: rssBytes ? Number((rssBytes / 1024 / 1024).toFixed(1)) : null,
+    note: 'Synthetic local fixture; excludes live provider sync and browser paint timing.',
+  };
+  const serializedReport = JSON.stringify(report, null, 2);
+  console.log(serializedReport);
+  if (process.env.SIDEKICK_PERF_OUTPUT_FILE) {
+    await writeFile(resolve(process.env.SIDEKICK_PERF_OUTPUT_FILE), `${serializedReport}\n`, {
+      mode: 0o600,
+    });
+  }
 } finally {
   if (child.exitCode === null) {
     child.kill('SIGTERM');

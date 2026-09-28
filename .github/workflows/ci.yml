@@ -46,6 +46,18 @@ jobs:
       - name: Build production app
         run: npm run build
 
+      - name: Measure synthetic performance at minimum Node.js version
+        env:
+          SIDEKICK_PERF_OUTPUT_FILE: performance-macos-node-22.13.json
+        run: node scripts/performance-smoke.mjs
+
+      - name: Upload minimum-runtime performance sample
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: performance-macos-node-22.13
+          path: performance-macos-node-22.13.json
+          if-no-files-found: error
+
   verify:
     name: Verify on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -121,6 +133,18 @@ jobs:
         env:
           SIDEKICK_WINDOWS_SERVICE_SMOKE: '1'
         run: npm run test:windows-service
+
+      - name: Measure synthetic performance
+        env:
+          SIDEKICK_PERF_OUTPUT_FILE: performance-${{ runner.os }}-node-22.json
+        run: node scripts/performance-smoke.mjs
+
+      - name: Upload platform performance sample
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: performance-${{ runner.os }}-node-22
+          path: performance-${{ runner.os }}-node-22.json
+          if-no-files-found: error
 
   package:
     name: Smoke-check desktop package on ${{ matrix.os }}
