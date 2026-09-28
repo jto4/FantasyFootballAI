@@ -61,6 +61,7 @@ module.exports = {
       config: {
         options: {
           bin: 'Sunday Sidekick',
+          license: 'MIT',
         },
       },
     },
