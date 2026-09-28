@@ -12,19 +12,19 @@ import {
 } from './data-directory.mjs';
 
 test('desktop data directory selection honors override, saved selection, and default order', () => {
+  const override = path.resolve('tmp', 'override');
+  const saved = path.resolve('tmp', 'saved');
+  const fallback = path.resolve('tmp', 'default');
   assert.equal(
     resolveDataDirectory({
-      environmentOverride: '/tmp/override',
-      savedDirectory: '/tmp/saved',
-      defaultDirectory: '/tmp/default',
+      environmentOverride: override,
+      savedDirectory: saved,
+      defaultDirectory: fallback,
     }),
-    '/tmp/override',
+    override,
   );
-  assert.equal(
-    resolveDataDirectory({ savedDirectory: '/tmp/saved', defaultDirectory: '/tmp/default' }),
-    '/tmp/saved',
-  );
-  assert.equal(resolveDataDirectory({ defaultDirectory: '/tmp/default' }), '/tmp/default');
+  assert.equal(resolveDataDirectory({ savedDirectory: saved, defaultDirectory: fallback }), saved);
+  assert.equal(resolveDataDirectory({ defaultDirectory: fallback }), fallback);
 });
 
 test('desktop data directory selection ignores bad saved preferences and rejects relative paths', () => {
@@ -182,6 +182,11 @@ if (process.platform === 'win32') {
       await copyLocalDirectory(source, destination);
 
       const account = execFileSync('whoami.exe', [], { encoding: 'utf8' }).trim();
+      const trustedPrincipals = new Set([
+        account.toLowerCase(),
+        'nt authority\\system',
+        'builtin\\administrators',
+      ]);
       for (const target of [
         destination,
         path.join(destination, 'nested'),
@@ -189,14 +194,16 @@ if (process.platform === 'win32') {
       ]) {
         const acl = execFileSync('icacls.exe', [target], { encoding: 'utf8' });
         const entries = acl.split(/\r?\n/).filter((line) => /:\(/.test(line));
-        assert.equal(entries.length, 1, acl);
-        assert.match(
-          entries[0],
-          new RegExp(`^\\s*${account.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}:`),
+        const principals = entries.map((line) => line.split(':(')[0].trim().toLowerCase());
+        assert.deepEqual([...principals].sort(), [...trustedPrincipals].sort(), acl);
+        assert.ok(
+          entries.every((line) => /\(F\)/.test(line)),
+          acl,
         );
-        assert.match(entries[0], /\(F\)/);
-        if (target === destination) assert.doesNotMatch(entries[0], /\(I\)/);
-        else assert.match(entries[0], /\(I\)/);
+        assert.ok(
+          entries.every((line) => (target === destination ? !/\(I\)/ : /\(I\)/).test(line)),
+          acl,
+        );
       }
     } finally {
       await rm(root, { recursive: true, force: true });
