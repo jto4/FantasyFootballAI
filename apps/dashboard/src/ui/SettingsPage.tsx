@@ -5,6 +5,7 @@ import { credentialStatusLabel, parseCredentialStatuses } from './credential-sta
 import { YahooConnectionSection, type YahooOAuthStatus } from './YahooConnectionSection.js';
 import { AIRuntimeSection } from './AIRuntimeSection.js';
 import { AIMemoryPrivacySection } from './AIMemoryPrivacySection.js';
+import { WritingStyleSection } from './WritingStyleSection.js';
 import { Copy, Download, RefreshCw, Save, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import {
   applyScheduleRecommendations,
@@ -18,7 +19,6 @@ import {
   platformDraftCalendarSuggestions,
   normalizeChannelBoundaries,
   supportedNewsSources,
-  supportedMessageChannels,
   type ActionSetting,
   type AppSettings,
   type LeagueCalendarEvent,
@@ -101,30 +101,6 @@ const timezonesForCalendar = [
   'America/Los_Angeles',
   'UTC',
 ];
-const channelNames = {
-  dashboard: 'Dashboard drafts',
-  email: 'Email',
-  sms: 'SMS',
-  imessage: 'iMessage',
-} as const;
-const writingStylePresets = [
-  { name: 'Commissioner clean', value: 'Clear, concise league updates with light humor.' },
-  {
-    name: 'Sharp league-mate',
-    value:
-      'Funny, sharp fantasy-football banter. Tease roster choices and predictions, then back it up with league data.',
-  },
-  {
-    name: 'Dry analyst',
-    value: 'Wry, understated commentary with concise analysis. Let the stats make the joke.',
-  },
-  {
-    name: 'Hype crew',
-    value:
-      'High-energy, celebratory football commentary. Build anticipation and make every matchup feel big.',
-  },
-];
-
 export function SettingsPage({
   settings,
   leagues,
@@ -1301,116 +1277,35 @@ export function SettingsPage({
           copies stay on this computer until you delete them.
         </small>
       </section>
-      <section className="settings-card">
-        <div className="settings-card-title">
-          <div>
-            <h2 ref={voiceHeadingRef} tabIndex={-1}>
-              Writing style
-            </h2>
-            <p>Set the personality and boundaries for league updates.</p>
-          </div>
-          <ShieldCheck size={18} />
-        </div>
-        <label>
-          STARTING STYLE
-          <select
-            value={
-              writingStylePresets.find((preset) => preset.value === form.writingStyle)?.name ??
-              'Custom'
-            }
-            onChange={(event) => {
-              const preset = writingStylePresets.find((item) => item.name === event.target.value);
-              if (preset) setForm((current) => ({ ...current, writingStyle: preset.value }));
-            }}
-          >
-            <option value="Custom">Custom style</option>
-            {writingStylePresets.map((preset) => (
-              <option key={preset.name} value={preset.name}>
-                {preset.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <textarea
-          value={form.writingStyle}
-          maxLength={1000}
-          onChange={(event) =>
-            setForm((current) => ({ ...current, writingStyle: event.target.value }))
-          }
-          placeholder="Funny, sharp, stats-aware, never mean about family or health…"
-        />
-        <small>
-          Choose a starting voice, then edit every word. Use fantasy decisions as the target of
-          jokes. Excluded topics are passed to the AI as boundaries for every generated report.
-        </small>
-        <label className="report-length-setting">
-          REPORT LENGTH
-          <select
-            value={form.reportLength}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                reportLength: event.target.value as NonNullable<AppSettings['reportLength']>,
-              }))
-            }
-          >
-            <option value="short">Short · 120–180 words</option>
-            <option value="standard">Standard · 250–400 words</option>
-            <option value="long">Long · 450–650 words</option>
-          </select>
-        </label>
-        <label className="switch-label">
-          <input
-            type="checkbox"
-            checked={form.allowProfanity}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, allowProfanity: event.target.checked }))
-            }
-          />
-          Allow profanity
-        </label>
-        <div className="settings-fields">
-          <label>
-            TOPICS TO AVOID
-            <textarea
-              value={form.excludedTopics}
-              maxLength={2000}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, excludedTopics: event.target.value }))
-              }
-              placeholder="Family, health, work, politics…"
-            />
-          </label>
-        </div>
-        <div className="channel-boundaries">
-          <h3>Additional channel boundaries</h3>
-          <p>
-            Add subjects to avoid for each destination. Only the selected destination’s boundary is
-            included in that report’s AI prompt.
-          </p>
-          <div className="settings-fields two">
-            {supportedMessageChannels.map((channel) => (
-              <label key={channel}>
-                {channelNames[channel].toUpperCase()} · EXTRA TOPICS TO AVOID
-                <textarea
-                  value={form.channelBoundaries?.[channel] ?? ''}
-                  maxLength={2000}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      channelBoundaries: {
-                        ...normalizeChannelBoundaries(current.channelBoundaries),
-                        [channel]: event.target.value,
-                      },
-                    }))
-                  }
-                  placeholder="No additional limits"
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-      </section>
+      <WritingStyleSection
+        headingRef={voiceHeadingRef}
+        writingStyle={form.writingStyle}
+        reportLength={form.reportLength ?? 'standard'}
+        allowProfanity={form.allowProfanity}
+        excludedTopics={form.excludedTopics}
+        channelBoundaries={normalizeChannelBoundaries(form.channelBoundaries)}
+        onWritingStyleChange={(writingStyle) =>
+          setForm((current) => ({ ...current, writingStyle }))
+        }
+        onReportLengthChange={(reportLength) =>
+          setForm((current) => ({ ...current, reportLength }))
+        }
+        onProfanityChange={(allowProfanity) =>
+          setForm((current) => ({ ...current, allowProfanity }))
+        }
+        onExcludedTopicsChange={(excludedTopics) =>
+          setForm((current) => ({ ...current, excludedTopics }))
+        }
+        onChannelBoundaryChange={(channel, value) =>
+          setForm((current) => ({
+            ...current,
+            channelBoundaries: {
+              ...normalizeChannelBoundaries(current.channelBoundaries),
+              [channel]: value,
+            },
+          }))
+        }
+      />
       <AIRuntimeSection
         headingRef={aiHeadingRef}
         runtime={runtime}
