@@ -152,6 +152,21 @@ with the same synthetic fixture after the Resend and group-chat memory-consent r
 | Dashboard JavaScript and CSS assets              |        415.7 KiB |
 | API process working set                          |        118.8 MiB |
 
+## Consent-guard follow-up sample recorded on 2026-09-28 06:09 UTC
+
+Same host, runtime, synthetic fixture, and sample counts as the preceding current-tree run.
+
+| Metric                                           |            Value |
+| ------------------------------------------------ | ---------------: |
+| API startup                                      |           184 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.31 / 0.74 ms |
+| Full-state endpoint p50 / p95 (30 samples)       |   1.78 / 2.59 ms |
+| Synthetic report pipeline p50 / p95 (10 samples) | 53.01 / 58.98 ms |
+| State payload                                    |        465.2 KiB |
+| Dashboard shell and assets                       |             3 ms |
+| Dashboard assets                                 |        415.7 KiB |
+| API process working set                          |          119 MiB |
+
 Health and full-state results are consistent with previous API samples. Synthetic report
 timing includes local CLI startup but no model inference. The built dashboard assets are
 about 6.3 KiB larger than the earlier 409.4 KiB sample with the saved voice controls. The

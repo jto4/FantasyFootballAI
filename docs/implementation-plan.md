@@ -78,12 +78,17 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The current macOS ARM DMG was rebuilt on 2026-09-28 06:02 UTC from the committed source with Node.js
+The current macOS ARM DMG was rebuilt on 2026-09-28 06:09 UTC from the current source with Node.js
 25.9.0/npm 11.12.1 after fixing and testing Resend and group-chat memory-consent races, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
 MCP stdio handshake/tool call passed, and `hdiutil verify` confirmed the image checksum. SHA-256 is
-`73498b7d57af846c4af4448172e67d99a31c4e72540a14320ffb7bf9bab86c82`. It remains unsigned and not
+`bf13312692b91b0b4fd801b0897fb8f722f5b30c84c3ef74a7760eb6b0bf2f81`. It remains unsigned and not
 notarized; Intel Mac and Linux RPM packaging still need hosted verification, and interactive tray
 lifecycle checks remain open.
+
+Group-chat mention replies recheck destination, reply/background-poll switches, selected league,
+and member-context consent synchronously before each model call, including after asynchronous AI
+provider initialization. The focused API test and full local test suite cover the abort-before-model
+behavior; this is a local code change and has not yet been pushed or released.
 The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The polling configuration and restore behavior pass repository checks; live Twilio polling and
 Windows/Linux packaged runtime verification remain open.
 

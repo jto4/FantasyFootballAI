@@ -204,6 +204,27 @@ describe('group chat reply drafts', () => {
     expect(generate.mock.calls[1]?.[0].prompt).not.toContain('private imported messages');
   });
 
+  it('checks current consent immediately before each AI generation', async () => {
+    const generate = vi.fn(async (_request: AIRequest) => 'Reply');
+    const beforeGenerate = vi.fn(() => {
+      throw new Error('Group chat memory sharing changed before AI generation. Try again.');
+    });
+
+    await expect(
+      buildMentionReplyDrafts(
+        { settings: settings(), leagues: [league], memories: [], reports: [] },
+        incoming(1),
+        'imessage',
+        { id: 'fixture', generate },
+        { beforeGenerate },
+      ),
+    ).rejects.toThrow('Group chat memory sharing changed before AI generation');
+    expect(beforeGenerate).toHaveBeenCalledWith({
+      memberContext: 'disabled by owner',
+    });
+    expect(generate).not.toHaveBeenCalled();
+  });
+
   it('rejects chat replies without a configured group or AI runtime', async () => {
     await expect(
       buildMentionReplyDrafts(

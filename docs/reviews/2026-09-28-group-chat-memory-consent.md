@@ -18,6 +18,10 @@ and privacy review; no automated security scan was run.
 - Member conversation analysis checks the current memory and analysis opt-in before each
   participant-specific AI call. Mention-reply generation receives a fresh state snapshot
   after history retrieval; iMessage also refreshes once more after member analysis.
+- Mention-reply generation now performs a synchronous last-moment check immediately before
+  each model call, after asynchronous provider construction. It re-reads the destination,
+  background polling and reply toggles, selected league, and the exact member-context text
+  that would be sent. A mismatch aborts before calling the model.
 - The final SQLite update still checks memory, target, polling, and reply controls before it
   stores imported text, advances cursors, or saves drafts. This prevents an in-flight request
   from persisting after an owner disables its settings.
@@ -27,7 +31,8 @@ and privacy review; no automated security scan was run.
 ## Validation
 
 - `npm run typecheck --workspace @sidekick/api`
-- `npm test --workspace @sidekick/api -- --run src/group-chat-sync-guard.test.ts`
+- `npm run test --workspace @sidekick/api -- src/chat-replies.test.ts`
+- Full `npm test`, `npm run typecheck`, `npm run lint`, and `npm run format:check`
 - Full project tests, lint, format check, production build, and packaged smoke checks are
   recorded separately in `docs/tasks.md`.
 
