@@ -2,6 +2,8 @@
 
 For contributor workflows and the repeatable local performance smoke benchmark, see
 [`AGENTS.md`](../AGENTS.md) and [`performance.md`](performance.md).
+For common install, connection, scheduling, delivery, recovery, and MCP problems, see the
+[troubleshooting guide](troubleshooting.md).
 
 To verify the current user's OS credential store without touching saved Sidekick credentials,
 run `npm run credentials:smoke`. It stores a random temporary value in an isolated service

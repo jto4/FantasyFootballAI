@@ -17,6 +17,8 @@ Use this page to find the right project context and keep the records in sync.
 ## Reference
 
 - [`setup.md`](setup.md) — source setup, credentials, providers, data handling, and operations.
+- [`troubleshooting.md`](troubleshooting.md) — common install, provider, scheduling, delivery,
+  recovery, and MCP issues.
 - [`architecture.md`](architecture.md) — service boundaries, integrations, storage, and data
   flow.
 - [`decisions.md`](decisions.md) — durable architectural choices and why they were made.

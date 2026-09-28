@@ -555,8 +555,9 @@ permissions; MCP tools state their side effects and never send without authoriza
 - Test clean installation, upgrade, uninstall, persistence, and credential storage on
   all supported operating systems.
 - Publish release notes, supported integration matrix, troubleshooting guidance, and
-  supported-platform guidance for the public GitHub repository. The current integration and OS
-  status is documented in `docs/support-matrix.md` but needs owner review before public release.
+  supported-platform guidance for the public GitHub repository. The troubleshooting guide
+  and current integration/OS matrix are in `docs/troubleshooting.md` and
+  `docs/support-matrix.md`; the owner must review support claims before public release.
   A desktop installation guide and MIT license ship as standalone release assets and inside each
   OS archive; release notes and verified support claims remain. Contribution setup and PR checks
   are documented in `CONTRIBUTING.md`.
