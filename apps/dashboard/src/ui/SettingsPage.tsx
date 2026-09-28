@@ -10,7 +10,8 @@ import { LocalBackupSection } from './LocalBackupSection.js';
 import { DesktopSettingsSections } from './DesktopSettingsSections.js';
 import { CredentialsSection, type LocalImage, type SecretState } from './CredentialsSection.js';
 import { AutomaticActionsSection } from './AutomaticActionsSection.js';
-import { Copy, RefreshCw, Save } from 'lucide-react';
+import { DeliveryChannelsSection } from './DeliveryChannelsSection.js';
+import { RefreshCw, Save } from 'lucide-react';
 import {
   applyScheduleRecommendations,
   isValidTimezone,
@@ -153,10 +154,6 @@ export function SettingsPage({
     secretState.find((item) => item.provider === 'bluebubbles')?.configured === true;
   const twilioConfigured =
     secretState.find((item) => item.provider === 'twilio')?.configured === true;
-  const validTwilioConversationTarget = /^CH[0-9a-fA-F]{32}$/.test(form.smsRecipient?.trim() ?? '');
-  const chatReplyDestinationReady =
-    (validTwilioConversationTarget && twilioConfigured) ||
-    (Boolean(form.imessageChatGuid?.trim()) && blueBubblesConfigured);
   const imageGenerationConfigured =
     secretState.find((item) => item.provider === 'image-generation')?.configured === true;
   useEffect(() => {
@@ -961,278 +958,20 @@ export function SettingsPage({
             the League desk to fetch them sooner.
           </p>
         </div>
-        <div className="settings-fields two recipients">
-          <label>
-            EMAIL RECIPIENT
-            <input
-              value={form.emailRecipient ?? ''}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, emailRecipient: event.target.value }))
-              }
-              placeholder="league@example.com"
-            />
-          </label>
-          <label>
-            SMS RECIPIENT OR TWILIO GROUP SID
-            <input
-              value={form.smsRecipient ?? ''}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, smsRecipient: event.target.value }))
-              }
-              placeholder="+15555550123"
-            />
-            <small>
-              Use a phone number for direct SMS or an existing Twilio Conversations SID (CH…) to
-              send reports into that group. The app does not create conversations or add members.
-            </small>
-          </label>
-          <label>
-            IMESSAGE GROUP CHAT ID
-            <input
-              value={form.imessageChatGuid ?? ''}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, imessageChatGuid: event.target.value }))
-              }
-              placeholder="iMessage chat GUID from BlueBubbles"
-            />
-            <small>
-              Connect a BlueBubbles server below, then use its chat GUID for the group you want to
-              receive reports.
-            </small>
-          </label>
-          <label>
-            YOUR NAME IN THE GROUP CHAT
-            <input
-              required
-              value={form.imessageOwnerName ?? 'League owner'}
-              maxLength={100}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, imessageOwnerName: event.target.value }))
-              }
-              placeholder="The name friends use for you"
-            />
-            <small>Used to identify messages sent from your own iMessage account.</small>
-          </label>
-        </div>
-        <label className="switch-label">
-          <input
-            type="checkbox"
-            checked={form.twilioConversationAutoSyncEnabled ?? false}
-            disabled={!form.memoryEnabled || !validTwilioConversationTarget || !twilioConfigured}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                twilioConversationAutoSyncEnabled: event.target.checked,
-              }))
-            }
-          />
-          Automatically sync this Twilio Conversations group
-        </label>
-        <div className="schedule-fields">
-          <label>
-            CHECK FOR NEW TWILIO MESSAGES
-            <select
-              value={form.twilioConversationSyncIntervalMinutes ?? 15}
-              disabled={!form.twilioConversationAutoSyncEnabled}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  twilioConversationSyncIntervalMinutes: Number(event.target.value) as
-                    5 | 15 | 30 | 60,
-                }))
-              }
-            >
-              {[5, 15, 30, 60].map((minutes) => (
-                <option key={minutes} value={minutes}>
-                  Every {minutes} minutes
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <p className="schedule-explainer">
-          When enabled, the running app checks only the configured Twilio group. History is imported
-          page by page using the same local deduplication and retention rules as manual sync. AI
-          analysis still requires its separate opt-in; memory must remain enabled.
-        </p>
-        {(!validTwilioConversationTarget || !twilioConfigured) && (
-          <p className="schedule-explainer">
-            Set an existing Twilio Conversations SID as the SMS target and save Twilio credentials
-            before enabling automatic sync.
-          </p>
-        )}
-        {twilioAutoSyncStatus?.lastCheckedAt && (
-          <p className="schedule-explainer" role="status">
-            Last automatic Twilio check:{' '}
-            {new Date(twilioAutoSyncStatus.lastCheckedAt).toLocaleString()}.
-            {twilioAutoSyncStatus.lastError
-              ? ` ${twilioAutoSyncStatus.lastError}`
-              : ` ${twilioAutoSyncStatus.lastAddedMessages ?? 0} new messages imported.`}
-          </p>
-        )}
-        <label className="switch-label">
-          <input
-            type="checkbox"
-            checked={form.imessageAutoSyncEnabled}
-            disabled={
-              !form.memoryEnabled || !form.imessageChatGuid?.trim() || !blueBubblesConfigured
-            }
-            onChange={(event) =>
-              setForm((current) => ({ ...current, imessageAutoSyncEnabled: event.target.checked }))
-            }
-          />
-          Automatically sync this group chat
-        </label>
-        <div className="schedule-fields">
-          <label>
-            CHECK FOR NEW MESSAGES
-            <select
-              value={form.imessageSyncIntervalMinutes}
-              disabled={!form.imessageAutoSyncEnabled}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  imessageSyncIntervalMinutes: Number(event.target.value) as 5 | 15 | 30 | 60,
-                }))
-              }
-            >
-              {[5, 15, 30, 60].map((minutes) => (
-                <option key={minutes} value={minutes}>
-                  Every {minutes} minutes
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <p className="schedule-explainer">
-          When enabled, the running app checks only this chat on the selected interval. New message
-          text stays local unless conversation analysis is separately enabled. Turning off member
-          memory disables polling. Retention settings still apply.
-        </p>
-        {!blueBubblesConfigured && (
-          <p className="schedule-explainer">
-            Save BlueBubbles server settings in Credentials before enabling automatic sync.
-          </p>
-        )}
-        <div className="schedule-fields">
-          <div>
-            <strong>Live message webhook</strong>
-            <p className="schedule-explainer">
-              Optional when BlueBubbles and Sunday Sidekick run on the same computer. Create a
-              private local URL, then add it as a <code>new-message</code> webhook in BlueBubbles.
-              It triggers the same bounded history sync and memory settings as polling. The URL
-              contains a secret and is shown once; regenerate it if you lose it.
-            </p>
-            <div className="button-row">
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => void createBlueBubblesWebhook()}
-              >
-                {blueBubblesWebhookConfigured ? 'Regenerate webhook URL' : 'Create webhook URL'}
-              </button>
-              {blueBubblesWebhookConfigured && (
-                <button
-                  type="button"
-                  className="small-button danger"
-                  onClick={() => void revokeBlueBubblesWebhook()}
-                >
-                  Revoke webhook
-                </button>
-              )}
-            </div>
-            {blueBubblesWebhookUrl && (
-              <div className="credential-test">
-                <input
-                  type="text"
-                  readOnly
-                  value={blueBubblesWebhookUrl}
-                  aria-label="Private BlueBubbles webhook URL"
-                />
-                <button
-                  type="button"
-                  className="small-button"
-                  onClick={() => {
-                    void navigator.clipboard.writeText(blueBubblesWebhookUrl);
-                    setMessage('Webhook URL copied. Paste it into BlueBubbles.');
-                  }}
-                >
-                  <Copy size={13} /> Copy URL
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-        {imessageAutoSyncStatus?.lastCheckedAt && (
-          <p className="schedule-explainer" role="status">
-            Last automatic check: {new Date(imessageAutoSyncStatus.lastCheckedAt).toLocaleString()}.
-            {imessageAutoSyncStatus.lastError
-              ? ` ${imessageAutoSyncStatus.lastError}`
-              : ` ${imessageAutoSyncStatus.lastAddedMessages ?? 0} new messages imported.`}
-          </p>
-        )}
-        <div className="settings-fields two recipients">
-          <label>
-            GROUP CHAT AGENT NAME OR MENTION
-            <input
-              maxLength={60}
-              required
-              value={form.chatAgentName ?? 'Sunday Sidekick'}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, chatAgentName: event.target.value }))
-              }
-              placeholder="Sunday Sidekick"
-            />
-          </label>
-          <label>
-            LEAGUE CONTEXT FOR CHAT REPLIES
-            <select
-              value={form.chatReplyLeagueId ?? ''}
-              disabled={leagues.length === 0}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, chatReplyLeagueId: event.target.value }))
-              }
-            >
-              {leagues.length === 0 && <option value="">Connect a league first</option>}
-              {leagues.map((league) => (
-                <option value={league.id} key={league.id}>
-                  {league.displayName}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <label className="switch-label">
-          <input
-            type="checkbox"
-            checked={form.chatRepliesEnabled === true}
-            disabled={!form.memoryEnabled || !chatReplyDestinationReady || leagues.length === 0}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, chatRepliesEnabled: event.target.checked }))
-            }
-          />
-          Draft a reply when someone directly addresses the agent
-        </label>
-        <label className="switch-label">
-          <input
-            type="checkbox"
-            checked={form.chatRepliesAutoSend === true}
-            disabled={form.chatRepliesEnabled !== true}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, chatRepliesAutoSend: event.target.checked }))
-            }
-          />
-          Send generated chat replies automatically
-        </label>
-        <p className="schedule-explainer">
-          This is off by default. When enabled, a group sync checks new messages for a first-line “
-          {form.chatAgentName || 'Sunday Sidekick'}” or “@{form.chatAgentName || 'Sunday Sidekick'}”
-          mention, sends that message and the selected league context to your configured AI runtime,
-          and saves a reply draft. By default, review and send from Schedule & drafts. If you
-          separately enable automatic sending, generated replies go directly to the configured
-          group. The configured group channel is used, and member notes are included only when their
-          separate report-context setting is enabled.
-        </p>
+        <DeliveryChannelsSection
+          settings={form}
+          setSettings={setForm}
+          leagues={leagues}
+          twilioConfigured={twilioConfigured}
+          twilioAutoSyncStatus={twilioAutoSyncStatus}
+          blueBubblesConfigured={blueBubblesConfigured}
+          imessageAutoSyncStatus={imessageAutoSyncStatus}
+          blueBubblesWebhookConfigured={blueBubblesWebhookConfigured}
+          blueBubblesWebhookUrl={blueBubblesWebhookUrl}
+          onCreateWebhook={() => void createBlueBubblesWebhook()}
+          onRevokeWebhook={() => void revokeBlueBubblesWebhook()}
+          onNotice={setMessage}
+        />
       </section>
       <CredentialsSection
         headingRef={credentialsHeadingRef}
