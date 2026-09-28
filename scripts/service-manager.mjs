@@ -21,6 +21,7 @@ export function createServiceManager({
   repositoryRoot = defaultRepositoryRoot,
   nodePath = process.execPath,
   userId = process.getuid?.(),
+  windowsTaskName = serviceName,
   runCommand = spawnCommand,
   fetchImpl = globalThis.fetch,
   logger = console,
@@ -84,18 +85,18 @@ export function createServiceManager({
 
   function installWindowsTask() {
     const taskCommand = windowsTaskCommand(nodePath, paths.serviceScript);
-    invoke('schtasks.exe', ['/End', '/TN', serviceName], { allowFailure: true });
+    invoke('schtasks.exe', ['/End', '/TN', windowsTaskName], { allowFailure: true });
     invoke('schtasks.exe', [
       '/Create',
       '/TN',
-      serviceName,
+      windowsTaskName,
       '/SC',
       'ONLOGON',
       '/TR',
       taskCommand,
       '/F',
     ]);
-    invoke('schtasks.exe', ['/Run', '/TN', serviceName]);
+    invoke('schtasks.exe', ['/Run', '/TN', windowsTaskName]);
     logger.info(`Installed and started ${serviceName}. It will start when you sign in to Windows.`);
   }
 
@@ -112,7 +113,7 @@ export function createServiceManager({
       invoke('systemctl', ['--user', 'daemon-reload'], { allowFailure: true });
     } else if (platform === 'win32') {
       await stopWindowsTaskGracefully();
-      invoke('schtasks.exe', ['/Delete', '/TN', serviceName, '/F'], { allowFailure: true });
+      invoke('schtasks.exe', ['/Delete', '/TN', windowsTaskName, '/F'], { allowFailure: true });
     } else {
       throw new Error(`Background service uninstallation is unsupported on ${platform}.`);
     }
@@ -136,7 +137,7 @@ export function createServiceManager({
       invoke('systemctl', ['--user', action, 'sunday-sidekick.service']);
     } else if (platform === 'win32') {
       if (action === 'stop') await stopWindowsTaskGracefully();
-      else invoke('schtasks.exe', ['/Run', '/TN', serviceName]);
+      else invoke('schtasks.exe', ['/Run', '/TN', windowsTaskName]);
     } else {
       throw new Error(`Background service control is unsupported on ${platform}.`);
     }
@@ -173,7 +174,7 @@ export function createServiceManager({
         }
       }
     }
-    invoke('schtasks.exe', ['/End', '/TN', serviceName], { allowFailure: true });
+    invoke('schtasks.exe', ['/End', '/TN', windowsTaskName], { allowFailure: true });
   }
 
   async function showStatus() {
@@ -185,7 +186,7 @@ export function createServiceManager({
         allowFailure: true,
       });
     } else if (platform === 'win32') {
-      invoke('schtasks.exe', ['/Query', '/TN', serviceName, '/FO', 'LIST', '/V'], {
+      invoke('schtasks.exe', ['/Query', '/TN', windowsTaskName, '/FO', 'LIST', '/V'], {
         allowFailure: true,
       });
     } else {
