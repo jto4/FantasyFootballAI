@@ -245,7 +245,9 @@ async function start() {
         'The packaged SQLite recovery checker could not read the new local database.',
       );
     console.info('Packaged desktop smoke check passed: API and dashboard are responding locally.');
-    app.quit();
+    // Smoke checks run in headless CI; shut down the child directly before bypassing UI quit hooks.
+    await stopApi(dataDirectory);
+    app.exit(0);
     return;
   }
   await writeFile(join(dataDirectory, 'service-port'), `${apiPort}\n`, { mode: 0o600 });
