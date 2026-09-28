@@ -6,6 +6,7 @@ import {
   channelBoundaryForReport,
   isValidChannelBoundaries,
   isValidEspnSeason,
+  isValidNewsSources,
   defaultActionSettings,
   defaultNewsSources,
   scheduleRecommendations,
@@ -1207,6 +1208,9 @@ describe('league analysis', () => {
       normalizeNewsSources(['pff', 'espn', 'fox', 'cbs', 'pff', 'https://example.test/rss']),
     ).toEqual(['pff', 'espn', 'fox', 'cbs']);
     expect(normalizeNewsSources([])).toEqual([]);
+    expect(isValidNewsSources(['espn', 'cbs'])).toBe(true);
+    expect(isValidNewsSources(['espn', 'custom'])).toBe(false);
+    expect(isValidNewsSources('cbs')).toBe(false);
   });
 
   it('schedules review-only offseason and weekly reports by default', () => {

@@ -17,6 +17,7 @@ export const supportedNewsSources: Array<{ id: NewsSourceId; name: string }> = [
   { id: 'fox', name: 'FOX Sports NFL' },
   { id: 'cbs', name: 'CBS Sports NFL' },
 ];
+const supportedNewsSourceIds = new Set<NewsSourceId>(supportedNewsSources.map(({ id }) => id));
 export const defaultNewsSources = ['espn'] as const satisfies readonly NewsSourceId[];
 export type ReportKind =
   'offseason-update' | 'draft-hype' | 'draft-review' | 'power-rankings' | 'matchup-preview';
@@ -1542,15 +1543,15 @@ export function normalizeScoring(raw: Record<string, unknown> | undefined): Reco
   );
 }
 
-/** Keep saved source selection inside the built-in feed allow-list. */
+/** Check an untrusted saved selection against the built-in feed allow-list. */
+export function isValidNewsSources(input: unknown): input is NewsSourceId[] {
+  return Array.isArray(input) && input.every((value) => supportedNewsSourceIds.has(value));
+}
+
+/** Normalize legacy values while keeping only supported feed identifiers. */
 export function normalizeNewsSources(input: unknown): NewsSourceId[] {
   if (!Array.isArray(input)) return [...defaultNewsSources];
   return [
-    ...new Set(
-      input.filter(
-        (value): value is NewsSourceId =>
-          value === 'espn' || value === 'pff' || value === 'fox' || value === 'cbs',
-      ),
-    ),
+    ...new Set(input.filter((value): value is NewsSourceId => supportedNewsSourceIds.has(value))),
   ];
 }

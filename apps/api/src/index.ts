@@ -11,6 +11,7 @@ import {
   defaultLeagueStaleAfterHours,
   isLeagueStaleAfterHours,
   isValidEspnSeason,
+  isValidNewsSources,
   isValidWritingStylePresets,
   isValidChannelBoundaries,
   leaguesForAction,
@@ -1034,11 +1035,7 @@ app.put('/api/settings', async (req, res) => {
       conversationRetentionDays !== 30 &&
       conversationRetentionDays !== 90 &&
       conversationRetentionDays !== 365) ||
-    (newsSources !== undefined &&
-      (!Array.isArray(newsSources) ||
-        !newsSources.every(
-          (source) => source === 'espn' || source === 'pff' || source === 'fox' || source === 'cbs',
-        ))) ||
+    (newsSources !== undefined && !isValidNewsSources(newsSources)) ||
     typeof newsRefreshMinutes !== 'number' ||
     !Number.isInteger(newsRefreshMinutes) ||
     newsRefreshMinutes < 5 ||

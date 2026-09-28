@@ -18,6 +18,7 @@ import {
   defaultActionSettings,
   defaultLeagueStaleAfterHours,
   defaultNewsSources,
+  isValidNewsSources,
   isLeagueStaleAfterHours,
   isValidWritingStylePresets,
   normalizeActionSettings,
@@ -869,11 +870,7 @@ export function validateState(input: unknown): AppState {
         !Number.isInteger(rawSettings.scheduledSyncRetries) ||
         rawSettings.scheduledSyncRetries < 0 ||
         rawSettings.scheduledSyncRetries > 3)) ||
-    (rawSettings.newsSources !== undefined &&
-      (!Array.isArray(rawSettings.newsSources) ||
-        !rawSettings.newsSources.every(
-          (source) => source === 'espn' || source === 'pff' || source === 'fox' || source === 'cbs',
-        ))) ||
+    (rawSettings.newsSources !== undefined && !isValidNewsSources(rawSettings.newsSources)) ||
     (rawSettings.nflInjuryReportsEnabled !== undefined &&
       typeof rawSettings.nflInjuryReportsEnabled !== 'boolean')
   ) {
