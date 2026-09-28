@@ -576,11 +576,12 @@ connect a league, and keep the agent running without leaving a terminal open.
   review, duplicate-send prevention, data export/deletion, source-message retention,
   and upgrade recovery.
 - `npm run perf:smoke` records cold API startup, API working set, health and full-state
-  latency, and built dashboard asset transfer time against a synthetic local fixture. CI
-  captures downloadable JSON samples on macOS, Windows, Linux, and the minimum Node.js
-  runtime; owner-machine macOS ARM repeat samples are recorded in `docs/performance.md`.
-  Measure live provider sync duration, real model inference, browser paint/interaction
-  responsiveness, scheduler resource use, and lower-powered hardware before releases.
+  latency, and built dashboard asset transfer time against a synthetic local fixture. Hosted
+  run `36376672913` uploaded comparable JSON samples on macOS, Windows, Linux, and the minimum
+  Node.js runtime; the cross-platform results and owner-machine macOS ARM repeats are recorded
+  in `docs/performance.md`. Measure live provider sync duration, real model inference,
+  browser paint/interaction responsiveness, scheduler resource use, and lower-powered hardware
+  before releases.
 - Keep `AGENTS.md`, setup, architecture, decisions, tasks, and memory docs current.
   Separate durable project guidance from temporary implementation notes.
 

@@ -96,3 +96,21 @@ verifying the native LaunchAgent lifecycle:
 This remains consistent with the prior macOS samples for API and report latency. Asset size
 varies with the build output and is retained for comparison; these single-host synthetic
 measurements are not universal performance thresholds.
+
+## Cross-platform CI samples recorded on 2026-09-28
+
+Hosted run `36376672913` uploaded one JSON artifact per supported OS and one for the minimum
+Node.js 22.13.0 runtime. Each used the same 8-league synthetic fixture. Hosted-runner
+contention and VM hardware differ, so these values are reference points, not release gates.
+
+| Runner and runtime           | Startup | Health p95 | Full state p95 | Synthetic report p95 | API working set |
+| ---------------------------- | ------: | ---------: | -------------: | -------------------: | --------------: |
+| Ubuntu x64, Node.js 22.23.2  |  251 ms |    4.61 ms |       11.62 ms |             63.96 ms |       104.1 MiB |
+| Windows x64, Node.js 22.23.2 |  390 ms |    9.06 ms |       24.47 ms |            128.36 ms |        78.6 MiB |
+| macOS ARM, Node.js 22.23.2   |  315 ms |    3.27 ms |        9.87 ms |            160.18 ms |       113.0 MiB |
+| macOS ARM, Node.js 22.13.0   |  235 ms |    2.66 ms |        5.07 ms |            103.18 ms |       112.3 MiB |
+
+All runners reported a 465.0–465.1 KiB state response and 409.4 KiB of JavaScript and CSS
+assets. The ten-report p95 spread, especially on macOS ARM, shows why hosted measurements
+should guide investigation rather than trigger timing thresholds. Download the named JSON
+artifacts from the workflow run to inspect medians and the full benchmark metadata.
