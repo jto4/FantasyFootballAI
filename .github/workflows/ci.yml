@@ -52,7 +52,7 @@ jobs:
         run: node scripts/performance-smoke.mjs
 
       - name: Upload minimum-runtime performance sample
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: performance-macos-node-22.13
           path: performance-macos-node-22.13.json
@@ -140,7 +140,7 @@ jobs:
         run: node scripts/performance-smoke.mjs
 
       - name: Upload platform performance sample
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: performance-${{ runner.os }}-node-22
           path: performance-${{ runner.os }}-node-22.json

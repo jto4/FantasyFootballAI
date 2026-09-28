@@ -1,13 +1,14 @@
 # Dashboard visual direction
 
-The dashboard uses the restrained dark product language described for the Bakers Studio
+The dashboard uses the restrained dark product language associated with the Bakers Studio
 reference: an almost-black field, oversized white sans-serif type, neutral warm-gray
-surfaces, thin rules, and small orange, pink, green, and violet accents. An indexed
-[Selected Screens entry](https://selectedscreens.com/s/bakers-branch/) identifies the
-linked post as Bakers Studio's Branch seed-deck system and describes its dark dashboard
-and modular accent colors. The original X media itself was not available for direct
-inspection, so this note records the public description rather than claiming pixel-level
-reference fidelity.
+surfaces, thin rules, and small orange, pink, green, and violet accents. The X post is titled
+“wave + gradient,” and its text and metadata are visible in the public browser view. Its video
+does not play there, so its animation and exact visual details have not been verified. An
+[indexed Selected Screens entry](https://selectedscreens.com/s/bakers-branch/) identifies
+the linked post with Bakers Studio's Branch seed-deck system and describes its dark dashboard
+and modular accent colors. This note records those accessible descriptions without claiming
+pixel-level reference fidelity.
 
 The current React interface keeps all navigation and league data code-native. League
 selection sits in the top bar; the local-service state stays visible; page sections use

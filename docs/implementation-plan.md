@@ -7,7 +7,8 @@ the work needed to make it a polished project people can install and run. It is 
 not a claim that the features below are already implemented. The dashboard stop control
 has been implemented and exercised against the combined development launcher. The dashboard
 now uses a responsive dark editorial design based on the linked reference's published
-description; direct pixel comparison with the unavailable X media remains unverified.
+description; the post metadata is visible, but its video does not play in the available
+browser view, so direct visual comparison remains unverified.
 
 The repository currently has a working local API and React dashboard, including a focused schedule/history view and tested season-status copy helper, a TypeScript npm
 workspaces structure, initial integrations, SQLite state persistence, MCP tools, and
@@ -51,8 +52,9 @@ existing import-created profiles, which updates style/context from prior notes o
 analysis is opted in. Exact re-imports are skipped and merged source blocks retain independent
 retention dates; common quoted EML replies are excluded from the sender's style sample.
 Report settings now include owner-controlled profanity and excluded-topic boundaries; import
-analysis still requires explicit opt-in. The linked X media could not be fetched, but an
-indexed design archive described the dark dashboard's near-black palette, oversized type,
+analysis still requires explicit opt-in. The linked X post's title and metadata are visible,
+but its video does not play in the available browser view. An indexed design archive describes
+the dark dashboard's near-black palette, oversized type,
 neutral surfaces, and restrained color accents. The responsive redesign is implemented and
 reviewed against that description; see `docs/design/dashboard-visual-direction.md` and its
 generated concept. Exact comparison to the original post remains unverified.
@@ -160,7 +162,8 @@ npm run service -- status
 
 The dashboard now applies the linked post's visual direction:
 [Bakers Studio, “wave + gradient”](https://x.com/studiobakers/status/2101998189889122451?s=46).
-The X media remains inaccessible. An [indexed reference description](https://selectedscreens.com/s/bakers-branch/)
+The post's “wave + gradient” title and metadata are visible, but its video does not play in
+the available browser view. An [indexed reference description](https://selectedscreens.com/s/bakers-branch/)
 describes the dark surface, oversized type, soft-focus imagery, and small modular accents.
 The implementation uses those broad visual cues without claiming exact layout fidelity or
 copying the source imagery. See `docs/design/dashboard-visual-direction.md`.
@@ -615,8 +618,9 @@ The remaining decisions and release gates are:
 - Broader league-format fixtures, verified Yahoo/ESPN starter semantics, independently verified market ADP, additional AI/image
   providers, provider-specific pricing catalogs, and CLI token-usage support remain outside the
   verified launch scope. API cost estimates use owner-entered rates and are explicitly approximate.
-- Direct comparison with the original dashboard image remains open because X blocks the media;
-  current visual cues and the generated concept are documented in `docs/design`.
+- Direct comparison with the original dashboard video remains open because it does not play
+  in the available browser view; current visual cues and the generated concept are documented
+  in `docs/design`.
 - Yahoo and Sleeper playoff status is recognized when both platform fields are available; ESPN
   H2H playoff start is inferred from schedule settings and labeled as uncertain. Each recurring
   schedule reevaluates report eligibility after refreshing league phase, but does not infer or
