@@ -71,3 +71,23 @@ installing the native SQLite dependency for that runtime:
 The benchmark used a synthetic fixture and a local CLI stub. It measures application
 overhead, not provider/model latency or real browser interaction, and should be compared only
 with runs using the same fixture and environment.
+
+## Repeat sample recorded on 2026-09-28
+
+A fresh macOS ARM run under Node.js 25.9.0 with the same synthetic fixture completed after
+verifying the native LaunchAgent lifecycle:
+
+| Measurement                                      |           Result |
+| ------------------------------------------------ | ---------------: |
+| Cold API startup to healthy                      |           185 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.27 / 0.65 ms |
+| Full local state p50 / p95 (30 samples)          |   1.76 / 2.45 ms |
+| Full state response                              |        465.1 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 50.32 / 59.44 ms |
+| Dashboard shell and built assets                 |             3 ms |
+| Dashboard JavaScript and CSS assets              |        409.4 KiB |
+| API process working set                          |        118.3 MiB |
+
+This remains consistent with the prior macOS samples for API and report latency. Asset size
+varies with the build output and is retained for comparison; these single-host synthetic
+measurements are not universal performance thresholds.
