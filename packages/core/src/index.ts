@@ -10,16 +10,48 @@ export function isValidEspnSeason(value: unknown): value is number {
   );
 }
 
-export type NewsSourceId = 'espn' | 'pff' | 'fox';
+export type NewsSourceId = 'espn' | 'pff' | 'fox' | 'cbs' | 'pft';
 export const supportedNewsSources: Array<{ id: NewsSourceId; name: string }> = [
   { id: 'espn', name: 'ESPN NFL' },
   { id: 'pff', name: 'PFF football' },
   { id: 'fox', name: 'FOX Sports NFL' },
+  { id: 'cbs', name: 'CBS Sports NFL' },
+  { id: 'pft', name: 'Pro Football Talk' },
 ];
+const supportedNewsSourceIds = new Set<NewsSourceId>(supportedNewsSources.map(({ id }) => id));
 export const defaultNewsSources = ['espn'] as const satisfies readonly NewsSourceId[];
 export type ReportKind =
   'offseason-update' | 'draft-hype' | 'draft-review' | 'power-rankings' | 'matchup-preview';
 export type ReportLength = 'short' | 'standard' | 'long';
+export interface WritingStylePreset {
+  name: string;
+  value: string;
+}
+
+/** Keep reusable owner-authored voices bounded and unambiguous at persistence boundaries. */
+export function isValidWritingStylePresets(value: unknown): value is WritingStylePreset[] {
+  if (!Array.isArray(value) || value.length > 20) return false;
+  const names = new Set<string>();
+  for (const item of value) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+    const preset = item as Record<string, unknown>;
+    if (
+      typeof preset.name !== 'string' ||
+      preset.name.trim().length === 0 ||
+      preset.name.length > 40 ||
+      /[\u0000-\u001f\u007f]/.test(preset.name) ||
+      typeof preset.value !== 'string' ||
+      preset.value.trim().length === 0 ||
+      preset.value.length > 1000
+    )
+      return false;
+    const normalizedName = preset.name.trim().toLowerCase();
+    if (names.has(normalizedName)) return false;
+    names.add(normalizedName);
+  }
+  return true;
+}
+
 export const reportLengthGuidance: Record<ReportLength, string> = {
   short: 'Keep the report to about 120–180 words. Prioritize the strongest league-specific point.',
   standard: 'Aim for about 250–400 words. Balance useful analysis with a few sharp jokes.',
@@ -280,6 +312,8 @@ export interface LeagueCalendarEvent {
 }
 export interface AppSettings {
   writingStyle: string;
+  /** Locally stored owner-named voices that can be applied to the active writing style. */
+  customWritingStylePresets?: WritingStylePreset[];
   reportLength: ReportLength;
   allowProfanity: boolean;
   excludedTopics: string;
@@ -813,18 +847,20 @@ export function analyzeLeague(league: LeagueConnection, kind: ReportKind, style:
             ranking.basis === 'wins'
               ? `, ${team.wins} wins${team.losses !== undefined ? `, ${team.losses} losses` : ''}${team.pointsFor !== undefined ? `, ${team.pointsFor.toFixed(1)} points for` : ''}`
               : `, ${team.pointsFor?.toFixed(1)} points for`;
-          return `${index + 1}. ${team.name}${team.owner ? ` (${team.owner})` : ''}${record}`;
+          const place = ranking.places[index]!;
+          const rankLabel = `${place.tied ? 'T-' : ''}${place.rank}`;
+          return `${rankLabel}. ${team.name}${team.owner ? ` (${team.owner})` : ''}${record}`;
         })
         .join('\n')
     : 'Team data is incomplete; there is no reliable common metric for a standings ranking.';
   const body =
     kind === 'power-rankings'
-      ? `${lead}, using ${scoring}.\n\n${rankingText}\n\nRanking basis: ${ranking.basis ?? 'unavailable'}. This is a standings-based snapshot, not a projection. Voice: ${style}.`
+      ? `${lead}, using ${scoring}.\n\n${rankingText}\n\nRanking basis: ${ranking.basis ?? 'unavailable'}${ranking.tieBreaker ? `; tie-breaker: ${ranking.tieBreaker}` : ''}. This is a standings-based snapshot, not a projection. Voice: ${style}.`
       : `${lead}, using ${scoring}.\n\n${kind === 'draft-hype' ? 'Draft board: clear your calendar, charge your phone, and prepare your best confident reach.' : kind === 'draft-review' ? 'Draft review: the picks are in. Let’s see who built a contender and who drafted purely for the group chat.' : kind === 'matchup-preview' ? 'Matchup preview: bring the receipts, check the lineups, and get ready for a week of questionable confidence.' : 'Offseason check-in: rosters are taking shape and the group chat is about to become a full-time job.'}\n\nVoice: ${style}. Connect an AI provider to generate a personalized breakdown from current player projections and news.`;
   return { title: titleByKind[kind], body, citations: [] as { title: string; url: string }[] };
 }
 
-/** Rank only when every team has a comparable primary metric; break ties with points for. */
+/** Rank on a complete primary metric and use points-for only as a complete wins tiebreaker. */
 export function rankTeams(league: LeagueConnection) {
   const hasStandingsSignal = league.teams.some(
     (team) => (team.wins ?? 0) > 0 || (team.losses ?? 0) > 0 || (team.pointsFor ?? 0) > 0,
@@ -839,13 +875,34 @@ export function rankTeams(league: LeagueConnection) {
           league.teams.every((team) => Number.isFinite(team.pointsFor))
         ? 'pointsFor'
         : undefined;
+  const tieBreaker =
+    basis === 'wins' && league.teams.every((team) => Number.isFinite(team.pointsFor))
+      ? 'pointsFor'
+      : undefined;
   const teams = [...league.teams].sort((left, right) => {
     if (basis === 'wins' && right.wins !== left.wins) return (right.wins ?? 0) - (left.wins ?? 0);
     if (basis === 'pointsFor' && right.pointsFor !== left.pointsFor)
       return (right.pointsFor ?? 0) - (left.pointsFor ?? 0);
-    return (right.pointsFor ?? 0) - (left.pointsFor ?? 0);
+    if (tieBreaker === 'pointsFor' && right.pointsFor !== left.pointsFor)
+      return (right.pointsFor ?? 0) - (left.pointsFor ?? 0);
+    return 0;
   });
-  return { basis, teams };
+  let currentRank = 0;
+  const ranks = teams.map((team, index) => {
+    const previous = teams[index - 1];
+    const tied =
+      previous !== undefined &&
+      (basis === 'wins'
+        ? team.wins === previous.wins &&
+          (tieBreaker !== 'pointsFor' || team.pointsFor === previous.pointsFor)
+        : basis === 'pointsFor' && team.pointsFor === previous.pointsFor);
+    if (!tied) currentRank = index + 1;
+    return currentRank;
+  });
+  const rankCounts = new Map<number, number>();
+  for (const rank of ranks) rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
+  const places = ranks.map((rank) => ({ rank, tied: (rankCounts.get(rank) ?? 0) > 1 }));
+  return { basis, tieBreaker, teams, places };
 }
 
 /** Provide cautious preseason power-ranking evidence from one complete owner-confirmed source. */
@@ -940,12 +997,12 @@ export function reportEvidenceGuidance(
   projections: PlayerProjection[] = [],
 ): string {
   if (kind === 'power-rankings') {
-    const { basis } = rankTeams(league);
+    const { basis, tieBreaker } = rankTeams(league);
     const preseasonEvidence = basis
       ? undefined
       : preseasonRosterProjectionEvidence(league, projections);
     const rankingGuidance = basis
-      ? `Rank only from the comparable team snapshot using ${basis}${basis === 'wins' ? ' and use pointsFor as the tie-breaker when present' : ''}; state that this is not a projection.`
+      ? `Rank only from the comparable team snapshot using ${basis}${basis === 'wins' ? (tieBreaker === 'pointsFor' ? ' and use pointsFor as the tie-breaker because every team has a value' : '; keep equal records tied because complete pointsFor tie-break data is unavailable') : ''}; state that this is not a projection.`
       : (preseasonEvidence ??
         'There is no complete shared record or points-for metric across all teams, and complete owner-confirmed roster projections are unavailable; say rankings are unavailable instead of inventing an order.');
     return `${rankingGuidance} ${leagueSeasonPhaseGuidance(league)}`;
@@ -1510,14 +1567,15 @@ export function normalizeScoring(raw: Record<string, unknown> | undefined): Reco
   );
 }
 
-/** Keep saved source selection inside the built-in feed allow-list. */
+/** Check an untrusted saved selection against the built-in feed allow-list. */
+export function isValidNewsSources(input: unknown): input is NewsSourceId[] {
+  return Array.isArray(input) && input.every((value) => supportedNewsSourceIds.has(value));
+}
+
+/** Normalize legacy values while keeping only supported feed identifiers. */
 export function normalizeNewsSources(input: unknown): NewsSourceId[] {
   if (!Array.isArray(input)) return [...defaultNewsSources];
   return [
-    ...new Set(
-      input.filter(
-        (value): value is NewsSourceId => value === 'espn' || value === 'pff' || value === 'fox',
-      ),
-    ),
+    ...new Set(input.filter((value): value is NewsSourceId => supportedNewsSourceIds.has(value))),
   ];
 }

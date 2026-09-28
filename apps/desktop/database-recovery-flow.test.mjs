@@ -104,6 +104,33 @@ test('startup recovery offers a validated partial-row salvage before older safet
   assert.equal(restored.status, 'restored');
 });
 
+test('startup recovery labels raw-page salvage as potentially incomplete', async () => {
+  const rawPageBackup = {
+    name: 'before-restore-2026-09-27T12-00-00-000Z-page-salvage-deadbeef.sqlite',
+  };
+  let promptOptions;
+  let inspections = 0;
+  await recoverFromSafetyBackup('/data', {
+    inspect: async () => {
+      inspections += 1;
+      return {
+        current: { exists: true, valid: false },
+        backups: inspections === 1 ? [] : [{ ...rawPageBackup, valid: true }],
+      };
+    },
+    restore: async (_path, name) => assert.equal(name, rawPageBackup.name),
+    salvage: async () => ({ backupName: rawPageBackup.name, counts: {} }),
+    startFresh: async () => ({ recoveryPath: '/data/recovery' }),
+    prompt: async (options) => {
+      promptOptions = options;
+      return { response: 0 };
+    },
+  });
+  assert.equal(inspections, 2);
+  assert.match(promptOptions.detail, /raw-page recovery and validated salvage/);
+  assert.match(promptOptions.detail, /some data may be missing/);
+});
+
 test('startup recovery reports restore failure without claiming data was replaced', async () => {
   const result = await recoverFromSafetyBackup('/local-data', {
     inspect: async () => report,

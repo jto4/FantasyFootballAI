@@ -19,18 +19,9 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import {
-  defaultActionSettings,
-  defaultNewsSources,
-  espnSeasonBounds,
-  leagueSeasonPhase,
-  rankTeams,
-  type AppSettings,
-  type LeagueConnection,
-  type NewsItem,
-  type SavedReport,
-} from '@sidekick/core';
+import { espnSeasonBounds, leagueSeasonPhase, rankTeams } from '@sidekick/core';
 import { SettingsPage } from './SettingsPage';
+import { SetupWizard } from './SetupWizard';
 import { MemoryPage } from './MemoryPage';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
@@ -38,53 +29,16 @@ import { seasonHeroHeadline, seasonKicker } from './season-copy';
 import { SchedulePage, type ScheduledRun } from './SchedulePage';
 import { formatTime } from './date-format';
 import { LeaguesPage } from './LeaguesPage';
-type AppState = {
-  leagues: LeagueConnection[];
-  reports: SavedReport[];
-  settings: AppSettings;
-  scheduledRuns: ScheduledRun[];
-};
-type CredentialProvider = { provider: string; configured: boolean };
-type NewsSnapshot = {
-  items: NewsItem[];
-  refreshedAt?: string;
-  stale: boolean;
-  error?: string;
-};
-const initial: AppState = {
-  leagues: [],
-  reports: [],
-  settings: {
-    writingStyle: 'Funny, sharp league banter',
-    reportLength: 'standard',
-    allowProfanity: false,
-    excludedTopics: '',
-    memoryEnabled: true,
-    actions: structuredClone(defaultActionSettings),
-    analyzeImportsWithAI: false,
-    includeMemberContextInReports: false,
-    includeMemberContextInChatReplies: false,
-    newsRefreshMinutes: 15,
-    newsSources: [...defaultNewsSources],
-    nflInjuryReportsEnabled: false,
-    imessageAutoSyncEnabled: false,
-    imessageSyncIntervalMinutes: 15,
-    twilioConversationAutoSyncEnabled: false,
-    twilioConversationSyncIntervalMinutes: 15,
-    chatRepliesEnabled: false,
-    chatRepliesAutoSend: false,
-    chatAgentName: 'Sunday Sidekick',
-    mcpDeliveryEnabled: false,
-    aiRuntime: {
-      mode: 'api',
-      model: 'gpt-4o-mini',
-      command: '',
-      args: '',
-      baseUrl: 'https://api.openai.com/v1',
-    },
-  },
-  scheduledRuns: [],
-};
+import { LoadError, LoadingStatus } from './LoadFeedback.js';
+import {
+  initialAppState,
+  isAppState,
+  isCredentialProviders,
+  isNewsSnapshot,
+  type AppState,
+  type CredentialProvider,
+  type NewsSnapshot,
+} from './app-state';
 const menu = [
   { label: 'League desk', icon: Home },
   { label: 'Leagues', icon: Users },
@@ -95,7 +49,7 @@ const menu = [
 ];
 
 export function App() {
-  const [state, setState] = useState<AppState>(initial);
+  const [state, setState] = useState<AppState>(initialAppState);
   const [activeLeagueId, setActiveLeagueId] = useState(() => {
     try {
       return window.localStorage.getItem('sidekick.activeLeagueId') ?? '';
@@ -120,9 +74,14 @@ export function App() {
   const [espnSeason, setEspnSeason] = useState(new Date().getFullYear());
   const [busy, setBusy] = useState(false);
   const [refreshingLeagueId, setRefreshingLeagueId] = useState('');
+  const [disconnectingLeagueId, setDisconnectingLeagueId] = useState('');
   const [refreshingNews, setRefreshingNews] = useState(false);
   const [retryingRunId, setRetryingRunId] = useState('');
+  const [sendingReportId, setSendingReportId] = useState('');
   const [notice, setNotice] = useState('');
+  const [stateLoaded, setStateLoaded] = useState(false);
+  const [stateLoading, setStateLoading] = useState(true);
+  const [stateLoadError, setStateLoadError] = useState('');
   const [serviceStatus, setServiceStatus] = useState<
     'checking' | 'running' | 'stopping' | 'stopped' | 'unavailable'
   >('checking');
@@ -139,23 +98,69 @@ export function App() {
   }, [activeLeagueId, league?.id]);
 
   async function refresh() {
+    if (!stateLoaded) setStateLoading(true);
     try {
-      const [snapshot, stories, credentials] = await Promise.all([
-        fetch('/api/state').then((r) => r.json()),
-        fetch('/api/news').then((r) => r.json()),
-        fetch('/api/credentials').then((r) => (r.ok ? r.json() : [])),
-      ]);
+      const response = await fetch('/api/state');
+      if (!response.ok) throw new Error(`Local service returned ${response.status} while loading.`);
+      const snapshot: unknown = await response.json();
+      if (!isAppState(snapshot))
+        throw new Error('Local service returned an invalid state snapshot.');
       setState(snapshot);
-      setNews(
-        stories && Array.isArray(stories.items)
-          ? stories
-          : { items: [], stale: true, error: 'Football news is temporarily unavailable.' },
-      );
-      setCredentialProviders(Array.isArray(credentials) ? credentials : []);
+      setStateLoaded(true);
+      setStateLoadError('');
       setServiceStatus('running');
-    } catch {
+      setNotice((current) =>
+        current === 'Local service is unavailable. Start it with npm run dev.' ? '' : current,
+      );
+
+      const [stories, credentials] = await Promise.allSettled([
+        fetch('/api/news'),
+        fetch('/api/credentials'),
+      ]);
+      if (stories.status === 'fulfilled' && stories.value.ok) {
+        try {
+          const snapshot: unknown = await stories.value.json();
+          setNews(
+            isNewsSnapshot(snapshot)
+              ? snapshot
+              : {
+                  items: [],
+                  stale: true,
+                  error: 'Football news returned an invalid response.',
+                },
+          );
+        } catch {
+          setNews((current) => ({
+            ...current,
+            stale: true,
+            error: 'Football news is temporarily unavailable.',
+          }));
+        }
+      } else {
+        setNews((current) => ({
+          ...current,
+          stale: true,
+          error: 'Football news is temporarily unavailable.',
+        }));
+      }
+      if (credentials.status === 'fulfilled' && credentials.value.ok) {
+        try {
+          const result: unknown = await credentials.value.json();
+          if (isCredentialProviders(result)) setCredentialProviders(result);
+        } catch {
+          // Keep the last known credential status if an optional refresh is malformed.
+        }
+      }
+    } catch (error) {
       setServiceStatus('unavailable');
-      setNotice('Local service is unavailable. Start it with npm run dev.');
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Local service is unavailable. Start it with npm run dev.';
+      setStateLoadError(message);
+      if (stateLoaded) setNotice(`Could not refresh local league data. ${message}`);
+    } finally {
+      setStateLoading(false);
     }
   }
   useEffect(() => {
@@ -175,10 +180,13 @@ export function App() {
   async function refreshCredentials() {
     try {
       const response = await fetch('/api/credentials');
-      const credentials = response.ok ? await response.json() : [];
-      setCredentialProviders(Array.isArray(credentials) ? credentials : []);
+      if (!response.ok) throw new Error(`Credential status request failed (${response.status}).`);
+      const credentials: unknown = await response.json();
+      if (!isCredentialProviders(credentials))
+        throw new Error('Credential status response was invalid.');
+      setCredentialProviders(credentials);
     } catch {
-      setCredentialProviders([]);
+      setNotice('Could not refresh credential status. Check the Credentials section in Settings.');
     }
   }
 
@@ -277,9 +285,25 @@ export function App() {
   }
 
   async function removeLeague(id: string) {
-    await fetch(`/api/leagues/${encodeURIComponent(id)}`, { method: 'DELETE' });
-    setNotice('League disconnected.');
-    await refresh();
+    const disconnectedLeague = state.leagues.find((item) => item.id === id);
+    if (!disconnectedLeague) return;
+    if (
+      !window.confirm(
+        `Disconnect ${disconnectedLeague.displayName}? This removes its saved league snapshot, imported projections, and calendar events. Existing reports and member profiles will remain.`,
+      )
+    )
+      return;
+    setDisconnectingLeagueId(id);
+    try {
+      const response = await fetch(`/api/leagues/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error(`Could not disconnect this league (${response.status}).`);
+      setNotice(`${disconnectedLeague.displayName} disconnected.`);
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Could not disconnect this league.');
+    } finally {
+      setDisconnectingLeagueId('');
+    }
   }
 
   async function refreshLeague(id: string) {
@@ -301,7 +325,12 @@ export function App() {
   }
 
   async function sendReport(id: string) {
+    if (sendingReportId) return;
     const report = state.reports.find((item) => item.id === id);
+    if (!report) {
+      setNotice('This report is no longer available. Refresh the page and check report history.');
+      return;
+    }
     const retryUncertain = report?.deliveryState === 'uncertain';
     if (retryUncertain) {
       const usesResendIdempotency = report?.deliveryAttempts?.at(-1)?.channel === 'email';
@@ -330,22 +359,32 @@ export function App() {
         emailSubject = subject.trim();
       }
     }
-    const response = await fetch(`/api/reports/${encodeURIComponent(id)}/send`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        ...(replyToId ? { replyToId, emailSubject } : {}),
-        ...(retryUncertain ? { retryUncertain: true } : {}),
-      }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      setNotice(result.error ?? 'Could not send draft.');
+    setSendingReportId(id);
+    try {
+      const response = await fetch(`/api/reports/${encodeURIComponent(id)}/send`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          ...(replyToId ? { replyToId, emailSubject } : {}),
+          ...(retryUncertain ? { retryUncertain: true } : {}),
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setNotice(result.error ?? 'Could not send draft.');
+        await refresh();
+        return;
+      }
+      setNotice('Update sent.');
       await refresh();
-      return;
+    } catch {
+      await refresh();
+      setNotice(
+        'Could not confirm delivery. Check report and delivery history before attempting to send again.',
+      );
+    } finally {
+      setSendingReportId('');
     }
-    setNotice('Update sent.');
-    await refresh();
   }
 
   async function stopApplication() {
@@ -436,16 +475,28 @@ export function App() {
           >
             <Power size={15} /> <span>Stop app</span>
           </button>
-          <button className="help-link">
+          <a
+            className="help-link"
+            href="https://github.com/jto4/FantasyFootballAI/blob/main/README.md"
+            target="_blank"
+            rel="noreferrer"
+          >
             <CircleHelp size={16} /> Help & documentation
-          </button>
+          </a>
           <div className="user-chip">
             <div className="user-avatar">C</div>
             <div>
               <strong>Commissioner</strong>
               <small>Local workspace</small>
             </div>
-            <Settings size={16} />
+            <button
+              type="button"
+              className="workspace-settings-button"
+              aria-label="Open settings"
+              onClick={() => setSection('Settings')}
+            >
+              <Settings size={16} />
+            </button>
           </div>
         </div>
       </aside>
@@ -507,7 +558,16 @@ export function App() {
               </button>
             </div>
           )}
-          {section === 'Settings' ? (
+          {!stateLoaded ? (
+            stateLoading ? (
+              <LoadingStatus message="Loading your leagues, reports, and schedule…" />
+            ) : (
+              <LoadError
+                message={stateLoadError || 'Could not load local league data.'}
+                onRetry={() => void refresh()}
+              />
+            )
+          ) : section === 'Settings' ? (
             <SettingsPage
               settings={state.settings}
               leagues={state.leagues}
@@ -515,6 +575,7 @@ export function App() {
                 setState((current) => ({ ...current, settings }));
               }}
               onCredentialsChanged={() => void refreshCredentials()}
+              onFocusCredentials={() => setSettingsFocusTarget('credentials')}
               onRuntimeTested={(testedRuntime) =>
                 setTestedCliRuntime(
                   `${testedRuntime.mode}\u0000${testedRuntime.command}\u0000${testedRuntime.args}`,
@@ -532,6 +593,7 @@ export function App() {
                 ? {}
                 : { staleAfterHours: state.settings.leagueStaleAfterHours })}
               refreshingLeagueId={refreshingLeagueId}
+              disconnectingLeagueId={disconnectingLeagueId}
               onConnect={() => setModal(true)}
               onSetActive={setActiveLeagueId}
               onRefresh={(id) => void refreshLeague(id)}
@@ -543,6 +605,7 @@ export function App() {
               reports={state.reports}
               scheduledRuns={state.scheduledRuns}
               retryingRunId={retryingRunId}
+              sendingReportId={sendingReportId}
               onGenerate={(kind) => void createReport(kind)}
               onRetry={(run) => void retryScheduledRun(run)}
               onSend={(reportId) => void sendReport(reportId)}
@@ -782,7 +845,10 @@ export function App() {
                       </div>
                       {rankedTeams.slice(0, 5).map((team, index) => (
                         <div className="ranking-row" key={team.id}>
-                          <span className="rank-num">{String(index + 1).padStart(2, '0')}</span>
+                          <span className="rank-num">
+                            {ranking?.places[index]?.tied ? 'T-' : ''}
+                            {String(ranking?.places[index]?.rank ?? index + 1).padStart(2, '0')}
+                          </span>
                           <div className="team-name">
                             <span className="team-badge">{team.name.slice(0, 1)}</span>
                             <div>
@@ -1092,152 +1158,36 @@ export function App() {
         </div>
       )}
       {setupWizardOpen && (
-        <div
-          className="modal-scrim"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setSetupWizardOpen(false);
+        <SetupWizard
+          step={setupWizardStep}
+          closeButtonRef={setupWizardCloseRef}
+          onStepChange={setSetupWizardStep}
+          onClose={() => setSetupWizardOpen(false)}
+          onConnectLeague={() => {
+            setSetupWizardOpen(false);
+            setModal(true);
           }}
-        >
-          <section
-            className="setup-wizard-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="setup-wizard-title"
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                setSetupWizardOpen(false);
-                return;
-              }
-              if (event.key !== 'Tab') return;
-              const controls = event.currentTarget.querySelectorAll<HTMLElement>(
-                'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled)',
-              );
-              const first = controls.item(0);
-              const last = controls.item(controls.length - 1);
-              if (event.shiftKey && document.activeElement === first) {
-                event.preventDefault();
-                last?.focus();
-              } else if (!event.shiftKey && document.activeElement === last) {
-                event.preventDefault();
-                first?.focus();
-              }
-            }}
-          >
-            <button
-              ref={setupWizardCloseRef}
-              type="button"
-              className="modal-close"
-              onClick={() => setSetupWizardOpen(false)}
-              aria-label="Close guided setup"
-            >
-              ×
-            </button>
-            <p className="section-overline">STEP {setupWizardStep + 1} OF 3</p>
-            <h2 id="setup-wizard-title">
-              {setupWizardStep === 0
-                ? 'Connect your league'
-                : setupWizardStep === 1
-                  ? 'Choose and test an AI runtime'
-                  : 'Set the voice and schedule'}
-            </h2>
-            <p className="setup-wizard-description">
-              {setupWizardStep === 0
-                ? 'Choose Sleeper, ESPN, or Yahoo and enter a league ID. Private leagues may need owner-authorized access first.'
-                : setupWizardStep === 1
-                  ? 'Use an API key or a local CLI. Setup is complete after the selected runtime passes its data-free test.'
-                  : 'Choose a writing style, set boundaries, and decide when reports should be drafted or sent. Your league data stays in the local app data folder by default.'}
-            </p>
-            <div className="setup-wizard-progress" aria-label={`Step ${setupWizardStep + 1} of 3`}>
-              {[0, 1, 2].map((step) => (
-                <span
-                  key={step}
-                  className={step <= setupWizardStep ? 'current' : ''}
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
-            <div className="setup-wizard-actions">
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => setSetupWizardStep((step) => Math.max(0, step - 1))}
-                disabled={setupWizardStep === 0}
-              >
-                Back
-              </button>
-              {setupWizardStep === 0 ? (
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={() => {
-                    setSetupWizardOpen(false);
-                    setModal(true);
-                  }}
-                >
-                  Connect a league <span>→</span>
-                </button>
-              ) : setupWizardStep === 1 ? (
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={() => {
-                    setSetupWizardOpen(false);
-                    setSettingsFocusTarget('ai');
-                    setSection('Settings');
-                  }}
-                >
-                  Set up AI <span>→</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={() => {
-                    setSetupWizardOpen(false);
-                    setSettingsFocusTarget('voice');
-                    setSection('Settings');
-                  }}
-                >
-                  Personalize <span>→</span>
-                </button>
-              )}
-              {setupWizardStep === 2 && window.sidekickDesktop && (
-                <button
-                  type="button"
-                  className="small-button"
-                  onClick={() => {
-                    setSetupWizardOpen(false);
-                    setSettingsFocusTarget('data');
-                    setSection('Settings');
-                  }}
-                >
-                  Choose local data folder
-                </button>
-              )}
-              {setupWizardStep === 2 && (
-                <button
-                  type="button"
-                  className="small-button"
-                  onClick={() => {
-                    setSetupWizardOpen(false);
-                    setSettingsFocusTarget('credentials');
-                    setSection('Settings');
-                  }}
-                >
-                  Set up optional delivery providers
-                </button>
-              )}
-            </div>
-            <button
-              type="button"
-              className="setup-wizard-finish"
-              onClick={() => setSetupWizardOpen(false)}
-            >
-              Finish later
-            </button>
-          </section>
-        </div>
+          onSetupAi={() => {
+            setSetupWizardOpen(false);
+            setSettingsFocusTarget('ai');
+            setSection('Settings');
+          }}
+          onPersonalize={() => {
+            setSetupWizardOpen(false);
+            setSettingsFocusTarget('voice');
+            setSection('Settings');
+          }}
+          onChooseDataDirectory={() => {
+            setSetupWizardOpen(false);
+            setSettingsFocusTarget('data');
+            setSection('Settings');
+          }}
+          onSetupDelivery={() => {
+            setSetupWizardOpen(false);
+            setSettingsFocusTarget('credentials');
+            setSection('Settings');
+          }}
+        />
       )}
     </div>
   );

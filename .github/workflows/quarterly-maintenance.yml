@@ -1,0 +1,28 @@
+name: Quarterly maintenance review
+
+on:
+  schedule:
+    - cron: '0 14 7 1,4,7,10 *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: quarterly-maintenance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  open-review:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the review checklist
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Open the quarterly review issue if one is not already open
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/quarterly-maintenance.mjs

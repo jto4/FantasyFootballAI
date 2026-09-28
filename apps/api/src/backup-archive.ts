@@ -129,12 +129,15 @@ export function parsePortableBackup(contents: Buffer): PortableBackupContents {
 
   let expandedBytes = 0;
   let entryCount = 0;
+  const entryNames = new Set<string>();
   const files = unzipSync(contents, {
     filter: ({ name, originalSize }) => {
       entryCount += 1;
       expandedBytes += originalSize;
       if (entryCount > maximumImageCount + 2 || expandedBytes > maximumArchiveBytes)
         throw new Error('Backup archive exceeds its expanded size limit.');
+      if (entryNames.has(name)) throw new Error('Backup archive repeats a file path.');
+      entryNames.add(name);
       if (
         name !== 'database.sqlite' &&
         name !== 'manifest.json' &&

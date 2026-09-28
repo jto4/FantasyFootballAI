@@ -265,6 +265,8 @@ body {
   border: 0;
   background: none;
   color: #859398;
+  text-decoration: none;
+  cursor: pointer;
   font:
     500 10px 'DM Sans',
     sans-serif;
@@ -300,6 +302,24 @@ body {
 }
 .user-chip > svg {
   color: #718087;
+}
+.workspace-settings-button {
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  border: 0;
+  margin-left: auto;
+  background: transparent;
+  color: #718087;
+  cursor: pointer;
+}
+.workspace-settings-button:hover {
+  color: #f4aa81;
+}
+.workspace-settings-button:focus-visible,
+.help-link:focus-visible {
+  outline: 2px solid #f0a39a;
+  outline-offset: 2px;
 }
 .main-area {
   margin-left: 248px;
@@ -1390,6 +1410,7 @@ p {
   margin-left: auto;
   font-size: 14px;
 }
+
 @media (max-width: 1100px) {
   .sidebar {
     width: 215px;

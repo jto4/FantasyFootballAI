@@ -37,6 +37,8 @@ so the visual treatment does not hide dense fantasy information behind decorativ
 The choice follows the linked Bakers Studio reference's publicly indexed description; the
 original post media could not be inspected directly. Record the gap in
 `docs/design/dashboard-visual-direction.md` and avoid claiming exact screenshot fidelity.
+Superseded by decision 018 after the owner requested adaptation of the reference's visible
+frames.
 
 ## 008: Self-contained desktop packaging
 
@@ -134,3 +136,32 @@ AES-256-GCM authentication; do not store or log the passphrase. Preserve read co
 for existing ZIP and SQLite backups. Automatic local safety copies remain protected by
 filesystem permissions and are not encrypted because recovery must remain available without
 a separately stored passphrase.
+
+## 018: Warm editorial dashboard direction
+
+Supersede decision 007's dark palette following the owner's request to adapt the dashboard to
+the visible frames from Bakers Studio's “wave + gradient” post. Use warm cream surfaces,
+editorial serif display headings, soft locally bundled gradient-wave artwork, quiet rules, and
+restrained clay accents. Treat the reference as a mood source: preserve the product's existing
+league workflows, controls, readable data density, responsive behavior, and accessibility.
+Record the visual direction in `docs/design/dashboard-visual-direction.md`; require desktop and
+narrow-width review after dashboard visual changes.
+
+## 019: Owner-controlled desktop updates
+
+Use Electron's native updater for packaged macOS and Windows applications, and keep Linux
+updates on the distribution package or manual download path. Check for updates only after an
+owner action; download in the background and require explicit approval before restarting to
+install. Publish architecture-specific macOS ZIPs and Windows Squirrel metadata alongside the
+manual installers, verify their checksums during release assembly, and require version tags to
+match the app manifest. macOS update delivery requires signed packages; do not describe native
+updates as verified until a signed public release has been installed and upgraded on supported
+devices.
+
+## 020: Publish the project under the MIT License
+
+Use the MIT License for the public repository and distributed source and desktop packages.
+Keep the standard license text in the root `LICENSE` file, declare `"license": "MIT"` in
+the root package metadata, and include the license with release assets and inside each
+platform archive. This license choice does not change provider terms, attribution
+requirements, or restrictions on third-party data and services.

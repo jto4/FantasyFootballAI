@@ -174,9 +174,11 @@ function runCLI(command: string, args: string[], input: string | undefined): Pro
     // memory or surface it through API errors; this process may be connected to local secrets.
     child.stderr.resume();
     const timer = setTimeout(() => child.kill(), 60_000);
-    child.once('error', (error) => {
+    child.once('error', () => {
       clearTimeout(timer);
-      reject(new Error(`Could not start AI CLI: ${error.message}`));
+      reject(
+        new Error('Could not start the configured AI CLI. Confirm it is installed and executable.'),
+      );
     });
     child.once('close', (code) => {
       clearTimeout(timer);

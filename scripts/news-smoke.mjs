@@ -1,6 +1,7 @@
 import { fetchFootballNewsWithStatus } from '../packages/integrations/dist/news.js';
+import { supportedNewsSources } from '../packages/core/dist/index.js';
 
-const sources = ['espn', 'pff', 'fox'];
+const sources = supportedNewsSources.map(({ id }) => id);
 const results = await Promise.all(
   sources.map(async (source) => {
     try {

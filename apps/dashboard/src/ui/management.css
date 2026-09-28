@@ -94,6 +94,37 @@
     10px 'DM Sans',
     sans-serif;
 }
+.custom-style-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+.custom-style-presets label {
+  display: grid;
+  flex: 1 1 200px;
+  gap: 6px;
+  color: #929d9e;
+  font:
+    8px 'DM Mono',
+    monospace;
+  letter-spacing: 0.6px;
+}
+.custom-style-presets input {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #e0e6e1;
+  border-radius: 5px;
+  background: #fbfcfa;
+  padding: 0 10px;
+  color: #344247;
+}
+.custom-style-presets > small {
+  flex-basis: 100%;
+  color: #929d9e;
+  font-size: 9px;
+}
 .settings-card > small {
   display: block;
   margin-top: 5px;

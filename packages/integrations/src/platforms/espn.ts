@@ -58,7 +58,7 @@ export class EspnConnector implements LeagueConnector {
     const displayName = boundedDisplayName(settings.name ?? data.name, `ESPN League ${id}`);
     const status = asRecord(data.status);
     const responseSeason = boundedInteger(data.seasonId, 2000, 2099);
-    const currentWeek = numberOrUndefined(status?.currentMatchupPeriod);
+    const currentWeek = boundedInteger(status?.currentMatchupPeriod, 1, 30);
     const seasonComplete = booleanOrUndefined(status?.isExpired);
     const scheduleSettings = asRecord(settings.scheduleSettings);
     const scoringSettings = asRecord(settings.scoringSettings);
@@ -233,15 +233,14 @@ function espnApplyRosters(teams: LeagueConnection['teams'], rawTeams: unknown[])
       if (!id || !name) return [];
       const positionId = boundedInteger(player?.defaultPositionId, 1, 30);
       const lineupSlot = boundedInteger(row?.lineupSlotId, 0, 100);
+      const rosterPosition = lineupSlot === undefined ? undefined : lineupSlots[lineupSlot];
       const status = boundedString(player?.injuryStatus ?? row?.status, 32);
       return [
         {
           id,
           name,
           ...(positionId && positions[positionId] ? { position: positions[positionId] } : {}),
-          ...(lineupSlot !== undefined
-            ? { rosterPosition: lineupSlots[lineupSlot] ?? String(lineupSlot) }
-            : {}),
+          ...(rosterPosition ? { rosterPosition } : {}),
           ...(status ? { status } : {}),
         },
       ];

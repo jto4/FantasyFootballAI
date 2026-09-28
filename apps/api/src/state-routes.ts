@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import type { AppState } from './store.js';
+import type { AppState, DashboardStateSnapshot } from './store.js';
 import { summarizeLeagues, summarizeReports } from './mcp-data.js';
 import { summarizeProjectionSources } from './projections.js';
 
 export interface StateRouteDependencies {
   snapshot: () => AppState;
+  dashboardSnapshot?: () => DashboardStateSnapshot;
 }
 
 /** Read-only local state endpoints are kept separate from API startup and background work. */
@@ -12,6 +13,7 @@ export function createStateRouter(dependencies: StateRouteDependencies): Router 
   const router = Router();
 
   router.get('/api/state', (_req, res) => {
+    if (dependencies.dashboardSnapshot) return res.json(dependencies.dashboardSnapshot());
     const state = dependencies.snapshot();
     const { playerProjections: _projections, ...dashboardState } = state;
     void _projections;

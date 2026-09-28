@@ -54,6 +54,16 @@ export async function fetchRetryingJson<T>(
   init: RequestInit = {},
   options: RetryingJsonRequestOptions = {},
 ): Promise<T> {
+  const response = await fetchRetryingResponse(url, init, options);
+  return readBoundedJson<T>(response, options.maxResponseBytes ?? 2_000_000);
+}
+
+/** Retry bounded idempotent HTTP reads and return the successful response to its parser. */
+export async function fetchRetryingResponse(
+  url: string,
+  init: RequestInit = {},
+  options: RetryingJsonRequestOptions = {},
+): Promise<Response> {
   const attempts = Math.max(1, Math.min(5, options.maxAttempts ?? 3));
   const maxDelay = Math.max(0, Math.min(10_000, options.maxRetryDelayMs ?? 2_000));
   const method = (init.method ?? 'GET').toUpperCase();
@@ -78,10 +88,12 @@ export async function fetchRetryingJson<T>(
       continue;
     }
 
-    if (response.ok) return readBoundedJson<T>(response, options.maxResponseBytes ?? 2_000_000);
+    if (response.ok) return response;
     const retryable = retrySafe && (response.status === 429 || response.status >= 500);
-    if (!retryable || attempt === maxAttempts - 1)
+    if (!retryable || attempt === maxAttempts - 1) {
+      await response.body?.cancel().catch(() => undefined);
       throw new Error(`Provider request failed (${response.status})`);
+    }
     const delay = retryDelay(response.headers.get('retry-after'), attempt, maxDelay);
     await response.body?.cancel().catch(() => undefined);
     if (delay > 0) await sleep(delay);

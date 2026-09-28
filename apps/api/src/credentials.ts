@@ -4,6 +4,7 @@ const service = 'SundaySidekick';
 const knownProviders = [
   'openai',
   'image-generation',
+  'stability-image-generation',
   'espn',
   'yahoo',
   'yahoo-oauth-client',

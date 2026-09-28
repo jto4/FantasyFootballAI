@@ -11,6 +11,7 @@ const actions = {
   onAuthorize: vi.fn(),
   onDisconnect: vi.fn(),
   onCompleteAuthorization: vi.fn(),
+  onRetryStatus: vi.fn(),
 };
 
 describe('Yahoo connection section', () => {
@@ -24,6 +25,8 @@ describe('Yahoo connection section', () => {
           requiresReconnect: false,
           redirectUri: 'oob',
         },
+        statusLoading: false,
+        statusError: '',
         clientId: '',
         clientSecret: '',
         authorizationUrl: '',
@@ -49,6 +52,8 @@ describe('Yahoo connection section', () => {
           requiresReconnect: true,
           redirectUri: 'oob',
         },
+        statusLoading: false,
+        statusError: '',
         clientId: 'client',
         clientSecret: '',
         authorizationUrl: 'https://api.login.yahoo.com/oauth2/request_auth',
@@ -62,5 +67,30 @@ describe('Yahoo connection section', () => {
     expect(markup).toContain('AUTHORIZATION CODE FROM YAHOO');
     expect(markup).toContain('Complete Yahoo connection');
     expect(markup).toContain('href="https://api.login.yahoo.com/oauth2/request_auth"');
+  });
+
+  it('does not report Yahoo as disconnected when status cannot be loaded', () => {
+    const markup = renderToStaticMarkup(
+      createElement(YahooConnectionSection, {
+        headingRef: null,
+        status: {
+          clientConfigured: false,
+          authorized: false,
+          requiresReconnect: false,
+          redirectUri: 'oob',
+        },
+        statusLoading: false,
+        statusError: 'Could not read Yahoo connection status.',
+        clientId: '',
+        clientSecret: '',
+        authorizationUrl: '',
+        authorizationCode: '',
+        ...actions,
+      }),
+    );
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain('Try again');
+    expect(markup).not.toContain('NOT CONNECTED');
   });
 });

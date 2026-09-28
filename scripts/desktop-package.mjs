@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createDesktopSmokePlan } from './desktop-smoke-plan.mjs';
 import { makeInternalSymlinksRelative } from './portable-symlinks.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -20,7 +21,9 @@ async function copyProjectFiles() {
   await mkdir(staging, { recursive: true });
   await cp(join(root, 'apps/desktop/main.mjs'), join(staging, 'main.mjs'));
   await cp(join(root, 'apps/desktop/update-check.mjs'), join(staging, 'update-check.mjs'));
+  await cp(join(root, 'apps/desktop/native-updater.mjs'), join(staging, 'native-updater.mjs'));
   await cp(join(root, 'apps/desktop/background-tray.mjs'), join(staging, 'background-tray.mjs'));
+  await cp(join(root, 'apps/desktop/background-mode.mjs'), join(staging, 'background-mode.mjs'));
   await cp(join(root, 'apps/desktop/tray-icon.png'), join(staging, 'tray-icon.png'));
   await cp(join(root, 'apps/desktop/mcp-endpoint.mjs'), join(staging, 'mcp-endpoint.mjs'));
   await cp(join(root, 'apps/desktop/data-directory.mjs'), join(staging, 'data-directory.mjs'));
@@ -157,20 +160,22 @@ async function smokeCheckPackage(packageRoot) {
           packageDirectory,
           process.platform === 'win32' ? 'Sunday Sidekick.exe' : 'Sunday Sidekick',
         );
-  if (process.platform === 'win32' && process.env.CI === 'true') {
+  const { skipHostedWindowsRuntimeSmoke, useXvfb, sandboxArgs } = createDesktopSmokePlan(
+    process.platform,
+    process.env.CI === 'true',
+  );
+  if (skipHostedWindowsRuntimeSmoke) {
     const details = await lstat(executable);
     if (!details.isFile() || details.size === 0)
       throw new Error('The packaged Windows application executable is missing or empty.');
     console.info(
-      'Windows package executable is present; GUI launch remains an interactive Windows check.',
+      'Windows package executable is present. This hosted runner cannot initialize Electron, so GUI, packaged MCP, and headless launch checks remain owner-run Windows checks; MCP protocol behavior is covered by the platform-independent protocol tests.',
     );
     return;
   }
-  const smokeData = join(staging, '.smoke-data');
-  const useXvfb = process.platform === 'linux' && process.env.CI === 'true';
-  const command = useXvfb ? 'xvfb-run' : executable;
   // Hosted Linux runners cannot set Electron's SUID sandbox ownership; this is smoke-only.
-  const sandboxArgs = useXvfb ? ['--no-sandbox'] : [];
+  const smokeData = join(staging, '.smoke-data');
+  const command = useXvfb ? 'xvfb-run' : executable;
   const commandArgs = useXvfb
     ? ['-a', executable, ...sandboxArgs, '--sidekick-smoke-test']
     : ['--sidekick-smoke-test'];
@@ -225,6 +230,25 @@ async function smokeCheckPackage(packageRoot) {
   if (mcpResult.status !== 0)
     throw new Error(
       `The packaged MCP smoke check failed (${mcpResult.status ?? mcpResult.signal}).`,
+    );
+
+  const headlessArguments = [
+    join(root, 'scripts', 'packaged-headless-smoke.mjs'),
+    executable,
+    join(staging, '.headless-smoke-data'),
+    ...(useXvfb ? ['--xvfb'] : []),
+    ...sandboxArgs,
+  ];
+  const headlessResult = spawnSync(process.execPath, headlessArguments, {
+    cwd: staging,
+    env: process.env,
+    timeout: 90_000,
+    stdio: 'inherit',
+  });
+  if (headlessResult.error) throw headlessResult.error;
+  if (headlessResult.status !== 0)
+    throw new Error(
+      `The packaged headless desktop smoke check failed (${headlessResult.status ?? headlessResult.signal}).`,
     );
 }
 

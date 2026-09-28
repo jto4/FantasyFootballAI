@@ -25,6 +25,90 @@ afterEach(async () => {
 });
 
 describe('local SQLite store', () => {
+  it('creates dashboard and report snapshots without cloning private import text', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-memory-snapshots-'));
+    const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
+    await store.load();
+    const privateSource = `PRIVATE:${'conversation text '.repeat(14_700)}`;
+    await store.update((state) => {
+      state.memories.push({
+        id: 'memory-snapshot',
+        name: 'League Member',
+        sourceName: 'Conversation export',
+        importedAt: new Date().toISOString(),
+        sourceText: privateSource,
+        sourceAuthorId: 'private-author-id',
+        styleNotes: 'Short, dry replies.',
+        contextNotes: 'Likes the Lions.',
+      });
+    });
+
+    const dashboard = store.dashboardSnapshot();
+    expect(JSON.stringify(dashboard)).not.toContain('PRIVATE:');
+    expect(dashboard.memories[0]).toMatchObject({
+      id: 'memory-snapshot',
+      sourceLength: privateSource.length,
+      canMergeImportedConversation: false,
+      styleNotes: 'Short, dry replies.',
+    });
+    expect(dashboard.memories[0]).not.toHaveProperty('sourceAuthorId');
+    expect(dashboard.memories[0]).not.toHaveProperty('sourceText');
+
+    const report = store.reportSnapshot();
+    expect(report.memories[0]).toMatchObject({
+      sourceText: '',
+      sourceAuthorId: 'private-author-id',
+      styleNotes: 'Short, dry replies.',
+    });
+    report.memories[0]!.styleNotes = 'mutated report copy';
+    expect(store.snapshot().memories[0]?.styleNotes).toBe('Short, dry replies.');
+    const fullSnapshot = store.snapshot();
+    fullSnapshot.memories[0]!.sourceText = 'replaced snapshot source';
+    expect(store.snapshot().memories[0]?.sourceText).toBe(privateSource);
+  });
+
+  it('does not rewrite imported conversation rows during unrelated state updates', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-memory-persistence-'));
+    const path = join(directory, 'state.sqlite');
+    const store = openStore(path, join(directory, 'missing.json'));
+    await store.load();
+    await store.update((state) => {
+      state.memories.push({
+        id: 'memory-retained',
+        name: 'League Member',
+        sourceName: 'Conversation export',
+        importedAt: new Date().toISOString(),
+        sourceText: 'Private history '.repeat(20_000),
+        sourceAuthorId: 'private-author-id',
+        styleNotes: 'Dry humor.',
+        contextNotes: '',
+      });
+    });
+
+    const observer = new Database(path);
+    observer.exec(`
+      CREATE TABLE memory_write_count (count INTEGER NOT NULL);
+      INSERT INTO memory_write_count VALUES (0);
+      CREATE TRIGGER count_memory_updates AFTER UPDATE ON memories
+      BEGIN UPDATE memory_write_count SET count = count + 1; END;
+      CREATE TRIGGER count_memory_deletes AFTER DELETE ON memories
+      BEGIN UPDATE memory_write_count SET count = count + 1; END;
+      CREATE TRIGGER count_memory_inserts AFTER INSERT ON memories
+      BEGIN UPDATE memory_write_count SET count = count + 1; END;
+    `);
+
+    await store.update((state) => {
+      state.settings.writingStyle = 'Commissioner';
+    });
+    expect(observer.prepare('SELECT count FROM memory_write_count').get()).toEqual({ count: 0 });
+
+    await store.update((state) => {
+      state.memories[0]!.styleNotes = 'More deadpan.';
+    });
+    expect(observer.prepare('SELECT count FROM memory_write_count').get()).toEqual({ count: 1 });
+    observer.close();
+  });
+
   it('validates restored citation links and upgrades reports missing legacy citations', async () => {
     directory = await mkdtemp(join(tmpdir(), 'sidekick-report-citations-'));
     const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
@@ -90,6 +174,55 @@ describe('local SQLite store', () => {
     expect(() => validateState(invalid)).toThrow('Invalid report delivery state in local data.');
   });
 
+  it('validates persisted scheduled run records and recurring occurrence keys', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-scheduled-runs-'));
+    const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
+    await store.load();
+    const baseline = store.snapshot();
+    const run = {
+      id: 'run-1',
+      kind: 'power-rankings',
+      startedAt: '2026-11-01T05:30:00.000Z',
+      status: 'running' as const,
+      occurrenceKey: 'power-rankings:daily:2::01:30:America/New_York:2026-11-01',
+      leagueResults: [
+        { leagueId: 'league-1', displayName: 'Sunday League', status: 'succeeded' as const },
+      ],
+    };
+    baseline.scheduledRuns = [run];
+    expect(validateState(baseline).scheduledRuns[0]).toMatchObject(run);
+
+    const unexpectedField = structuredClone(baseline);
+    (unexpectedField.scheduledRuns[0] as unknown as Record<string, unknown>).privatePayload =
+      'must not reach the dashboard';
+    expect(validateState(unexpectedField).scheduledRuns[0]).not.toHaveProperty('privatePayload');
+
+    const invalidStatus = structuredClone(baseline);
+    (invalidStatus.scheduledRuns[0] as unknown as Record<string, unknown>).status = 'queued';
+    expect(() => validateState(invalidStatus)).toThrow('Invalid scheduled run history');
+
+    const invalidOccurrence = structuredClone(baseline);
+    invalidOccurrence.scheduledRuns[0]!.occurrenceKey = 'invalid\noccurrence';
+    expect(() => validateState(invalidOccurrence)).toThrow('Invalid scheduled run history');
+
+    const duplicateIds = structuredClone(baseline);
+    duplicateIds.scheduledRuns.push({ ...run, id: run.id });
+    expect(() => validateState(duplicateIds)).toThrow('Invalid scheduled run history');
+
+    const oversizedHistory = structuredClone(baseline);
+    oversizedHistory.scheduledRuns = Array.from({ length: 101 }, (_, index) => ({
+      ...run,
+      id: `run-${index}`,
+    }));
+    expect(() => validateState(oversizedHistory)).toThrow('Invalid scheduled run history');
+
+    const invalidLeagueResult = structuredClone(baseline);
+    (invalidLeagueResult.scheduledRuns[0]!.leagueResults![0] as unknown as Record<string, unknown>)[
+      'status'
+    ] = 'unknown';
+    expect(() => validateState(invalidLeagueResult)).toThrow('Invalid scheduled run history');
+  });
+
   it('validates persisted Twilio Conversations page cursors', async () => {
     directory = await mkdtemp(join(tmpdir(), 'sidekick-twilio-cursor-'));
     const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
@@ -107,6 +240,18 @@ describe('local SQLite store', () => {
     expect(() => validateState(candidate)).toThrow('Invalid settings in local state.');
     candidate.settings.twilioConversationSyncCursor.initialized = true;
     candidate.settings.twilioConversationSyncCursor.page = -1;
+    expect(() => validateState(candidate)).toThrow('Invalid settings in local state.');
+  });
+
+  it('rejects malformed saved writing style presets in local state', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-writing-presets-'));
+    const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
+    await store.load();
+    const candidate = structuredClone(store.snapshot());
+    candidate.settings.customWritingStylePresets = [
+      { name: 'Commissioner', value: 'Concise.' },
+      { name: 'commissioner', value: 'With more sarcasm.' },
+    ];
     expect(() => validateState(candidate)).toThrow('Invalid settings in local state.');
   });
 
@@ -395,9 +540,13 @@ describe('local SQLite store', () => {
     expect(store.snapshot().settings.newsRefreshMinutes).toBe(15);
     expect(store.snapshot().settings.reportLength).toBe('standard');
     expect(store.snapshot().settings.leagueStaleAfterHours).toBe(24);
+    expect(store.snapshot().settings.customWritingStylePresets).toEqual([]);
     await store.update((state) => {
       state.settings.writingStyle = 'Dry and kind';
-      state.settings.newsSources = ['fox'];
+      state.settings.customWritingStylePresets = [
+        { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
+      ];
+      state.settings.newsSources = ['fox', 'cbs'];
       state.settings.leagueStaleAfterHours = 72;
       state.leagues.push({
         id: 'league-1',
@@ -414,7 +563,10 @@ describe('local SQLite store', () => {
     const reopened = openStore(file, join(directory, 'missing-legacy.json'));
     await reopened.load();
     expect(reopened.snapshot().settings.writingStyle).toBe('Dry and kind');
-    expect(reopened.snapshot().settings.newsSources).toEqual(['fox']);
+    expect(reopened.snapshot().settings.customWritingStylePresets).toEqual([
+      { name: 'Sunday desk', value: 'Crisp, funny, and specific.' },
+    ]);
+    expect(reopened.snapshot().settings.newsSources).toEqual(['fox', 'cbs']);
     expect(reopened.snapshot().settings.leagueStaleAfterHours).toBe(72);
 
     const database = new Database(file, { readonly: true });
@@ -744,6 +896,7 @@ describe('local SQLite store', () => {
         id: 'run-1',
         kind: 'power-rankings',
         startedAt: '2026-09-25T12:00:00.000Z',
+        occurrenceKey: 'power-rankings:daily:2::01:30:America/New_York:2026-11-01',
         finishedAt: '2026-09-25T12:01:00.000Z',
         status: 'succeeded',
         detail: 'Processed 1 league(s).',
@@ -776,10 +929,30 @@ describe('local SQLite store', () => {
           },
         ],
       });
+      state.scheduledRuns.push({
+        id: 'run-calendar',
+        kind: 'draft-hype',
+        startedAt: '2026-09-25T12:10:00.000Z',
+        status: 'running',
+        calendarEventId: 'event-1',
+        calendarEventTitle: 'League draft',
+        leagueResults: [
+          {
+            leagueId: 'league-1',
+            displayName: 'Sunday Crew',
+            status: 'failed',
+            detail:
+              'Calendar event was interrupted before completion; retry as a draft after review.',
+          },
+        ],
+      });
     });
     const reopened = openStore(file, legacyFile);
     await reopened.load();
     expect(reopened.snapshot().scheduledRuns[0]?.status).toBe('succeeded');
+    expect(reopened.snapshot().scheduledRuns[0]?.occurrenceKey).toBe(
+      'power-rankings:daily:2::01:30:America/New_York:2026-11-01',
+    );
     expect(reopened.snapshot().scheduledRuns[0]?.leagueResults).toEqual([
       { leagueId: 'league-1', displayName: 'Sunday Crew', status: 'succeeded' },
       {
@@ -801,6 +974,15 @@ describe('local SQLite store', () => {
         },
       ],
     });
+    expect(reopened.snapshot().scheduledRuns[2]).toMatchObject({
+      id: 'run-calendar',
+      status: 'failed',
+      detail:
+        'Calendar event was interrupted before completion; retry failed leagues as drafts after review.',
+      calendarEventId: 'event-1',
+      calendarEventTitle: 'League draft',
+      leagueResults: [{ leagueId: 'league-1', status: 'failed' }],
+    });
   });
 
   it('restores a validated SQLite backup and preserves a pre-restore safety copy', async () => {
@@ -810,6 +992,9 @@ describe('local SQLite store', () => {
     await store.load();
     await store.update((state) => {
       state.settings.writingStyle = 'Backup voice';
+      state.settings.customWritingStylePresets = [
+        { name: 'Game day', value: 'Loud, joyous, and stat-aware.' },
+      ];
       state.leagues.push({
         id: 'league-from-backup',
         platform: 'sleeper',
@@ -833,6 +1018,9 @@ describe('local SQLite store', () => {
     const safetyCopy = await store.restoreFromBuffer(backup);
 
     expect(store.snapshot().settings.writingStyle).toBe('Backup voice');
+    expect(store.snapshot().settings.customWritingStylePresets).toEqual([
+      { name: 'Game day', value: 'Loud, joyous, and stat-aware.' },
+    ]);
     expect(store.snapshot().leagues.map((league) => league.id)).toEqual(['league-from-backup']);
     const preserved = new Database(safetyCopy, { readonly: true });
     expect(preserved.prepare('SELECT payload FROM app_settings WHERE id = 1').get()).toBeDefined();

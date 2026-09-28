@@ -18,7 +18,9 @@ import {
   defaultActionSettings,
   defaultLeagueStaleAfterHours,
   defaultNewsSources,
+  isValidNewsSources,
   isLeagueStaleAfterHours,
+  isValidWritingStylePresets,
   normalizeActionSettings,
   normalizeChannelBoundaries,
   normalizeLeagueCalendarEvents,
@@ -46,10 +48,21 @@ export interface AppState {
   scheduledRuns: ScheduledRun[];
 }
 
+export type DashboardStateSnapshot = Omit<AppState, 'memories' | 'playerProjections'> & {
+  memories: Array<
+    Omit<MemberMemory, 'sourceText' | 'sourceAuthorId'> & {
+      sourceLength: number;
+      canMergeImportedConversation: boolean;
+    }
+  >;
+};
+
 export interface ScheduledRun {
   id: string;
   kind: string;
   startedAt: string;
+  /** Local recurring wall-clock occurrence claimed by the scheduler, if any. */
+  occurrenceKey?: string;
   finishedAt?: string;
   status: 'running' | 'succeeded' | 'failed';
   detail?: string;
@@ -124,6 +137,7 @@ const initialState: AppState = {
     actions: structuredClone(defaultActionSettings),
     calendarEvents: [],
     writingStyle: 'Funny, sharp league banter',
+    customWritingStylePresets: [],
     reportLength: 'standard',
     leagueStaleAfterHours: defaultLeagueStaleAfterHours,
     allowProfanity: false,
@@ -162,6 +176,21 @@ const initialState: AppState = {
   playerProjections: [],
   scheduledRuns: [],
 };
+
+/**
+ * Conversation source text is immutable string data. Share those string values across state
+ * snapshots while cloning the profile objects that callers may mutate.
+ */
+function cloneAppState(state: AppState): AppState {
+  const { memories, ...stateWithoutMemories } = state;
+  return {
+    ...structuredClone(stateWithoutMemories),
+    memories: memories.map((profile) => {
+      const { sourceText, ...metadata } = profile;
+      return { ...structuredClone(metadata), sourceText };
+    }),
+  };
+}
 
 const migrations: Array<(database: DatabaseHandle) => void> = [
   (database) => {
@@ -454,21 +483,49 @@ export class LocalStore {
   }
 
   snapshot(): AppState {
-    return structuredClone(this.state);
+    return cloneAppState(this.state);
   }
 
-  async update(mutator: (state: AppState) => void): Promise<AppState> {
-    let result: AppState | undefined;
+  settingsSnapshot(): AppState['settings'] {
+    return structuredClone(this.state.settings);
+  }
+
+  /** Avoid cloning private imported text when the dashboard only needs profile summaries. */
+  dashboardSnapshot(): DashboardStateSnapshot {
+    const { memories, playerProjections: _projections, ...dashboardState } = this.state;
+    void _projections;
+    return {
+      ...structuredClone(dashboardState),
+      memories: memories.map(({ sourceText, sourceAuthorId, ...profile }) => ({
+        ...structuredClone(profile),
+        canMergeImportedConversation: !sourceAuthorId,
+        sourceLength: sourceText.length,
+      })),
+    };
+  }
+
+  /** Report generation reads profile notes, never the original imported conversation text. */
+  reportSnapshot(): AppState {
+    const { memories, ...state } = this.state;
+    return {
+      ...structuredClone(state),
+      memories: memories.map((profile) => {
+        const { sourceText: _sourceText, ...reportProfile } = profile;
+        void _sourceText;
+        return { ...structuredClone(reportProfile), sourceText: '' };
+      }),
+    };
+  }
+
+  async update(mutator: (state: AppState) => void): Promise<void> {
     const operation = this.transaction.then(async () => {
-      const next = structuredClone(this.state);
+      const next = cloneAppState(this.state);
       mutator(next);
-      this.persist(next);
+      this.persist(next, this.state);
       this.state = next;
-      result = structuredClone(next);
     });
     this.transaction = operation.catch(() => undefined);
     await operation;
-    return result!;
   }
 
   async purgeExpiredConversationSources(): Promise<number> {
@@ -653,7 +710,9 @@ export class LocalStore {
       if (run.status !== 'running') continue;
       run.status = 'failed';
       run.finishedAt = finishedAt;
-      run.detail = 'Interrupted when the app last stopped.';
+      run.detail = run.calendarEventId
+        ? 'Calendar event was interrupted before completion; retry failed leagues as drafts after review.'
+        : 'Interrupted when the app last stopped.';
       changed = true;
     }
     for (const report of this.state.reports) {
@@ -698,7 +757,7 @@ export class LocalStore {
       throw new Error(`State database version ${finalVersion} is newer than this app supports.`);
   }
 
-  private persist(state: AppState): void {
+  private persist(state: AppState, previous?: AppState): void {
     if (!this.database) throw new Error('Local database is not loaded.');
     const write = this.database.transaction((next: AppState, updatedAt: string) => {
       const settings = this.database!.prepare(`
@@ -709,12 +768,48 @@ export class LocalStore {
       settings.run(JSON.stringify(next.settings), updatedAt);
       replaceRows(this.database!, 'leagues', next.leagues);
       replaceRows(this.database!, 'reports', next.reports);
-      replaceRows(this.database!, 'memories', next.memories);
+      replaceMemoryRows(this.database!, next.memories, previous?.memories);
       replacePlayerProjectionRows(this.database!, next.playerProjections);
       replaceScheduledRuns(this.database!, next.scheduledRuns);
     });
     write(state, new Date().toISOString());
   }
+}
+
+/** Skip serializing large, unchanged imported conversations during unrelated updates. */
+function replaceMemoryRows(
+  database: DatabaseHandle,
+  rows: MemberMemory[],
+  previous?: MemberMemory[],
+): void {
+  const sameOrder =
+    previous?.length === rows.length &&
+    previous.every((profile, index) => profile.id === rows[index]?.id);
+  if (!sameOrder) {
+    replaceRows(database, 'memories', rows);
+    return;
+  }
+
+  const upsert = database.prepare(`
+    INSERT INTO memories (id, payload) VALUES (?, ?)
+    ON CONFLICT(id) DO UPDATE SET payload = excluded.payload
+    WHERE payload != excluded.payload
+  `);
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index]!;
+    const prior = previous![index]!;
+    if (row === prior) continue;
+    if (row.sourceText === prior.sourceText && sameMemoryMetadata(row, prior)) continue;
+    upsert.run(row.id, JSON.stringify(row));
+  }
+}
+
+function sameMemoryMetadata(left: MemberMemory, right: MemberMemory): boolean {
+  const { sourceText: _leftSource, ...leftMetadata } = left;
+  const { sourceText: _rightSource, ...rightMetadata } = right;
+  void _leftSource;
+  void _rightSource;
+  return JSON.stringify(leftMetadata) === JSON.stringify(rightMetadata);
 }
 
 function isSafetyBackupName(name: string): boolean {
@@ -801,7 +896,8 @@ export function validateState(input: unknown): AppState {
     !candidate.settings ||
     !Array.isArray(candidate.leagues) ||
     !Array.isArray(candidate.reports) ||
-    (candidate.playerProjections !== undefined && !Array.isArray(candidate.playerProjections))
+    (candidate.playerProjections !== undefined && !Array.isArray(candidate.playerProjections)) ||
+    (candidate.scheduledRuns !== undefined && !Array.isArray(candidate.scheduledRuns))
   ) {
     throw new Error('Invalid local state structure');
   }
@@ -812,6 +908,8 @@ export function validateState(input: unknown): AppState {
     Array.isArray(rawSettings) ||
     (rawSettings.writingStyle !== undefined &&
       (typeof rawSettings.writingStyle !== 'string' || rawSettings.writingStyle.length > 1000)) ||
+    (rawSettings.customWritingStylePresets !== undefined &&
+      !isValidWritingStylePresets(rawSettings.customWritingStylePresets)) ||
     (rawSettings.reportLength !== undefined &&
       !['short', 'standard', 'long'].includes(String(rawSettings.reportLength))) ||
     (rawSettings.leagueStaleAfterHours !== undefined &&
@@ -865,11 +963,7 @@ export function validateState(input: unknown): AppState {
         !Number.isInteger(rawSettings.scheduledSyncRetries) ||
         rawSettings.scheduledSyncRetries < 0 ||
         rawSettings.scheduledSyncRetries > 3)) ||
-    (rawSettings.newsSources !== undefined &&
-      (!Array.isArray(rawSettings.newsSources) ||
-        !rawSettings.newsSources.every(
-          (source) => source === 'espn' || source === 'pff' || source === 'fox',
-        ))) ||
+    (rawSettings.newsSources !== undefined && !isValidNewsSources(rawSettings.newsSources)) ||
     (rawSettings.nflInjuryReportsEnabled !== undefined &&
       typeof rawSettings.nflInjuryReportsEnabled !== 'boolean')
   ) {
@@ -930,6 +1024,36 @@ export function validateState(input: unknown): AppState {
     new Set(playerProjections.map((projection) => projection.id)).size !== playerProjections.length
   )
     throw new Error('Invalid player projections in local state.');
+  const storedScheduledRuns = candidate.scheduledRuns ?? [];
+  if (
+    storedScheduledRuns.length > 100 ||
+    storedScheduledRuns.some((run) => !isValidScheduledRun(run)) ||
+    new Set(storedScheduledRuns.map((run) => run.id)).size !== storedScheduledRuns.length
+  )
+    throw new Error('Invalid scheduled run history in local state.');
+  // Project validated rows into the public schema so unknown backup fields never escape via the API.
+  const scheduledRuns = storedScheduledRuns.map((run) => ({
+    id: run.id,
+    kind: run.kind,
+    startedAt: run.startedAt,
+    ...(run.occurrenceKey !== undefined ? { occurrenceKey: run.occurrenceKey } : {}),
+    ...(run.finishedAt !== undefined ? { finishedAt: run.finishedAt } : {}),
+    status: run.status,
+    ...(run.detail !== undefined ? { detail: run.detail } : {}),
+    ...(run.leagueResults !== undefined
+      ? {
+          leagueResults: run.leagueResults.map((result) => ({
+            leagueId: result.leagueId,
+            displayName: result.displayName,
+            status: result.status,
+            ...(result.detail !== undefined ? { detail: result.detail } : {}),
+          })),
+        }
+      : {}),
+    ...(run.retryOf !== undefined ? { retryOf: run.retryOf } : {}),
+    ...(run.calendarEventId !== undefined ? { calendarEventId: run.calendarEventId } : {}),
+    ...(run.calendarEventTitle !== undefined ? { calendarEventTitle: run.calendarEventTitle } : {}),
+  }));
   return {
     settings: {
       ...initialState.settings,
@@ -987,8 +1111,51 @@ export function validateState(input: unknown): AppState {
     reports: candidate.reports.map((report) => ({ ...report, citations: report.citations ?? [] })),
     memories: Array.isArray(candidate.memories) ? candidate.memories : [],
     playerProjections,
-    scheduledRuns: Array.isArray(candidate.scheduledRuns) ? candidate.scheduledRuns : [],
+    scheduledRuns,
   };
+}
+
+function isValidScheduledRun(value: unknown): value is ScheduledRun {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const run = value as Record<string, unknown>;
+  const validText = (text: unknown, maxLength: number): text is string =>
+    typeof text === 'string' &&
+    text.length > 0 &&
+    text.length <= maxLength &&
+    !/[\u0000-\u001f\u007f]/.test(text);
+  const validTimestamp = (timestamp: unknown): timestamp is string =>
+    typeof timestamp === 'string' &&
+    timestamp.length <= 100 &&
+    Number.isFinite(Date.parse(timestamp));
+  const validOptionalText = (text: unknown, maxLength: number): text is string | undefined =>
+    text === undefined || (validText(text, maxLength) && !/[\u0000-\u001f\u007f]/.test(text));
+  if (
+    !validText(run.id, 100) ||
+    !validText(run.kind, 80) ||
+    !validTimestamp(run.startedAt) ||
+    (run.finishedAt !== undefined && !validTimestamp(run.finishedAt)) ||
+    !['running', 'succeeded', 'failed'].includes(String(run.status)) ||
+    !validOptionalText(run.detail, 1_000) ||
+    !validOptionalText(run.retryOf, 100) ||
+    !validOptionalText(run.calendarEventId, 100) ||
+    !validOptionalText(run.calendarEventTitle, 120) ||
+    !validOptionalText(run.occurrenceKey, 400) ||
+    (run.leagueResults !== undefined &&
+      (!Array.isArray(run.leagueResults) ||
+        run.leagueResults.length > 32 ||
+        run.leagueResults.some((result) => {
+          if (!result || typeof result !== 'object' || Array.isArray(result)) return true;
+          const item = result as Record<string, unknown>;
+          return (
+            !validText(item.leagueId, 200) ||
+            !validText(item.displayName, 200) ||
+            !['succeeded', 'failed', 'skipped'].includes(String(item.status)) ||
+            !validOptionalText(item.detail, 1_000)
+          );
+        })))
+  )
+    return false;
+  return true;
 }
 
 function isSafeCitationUrl(value: unknown): value is string {
