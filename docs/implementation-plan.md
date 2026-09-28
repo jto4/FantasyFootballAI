@@ -22,6 +22,10 @@ download-and-run experience for typical league owners.
 Readiness was reviewed on 2026-09-28. Treat the snapshot below as the current baseline;
 update it only after the workflows have been implemented and verified.
 
+The CI and desktop release workflows now pin artifact upload and download actions to reviewed
+full commit SHAs using the Node.js 24 runtime. Local release-assembly and formatting checks pass;
+hosted validation of the updated artifact actions and release matrix remains pending.
+
 Since the previous snapshot, SQLite restore now validates imported settings and resets
 restored custom AI endpoints, CLI runtimes, and automatic scheduled sends to
 review-required defaults. A per-user background service command now creates a LaunchAgent,
