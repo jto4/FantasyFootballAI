@@ -4,8 +4,11 @@ export const serviceName = 'Sunday Sidekick';
 export const serviceLabel = 'com.sundaysidekick.app';
 
 export function servicePaths(home, repositoryRoot) {
+  return servicePathsForDataDirectory(home, repositoryRoot, join(home, '.sidekick'));
+}
+
+export function servicePathsForDataDirectory(home, repositoryRoot, dataDirectory) {
   const serviceScript = join(repositoryRoot, 'scripts', 'service-runner.mjs');
-  const dataDirectory = join(home, '.sidekick');
   const logDirectory = join(dataDirectory, 'logs');
   return {
     serviceScript,
@@ -22,6 +25,8 @@ export function serviceEnvironment(environment, dataDirectory) {
   return {
     ...environment,
     SIDEKICK_SERVICE: '1',
+    SIDEKICK_DATABASE_FILE: join(dataDirectory, 'state.sqlite'),
+    SIDEKICK_DATA_FILE: join(dataDirectory, 'state.json'),
     SIDEKICK_USER_DATA_DIR: dataDirectory,
   };
 }
@@ -32,6 +37,8 @@ export function renderLaunchAgent({
   serviceScript,
   stdoutLog,
   stderrLog,
+  dataDirectory,
+  servicePort = 4173,
 }) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -39,6 +46,10 @@ export function renderLaunchAgent({
   <key>Label</key><string>${xmlEscape(serviceLabel)}</string>
   <key>ProgramArguments</key><array><string>${xmlEscape(nodePath)}</string><string>${xmlEscape(serviceScript)}</string></array>
   <key>WorkingDirectory</key><string>${xmlEscape(repositoryRoot)}</string>
+  <key>EnvironmentVariables</key><dict>
+    <key>SIDEKICK_PORT</key><string>${servicePort}</string>
+    <key>SIDEKICK_USER_DATA_DIR</key><string>${xmlEscape(dataDirectory)}</string>
+  </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
   <key>ThrottleInterval</key><integer>15</integer>

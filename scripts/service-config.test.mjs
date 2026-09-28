@@ -22,10 +22,17 @@ describe('background service configuration', () => {
       serviceScript: paths.serviceScript,
       stdoutLog: paths.stdoutLog,
       stderrLog: paths.stderrLog,
+      dataDirectory: paths.dataDirectory,
     });
     assert.match(config, /<key>RunAtLoad<\/key><true\/>/);
     assert.match(config, /<key>SuccessfulExit<\/key><false\/>/);
     assert.ok(config.includes('/Users/League Owner/app'));
+    assert.ok(config.includes('<key>SIDEKICK_PORT</key><string>4173</string>'));
+    assert.ok(
+      config.includes(
+        '<key>SIDEKICK_USER_DATA_DIR</key><string>/Users/League Owner/.sidekick</string>',
+      ),
+    );
   });
 
   it('escapes systemd paths and runs in the user scope', () => {
@@ -72,6 +79,8 @@ describe('background service configuration', () => {
       {
         PATH: '/bin',
         SIDEKICK_SERVICE: '1',
+        SIDEKICK_DATABASE_FILE: '/Users/League Owner/.sidekick/state.sqlite',
+        SIDEKICK_DATA_FILE: '/Users/League Owner/.sidekick/state.json',
         SIDEKICK_USER_DATA_DIR: paths.dataDirectory,
       },
     );

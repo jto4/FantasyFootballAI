@@ -33,8 +33,12 @@ per-user logon task, runs a temporary Node script from a path containing spaces,
 the process result and XML logon trigger, then stops and removes the task. A second Windows CI
 check launches the built local API through that task, verifies health and the isolated SQLite
 file, and exercises status, graceful stop, restart, and uninstall against a temporary data
-directory. This does not prove that the ONLOGON trigger fires at a real sign-in. Native
-launchd/systemd behavior and Windows sign-in behavior still need validation. The packaged desktop app can now close its dashboard window to a system
+directory. A real macOS LaunchAgent install/start/status/stop/restart/uninstall check has
+also passed on the owner Mac using a temporary home, data directory, and port; LaunchAgent
+environment now keeps both SQLite and legacy JSON files in that selected directory. Ubuntu
+CI verifies the equivalent lifecycle through systemd. This does not prove that the Windows
+ONLOGON trigger fires at a real sign-in. Windows sign-in behavior still needs validation.
+The packaged desktop app can now close its dashboard window to a system
 tray menu while keeping scheduled work alive; explicit tray Quit shuts down the service.
 Owners can also opt to start hidden at sign-in; Windows and Linux use a launch argument, and
 macOS checks Electron's login-item launch signal with the private preference. Ordinary starts
@@ -94,8 +98,8 @@ dev` remains available for development.
   for launch at sign-in; closing its window now hides it to the system tray while scheduled
   tasks continue, and explicit tray Quit stops the service. Windows Task Scheduler
   registration, launch, status, stop, and uninstall now run against a temporary task in CI;
-  native macOS/Linux service-manager behavior, actual Windows sign-in execution, and headless
-  desktop operation remain unverified.
+  macOS LaunchAgent and Linux systemd service-manager lifecycles now have real runtime checks;
+  actual Windows sign-in execution and headless desktop operation remain unverified.
 - **Is the entire product plan implemented?** No. Several platform connectors and
   provider paths are partial. Season-aware scheduling, platform verification, recovery edge cases,
   stable packaging dependencies, release packaging, and cross-platform validation remain open.
@@ -545,8 +549,9 @@ permissions; MCP tools state their side effects and never send without authoriza
   restart, and removal. Ubuntu CI now also launches the built service through a real systemd
   user unit, checks local API health and SQLite persistence, and verifies status, stop/restart,
   and uninstall. This caught and fixed systemd's rejection of a quoted `WorkingDirectory`;
-  checkout paths with spaces use C-style escapes. Actual ONLOGON execution at sign-in and
-  launchd behavior remain unverified.
+  checkout paths with ASCII and Unicode whitespace use UTF-8 C-style byte escapes. A real
+  macOS LaunchAgent cycle has passed on the owner Mac using a temporary home, isolated
+  database, and free port; actual ONLOGON execution at sign-in remains unverified.
 - Test clean installation, upgrade, uninstall, persistence, and credential storage on
   all supported operating systems.
 - Publish release notes, supported integration matrix, troubleshooting guidance, and

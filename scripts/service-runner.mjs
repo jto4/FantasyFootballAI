@@ -2,11 +2,20 @@ import { spawn } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 import { chmod, mkdir, rename, stat, unlink } from 'node:fs/promises';
 import { homedir } from 'node:os';
+import { isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { serviceEnvironment, servicePaths } from './service-config.mjs';
+import { serviceEnvironment, servicePathsForDataDirectory } from './service-config.mjs';
 
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
-const paths = servicePaths(homedir(), repositoryRoot);
+const configuredDataDirectory = process.env.SIDEKICK_USER_DATA_DIR;
+if (configuredDataDirectory && !isAbsolute(configuredDataDirectory)) {
+  throw new Error('The background service data directory must be an absolute path.');
+}
+const paths = servicePathsForDataDirectory(
+  homedir(),
+  repositoryRoot,
+  configuredDataDirectory ?? join(homedir(), '.sidekick'),
+);
 await mkdir(paths.logDirectory, { recursive: true, mode: 0o700 });
 await chmod(paths.logDirectory, 0o700).catch(() => undefined);
 await rotateIfLarge(paths.stdoutLog);

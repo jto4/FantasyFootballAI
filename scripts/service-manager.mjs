@@ -68,6 +68,8 @@ export function createServiceManager({
         serviceScript: paths.serviceScript,
         stdoutLog: paths.stdoutLog,
         stderrLog: paths.stderrLog,
+        dataDirectory: paths.dataDirectory,
+        servicePort,
       }),
     );
     invoke('launchctl', ['bootout', `gui/${userId}`, paths.launchAgent], { allowFailure: true });
