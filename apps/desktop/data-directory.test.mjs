@@ -204,7 +204,9 @@ if (process.platform === 'win32') {
           acl,
         );
         assert.ok(
-          entries.every((line) => (target === destination ? !/\(I\)/ : /\(I\)/).test(line)),
+          entries.every((line) =>
+            target === destination ? !/\(I\)/.test(line) : /\(I\)/.test(line),
+          ),
           acl,
         );
       }
