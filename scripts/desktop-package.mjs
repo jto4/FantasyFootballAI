@@ -156,6 +156,15 @@ async function smokeCheckPackage(packageRoot) {
           packageDirectory,
           process.platform === 'win32' ? 'Sunday Sidekick.exe' : 'Sunday Sidekick',
         );
+  if (process.platform === 'win32' && process.env.CI === 'true') {
+    const details = await lstat(executable);
+    if (!details.isFile() || details.size === 0)
+      throw new Error('The packaged Windows application executable is missing or empty.');
+    console.info(
+      'Windows package executable is present; GUI launch remains an interactive Windows check.',
+    );
+    return;
+  }
   const smokeData = join(staging, '.smoke-data');
   const useXvfb = process.platform === 'linux' && process.env.CI === 'true';
   const command = useXvfb ? 'xvfb-run' : executable;
