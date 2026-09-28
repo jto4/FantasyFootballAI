@@ -829,6 +829,9 @@ describe('local SQLite store', () => {
     await store.load();
     await store.update((state) => {
       state.settings.writingStyle = 'Backup voice';
+      state.settings.customWritingStylePresets = [
+        { name: 'Game day', value: 'Loud, joyous, and stat-aware.' },
+      ];
       state.leagues.push({
         id: 'league-from-backup',
         platform: 'sleeper',
@@ -852,6 +855,9 @@ describe('local SQLite store', () => {
     const safetyCopy = await store.restoreFromBuffer(backup);
 
     expect(store.snapshot().settings.writingStyle).toBe('Backup voice');
+    expect(store.snapshot().settings.customWritingStylePresets).toEqual([
+      { name: 'Game day', value: 'Loud, joyous, and stat-aware.' },
+    ]);
     expect(store.snapshot().leagues.map((league) => league.id)).toEqual(['league-from-backup']);
     const preserved = new Database(safetyCopy, { readonly: true });
     expect(preserved.prepare('SELECT payload FROM app_settings WHERE id = 1').get()).toBeDefined();
