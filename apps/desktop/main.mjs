@@ -14,7 +14,6 @@ import { createServer } from 'node:net';
 import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
-import squirrelStartup from 'electron-squirrel-startup';
 import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
 import {
   getStartHiddenPreference,
@@ -35,6 +34,9 @@ import {
 const startupTimeoutMs = 30_000;
 const smokeTest = process.argv.includes('--sidekick-smoke-test');
 const mcpMode = process.argv.includes('--sidekick-mcp');
+// The Squirrel helper can consume headless smoke arguments as installer events on Windows.
+const squirrelStartup =
+  smokeTest || mcpMode ? false : (await import('electron-squirrel-startup')).default;
 let apiProcess;
 let apiPort;
 let apiExited = false;
