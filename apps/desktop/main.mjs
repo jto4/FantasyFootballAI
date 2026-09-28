@@ -197,6 +197,9 @@ ipcMain.handle('sidekick:choose-data-directory', async (event) => {
 
 if (mcpMode) {
   app.whenReady().then(startPackagedMcp).catch(showStartupError);
+} else if (smokeTest) {
+  // CI launches the unpacked executable outside Squirrel's installer lifecycle.
+  app.whenReady().then(start).catch(showStartupError);
 } else if (squirrelStartup) {
   app.quit();
 } else if (!app.requestSingleInstanceLock()) {
