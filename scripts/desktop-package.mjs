@@ -159,8 +159,10 @@ async function smokeCheckPackage(packageRoot) {
   const smokeData = join(staging, '.smoke-data');
   const useXvfb = process.platform === 'linux' && process.env.CI === 'true';
   const command = useXvfb ? 'xvfb-run' : executable;
+  // Hosted Linux runners cannot set Electron's SUID sandbox ownership; this is smoke-only.
+  const sandboxArgs = useXvfb ? ['--no-sandbox'] : [];
   const commandArgs = useXvfb
-    ? ['-a', executable, '--sidekick-smoke-test']
+    ? ['-a', executable, ...sandboxArgs, '--sidekick-smoke-test']
     : ['--sidekick-smoke-test'];
   const result = spawnSync(command, commandArgs, {
     cwd: staging,
@@ -191,7 +193,12 @@ async function smokeCheckPackage(packageRoot) {
 
   const mcpResult = spawnSync(
     process.execPath,
-    [join(root, 'scripts', 'packaged-mcp-smoke.mjs'), executable, join(staging, '.mcp-smoke-data')],
+    [
+      join(root, 'scripts', 'packaged-mcp-smoke.mjs'),
+      executable,
+      join(staging, '.mcp-smoke-data'),
+      ...sandboxArgs,
+    ],
     { cwd: staging, env: process.env, timeout: 30_000, stdio: 'inherit' },
   );
   if (mcpResult.error) throw mcpResult.error;

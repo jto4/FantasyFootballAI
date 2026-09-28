@@ -1,10 +1,9 @@
 import { lstat, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import path from 'node:path';
-const { basename, dirname, join, resolve } = path;
+import pathModule from 'node:path';
 
 export function linuxAutostartFile(home = homedir()) {
-  return join(home, '.config', 'autostart', 'sunday-sidekick.desktop');
+  return pathModule.join(home, '.config', 'autostart', 'sunday-sidekick.desktop');
 }
 
 export async function getLaunchAtLogin(
@@ -51,7 +50,7 @@ export async function setLaunchAtLogin(
       await rm(path, { force: true });
       return { supported: true, enabled: false };
     }
-    const directory = join(home, '.config', 'autostart');
+    const directory = pathModule.join(home, '.config', 'autostart');
     await mkdir(directory, { recursive: true, mode: 0o700 });
     const temporaryPath = `${path}.${process.pid}.tmp`;
     const contents = [
@@ -84,7 +83,7 @@ export async function setLaunchAtLogin(
 function loginItemOptions(platform, executable, startHidden) {
   if (platform !== 'win32') return {};
   // Squirrel installs versioned app folders; its stable launcher lives one directory up.
-  const windowsPath = path.win32;
+  const windowsPath = pathModule.win32;
   return {
     path: windowsPath.resolve(
       windowsPath.dirname(executable),

@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { join } from 'node:path';
 
-const [executable, dataDirectory] = process.argv.slice(2);
+const [executable, dataDirectory, ...runtimeArguments] = process.argv.slice(2);
 if (!executable || !dataDirectory) throw new Error('Usage: packaged-mcp-smoke <app> <data-dir>');
 await mkdir(dataDirectory, { recursive: true, mode: 0o700 });
 const paths = [];
@@ -27,7 +27,7 @@ const address = api.address();
 if (!address || typeof address === 'string') throw new Error('Could not start the smoke API.');
 await writeFile(join(dataDirectory, 'service-port'), `${address.port}\n`, { mode: 0o600 });
 
-const app = spawn(executable, ['--sidekick-mcp'], {
+const app = spawn(executable, [...runtimeArguments, '--sidekick-mcp'], {
   stdio: ['pipe', 'pipe', 'pipe'],
   windowsHide: true,
   env: {
