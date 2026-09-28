@@ -19,6 +19,7 @@ const forgeArgs = process.argv.slice(2).filter((argument) => argument !== '--upd
 async function copyProjectFiles() {
   await mkdir(staging, { recursive: true });
   await cp(join(root, 'apps/desktop/main.mjs'), join(staging, 'main.mjs'));
+  await cp(join(root, 'apps/desktop/update-check.mjs'), join(staging, 'update-check.mjs'));
   await cp(join(root, 'apps/desktop/background-tray.mjs'), join(staging, 'background-tray.mjs'));
   await cp(join(root, 'apps/desktop/tray-icon.png'), join(staging, 'tray-icon.png'));
   await cp(join(root, 'apps/desktop/mcp-endpoint.mjs'), join(staging, 'mcp-endpoint.mjs'));

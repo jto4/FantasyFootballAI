@@ -35,10 +35,15 @@ In Settings, enable **Launch at sign-in** to start the app in the background whe
 Closing the dashboard window hides the app to the system tray; choose **Quit Sunday Sidekick**
 from the tray menu to stop scheduled work.
 
-## Updates and support status
+## Check for updates
 
-The desktop app does not yet have an automatic update flow. Check the project's release notes
-for upgrade instructions before replacing an existing installation. Keep a current in-app
-backup before upgrading. The owner must publish signed packages and complete interactive
-installation, upgrade, data-folder migration, background-service, and credential-storage checks
-on each supported operating system before claiming full platform support.
+In the desktop app, open **Settings → Desktop updates** and choose **Check for updates**. The
+check asks GitHub for the latest published stable release; it sends no league, profile, or
+credential data. When an update is available, choose **View version** to open the official
+release page in your browser, then download and install the package for your operating system
+using the steps above. Back up local data before installing.
+
+Downloads are installed manually; the app does not silently replace or restart itself. The
+repository still needs a published signed release, and interactive installation, upgrade, data
+folder migration, background-service, and credential-storage checks on each supported operating
+system before claiming full platform support.

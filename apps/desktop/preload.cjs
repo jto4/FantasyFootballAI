@@ -9,4 +9,6 @@ contextBridge.exposeInMainWorld('sidekickDesktop', {
   setStartHidden: (enabled) => ipcRenderer.invoke('sidekick:set-start-hidden', enabled),
   getDataDirectory: () => ipcRenderer.invoke('sidekick:get-data-directory'),
   chooseDataDirectory: () => ipcRenderer.invoke('sidekick:choose-data-directory'),
+  checkForUpdates: () => ipcRenderer.invoke('sidekick:check-for-updates'),
+  openReleasePage: () => ipcRenderer.invoke('sidekick:open-release-page'),
 });

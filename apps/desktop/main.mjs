@@ -24,6 +24,7 @@ import { createBackgroundTray } from './background-tray.mjs';
 import { createRotatingLogWriter } from './log-writer.mjs';
 import { recoverFromSafetyBackup } from './database-recovery-flow.mjs';
 import { readDesktopMcpEndpoint } from './mcp-endpoint.mjs';
+import { checkForDesktopUpdate } from './update-check.mjs';
 import {
   copyLocalDirectory,
   isDataDirectoryActive,
@@ -107,6 +108,14 @@ ipcMain.handle('sidekick:set-start-hidden', async (event, enabled) => {
 ipcMain.handle('sidekick:get-data-directory', async (event) => {
   assertTrustedDashboard(event);
   return await getDataDirectory();
+});
+ipcMain.handle('sidekick:check-for-updates', async (event) => {
+  assertTrustedDashboard(event);
+  return checkForDesktopUpdate(app.getVersion());
+});
+ipcMain.handle('sidekick:open-release-page', async (event) => {
+  assertTrustedDashboard(event);
+  await shell.openExternal('https://github.com/jto4/FantasyFootballAI/releases/latest');
 });
 ipcMain.handle('sidekick:choose-data-directory', async (event) => {
   assertTrustedDashboard(event);

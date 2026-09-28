@@ -245,6 +245,8 @@ export function SettingsPage({
   const [startHiddenBusy, setStartHiddenBusy] = useState(false);
   const [dataDirectory, setDataDirectory] = useState<string | null>(null);
   const [dataDirectoryBusy, setDataDirectoryBusy] = useState(false);
+  const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateCheckResult | null>(null);
+  const [desktopUpdateBusy, setDesktopUpdateBusy] = useState(false);
   const [diagnosticLogs, setDiagnosticLogs] = useState<DiagnosticLogSnapshot | null>(null);
   const [diagnosticLogsBusy, setDiagnosticLogsBusy] = useState(false);
   const [diagnosticLogsError, setDiagnosticLogsError] = useState('');
@@ -334,6 +336,32 @@ export function SettingsPage({
       );
     } finally {
       setDataDirectoryBusy(false);
+    }
+  }
+
+  async function checkDesktopUpdates() {
+    const desktop = window.sidekickDesktop;
+    if (!desktop || desktopUpdateBusy) return;
+    setDesktopUpdateBusy(true);
+    setDesktopUpdate(null);
+    try {
+      setDesktopUpdate(await desktop.checkForUpdates());
+    } catch {
+      setDesktopUpdate({
+        status: 'error',
+        currentVersion: 'unknown',
+        message: 'Could not check for updates. Try again when you have an internet connection.',
+      });
+    } finally {
+      setDesktopUpdateBusy(false);
+    }
+  }
+
+  async function openDesktopReleasePage() {
+    try {
+      await window.sidekickDesktop?.openReleasePage();
+    } catch {
+      setMessage('Could not open the official Sunday Sidekick releases page.');
     }
   }
 
@@ -1051,39 +1079,86 @@ export function SettingsPage({
         onCompleteAuthorization={() => void completeYahooAuthorization()}
       />
       {launchAtLogin && (
-        <section className="settings-card">
-          <div className="settings-card-title">
-            <div>
-              <h2>Desktop startup</h2>
-              <p>
-                Run scheduled reports automatically by opening Sunday Sidekick when you sign in.
-              </p>
+        <>
+          <section className="settings-card">
+            <div className="settings-card-title">
+              <div>
+                <h2>Desktop startup</h2>
+                <p>
+                  Run scheduled reports automatically by opening Sunday Sidekick when you sign in.
+                </p>
+              </div>
+              <ShieldCheck size={18} />
             </div>
-            <ShieldCheck size={18} />
-          </div>
-          <label className="settings-toggle">
-            <input
-              type="checkbox"
-              checked={launchAtLogin.enabled}
-              disabled={!launchAtLogin.supported || launchAtLoginBusy || startHiddenBusy}
-              onChange={(event) => void changeLaunchAtLogin(event.currentTarget.checked)}
-            />
-            <span>Launch at sign-in</span>
-          </label>
-          {startHidden && (
             <label className="settings-toggle">
               <input
                 type="checkbox"
-                checked={startHidden.enabled}
-                disabled={!startHidden.supported || launchAtLoginBusy || startHiddenBusy}
-                onChange={(event) => void changeStartHidden(event.currentTarget.checked)}
+                checked={launchAtLogin.enabled}
+                disabled={!launchAtLogin.supported || launchAtLoginBusy || startHiddenBusy}
+                onChange={(event) => void changeLaunchAtLogin(event.currentTarget.checked)}
               />
-              <span>Start hidden in the system tray</span>
+              <span>Launch at sign-in</span>
             </label>
+            {startHidden && (
+              <label className="settings-toggle">
+                <input
+                  type="checkbox"
+                  checked={startHidden.enabled}
+                  disabled={!startHidden.supported || launchAtLoginBusy || startHiddenBusy}
+                  onChange={(event) => void changeStartHidden(event.currentTarget.checked)}
+                />
+                <span>Start hidden in the system tray</span>
+              </label>
+            )}
+            <p className="schedule-explainer">
+              This affects the next sign-in launch. Close the window to keep the app running in the
+              tray.
+            </p>
+          </section>
+        </>
+      )}
+      {window.sidekickDesktop && (
+        <section className="settings-card" aria-labelledby="desktop-updates-title">
+          <div className="settings-card-title">
+            <div>
+              <h2 id="desktop-updates-title">Desktop updates</h2>
+              <p>Check the latest published stable release and download updates in your browser.</p>
+            </div>
+            <Download size={18} />
+          </div>
+          <div className="button-row">
+            <button
+              type="button"
+              className="small-button"
+              disabled={desktopUpdateBusy}
+              onClick={() => void checkDesktopUpdates()}
+            >
+              <RefreshCw size={13} /> {desktopUpdateBusy ? 'Checking…' : 'Check for updates'}
+            </button>
+            {desktopUpdate?.status === 'available' && (
+              <button
+                type="button"
+                className="small-button"
+                onClick={() => void openDesktopReleasePage()}
+              >
+                <Download size={13} /> View version {desktopUpdate.latestVersion}
+              </button>
+            )}
+          </div>
+          {desktopUpdate && (
+            <p role="status" className="schedule-explainer">
+              {desktopUpdate.status === 'available'
+                ? `Version ${desktopUpdate.latestVersion} is available. You have ${desktopUpdate.currentVersion}. Download it from the official release page and follow the platform install steps.`
+                : desktopUpdate.status === 'current'
+                  ? `You have the latest published version (${desktopUpdate.currentVersion}).`
+                  : desktopUpdate.status === 'unreleased'
+                    ? `You have version ${desktopUpdate.currentVersion}. No public release is available yet.`
+                    : desktopUpdate.message}
+            </p>
           )}
           <p className="schedule-explainer">
-            This affects the next sign-in launch. Close the window to keep the app running in the
-            tray.
+            Downloads are manual. Back up your local data before installing a release; see the
+            install guide for platform-specific steps.
           </p>
         </section>
       )}

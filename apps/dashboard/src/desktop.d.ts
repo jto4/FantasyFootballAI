@@ -7,6 +7,13 @@ interface DesktopDataDirectoryResult {
   changed: boolean;
 }
 
+interface DesktopUpdateCheckResult {
+  status: 'available' | 'current' | 'unreleased' | 'error';
+  currentVersion: string;
+  latestVersion?: string;
+  message?: string;
+}
+
 interface Window {
   sidekickDesktop?: {
     getLaunchAtLogin(): Promise<DesktopStartupSetting>;
@@ -15,5 +22,7 @@ interface Window {
     setStartHidden(enabled: boolean): Promise<DesktopStartupSetting>;
     getDataDirectory(): Promise<string>;
     chooseDataDirectory(): Promise<DesktopDataDirectoryResult>;
+    checkForUpdates(): Promise<DesktopUpdateCheckResult>;
+    openReleasePage(): Promise<void>;
   };
 }
