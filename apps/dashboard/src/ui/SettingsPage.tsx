@@ -6,7 +6,8 @@ import { AIRuntimeSection } from './AIRuntimeSection.js';
 import { AIMemoryPrivacySection } from './AIMemoryPrivacySection.js';
 import { WritingStyleSection } from './WritingStyleSection.js';
 import { LeagueCalendarSettings } from './LeagueCalendarSettings.js';
-import { Copy, Download, RefreshCw, Save, ShieldCheck, Trash2, Upload } from 'lucide-react';
+import { LocalBackupSection } from './LocalBackupSection.js';
+import { Copy, Download, RefreshCw, Save, ShieldCheck, Trash2 } from 'lucide-react';
 import {
   applyScheduleRecommendations,
   isValidTimezone,
@@ -23,7 +24,6 @@ import {
 } from '@sidekick/core';
 
 type SecretState = { provider: string; configured: boolean }[];
-type SafetyBackup = { name: string; createdAt: string; size: number };
 type LocalImage = { id: string; createdAt: string; size: number; mimeType: string };
 type DiagnosticLogEntry = {
   timestamp: string;
@@ -161,11 +161,6 @@ export function SettingsPage({
     redirectUri: '',
   });
   const [message, setMessage] = useState('');
-  const [backupBusy, setBackupBusy] = useState(false);
-  const [backupPassphrase, setBackupPassphrase] = useState('');
-  const [backupPassphraseConfirmation, setBackupPassphraseConfirmation] = useState('');
-  const [restorePassphrase, setRestorePassphrase] = useState('');
-  const [safetyBackups, setSafetyBackups] = useState<SafetyBackup[]>([]);
   const [runtimeBusy, setRuntimeBusy] = useState(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [launchAtLogin, setLaunchAtLogin] = useState<DesktopStartupSetting | null>(null);
@@ -241,10 +236,6 @@ export function SettingsPage({
       .then((r) => r.json())
       .then(setYahooOAuthStatus)
       .catch(() => setMessage('Could not read Yahoo connection status.'));
-    void fetch('/api/backups')
-      .then((r) => (r.ok ? r.json() : []))
-      .then((backups: SafetyBackup[]) => setSafetyBackups(Array.isArray(backups) ? backups : []))
-      .catch(() => setMessage('Could not read local safety backups.'));
   }, []);
 
   async function changeDataDirectory() {
@@ -733,108 +724,9 @@ export function SettingsPage({
     setMessage('Yahoo authorization removed from the operating system credential store.');
   }
 
-  async function downloadBackup() {
-    if (backupPassphrase.length < 12 || backupPassphrase.length > 200) {
-      setMessage('Use a backup passphrase between 12 and 200 characters.');
-      return;
-    }
-    if (backupPassphrase !== backupPassphraseConfirmation) {
-      setMessage('Backup passphrases do not match.');
-      return;
-    }
-    setBackupBusy(true);
-    setMessage('Encrypting local backup…');
-    try {
-      const response = await fetch('/api/backup/export', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ passphrase: backupPassphrase }),
-      });
-      if (!response.ok) {
-        const result = (await response.json()) as { error?: string };
-        throw new Error(result.error ?? 'Could not create a local backup.');
-      }
-      const backup = await response.blob();
-      const url = URL.createObjectURL(backup);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'sunday-sidekick-backup.ssb';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-      setMessage(
-        'Encrypted backup downloaded. Store its passphrase separately; it cannot be recovered.',
-      );
-      setBackupPassphrase('');
-      setBackupPassphraseConfirmation('');
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not create a local backup.');
-    } finally {
-      setBackupBusy(false);
-    }
-  }
-
-  async function deleteSafetyBackup(name: string) {
-    if (!window.confirm(`Permanently delete safety backup ${name}?`)) return;
-    const response = await fetch(`/api/backups/${encodeURIComponent(name)}`, { method: 'DELETE' });
-    if (!response.ok) {
-      setMessage('Could not delete that safety backup.');
-      return;
-    }
-    setSafetyBackups((backups) => backups.filter((backup) => backup.name !== name));
-    setMessage('Safety backup deleted from this computer.');
-  }
-
-  async function restoreBackup(event: React.ChangeEvent<HTMLInputElement>) {
-    const backup = event.currentTarget.files?.[0];
-    event.currentTarget.value = '';
-    if (!backup) return;
-    if (backup.size > 201 * 1024 * 1024) {
-      setMessage('Choose a backup file no larger than 201 MB.');
-      return;
-    }
-    const confirmed = window.confirm(
-      'Restore this backup? Current settings, leagues, reports, member memory, scheduled history, and generated images will be replaced. Automatic actions will return to draft mode; custom AI endpoints and local CLI runtimes will return to the default until you review and save those settings. A safety copy of the current database will be kept in the local backups folder.',
-    );
-    if (!confirmed) return;
-
-    setBackupBusy(true);
-    setMessage('Validating and restoring backup…');
-    try {
-      const response = await fetch('/api/backup', {
-        method: 'PUT',
-        headers: {
-          'content-type': backup.name.toLowerCase().endsWith('.ssb')
-            ? 'application/vnd.sunday-sidekick.encrypted-backup'
-            : backup.name.toLowerCase().endsWith('.zip')
-              ? 'application/vnd.sunday-sidekick.backup'
-              : 'application/vnd.sqlite3',
-          ...(restorePassphrase
-            ? { 'x-sidekick-backup-passphrase': encodeURIComponent(restorePassphrase) }
-            : {}),
-        },
-        body: backup,
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? 'Could not restore this backup.');
-      onSaved(result.settings as AppSettings);
-      await onRestored();
-      setForm({
-        ...result.settings,
-        actions: normalizeActionSettings(result.settings.actions),
-      });
-      const backupsResponse = await fetch('/api/backups');
-      if (backupsResponse.ok) setSafetyBackups(await backupsResponse.json());
-      setMessage(
-        `Backup restored. Review AI and delivery settings before enabling automation. Safety copy: ${result.safetyCopy}`,
-      );
-      setRestorePassphrase('');
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not restore this backup.');
-    } finally {
-      setBackupBusy(false);
-    }
+  function handleRestoredSettings(restoredSettings: AppSettings) {
+    onSaved(restoredSettings);
+    setForm(restoredSettings);
   }
 
   function setRuntime<K extends keyof NonNullable<AppSettings['aiRuntime']>>(
@@ -1051,113 +943,11 @@ export function SettingsPage({
           </small>
         </section>
       )}
-      <section className="settings-card">
-        <div className="settings-card-title">
-          <div>
-            <h2>Local backup and restore</h2>
-            <p>
-              Download or restore a consistent backup of your database and generated image library.
-              Older SQLite-only backups remain supported. Provider secrets stay in the operating
-              system credential manager.
-            </p>
-          </div>
-          <ShieldCheck size={18} />
-        </div>
-        <div className="settings-fields two">
-          <label>
-            Backup passphrase
-            <input
-              type="password"
-              autoComplete="new-password"
-              minLength={12}
-              maxLength={200}
-              value={backupPassphrase}
-              onChange={(event) => setBackupPassphrase(event.target.value)}
-              placeholder="At least 12 characters"
-            />
-          </label>
-          <label>
-            Confirm backup passphrase
-            <input
-              type="password"
-              autoComplete="new-password"
-              minLength={12}
-              maxLength={200}
-              value={backupPassphraseConfirmation}
-              onChange={(event) => setBackupPassphraseConfirmation(event.target.value)}
-              placeholder="Re-enter passphrase"
-            />
-          </label>
-          <button
-            type="button"
-            className="small-button"
-            onClick={() => void downloadBackup()}
-            disabled={
-              backupBusy ||
-              backupPassphrase.length < 12 ||
-              backupPassphrase !== backupPassphraseConfirmation
-            }
-          >
-            <Download size={14} /> Download backup
-          </button>
-          <label className="small-button backup-restore-label">
-            <Upload size={14} /> Restore backup
-            <input
-              type="file"
-              className="backup-file-input"
-              accept=".ssb,.zip,.sqlite,application/vnd.sunday-sidekick.encrypted-backup,application/zip,application/vnd.sqlite3,application/x-sqlite3"
-              onChange={(event) => void restoreBackup(event)}
-              disabled={backupBusy}
-              aria-label="Choose a Sunday Sidekick backup archive or legacy SQLite backup to restore"
-            />
-          </label>
-        </div>
-        <label className="backup-passphrase-restore">
-          Passphrase for encrypted backup
-          <input
-            type="password"
-            autoComplete="current-password"
-            maxLength={200}
-            value={restorePassphrase}
-            onChange={(event) => setRestorePassphrase(event.target.value)}
-            placeholder="Only needed for .ssb backups"
-          />
-        </label>
-        {safetyBackups.length > 0 && (
-          <div className="safety-backup-list" aria-label="Local safety backups">
-            <h3>Local safety copies</h3>
-            {safetyBackups.map((backup) => (
-              <div className="safety-backup-row" key={backup.name}>
-                <div>
-                  <strong>{new Date(backup.createdAt).toLocaleString()}</strong>
-                  <small>{(backup.size / (1024 * 1024)).toFixed(1)} MB · private local data</small>
-                </div>
-                <a
-                  className="small-button"
-                  href={`/api/backups/${encodeURIComponent(backup.name)}`}
-                  download={backup.name}
-                >
-                  <Download size={13} /> Download
-                </a>
-                <button
-                  type="button"
-                  className="small-button danger"
-                  onClick={() => void deleteSafetyBackup(backup.name)}
-                  aria-label={`Delete safety backup from ${new Date(backup.createdAt).toLocaleString()}`}
-                >
-                  <Trash2 size={13} /> Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <small className="schedule-explainer">
-          Downloaded backups encrypt league data, reports, imported memory, and generated images
-          with your passphrase. Keep it separately: it cannot be recovered. Older ZIP and SQLite
-          backups remain supported and are unencrypted. Pre-restore and automatic pre-upgrade safety
-          copies stay on this computer until you delete them.
-        </small>
-      </section>
+      <LocalBackupSection
+        onNotice={setMessage}
+        onRestored={onRestored}
+        onSettingsRestored={handleRestoredSettings}
+      />
       <WritingStyleSection
         headingRef={voiceHeadingRef}
         writingStyle={form.writingStyle}
