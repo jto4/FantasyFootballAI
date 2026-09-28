@@ -97,6 +97,27 @@ This remains consistent with the prior macOS samples for API and report latency.
 varies with the build output and is retained for comparison; these single-host synthetic
 measurements are not universal performance thresholds.
 
+## Additional repeat sample recorded on 2026-09-28
+
+The current tree was rebuilt and measured on macOS ARM under Node.js 25.9.0 with the same
+synthetic fixture:
+
+| Measurement                                      |           Result |
+| ------------------------------------------------ | ---------------: |
+| Cold API startup to healthy                      |           186 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.29 / 0.67 ms |
+| Full local state p50 / p95 (30 samples)          |   1.78 / 2.69 ms |
+| Full state response                              |        465.1 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 50.21 / 55.79 ms |
+| Dashboard shell and built assets                 |             3 ms |
+| Dashboard JavaScript and CSS assets              |        409.4 KiB |
+| API process working set                          |        117.6 MiB |
+
+The benchmark shut down its temporary API and removed its data directory after completion.
+No listener remained on the standard development or production ports. As with prior samples,
+the synthetic CLI excludes model inference and this single-machine result does not represent
+lower-powered systems.
+
 ## Cross-platform CI samples recorded on 2026-09-28
 
 Hosted run `36376672913` uploaded one JSON artifact per supported OS and one for the minimum
