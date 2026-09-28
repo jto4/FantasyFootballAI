@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { access, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { homedir } from 'node:os';
@@ -39,6 +40,22 @@ test(
           cwd: options.cwd,
           encoding: 'utf8',
         });
+        if (result.status !== 0) {
+          const journal = spawnSync(
+            'journalctl',
+            ['--user', '--unit', 'sunday-sidekick.service', '--no-pager', '--lines', '60'],
+            { encoding: 'utf8' },
+          );
+          let serviceLog = '';
+          try {
+            serviceLog = readFileSync(join(dataDirectory, 'logs', 'service-error.log'), 'utf8');
+          } catch {
+            // The service can fail before its log directory is created.
+          }
+          throw new Error(
+            `${program} ${args.join(' ')} exited with ${result.status}.\n${result.stderr ?? ''}\n${journal.stdout ?? ''}\n${serviceLog}`,
+          );
+        }
         return { status: result.status, error: result.error };
       },
     });
