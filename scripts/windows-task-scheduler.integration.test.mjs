@@ -68,7 +68,13 @@ test(
 
       await service.run('status');
       assert.ok((taskQueries.at(-1) ?? '').includes(taskName));
-      assert.match(taskQueries.at(-1) ?? '', /(At log on|ONLOGON)/i);
+      assert.match(taskQueries.at(-1) ?? '', /Last Result:\s+0/i);
+      const taskXml = spawnSync('schtasks.exe', ['/Query', '/TN', taskName, '/XML'], {
+        encoding: 'utf8',
+        windowsHide: true,
+      });
+      assert.equal(taskXml.status, 0, taskXml.stderr);
+      assert.match(taskXml.stdout ?? '', /<LogonTrigger>/i);
       await service.run('stop');
       await service.run('uninstall');
 
