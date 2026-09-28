@@ -32,6 +32,26 @@ benchmark does not measure live league refresh duration, real-provider inference
 browser paint/interaction responsiveness, or long-running scheduler resource use; those
 require a configured provider account and a separate recorded manual exercise before release.
 
+## Repeat sample recorded on 2026-09-27
+
+A fresh macOS ARM run under Node.js 25.9.0 with the same synthetic fixture completed after
+the cross-platform packaging work:
+
+| Measurement                                      |           Result |
+| ------------------------------------------------ | ---------------: |
+| Cold API startup to healthy                      |           187 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.28 / 0.61 ms |
+| Full local state p50 / p95 (30 samples)          |   1.86 / 2.69 ms |
+| Full state response                              |        465.1 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 50.10 / 59.40 ms |
+| Dashboard shell and built assets                 |             3 ms |
+| Dashboard JavaScript and CSS assets              |        407.5 KiB |
+| API process working set                          |        117.8 MiB |
+
+The synthetic measurements remain consistent with the prior sample. Small timing and asset
+size changes are expected across builds and host load; both reports are retained as
+observations rather than universal thresholds.
+
 ## Minimum-runtime sample recorded on 2026-09-27
 
 The same macOS ARM fixture was also run with the documented minimum Node.js 22.13.0 after
