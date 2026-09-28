@@ -14,8 +14,10 @@ the runner compatibility requirement is met by GitHub-hosted runners.
 Reviewed trigger scopes, least-privilege workflow permissions, the existing version-tag
 guard around release publication, and the pinned action commits. This update does not alter
 workflow triggers, secrets, permissions, artifact handling, or release publication behavior.
-No automated security scan was run. Hosted CI for the updated workflow is the required
-runtime check and is pending when this note was written.
+No automated security scan was run. Hosted CI run `36370139075` passed all source jobs and
+macOS, Windows, and Linux package jobs with the updated workflow. Windows package
+verification confirms that the executable artifact exists; the hosted runner cannot start
+the packaged GUI.
 
 This focused review does not cover the full release diff or produced artifacts. Complete
 both `SECURITY.md` release checklists for each release candidate.
