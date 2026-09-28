@@ -1,27 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { preferredScrollBehavior } from './motion.js';
-import { postDraftEventDraft } from './post-draft-event.js';
 import { credentialStatusLabel, parseCredentialStatuses } from './credential-status.js';
 import { YahooConnectionSection, type YahooOAuthStatus } from './YahooConnectionSection.js';
 import { AIRuntimeSection } from './AIRuntimeSection.js';
 import { AIMemoryPrivacySection } from './AIMemoryPrivacySection.js';
 import { WritingStyleSection } from './WritingStyleSection.js';
+import { LeagueCalendarSettings } from './LeagueCalendarSettings.js';
 import { Copy, Download, RefreshCw, Save, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import {
   applyScheduleRecommendations,
-  isValidLocalDateTime,
   isValidTimezone,
   scheduleRecommendations,
   defaultLeagueStaleAfterHours,
   leagueStaleAfterHoursOptions,
   normalizeNewsSources,
   normalizeActionSettings,
-  platformDraftCalendarSuggestions,
   normalizeChannelBoundaries,
   supportedNewsSources,
   type ActionSetting,
   type AppSettings,
-  type LeagueCalendarEvent,
   type LeagueConnection,
 } from '@sidekick/core';
 
@@ -87,20 +84,6 @@ const actionNames: Record<string, string> = {
   'power-rankings': 'Weekly power rankings',
   'matchup-preview': 'Matchup previews',
 };
-const reportKinds = [
-  'offseason-update',
-  'draft-hype',
-  'draft-review',
-  'power-rankings',
-  'matchup-preview',
-] as const;
-const timezonesForCalendar = [
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'UTC',
-];
 export function SettingsPage({
   settings,
   leagues,
@@ -184,36 +167,6 @@ export function SettingsPage({
   const [restorePassphrase, setRestorePassphrase] = useState('');
   const [safetyBackups, setSafetyBackups] = useState<SafetyBackup[]>([]);
   const [runtimeBusy, setRuntimeBusy] = useState(false);
-  const [calendarDraft, setCalendarDraft] = useState({
-    leagueId: leagues[0]?.id ?? '',
-    title: 'League milestone',
-    kind: 'draft-hype' as LeagueCalendarEvent['kind'],
-    date: todayLocalDate(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'),
-    time: '09:00',
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  });
-  const selectedCalendarLeague = leagues.find(
-    (league) => league.id === (calendarDraft.leagueId || leagues[0]?.id),
-  );
-  const platformDraftStart =
-    selectedCalendarLeague?.draft?.scheduledAt ?? selectedCalendarLeague?.draftScheduledAt;
-  const platformDraftSuggestions = platformDraftStart
-    ? platformDraftCalendarSuggestions(platformDraftStart, calendarDraft.timezone)
-    : undefined;
-  const platformDraftStartParts = platformDraftSuggestions?.draftHype;
-  const suggestedPostDraftReview = platformDraftSuggestions?.postDraftReview;
-  const draftTimeSource =
-    selectedCalendarLeague?.platform === 'sleeper'
-      ? 'Sleeper'
-      : selectedCalendarLeague?.platform === 'yahoo'
-        ? 'Yahoo'
-        : selectedCalendarLeague?.platform === 'espn'
-          ? 'ESPN'
-          : undefined;
-  const hasUpcomingPlatformDraft =
-    draftTimeSource !== undefined &&
-    platformDraftStartParts !== undefined &&
-    Date.parse(platformDraftStart ?? '') > Date.now();
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [launchAtLogin, setLaunchAtLogin] = useState<DesktopStartupSetting | null>(null);
   const [launchAtLoginBusy, setLaunchAtLoginBusy] = useState(false);
@@ -947,78 +900,6 @@ export function SettingsPage({
     }));
   }
 
-  function addCalendarEvent() {
-    const leagueId = calendarDraft.leagueId || leagues[0]?.id;
-    if (!leagueId || !calendarDraft.title.trim()) {
-      setMessage('Choose a league and enter a calendar event name.');
-      return;
-    }
-    if (!isValidLocalDateTime(calendarDraft.date, calendarDraft.time, calendarDraft.timezone)) {
-      setMessage(
-        'That local time does not occur on this date in the selected timezone. Choose another time.',
-      );
-      return;
-    }
-    if ((form.calendarEvents?.length ?? 0) >= 500) {
-      setMessage('The league calendar is full. Remove an event before adding another.');
-      return;
-    }
-    const event: LeagueCalendarEvent = {
-      ...calendarDraft,
-      id: window.crypto.randomUUID(),
-      leagueId,
-      title: calendarDraft.title.trim(),
-    };
-    setForm((current) => ({
-      ...current,
-      calendarEvents: [...(current.calendarEvents ?? []), event],
-    }));
-    setMessage('Calendar event added. Save Settings to activate it.');
-  }
-
-  function usePlatformDraftStart() {
-    if (!platformDraftStartParts || !draftTimeSource) return;
-    setCalendarDraft((current) => ({
-      ...current,
-      title: 'Draft day hype',
-      kind: 'draft-hype',
-      date: platformDraftStartParts.date,
-      time: platformDraftStartParts.time,
-    }));
-    setMessage(
-      `Draft hype date and time prefilled from ${draftTimeSource}. Review them, add the event, then save Settings.`,
-    );
-  }
-
-  function useSuggestedPostDraftReview() {
-    if (!suggestedPostDraftReview || !draftTimeSource) return;
-    setCalendarDraft((current) => ({
-      ...current,
-      ...postDraftEventDraft(suggestedPostDraftReview, 'draft-review'),
-    }));
-    setMessage(
-      `Post-draft review prefilled for the day after the ${draftTimeSource} draft at 9:00 AM. Review the timing, add the event, then save Settings.`,
-    );
-  }
-
-  function useSuggestedPostDraftPowerRankings() {
-    if (!suggestedPostDraftReview || !draftTimeSource) return;
-    setCalendarDraft((current) => ({
-      ...current,
-      ...postDraftEventDraft(suggestedPostDraftReview, 'power-rankings'),
-    }));
-    setMessage(
-      `Post-draft power rankings prefilled for the day after the ${draftTimeSource} draft at 9:00 AM. Review the timing, add the event, then save Settings.`,
-    );
-  }
-
-  function deleteCalendarEvent(eventId: string) {
-    setForm((current) => ({
-      ...current,
-      calendarEvents: (current.calendarEvents ?? []).filter((event) => event.id !== eventId),
-    }));
-  }
-
   return (
     <form className="settings-page" onSubmit={saveSettings}>
       <div className="page-title-block">
@@ -1649,160 +1530,26 @@ export function SettingsPage({
           The Leagues page warns at this age. Old snapshots remain available, but may no longer
           reflect current rosters or standings.
         </small>
-        <div className="news-source-settings">
-          <h3>LEAGUE SEASON CALENDAR</h3>
-          <p className="schedule-explainer">
-            Add a draft day, season milestone, or other league date. At that time, Sidekick
-            refreshes that league and saves the selected report as a draft. Calendar events never
-            send messages.
-          </p>
-          {leagues.length ? (
-            <>
-              <div className="settings-fields two">
-                <label>
-                  LEAGUE
-                  <select
-                    value={calendarDraft.leagueId || leagues[0]?.id || ''}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({ ...current, leagueId: event.target.value }))
-                    }
-                  >
-                    {leagues.map((league) => (
-                      <option key={league.id} value={league.id}>
-                        {league.displayName}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  REPORT
-                  <select
-                    value={calendarDraft.kind}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({
-                        ...current,
-                        kind: event.target.value as LeagueCalendarEvent['kind'],
-                      }))
-                    }
-                  >
-                    {reportKinds.map((kind) => (
-                      <option key={kind} value={kind}>
-                        {actionNames[kind]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  EVENT NAME
-                  <input
-                    value={calendarDraft.title}
-                    maxLength={120}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({ ...current, title: event.target.value }))
-                    }
-                    placeholder="Draft night"
-                  />
-                </label>
-                <label>
-                  DATE
-                  <input
-                    type="date"
-                    min={todayLocalDate(calendarDraft.timezone)}
-                    value={calendarDraft.date}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({ ...current, date: event.target.value }))
-                    }
-                  />
-                </label>
-                <label>
-                  TIME
-                  <input
-                    type="time"
-                    value={calendarDraft.time}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({ ...current, time: event.target.value }))
-                    }
-                  />
-                </label>
-                <label>
-                  TIMEZONE
-                  <select
-                    value={calendarDraft.timezone}
-                    onChange={(event) =>
-                      setCalendarDraft((current) => ({ ...current, timezone: event.target.value }))
-                    }
-                  >
-                    {[...new Set([calendarDraft.timezone, ...timezonesForCalendar])].map(
-                      (timezone) => (
-                        <option key={timezone} value={timezone}>
-                          {timezone}
-                        </option>
-                      ),
-                    )}
-                  </select>
-                </label>
-              </div>
-              <button type="button" className="small-button" onClick={addCalendarEvent}>
-                Add calendar event
-              </button>
-              {hasUpcomingPlatformDraft && platformDraftStartParts && draftTimeSource && (
-                <p className="schedule-explainer">
-                  {draftTimeSource} reports a draft at {platformDraftStartParts.date} at{' '}
-                  {platformDraftStartParts.time} ({calendarDraft.timezone}).{' '}
-                  <button type="button" className="text-button" onClick={usePlatformDraftStart}>
-                    Use platform draft time
-                  </button>
-                  {suggestedPostDraftReview && (
-                    <>
-                      {' '}
-                      <button
-                        type="button"
-                        className="text-button"
-                        onClick={useSuggestedPostDraftReview}
-                      >
-                        Suggest a review for the next day at 9:00 AM
-                      </button>{' '}
-                      <button
-                        type="button"
-                        className="text-button"
-                        onClick={useSuggestedPostDraftPowerRankings}
-                      >
-                        Suggest post-draft power rankings for the next day
-                      </button>
-                    </>
-                  )}
-                </p>
-              )}
-            </>
-          ) : (
-            <small>Connect a league to create a season calendar.</small>
-          )}
-          {(form.calendarEvents ?? []).length > 0 && (
-            <div className="safety-backup-list" aria-label="League calendar events">
-              {(form.calendarEvents ?? []).map((event) => (
-                <div className="safety-backup-row" key={event.id}>
-                  <div>
-                    <strong>{event.title}</strong>
-                    <small>
-                      {leagues.find((league) => league.id === event.leagueId)?.displayName ??
-                        'Disconnected league'}{' '}
-                      · {actionNames[event.kind]} · {event.date} {event.time} {event.timezone}
-                      {event.completedAt ? ' · complete' : ''}
-                    </small>
-                  </div>
-                  <button
-                    type="button"
-                    className="small-button danger"
-                    onClick={() => deleteCalendarEvent(event.id)}
-                    aria-label={`Remove ${event.title} calendar event`}
-                  >
-                    <Trash2 size={13} /> Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <LeagueCalendarSettings
+          leagues={leagues}
+          events={form.calendarEvents ?? []}
+          actionNames={actionNames}
+          onAddEvent={(event) =>
+            setForm((current) => ({
+              ...current,
+              calendarEvents: [...(current.calendarEvents ?? []), event],
+            }))
+          }
+          onDeleteEvent={(eventId) =>
+            setForm((current) => ({
+              ...current,
+              calendarEvents: (current.calendarEvents ?? []).filter(
+                (event) => event.id !== eventId,
+              ),
+            }))
+          }
+          onNotice={setMessage}
+        />
         <div className="news-source-settings">
           <h3>SCHEDULED LEAGUE REFRESH RETRIES</h3>
           <label>
