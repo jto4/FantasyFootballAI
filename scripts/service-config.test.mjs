@@ -29,9 +29,7 @@ describe('background service configuration', () => {
     assert.ok(config.includes('/Users/League Owner/app'));
     assert.ok(config.includes('<key>SIDEKICK_PORT</key><string>4173</string>'));
     assert.ok(
-      config.includes(
-        '<key>SIDEKICK_USER_DATA_DIR</key><string>/Users/League Owner/.sidekick</string>',
-      ),
+      config.includes(`<key>SIDEKICK_USER_DATA_DIR</key><string>${paths.dataDirectory}</string>`),
     );
   });
 
