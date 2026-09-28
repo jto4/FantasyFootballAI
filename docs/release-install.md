@@ -2,17 +2,20 @@
 
 This guide applies to published, signed Sunday Sidekick releases. Current desktop artifacts
 are unsigned and are still in pre-release verification; do not bypass operating-system
-publisher warnings to install an unsigned package. macOS ARM is the only package verified
-locally, and Windows/Linux interactive installation has not yet been verified.
+publisher warnings to install an unsigned package. Apple Silicon is the only Mac package
+verified locally; hosted Intel Mac packaging verification and Windows/Linux interactive
+installation remain outstanding.
 
 ## Choose the package for your computer
 
-Download the platform ZIP and `SHA256SUMS` from the same GitHub Release. Extract the ZIP and
+Download the platform ZIP matching your operating system and architecture and `SHA256SUMS`
+from the same GitHub Release. Extract the ZIP and
 follow the platform steps below. The ZIP contains this install guide, the MIT license, and the
 native installer artifacts for that platform.
 
-- **macOS:** Open the `.dmg` and drag Sunday Sidekick to Applications. Launch it from
-  Applications. A signed and notarized release is required for the normal Gatekeeper flow.
+- **macOS:** Download the ZIP matching your processor: ARM64 for Apple Silicon or x64 for
+  Intel. Open its `.dmg` and drag Sunday Sidekick to Applications. Launch it from Applications.
+  A signed and notarized release is required for the normal Gatekeeper flow.
 - **Windows:** Run `Setup.exe` from the extracted package. The Squirrel installer installs
   the app for the current user.
 - **Linux:** For Debian or Ubuntu, open the `.deb` package with the desktop package installer.

@@ -31,7 +31,8 @@ test('release archive assembly includes each native package and verifies assets'
   const packages = [
     { name: 'sunday-sidekick-Linux-X64', installer: 'SundaySidekick.deb' },
     { name: 'sunday-sidekick-Windows-X64', installer: 'Setup.exe' },
-    { name: 'sunday-sidekick-macOS-Arm64', installer: 'Sunday Sidekick.dmg' },
+    { name: 'sunday-sidekick-macOS-ARM64', installer: 'Sunday Sidekick-arm64.dmg' },
+    { name: 'sunday-sidekick-macOS-X64', installer: 'Sunday Sidekick-x64.dmg' },
   ];
 
   try {
@@ -97,6 +98,25 @@ test('release archive assembly includes each native package and verifies assets'
     assert.equal(rejected.status, 1);
     assert.match(rejected.stderr, /Native installer \(\*\.exe\) is missing/);
     assert.deepEqual(await readdir(invalidOutput), []);
+
+    const missingIntelInput = join(directory, 'missing-intel-input');
+    const missingIntelOutput = join(directory, 'missing-intel-output');
+    for (const item of packages.filter((item) => item.name !== 'sunday-sidekick-macOS-X64')) {
+      const packageDirectory = join(missingIntelInput, item.name);
+      await mkdir(packageDirectory, { recursive: true });
+      await writeFile(join(packageDirectory, item.installer), 'native package');
+    }
+    const missingIntel = spawnSync(
+      'bash',
+      [assemblyScript, missingIntelInput, missingIntelOutput, 'v1.2.3'],
+      { cwd: repositoryRoot, encoding: 'utf8' },
+    );
+    assert.equal(missingIntel.status, 1);
+    assert.match(
+      missingIntel.stderr,
+      /Expected packages from Linux, Windows, and both macOS architectures/,
+    );
+    assert.deepEqual(await readdir(missingIntelOutput), []);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

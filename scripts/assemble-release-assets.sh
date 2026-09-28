@@ -44,13 +44,14 @@ trap cleanup_staging EXIT
 
 shopt -s nullglob
 artifacts=("$artifacts_root"/sunday-sidekick-*)
-if [[ ${#artifacts[@]} -ne 3 ]]; then
-  echo "Expected packages from macOS, Windows, and Linux; found ${#artifacts[@]}." >&2
+if [[ ${#artifacts[@]} -ne 4 ]]; then
+  echo "Expected packages from Linux, Windows, and both macOS architectures; found ${#artifacts[@]}." >&2
   exit 1
 fi
 
 linux_seen=false
-macos_seen=false
+macos_arm64_seen=false
+macos_x64_seen=false
 windows_seen=false
 for artifact_dir in "${artifacts[@]}"; do
   if [[ ! -d "$artifact_dir" ]]; then
@@ -65,9 +66,14 @@ for artifact_dir in "${artifacts[@]}"; do
       linux_seen=true
       installer_pattern='*.deb'
       ;;
-    sunday-sidekick-macOS-*)
-      [[ "$macos_seen" == false ]] || { echo "Duplicate macOS artifact." >&2; exit 1; }
-      macos_seen=true
+    sunday-sidekick-macOS-ARM64)
+      [[ "$macos_arm64_seen" == false ]] || { echo "Duplicate macOS ARM64 artifact." >&2; exit 1; }
+      macos_arm64_seen=true
+      installer_pattern='*.dmg'
+      ;;
+    sunday-sidekick-macOS-X64)
+      [[ "$macos_x64_seen" == false ]] || { echo "Duplicate macOS x64 artifact." >&2; exit 1; }
+      macos_x64_seen=true
       installer_pattern='*.dmg'
       ;;
     sunday-sidekick-Windows-*)
@@ -95,8 +101,8 @@ for artifact_dir in "${artifacts[@]}"; do
   )
 done
 
-if [[ "$linux_seen" != true || "$macos_seen" != true || "$windows_seen" != true ]]; then
-  echo "Release archives must include one Linux, one macOS, and one Windows package." >&2
+if [[ "$linux_seen" != true || "$macos_arm64_seen" != true || "$macos_x64_seen" != true || "$windows_seen" != true ]]; then
+  echo "Release archives must include Linux, Windows, and both macOS architectures." >&2
   exit 1
 fi
 

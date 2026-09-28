@@ -15,7 +15,7 @@ npm start
 
 > **Showcase:** Sunday Sidekick is featured on Jimmy's project site at [sdeqst.app/projects/sunday-sidekick](https://www.sdeqst.app/projects/sunday-sidekick), with an overview, screenshots, and setup steps.
 
-> Early development: a desktop packaging pipeline now creates a bundled macOS, Windows, or Linux app, and the macOS ARM build has passed a packaged runtime smoke check. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, Windows/Linux runtime checks, and platform lifecycle verification are still open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
+> Early development: desktop packages include a bundled runtime for Apple Silicon and Intel Macs, Windows, and Linux. The Apple Silicon Mac, Windows, and Linux builds have passed hosted or local smoke checks; Intel Mac packaging is now in the release workflow and needs hosted verification. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, Windows/Linux interactive verification, and platform lifecycle checks remain open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
 
 ## Requirements
 
@@ -56,10 +56,11 @@ npm ci
 npm run desktop:make
 ```
 
-The installer is written to `apps/desktop/out/make/`. macOS ARM packaging and the bundled
-API/dashboard smoke check have been verified locally; Windows and Linux builds run through
-the dedicated GitHub Actions workflow and remain to be verified. Packages are currently
-unsigned, and this repository does not yet publish user-ready releases. Desktop Settings
+The installer is written to `apps/desktop/out/make/`. Apple Silicon macOS packaging and the
+bundled API/dashboard smoke check have been verified locally; the dedicated GitHub Actions
+workflow builds Intel macOS, Windows, and Linux packages. Packages are currently
+unsigned, and hosted Intel Mac verification is pending. This repository does not yet publish
+user-ready releases. Desktop Settings
 can enable launch at sign-in on macOS, Windows, and Linux and choose to start hidden in the
 tray on the next sign-in. Closing the desktop window hides it to the system tray while scheduled tasks continue. Use the tray menu to reopen the
 dashboard or choose **Quit Sunday Sidekick** to stop the local service. Headless background

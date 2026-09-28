@@ -59,14 +59,17 @@ use the source-checkout service commands instead.
 
 If the desktop app cannot open its SQLite database, it checks the five most recent valid local safety copies and offers an explicit restore choice. The app preserves the failed database and journal files in a recovery folder, then restores the chosen copy with automatic sends paused and custom AI/CLI runtimes reset for review. If no valid safety copy exists, it leaves the data folder unchanged and displays source-checkout recovery guidance.
 Packages are unsigned and are not published for end users yet. Version tags create a draft
-GitHub Release with a zip archive for each OS and a `SHA256SUMS` file; an owner must complete
+GitHub Release with a ZIP for Linux and Windows, plus separate Apple Silicon and Intel macOS
+ZIPs, and a `SHA256SUMS` file; an owner must complete
 the release review and publish it. After downloading the archive and checksum file, run
 `shasum -a 256 -c SHA256SUMS` on macOS or `sha256sum -c SHA256SUMS` on Linux to check for
 accidental corruption or incomplete downloads. On Windows, use `Get-FileHash <archive> -Algorithm
 SHA256` and compare its `Hash` value with that archive's line in `SHA256SUMS`. Checksums alone
-do not authenticate who published the files. macOS ARM is the only installer build verified locally. CI now builds and smoke-checks
-packages on macOS, Windows, and Linux for pushes and pull requests; successful runner results
-and interactive installation checks on each OS are still required before claiming support.
+do not authenticate who published the files. Apple Silicon is the only Mac installer build
+verified locally. Push and pull-request CI smoke-checks Apple Silicon macOS, Windows, and
+Linux packages; the on-demand and tag release workflow now also builds Intel Mac packages,
+which still need hosted verification. Successful runner results and interactive installation
+checks on each OS are still required before claiming support.
 
 On the League desk, choose **Guided setup** to walk through league connection, AI runtime
 settings, and optional voice/schedule customization. It resumes at the first incomplete
