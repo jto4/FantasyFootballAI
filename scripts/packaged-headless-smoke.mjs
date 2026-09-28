@@ -10,14 +10,46 @@ const useXvfb = options.includes('--xvfb');
 const sandboxArguments = options.filter((option) => option !== '--xvfb');
 const chromiumProfile = join(dataDirectory, 'chromium');
 await mkdir(dataDirectory, { recursive: true });
+let displayServer;
+let display;
+if (useXvfb) {
+  displayServer = spawn(
+    'Xvfb',
+    ['-displayfd', '1', '-screen', '0', '1280x720x24', '-nolisten', 'tcp'],
+    {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    },
+  );
+  display = await new Promise((resolve, reject) => {
+    let output = '';
+    const timer = setTimeout(
+      () => reject(new Error('Xvfb did not publish a display number.')),
+      5_000,
+    );
+    displayServer.once('error', (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+    displayServer.once('exit', (code) => {
+      clearTimeout(timer);
+      reject(new Error(`Xvfb exited before startup (${code}).`));
+    });
+    displayServer.stdout.setEncoding('utf8').on('data', (chunk) => {
+      output += chunk;
+      const match = output.match(/^(\d+)\r?\n/);
+      if (match) {
+        clearTimeout(timer);
+        resolve(match[1]);
+      }
+    });
+  });
+}
 const runtimeArgs = [
   ...sandboxArguments,
   `--user-data-dir=${chromiumProfile}`,
   '--sidekick-headless',
 ];
-const command = useXvfb ? 'xvfb-run' : executable;
-const args = useXvfb ? ['-a', executable, ...runtimeArgs] : runtimeArgs;
-const child = spawn(command, args, {
+const child = spawn(executable, runtimeArgs, {
   cwd: dataDirectory,
   env: {
     ...process.env,
@@ -26,6 +58,7 @@ const child = spawn(command, args, {
     LOCALAPPDATA: join(dataDirectory, 'localappdata'),
     SIDEKICK_USER_DATA_DIR: join(dataDirectory, 'data'),
     USERPROFILE: dataDirectory,
+    ...(display ? { DISPLAY: `:${display}` } : {}),
   },
   stdio: ['ignore', 'pipe', 'pipe'],
   windowsHide: true,
@@ -131,8 +164,10 @@ try {
   console.info(
     'Packaged headless desktop smoke check passed: local API health and clean shutdown.',
   );
+  displayServer?.kill('SIGTERM');
 } catch (error) {
   child.kill('SIGTERM');
   await Promise.race([exit.catch(() => undefined), delay(3_000)]);
+  displayServer?.kill('SIGTERM');
   throw error;
 }
