@@ -175,7 +175,13 @@ async function smokeCheckPackage(packageRoot) {
     timeout: 60_000,
     stdio: 'inherit',
   });
-  if (result.error) throw result.error;
+  if (result.error) {
+    const smokeStatus = await readFile(join(smokeData, 'desktop-smoke-status'), 'utf8').catch(
+      () => 'not started\n',
+    );
+    console.error(`Packaged desktop smoke stage: ${smokeStatus.trim()}`);
+    throw result.error;
+  }
   if (result.status !== 0)
     throw new Error(
       `The packaged application smoke check failed (${result.status ?? result.signal}).`,

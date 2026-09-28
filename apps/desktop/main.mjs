@@ -214,8 +214,10 @@ if (mcpMode) {
 }
 
 async function start() {
+  await writeSmokeStatus('starting');
   apiPort = await reserveLoopbackPort();
   const dataDirectory = await getDataDirectory();
+  await writeSmokeStatus('starting-api');
   await mkdir(dataDirectory, { recursive: true });
   try {
     await startLocalApi(dataDirectory);
@@ -228,6 +230,7 @@ async function start() {
     apiPort = await reserveLoopbackPort();
     await startLocalApi(dataDirectory);
   }
+  await writeSmokeStatus('api-ready');
   if (smokeTest) {
     const trayIcon = nativeImage.createFromPath(join(app.getAppPath(), 'tray-icon.png'));
     if (trayIcon.isEmpty()) throw new Error('The packaged system tray icon could not be loaded.');
@@ -246,7 +249,9 @@ async function start() {
       );
     console.info('Packaged desktop smoke check passed: API and dashboard are responding locally.');
     // Smoke checks run in headless CI; shut down the child directly before bypassing UI quit hooks.
+    await writeSmokeStatus('stopping-api');
     await stopApi(dataDirectory);
+    await writeSmokeStatus('stopped');
     app.exit(0);
     return;
   }
@@ -263,6 +268,13 @@ async function start() {
   });
   createWindow({ initiallyHidden: startHidden });
   startupInProgress = false;
+}
+
+async function writeSmokeStatus(status) {
+  if (!smokeTest || !process.env.SIDEKICK_USER_DATA_DIR) return;
+  const directory = process.env.SIDEKICK_USER_DATA_DIR;
+  await mkdir(directory, { recursive: true });
+  await writeFile(join(directory, 'desktop-smoke-status'), `${status}\n`);
 }
 
 async function startLocalApi(dataDirectory) {
