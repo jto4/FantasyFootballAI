@@ -81,6 +81,7 @@ import { LeagueCalendarScheduler, preserveCompletedOneOffs, ReportScheduler } fr
 import { replaceLocalImages } from './image-library.js';
 import { createImageRouter } from './image-routes.js';
 import { createReceivedEmailRouter } from './received-email-routes.js';
+import { groupChatSyncBlockReason } from './group-chat-sync-guard.js';
 import {
   createPortableBackup,
   decryptPortableBackup,
@@ -1382,7 +1383,7 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
     });
   }
   const state = store.snapshot();
-  const { memoryEnabled, analyzeImportsWithAI } = state.settings;
+  const { memoryEnabled } = state.settings;
   if (!memoryEnabled)
     return res.status(409).json({ error: 'Enable member memory in Settings before syncing.' });
   const chatGuid = state.settings.imessageChatGuid?.trim();
@@ -1406,6 +1407,15 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
     });
   }
 
+  const syncState = store.snapshot();
+  const blockedAfterFetch = groupChatSyncBlockReason(
+    syncState.settings,
+    'imessage',
+    chatGuid,
+    isBackgroundPoll,
+  );
+  if (blockedAfterFetch) return res.status(409).json({ error: blockedAfterFetch });
+
   const cursor =
     state.settings.imessageSyncCursor?.chatGuid === chatGuid
       ? state.settings.imessageSyncCursor
@@ -1428,10 +1438,18 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
 
   const notes = new Map<string, { styleNotes: string; contextNotes: string }>();
   let analysisFailures = 0;
-  if (analyzeImportsWithAI && memberGroups.size > 0) {
+  const analysisState = store.snapshot();
+  const blockedBeforeAnalysis = groupChatSyncBlockReason(
+    analysisState.settings,
+    'imessage',
+    chatGuid,
+    isBackgroundPoll,
+  );
+  if (blockedBeforeAnalysis) return res.status(409).json({ error: blockedBeforeAnalysis });
+  if (analysisState.settings.analyzeImportsWithAI && memberGroups.size > 0) {
     let ai: Awaited<ReturnType<typeof configuredAI>> = null;
     try {
-      ai = await configuredAI(state.settings);
+      ai = await configuredAI(analysisState.settings);
     } catch {
       ai = null;
     }
@@ -1453,7 +1471,10 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
         .join('\n')
         .slice(0, 20_000);
       for (const group of memberGroups.values()) {
-        const previous = state.memories.find((memory) => memory.sourceAuthorId === group.authorId);
+        if (!shouldAnalyzeImportedMessages(store.snapshot().settings)) break;
+        const previous = analysisState.memories.find(
+          (memory) => memory.sourceAuthorId === group.authorId,
+        );
         const authored = group.messages
           .map((message) => message.text)
           .join('\n')
@@ -1481,8 +1502,16 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
   const nextCursor = blueBubblesCursorAfterHistory(chatGuid, history, cursor);
   let chatReplyDrafts: SavedReport[];
   try {
+    const replyState = store.snapshot();
+    const blockedBeforeReply = groupChatSyncBlockReason(
+      replyState.settings,
+      'imessage',
+      chatGuid,
+      isBackgroundPoll,
+    );
+    if (blockedBeforeReply) return res.status(409).json({ error: blockedBeforeReply });
     chatReplyDrafts = await buildMentionReplyDrafts(
-      state,
+      replyState,
       cursor
         ? newMessages.map((message) => ({
             id: `bluebubbles:${message.guid}`,
@@ -1492,7 +1521,7 @@ app.post('/api/memory/imessage-sync', async (_req, res) => {
           }))
         : [],
       'imessage',
-      () => configuredAI(state.settings),
+      () => configuredAI(replyState.settings),
     );
   } catch (error) {
     return res.status(502).json({
@@ -1603,6 +1632,15 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
     });
   }
 
+  const syncState = store.snapshot();
+  const blockedAfterFetch = groupChatSyncBlockReason(
+    syncState.settings,
+    'sms',
+    conversationSid,
+    isBackgroundPoll,
+  );
+  if (blockedAfterFetch) return res.status(409).json({ error: blockedAfterFetch });
+
   const grouped = new Map<string, { author: string; messages: typeof history.messages }>();
   for (const message of messagesAfterTwilioCursor(history.messages, cursor?.lastIndex ?? -1)) {
     // Twilio's default API sender is `system`; do not learn the bot's generated report style as a member.
@@ -1613,15 +1651,23 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
     grouped.set(authorId, group);
   }
   for (const [authorId, group] of grouped) {
-    const previous = state.memories.find((memory) => memory.sourceAuthorId === authorId);
+    const previous = syncState.memories.find((memory) => memory.sourceAuthorId === authorId);
     group.messages = unseenTwilioConversationMessages(previous?.sourceText ?? '', group.messages);
     if (group.messages.length === 0) grouped.delete(authorId);
   }
 
   let chatReplyDrafts: SavedReport[];
   try {
+    const replyState = store.snapshot();
+    const blockedBeforeReply = groupChatSyncBlockReason(
+      replyState.settings,
+      'sms',
+      conversationSid,
+      isBackgroundPoll,
+    );
+    if (blockedBeforeReply) return res.status(409).json({ error: blockedBeforeReply });
     chatReplyDrafts = await buildMentionReplyDrafts(
-      state,
+      replyState,
       messagesAfterTwilioCursor(history.messages, cursor?.lastIndex ?? -1)
         .filter(() => canReplyToTwilioMentions(cursor))
         .filter((message) => message.author.trim().toLowerCase() !== 'system')
@@ -1634,7 +1680,7 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
             message.author.trim().toLowerCase() === config.from.trim().toLowerCase(),
         })),
       'sms',
-      () => configuredAI(state.settings),
+      () => configuredAI(replyState.settings),
     );
   } catch (error) {
     return res.status(502).json({
@@ -1644,10 +1690,18 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
 
   const notes = new Map<string, { styleNotes: string; contextNotes: string }>();
   let analysisFailures = 0;
-  if (shouldAnalyzeImportedMessages(state.settings) && grouped.size > 0) {
+  const analysisState = store.snapshot();
+  const blockedBeforeAnalysis = groupChatSyncBlockReason(
+    analysisState.settings,
+    'sms',
+    conversationSid,
+    isBackgroundPoll,
+  );
+  if (blockedBeforeAnalysis) return res.status(409).json({ error: blockedBeforeAnalysis });
+  if (shouldAnalyzeImportedMessages(analysisState.settings) && grouped.size > 0) {
     let ai: Awaited<ReturnType<typeof configuredAI>> = null;
     try {
-      ai = await configuredAI(state.settings);
+      ai = await configuredAI(analysisState.settings);
     } catch {
       ai = null;
     }
@@ -1664,7 +1718,10 @@ app.post('/api/memory/twilio-conversation-sync', async (_req, res) => {
         .join('\n')
         .slice(0, 20_000);
       for (const [authorId, group] of grouped) {
-        const previous = state.memories.find((memory) => memory.sourceAuthorId === authorId);
+        if (!shouldAnalyzeImportedMessages(store.snapshot().settings)) break;
+        const previous = analysisState.memories.find(
+          (memory) => memory.sourceAuthorId === authorId,
+        );
         const authored = group.messages
           .map((message) => message.body)
           .join('\n')

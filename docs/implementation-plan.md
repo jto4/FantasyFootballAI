@@ -78,10 +78,10 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The current macOS ARM DMG was rebuilt on 2026-09-28 05:54 UTC from the committed source with Node.js
-25.9.0/npm 11.12.1 after fixing and testing the Resend memory opt-out race, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
+The current macOS ARM DMG was rebuilt on 2026-09-28 06:02 UTC from the committed source with Node.js
+25.9.0/npm 11.12.1 after fixing and testing Resend and group-chat memory-consent races, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
 MCP stdio handshake/tool call passed, and `hdiutil verify` confirmed the image checksum. SHA-256 is
-`59acf5b921b450621a40df4c921f8464c9570d2dc81a566aba2ebe28321fa854`. It remains unsigned and not
+`73498b7d57af846c4af4448172e67d99a31c4e72540a14320ffb7bf9bab86c82`. It remains unsigned and not
 notarized; Intel Mac and Linux RPM packaging still need hosted verification, and interactive tray
 lifecycle checks remain open.
 The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The polling configuration and restore behavior pass repository checks; live Twilio polling and
@@ -519,7 +519,10 @@ their sources, and remain drafts unless the owner explicitly enables automatic s
   retains its cursor if generation fails, and defaults to review; a separate explicit owner
   opt-in can send directly to the originating group using persisted delivery claims and receipts.
   Initial history sync establishes a baseline rather than replying to old mentions, and restore
-  disables reply and automatic-reply settings. Live provider and account verification remains.
+  disables reply and automatic-reply settings. History sync rechecks member-memory consent, the
+  selected destination, and background polling after provider fetches and before AI stages;
+  per-member analysis stops if its separate opt-in is turned off. Live provider and account
+  verification remains.
 - MCP now exposes league summaries/detail, news, report listing/detail, draft generation, and
   sending a selected existing draft when the owner enables MCP delivery in Settings. Each tool
   invocation approves one send, uncertain outcomes cannot be retried through MCP, and email
