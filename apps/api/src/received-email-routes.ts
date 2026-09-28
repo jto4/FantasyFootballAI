@@ -81,12 +81,20 @@ export function createReceivedEmailRouter(dependencies: ReceivedEmailRouteDepend
             : 'Could not retrieve this received email from Resend.',
       });
     }
+    // Provider retrieval may take long enough for the owner to disable memory in Settings.
+    const importState = dependencies.store.snapshot();
+    if (!importState.settings.memoryEnabled)
+      return res
+        .status(409)
+        .json({ error: 'Member memory was disabled while retrieving the email.' });
     const address = email.from.match(/(?:^|<)\s*([^<>\s]+@[^<>\s]+)\s*>?\s*$/)?.[1]?.toLowerCase();
     if (!address || !isValidEmailAddress(address))
       return res.status(400).json({ error: 'The sender address is missing or invalid.' });
     const sourceAuthorId = `resend:${address}`;
     const marker = `[[resend-email:${email.id}]]`;
-    const existing = state.memories.find((profile) => profile.sourceAuthorId === sourceAuthorId);
+    const existing = importState.memories.find(
+      (profile) => profile.sourceAuthorId === sourceAuthorId,
+    );
     if (existing?.sourceText.includes(marker))
       return res.json({ imported: false, duplicate: true });
 
@@ -115,9 +123,9 @@ export function createReceivedEmailRouter(dependencies: ReceivedEmailRouteDepend
       existing?.styleNotes ??
       'AI analysis is off. The email was saved locally; add or edit notes below.';
     let contextNotes = existing?.contextNotes ?? '';
-    if (shouldAnalyzeImportedMessages(state.settings)) {
+    if (shouldAnalyzeImportedMessages(importState.settings)) {
       try {
-        const ai = await dependencies.configuredAI(state.settings);
+        const ai = await dependencies.configuredAI(importState.settings);
         if (ai) {
           ({ styleNotes, contextNotes } = splitMemoryAnalysis(
             await ai.generate({

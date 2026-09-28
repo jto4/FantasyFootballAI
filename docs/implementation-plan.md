@@ -78,10 +78,10 @@ potentially stale. See decision 014 in `docs/decisions.md`.
 OpenAI-compatible report calls now retain provider-returned token usage. The dashboard can
 estimate cost using owner-entered input and output rates per million tokens; CLI usage and
 provider billing adjustments remain unavailable. The end-to-end usage path is covered by tests.
-The current macOS ARM DMG was rebuilt on 2026-09-28 05:51 UTC from the committed source with Node.js
-25.9.0/npm 11.12.1 after extracting and testing the Resend inbox routes and clarifying the iMessage setup. Its packaged API/dashboard and
+The current macOS ARM DMG was rebuilt on 2026-09-28 05:54 UTC from the committed source with Node.js
+25.9.0/npm 11.12.1 after fixing and testing the Resend memory opt-out race, extracting the inbox routes, and clarifying the iMessage setup. Its packaged API/dashboard and
 MCP stdio handshake/tool call passed, and `hdiutil verify` confirmed the image checksum. SHA-256 is
-`d79025544ca5822e50d27a00ff3a44206989c677e7246d6bcc26632d8a52795c`. It remains unsigned and not
+`59acf5b921b450621a40df4c921f8464c9570d2dc81a566aba2ebe28321fa854`. It remains unsigned and not
 notarized; Intel Mac and Linux RPM packaging still need hosted verification, and interactive tray
 lifecycle checks remain open.
 The earlier smoke check followed Twilio Conversations polling, season-aware scheduled-report eligibility, and opt-in MCP report sending. The polling configuration and restore behavior pass repository checks; live Twilio polling and

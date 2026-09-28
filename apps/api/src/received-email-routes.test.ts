@@ -148,6 +148,24 @@ describe('Resend received-email routes', () => {
     expect(body).not.toContain('password');
   });
 
+  it('rechecks the memory setting after the provider returns an email body', async () => {
+    const setup = await startServer();
+    vi.mocked(setup.dependencies.store.snapshot)
+      .mockImplementationOnce(() => setup.state)
+      .mockImplementationOnce(() => {
+        setup.state.settings.memoryEnabled = false;
+        setup.state.settings.analyzeImportsWithAI = true;
+        return setup.state;
+      });
+
+    const response = await fetch(`${setup.url}/api/email/received/${email.id}/import`, {
+      method: 'POST',
+    });
+    expect(response.status).toBe(409);
+    expect(setup.dependencies.configuredAI).not.toHaveBeenCalled();
+    expect(setup.state.memories).toHaveLength(0);
+  });
+
   it('shares message content with AI only after the explicit import-analysis opt-in', async () => {
     const provider: AIProvider = {
       id: 'test-ai',
