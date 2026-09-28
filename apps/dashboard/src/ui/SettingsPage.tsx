@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { preferredScrollBehavior } from './motion.js';
-import { credentialStatusLabel, parseCredentialStatuses } from './credential-status.js';
+import { parseCredentialStatuses } from './credential-status.js';
 import { YahooConnectionSection, type YahooOAuthStatus } from './YahooConnectionSection.js';
 import { AIRuntimeSection } from './AIRuntimeSection.js';
 import { AIMemoryPrivacySection } from './AIMemoryPrivacySection.js';
@@ -8,7 +8,8 @@ import { WritingStyleSection } from './WritingStyleSection.js';
 import { LeagueCalendarSettings } from './LeagueCalendarSettings.js';
 import { LocalBackupSection } from './LocalBackupSection.js';
 import { DesktopSettingsSections } from './DesktopSettingsSections.js';
-import { Copy, Download, RefreshCw, Save, ShieldCheck, Trash2 } from 'lucide-react';
+import { CredentialsSection, type LocalImage, type SecretState } from './CredentialsSection.js';
+import { Copy, RefreshCw, Save } from 'lucide-react';
 import {
   applyScheduleRecommendations,
   isValidTimezone,
@@ -24,8 +25,6 @@ import {
   type LeagueConnection,
 } from '@sidekick/core';
 
-type SecretState = { provider: string; configured: boolean }[];
-type LocalImage = { id: string; createdAt: string; size: number; mimeType: string };
 type DiagnosticLogEntry = {
   timestamp: string;
   level: 'info' | 'warn' | 'error';
@@ -50,34 +49,6 @@ type SettingsPageProps = {
   onFocusTargetHandled: () => void;
   onRestored: () => Promise<void>;
 };
-const secrets = [
-  { id: 'openai', name: 'AI API key', help: 'Used only when API mode is selected.' },
-  {
-    id: 'image-generation',
-    name: 'Image generation key',
-    help: 'Saved in the operating system credential store.',
-  },
-  {
-    id: 'espn',
-    name: 'ESPN session cookie',
-    help: 'Owner-authorized ESPN session cookie for private league access.',
-  },
-  {
-    id: 'resend',
-    name: 'Resend delivery settings',
-    help: 'JSON with apiKey and from fields. A test email can verify the key and sender.',
-  },
-  {
-    id: 'twilio',
-    name: 'Twilio delivery settings',
-    help: 'JSON with accountSid and authToken; direct SMS also needs a from number.',
-  },
-  {
-    id: 'bluebubbles',
-    name: 'BlueBubbles iMessage bridge',
-    help: 'JSON with serverUrl and serverPassword. The BlueBubbles server must run on a Mac.',
-  },
-];
 const actionNames: Record<string, string> = {
   'offseason-update': 'Offseason updates',
   'draft-hype': 'Draft day hype',
@@ -1498,177 +1469,30 @@ export function SettingsPage({
           separate report-context setting is enabled.
         </p>
       </section>
-      <section className="settings-card">
-        <div className="settings-card-title">
-          <div>
-            <h2 ref={credentialsHeadingRef} tabIndex={-1}>
-              Credentials
-            </h2>
-            <p>
-              Secret values are stored in the OS credential manager and never returned to the
-              browser.
-            </p>
-          </div>
-          <ShieldCheck size={18} />
-        </div>
-        {credentialStoreAvailable === false && (
-          <p className="schedule-explainer" role="alert">
-            Credential status cannot be read because the operating system credential store is
-            unavailable. On Linux, start a Secret Service such as GNOME Keyring or KWallet in this
-            user’s D-Bus session, then reload Settings.
-          </p>
-        )}
-        <div className="credentials-grid">
-          {secrets.map((secret) => {
-            const configured = secretState.find((item) => item.provider === secret.id)?.configured;
-            return (
-              <div className="credential-row" key={secret.id}>
-                <div>
-                  <strong>{secret.name}</strong>
-                  <p>{secret.help}</p>
-                  <span className={configured ? 'credential-status ready' : 'credential-status'}>
-                    {credentialStatusLabel(credentialStoreAvailable, configured)}
-                  </span>
-                </div>
-                <div className="credential-edit">
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    value={secretValues[secret.id] ?? ''}
-                    onChange={(event) =>
-                      setSecretValues((current) => ({
-                        ...current,
-                        [secret.id]: event.target.value,
-                      }))
-                    }
-                    placeholder={configured ? 'Enter to replace' : 'Paste value locally'}
-                    aria-label={secret.name}
-                  />
-                  <button
-                    type="button"
-                    className="small-button"
-                    onClick={() => void saveSecret(secret.id)}
-                  >
-                    Save
-                  </button>
-                  {secret.id === 'twilio' && configured && (
-                    <button
-                      type="button"
-                      className="small-button"
-                      disabled={credentialTestBusy}
-                      onClick={() => void testTwilioCredentials()}
-                    >
-                      {credentialTestBusy ? 'Testing…' : 'Test credentials'}
-                    </button>
-                  )}
-                  {configured && (
-                    <button
-                      type="button"
-                      className="small-button danger"
-                      onClick={() => void removeSecret(secret.id)}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-                {secret.id === 'resend' && configured && (
-                  <div className="credential-test">
-                    <input
-                      type="email"
-                      autoComplete="email"
-                      value={resendTestRecipient}
-                      onChange={(event) => setResendTestRecipient(event.target.value)}
-                      placeholder="Your email for a test"
-                      aria-label="Resend test email recipient"
-                    />
-                    <button
-                      type="button"
-                      className="small-button"
-                      disabled={credentialTestBusy || !resendTestRecipient.trim()}
-                      onClick={() => void testResendCredentials()}
-                    >
-                      {credentialTestBusy ? 'Testing…' : 'Send test email'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        {(imageGenerationConfigured || localImages.length > 0) && (
-          <div className="image-generation-tool">
-            {imageGenerationConfigured && (
-              <>
-                <label htmlFor="image-generation-prompt">Generate a league image</label>
-                <p>
-                  The prompt is sent to OpenAI for generation. GPT Image results are saved in your
-                  local data folder; generation may incur API charges.
-                </p>
-                <textarea
-                  id="image-generation-prompt"
-                  value={imagePrompt}
-                  maxLength={4_000}
-                  onChange={(event) => setImagePrompt(event.target.value)}
-                  placeholder="Describe a draft-night poster, trophy, or team image…"
-                />
-                <button
-                  type="button"
-                  className="small-button"
-                  disabled={imageGenerationBusy || !imagePrompt.trim()}
-                  onClick={() => void createImage()}
-                >
-                  {imageGenerationBusy ? 'Generating…' : 'Generate image'}
-                </button>
-                {generatedImage && (
-                  <div className="generated-image-preview">
-                    <img src={generatedImage} alt="Generated fantasy football image" />
-                    <a
-                      className="small-button"
-                      href={
-                        generatedImage.startsWith('/api/images/')
-                          ? `${generatedImage}?download=1`
-                          : generatedImage
-                      }
-                      download="sunday-sidekick-image"
-                    >
-                      <Download size={13} /> Download image
-                    </a>
-                  </div>
-                )}
-              </>
-            )}
-            {localImages.length > 0 && (
-              <div className="local-image-library" aria-label="Saved local images">
-                <strong>Saved images</strong>
-                {localImages.map((image) => (
-                  <div className="local-image-row" key={image.id}>
-                    <img src={`/api/images/${image.id}`} alt="Saved fantasy football image" />
-                    <span>
-                      {new Date(image.createdAt).toLocaleString()} ·{' '}
-                      {(image.size / (1024 * 1024)).toFixed(1)} MB
-                    </span>
-                    <a
-                      className="small-button"
-                      href={`/api/images/${image.id}?download=1`}
-                      download={`sunday-sidekick-${image.id}`}
-                    >
-                      <Download size={13} /> Download
-                    </a>
-                    <button
-                      type="button"
-                      className="small-button danger"
-                      onClick={() => void removeLocalImage(image.id)}
-                      aria-label={`Delete saved image from ${new Date(image.createdAt).toLocaleString()}`}
-                    >
-                      <Trash2 size={13} /> Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </section>
+      <CredentialsSection
+        headingRef={credentialsHeadingRef}
+        credentialStoreAvailable={credentialStoreAvailable}
+        secretState={secretState}
+        secretValues={secretValues}
+        onSecretValueChange={(provider, value) =>
+          setSecretValues((current) => ({ ...current, [provider]: value }))
+        }
+        onSaveSecret={(provider) => void saveSecret(provider)}
+        onRemoveSecret={(provider) => void removeSecret(provider)}
+        credentialTestBusy={credentialTestBusy}
+        resendTestRecipient={resendTestRecipient}
+        onResendTestRecipientChange={setResendTestRecipient}
+        onTestTwilio={() => void testTwilioCredentials()}
+        onTestResend={() => void testResendCredentials()}
+        imageGenerationConfigured={imageGenerationConfigured}
+        imagePrompt={imagePrompt}
+        onImagePromptChange={setImagePrompt}
+        generatedImage={generatedImage}
+        imageGenerationBusy={imageGenerationBusy}
+        onCreateImage={() => void createImage()}
+        localImages={localImages}
+        onRemoveImage={(id) => void removeLocalImage(id)}
+      />
       <section className="settings-card">
         <div className="settings-card-title">
           <div>
