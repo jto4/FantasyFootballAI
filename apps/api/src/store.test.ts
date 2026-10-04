@@ -572,7 +572,7 @@ describe('local SQLite store', () => {
     const database = new Database(file, { readonly: true });
     expect(database.prepare('SELECT MAX(version) AS version FROM schema_migrations').get()).toEqual(
       {
-        version: 4,
+        version: 5,
       },
     );
     expect(database.prepare('SELECT id FROM leagues').all()).toEqual([{ id: 'league-1' }]);
@@ -857,7 +857,7 @@ describe('local SQLite store', () => {
     const upgradedDatabase = new Database(file, { readonly: true });
     expect(
       upgradedDatabase.prepare('SELECT MAX(version) AS version FROM schema_migrations').get(),
-    ).toEqual({ version: 4 });
+    ).toEqual({ version: 5 });
     expect(upgradedDatabase.prepare('SELECT id FROM leagues').all()).toEqual([
       { id: 'league-before-upgrade' },
     ]);

@@ -155,6 +155,7 @@ await test('partial-row salvage preserves valid records and omits malformed rows
     CREATE TABLE memories (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
     CREATE TABLE scheduled_runs (id TEXT PRIMARY KEY, position INTEGER NOT NULL, payload TEXT NOT NULL);
     CREATE TABLE player_projections (id TEXT PRIMARY KEY, league_id TEXT NOT NULL, payload TEXT NOT NULL);
+    CREATE TABLE generation_jobs (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
   `);
   addRow(
     database,
@@ -257,6 +258,23 @@ await test('partial-row salvage preserves valid records and omits malformed rows
   database
     .prepare('INSERT INTO scheduled_runs (id, position, payload) VALUES (?, ?, ?)')
     .run('run-bad', 1, JSON.stringify({ ...run, id: 'run-bad', status: 'unknown' }));
+  const job = {
+    id: 'recovered-job',
+    requestId: 'recovered-request',
+    leagueId: league.id,
+    kind: 'power-rankings',
+    createdAt: new Date().toISOString(),
+    status: 'completed',
+    reportId: report.id,
+  };
+  addRow(database, 'generation_jobs', job.id, JSON.stringify(job));
+  addRow(
+    database,
+    'generation_jobs',
+    'job-bad',
+    JSON.stringify({ ...job, id: 'job-bad', requestId: 'bad-request', status: 'unknown' }),
+  );
+  addRow(database, 'generation_jobs', 'job-invalid-json', '{bad-json');
   database.close();
 
   try {
@@ -267,7 +285,8 @@ await test('partial-row salvage preserves valid records and omits malformed rows
     assert.equal(result.counts.memories, 1);
     assert.equal(result.counts.projections, 1);
     assert.equal(result.counts.runs, 1);
-    assert.equal(result.counts.skipped, 4);
+    assert.equal(result.counts.jobs, 1);
+    assert.equal(result.counts.skipped, 6);
     const backupPath = join(backups, result.backupName);
     assert.match(result.backupName, /-salvage-[a-f\d]{8}\.sqlite$/);
     assert.equal(isValidAppDatabase(backupPath), true);

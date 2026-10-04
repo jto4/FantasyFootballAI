@@ -50,6 +50,7 @@ let apiPort;
 let apiExited = false;
 let startupInProgress = true;
 let storageOpenFailed = false;
+let sqliteRuntimeUnavailable = false;
 let apiLogWriter;
 let apiLogFlushPromise = Promise.resolve();
 let resolveApiExit = () => undefined;
@@ -365,6 +366,7 @@ async function startLocalApi(dataDirectory) {
   const entry = join(appRoot, 'apps', 'api', 'dist', 'index.js');
   apiExited = false;
   storageOpenFailed = false;
+  sqliteRuntimeUnavailable = false;
   apiExitPromise = new Promise((resolve) => {
     resolveApiExit = resolve;
   });
@@ -398,6 +400,7 @@ async function startLocalApi(dataDirectory) {
       try {
         const event = JSON.parse(line);
         if (event.event === 'storage.open.failed') storageOpenFailed = true;
+        if (event.event === 'runtime.sqlite.unavailable') sqliteRuntimeUnavailable = true;
       } catch {
         // Ignore non-JSON stdout from a package or a partial log line.
       }
@@ -599,7 +602,11 @@ async function waitUntilHealthy() {
       await delay(200);
     }
   }
-  throw new Error('The local service did not become ready within 30 seconds.');
+  throw new Error(
+    sqliteRuntimeUnavailable
+      ? 'The SQLite runtime cannot load. Reinstall the Sunday Sidekick package for this operating system and architecture. Your saved database does not need restoration.'
+      : 'The local service did not become ready within 30 seconds.',
+  );
 }
 
 async function reserveLoopbackPort() {

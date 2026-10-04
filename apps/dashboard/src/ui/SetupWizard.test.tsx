@@ -13,6 +13,7 @@ function renderStep(step: number) {
       onConnectLeague: vi.fn(),
       onSetupAi: vi.fn(),
       onPersonalize: vi.fn(),
+      onGenerate: vi.fn(),
       onChooseDataDirectory: vi.fn(),
       onSetupDelivery: vi.fn(),
     }),

@@ -144,6 +144,9 @@ export function isValidSettingsUpdate(value: unknown, leagueIds: ReadonlySet<str
     Array.isArray(actions) &&
     actions.every(isValidAction) &&
     validEvents(calendarEvents) &&
+    (settings.scheduledSyncRetries === undefined ||
+      ([0, 1, 2, 3].includes(Number(settings.scheduledSyncRetries)) &&
+        typeof settings.scheduledSyncRetries === 'number')) &&
     isValidRuntime(aiRuntime) &&
     optionalAddress(emailRecipient) &&
     optionalAddress(smsRecipient) &&

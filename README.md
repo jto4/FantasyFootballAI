@@ -15,11 +15,11 @@ npm start
 
 > **Showcase:** Sunday Sidekick is featured on Jimmy's project site at [sdeqst.app/projects/sunday-sidekick](https://www.sdeqst.app/projects/sunday-sidekick), with an overview, screenshots, and setup steps.
 
-> Early development: desktop packages include a bundled runtime for Apple Silicon and Intel Macs, Windows, Debian/Ubuntu, and Fedora/RHEL. Apple Silicon Mac, Windows, and Debian Linux builds have passed hosted or local smoke checks; Intel Mac and RPM packaging still need hosted verification. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, interactive OS verification, and platform lifecycle checks remain open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
+> Contributor preview: source and earlier native build checks are recorded in [current release status](docs/release-status.md) and the [support matrix](docs/support-matrix.md). Signed publication, live provider coverage, and owner-device installation/upgrade remain release gates. Earlier artifacts do not include the latest source changes.
 
 ## Requirements
 
-- [Node.js 22.13 or newer](https://nodejs.org/en/download) and npm
+- [Node.js 22 LTS (22.13 minimum; use the version in `.nvmrc`)](https://nodejs.org/en/download) and npm
 - macOS, Windows, or Linux
 
 On Linux, install the `libsecret` development package before `npm ci`; see the
@@ -75,7 +75,7 @@ Platform access must be authorized by the league owner. Sleeper uses its public 
 
 Compatible local AI clients can use the stdio MCP server and reusable skill. MCP sending is a separate tool and stays disabled until the owner opts in through Settings. See the [MCP setup guide](docs/mcp.md) for Claude Desktop, Cursor, and Visual Studio Code configuration examples and the current desktop-app limitation.
 
-See the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [maintainer release process](docs/release-process.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
+See [current release status](docs/release-status.md), the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [maintainer release process](docs/release-process.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
 
 ## Development
 

@@ -6,8 +6,13 @@ service details, see the [setup guide](setup.md).
 
 ## Install and open the dashboard
 
-- **A command says Node.js is too old:** install Node.js 22.13 or newer, then reopen the
-  terminal and check `node --version`.
+- **A command rejects your Node.js version:** select the exact Node 22 version in `.nvmrc`
+  (`nvm install && nvm use` with nvm), then run `npm ci` to reinstall native dependencies.
+  Newer major versions remain unsupported until their SQLite binding is verified.
+- **SQLite cannot load its native module:** a `NODE_MODULE_VERSION` or architecture mismatch
+  concerns the runtime, not database corruption. Use the pinned Node version and reinstall
+  dependencies. For desktop packages, reinstall the correct OS/architecture build. Do not
+  restore a database backup to fix a native binding error.
 - **`npm ci` fails on Linux while building the credential-store dependency:** install the
   distribution's `libsecret` development package first. Debian and Ubuntu use
   `libsecret-1-dev`; KWallet or another Secret Service implementation must also be available

@@ -165,3 +165,21 @@ Keep the standard license text in the root `LICENSE` file, declare `"license": "
 the root package metadata, and include the license with release assets and inside each
 platform archive. This license choice does not change provider terms, attribution
 requirements, or restrictions on third-party data and services.
+
+## 021: Explicit report review and independent settings saves
+
+Manual dashboard generation always requests a draft. Keep scheduled automatic delivery as a separate owner policy. Store generation evidence with new reports and support optimistic revision-checked edits only before any delivery attempt; check the persisted delivery claim in the same SQLite write transaction. Sending accepts the reviewed revision and destination so another window cannot silently change the content or target. Attempted content remains immutable for provider retries.
+
+Split Settings into shared allowlisted sections and merge each PATCH inside serialized persistence. AI tests and model discovery save only AI configuration. Keep the legacy full-settings API for existing clients. Extract report, delivery, and chat orchestration behind injected services, and verify the user journeys with isolated desktop/mobile Chromium tests.
+
+Use `release-status.md` for current release gates, `tasks.md` for active work, the support matrix for verification detail, and dated reviews for historical evidence. Pin the verified Node 22 LTS runtime and test the minimum separately; a native SQLite load failure must not trigger database recovery.
+
+## 022: Durable requests, frozen delivery, and revisioned settings
+
+Keep report generation independent of HTTP/browser lifetimes. Persist caller request IDs and terminal states, bound pending work, and commit the generated report and completed job together. Reconnect to the same request ID; an interrupted request requires a new explicit owner action. Keep backward-compatible report responses through the same queue, and serialize provider generation with scheduled callers.
+
+Treat every attempted report as immutable outbound content. Freeze its entire rendered envelope, preserve its email request key across retries, and refuse changed sender/account configuration. Retain only routing identity and a Resend-key hash in SQLite; credentials stay in the OS vault. Do not infer the original payload for older uncertain attempts.
+
+Use independent Settings section revisions checked against SQLite, including background/derived changes. Preserve pending edits on conflict and reload one section only after an owner action. Keep the legacy full-settings API for compatibility, while the dashboard requires revisioned section writes.
+
+Use lightweight live state and cursor-paged report summaries, fetching bodies for review. Keep provider-boundary browser substitutes while exercising production routers and real temporary SQLite. Preserve package public imports while splitting domain/persistence modules and focused Settings hooks. Consolidate CSS tokens and remove superseded exact-selector declarations without changing cascade order.

@@ -44,6 +44,16 @@ for evidence-backed platform/provider support.
 - Closing a packaged desktop dashboard window hides it to the system tray while the local API and schedules continue. The tray menu can reopen the dashboard or explicitly quit and stop the API. Owners can choose to start hidden at sign-in; ordinary app launches remain visible.
 - Do not scrape NFL.com injury pages or rely on undocumented injury endpoints. The optional nflverse CSV feed is CC BY 4.0, disabled by default, cached locally for six hours, and matched only by exact normalized name/team for the current week. Cite its URL and local retrieval time; discard “not injury related” rest-day labels, describe results as source-reported availability rather than medical advice, and continue gracefully when unavailable. Platform injury tags remain potentially stale.
 
+- Manual dashboard generation always requests a draft. Reports support revision-checked edits only before any delivery attempt, followed by an explicit recipient/channel/message review. Scheduled automatic policy remains independent.
+- Settings uses shared section allowlists; AI testing/discovery saves only AI fields. API and CLI onboarding readiness requires a successful test of the saved runtime, then first-draft review.
+- Source development uses the pinned Node 22 LTS runtime; native SQLite mismatch is a runtime setup failure, never grounds for database restoration. Current readiness belongs to `docs/release-status.md`; historical evidence belongs to dated reviews and the support matrix.
+
+- Manual generation uses durable request IDs and queued/running/completed/failed/interrupted jobs. A completed job and draft commit together; unfinished work never replays automatically after stop, restart, or restore. Legacy report clients share the same queue; scheduled work shares the provider concurrency bound.
+- Settings section writes require their current revision. SQLite increments revisions for changed sections and derived privacy controls; conflicts retain local edits, and restore invalidates open forms. Legacy full-settings PUT is retained for compatibility.
+- Outbound attempts persist the complete rendered envelope and public routing identity. Email retries keep their saved key, and changed sender/account configuration blocks delivery. Resend-key hashes are change-detection metadata; raw credentials never enter SQLite, logs, exports, or browser state. Older uncertain attempts without envelopes cannot be retried safely through the app.
+- Visible dashboards poll summary state without report bodies or imported source text. Report history is paginated; the review dialog loads the full saved content. Polls do not overwrite local Settings or draft edits.
+- Keep focused core domain/contracts modules, persistence modules, and Settings hooks behind existing public imports. Dashboard theme values come from canonical tokens; preserve CSS cascade ordering when consolidating rules.
+
 ## Maintenance
 
 Keep durable product and architecture facts here. Put current work and gaps in `docs/tasks.md`,

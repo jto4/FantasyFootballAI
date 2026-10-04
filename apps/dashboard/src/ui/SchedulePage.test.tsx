@@ -8,7 +8,6 @@ describe('SchedulePage', () => {
     const markup = renderToStaticMarkup(
       <SchedulePage
         actions={defaultActionSettings}
-        reports={[]}
         scheduledRuns={[
           {
             id: 'run-calendar',
@@ -29,10 +28,8 @@ describe('SchedulePage', () => {
           },
         ]}
         retryingRunId=""
-        sendingReportId=""
         onGenerate={vi.fn()}
         onRetry={vi.fn()}
-        onSend={vi.fn()}
       />,
     );
 
@@ -40,33 +37,19 @@ describe('SchedulePage', () => {
     expect(markup).toContain('Retry failed as drafts');
   });
 
-  it('disables additional sends while one report is being delivered', () => {
+  it('keeps generation review-only and disables duplicate generation', () => {
     const markup = renderToStaticMarkup(
       <SchedulePage
         actions={defaultActionSettings}
-        reports={[
-          {
-            id: 'report-1',
-            leagueId: 'league-1',
-            kind: 'draft-hype',
-            createdAt: '2026-09-28T12:00:00.000Z',
-            title: 'Draft hype',
-            body: 'Draft season is here.',
-            citations: [],
-            status: 'draft',
-          },
-        ]}
         scheduledRuns={[]}
         retryingRunId=""
-        sendingReportId="report-1"
+        generatingKind="power-rankings"
         onGenerate={vi.fn()}
         onRetry={vi.fn()}
-        onSend={vi.fn()}
       />,
     );
-
-    expect(markup).toContain('Sending…');
-    expect(markup).toContain('aria-busy="true"');
+    expect(markup).toContain('Generating…');
     expect(markup).toContain('disabled=""');
+    expect(markup).not.toContain('Send now');
   });
 });

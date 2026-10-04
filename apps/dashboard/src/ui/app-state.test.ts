@@ -19,7 +19,8 @@ describe('dashboard API state contracts', () => {
         scheduledRuns: [],
         settings: { actions: [] },
       }),
-    ).toBe(true);
+    ).toBe(false);
+    expect(isAppState(initialAppState)).toBe(true);
   });
 
   it('rejects malformed credential status without treating it as an empty credential store', () => {

@@ -430,13 +430,22 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
   let tables;
   let legacyState;
   let rawSettings;
-  const skipped = { settings: 0, leagues: 0, reports: 0, memories: 0, projections: 0, runs: 0 };
+  const skipped = {
+    settings: 0,
+    leagues: 0,
+    reports: 0,
+    memories: 0,
+    projections: 0,
+    runs: 0,
+    jobs: 0,
+  };
   const rawRecords = {
     leagues: [],
     reports: [],
     memories: [],
     playerProjections: [],
     scheduledRuns: [],
+    generationJobs: [],
   };
 
   try {
@@ -470,6 +479,7 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
       memories: legacyState?.memories,
       player_projections: legacyState?.playerProjections,
       scheduled_runs: legacyState?.scheduledRuns,
+      generation_jobs: legacyState?.generationJobs,
     };
     const sourceTables = {
       leagues: 'leagues',
@@ -477,8 +487,13 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
       memories: 'memories',
       playerProjections: 'player_projections',
       scheduledRuns: 'scheduled_runs',
+      generationJobs: 'generation_jobs',
     };
     for (const [target, table] of Object.entries(sourceTables)) {
+      const skippedKey =
+        { playerProjections: 'projections', scheduledRuns: 'runs', generationJobs: 'jobs' }[
+          target
+        ] ?? target;
       if (tables.has(table)) {
         try {
           const rows = database
@@ -494,24 +509,12 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
                 typeof row.id !== 'string' ||
                 value.id !== row.id
               ) {
-                skipped[
-                  target === 'playerProjections'
-                    ? 'projections'
-                    : target === 'scheduledRuns'
-                      ? 'runs'
-                      : target
-                ] += 1;
+                skipped[skippedKey] += 1;
                 continue;
               }
               rawRecords[target].push(value);
             } catch {
-              skipped[
-                target === 'playerProjections'
-                  ? 'projections'
-                  : target === 'scheduledRuns'
-                    ? 'runs'
-                    : target
-              ] += 1;
+              skipped[skippedKey] += 1;
             }
           }
         } catch {
@@ -568,6 +571,7 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     memories: [],
     playerProjections: [],
     scheduledRuns: [],
+    generationJobs: [],
   };
   const uniqueLeagues = uniqueRecords(rawRecords.leagues);
   skipped.leagues += rawRecords.leagues.length - uniqueLeagues.length;
@@ -610,6 +614,19 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
   skipped.projections +=
     rawRecords.playerProjections.length - uniqueProjections.length + rejectedProjectionRows;
   state.playerProjections = acceptedProjections;
+  const requests = new Set();
+  const uniqueJobs = uniqueRecords(rawRecords.generationJobs);
+  skipped.jobs += rawRecords.generationJobs.length - uniqueJobs.length;
+  for (const job of uniqueJobs) {
+    try {
+      if (requests.has(job.requestId)) throw new Error('Duplicate request ID.');
+      validateState({ ...state, generationJobs: [job] });
+      requests.add(job.requestId);
+      state.generationJobs.push(job);
+    } catch {
+      skipped.jobs++;
+    }
+  }
   const salvaged = validateState(state);
   const counts = {
     leagues: salvaged.leagues.length,
@@ -617,10 +634,16 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     memories: salvaged.memories.length,
     projections: salvaged.playerProjections.length,
     runs: salvaged.scheduledRuns.length,
+    jobs: salvaged.generationJobs.length,
     skipped: Object.values(skipped).reduce((sum, count) => sum + count, 0),
   };
   const recoveredRecords =
-    counts.leagues + counts.reports + counts.memories + counts.projections + counts.runs;
+    counts.leagues +
+    counts.reports +
+    counts.memories +
+    counts.projections +
+    counts.runs +
+    counts.jobs;
   if (recoveredRecords === 0 && (!isRecord(rawSettings) || Object.keys(rawSettings).length === 0))
     throw new Error('No independently valid Sunday Sidekick records could be salvaged.');
 

@@ -358,3 +358,35 @@ RSS checkpoints were 103.1 MiB after startup, 126.4 MiB after state reads, and 1
 and 130.1 MiB after reports 1, 5, and 10. This sample shows no large per-report growth and
 is consistent with recent same-host measurements. It remains a synthetic smoke without live
 provider sync, model inference, browser paint, or lower-powered hardware.
+
+## Workflow slice measured on 2026-10-02
+
+Local macOS ARM, pinned Node 22.23.3, `npm run perf:smoke`; same synthetic fixture
+(80 profiles / 4.53 MiB source history, 300 reports). API startup: 176 ms. Full-state
+latency p50/p95: 3.39/8.89 ms; synthetic generation p50/p95: 33.51/49.76 ms; final
+working set: 127.9 MiB. Dashboard shell/assets: 447.3 KiB, fetched in 4 ms locally.
+This sample includes the Reports/Settings/next-action changes, excludes real model inference,
+provider sync and browser paint timing, and does not replace lower-powered or native-platform
+release measurements.
+
+## Workflow reliability measured on 2026-10-02
+
+Local macOS ARM, Node 22.23.3, `npm run perf:smoke`; the synthetic fixture contains
+8 leagues, 96 teams, 80 profiles / 4.53 MiB source history, and 300 saved reports.
+
+| Metric                                           |            Value |
+| ------------------------------------------------ | ---------------: |
+| API startup                                      |           172 ms |
+| Full-state endpoint p50 / p95 (30 samples)       |   2.04 / 3.44 ms |
+| Dashboard summary p50 / p95 (30 samples)         |   2.00 / 2.55 ms |
+| Full-state payload                               |        465.3 KiB |
+| Dashboard summary payload                        |        160.9 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 40.19 / 45.02 ms |
+| Dashboard assets                                 |        461.7 KiB |
+| API process working set                          |        126.8 MiB |
+
+The summary used for live dashboard polling is about 65% smaller than full state and omits
+report bodies. Dashboard shell/assets fetched in 4 ms locally. RSS checkpoints were 103.4 MiB
+after startup, 122.3 MiB after state reads, and 123.8, 126.4, and 126.7 MiB after reports
+1, 5, and 10. These are single-host synthetic measurements; they exclude live provider sync,
+real model inference, browser paint, slower hardware, and native-platform release validation.

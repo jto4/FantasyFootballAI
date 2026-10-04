@@ -7,6 +7,9 @@ export function SetupWizard({
   onClose,
   onConnectLeague,
   onSetupAi,
+  ready = true,
+  generating = false,
+  onGenerate,
   onPersonalize,
   onChooseDataDirectory,
   onSetupDelivery,
@@ -17,6 +20,9 @@ export function SetupWizard({
   onClose: () => void;
   onConnectLeague: () => void;
   onSetupAi: () => void;
+  ready?: boolean;
+  generating?: boolean;
+  onGenerate: () => void;
   onPersonalize: () => void;
   onChooseDataDirectory: () => void;
   onSetupDelivery: () => void;
@@ -69,14 +75,14 @@ export function SetupWizard({
             ? 'Connect your league'
             : step === 1
               ? 'Choose and test an AI runtime'
-              : 'Set the voice and schedule'}
+              : 'Generate and review your first draft'}
         </h2>
         <p className="setup-wizard-description">
           {step === 0
             ? 'Choose Sleeper, ESPN, or Yahoo and enter a league ID. Private leagues may need owner-authorized access first.'
             : step === 1
               ? 'Use an API key or a local CLI. Setup is complete after the selected runtime passes its data-free test.'
-              : 'Choose a writing style, set boundaries, and decide when reports should be drafted or sent. Your league data stays in the local app data folder by default.'}
+              : 'Generate a report from your connected league, then review and edit it in Reports. This step never sends a message. Voice, schedules, delivery, and member memory are optional setup afterward.'}
         </p>
         <div className="setup-wizard-progress" aria-label={`Step ${step + 1} of 3`}>
           {[0, 1, 2].map((progressStep) => (
@@ -105,8 +111,18 @@ export function SetupWizard({
               Set up AI <span>→</span>
             </button>
           ) : (
-            <button type="button" className="primary-button" onClick={onPersonalize}>
-              Personalize <span>→</span>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={!ready || generating}
+              onClick={onGenerate}
+            >
+              {generating ? 'Generating…' : 'Generate first draft'} <span>→</span>
+            </button>
+          )}
+          {step === 2 && (
+            <button type="button" className="small-button" onClick={onPersonalize}>
+              Optional: personalize the voice
             </button>
           )}
           {step === 2 && window.sidekickDesktop && (

@@ -197,6 +197,8 @@ try {
 
   const healthLatencies = [];
   const stateLatencies = [];
+  const dashboardSummaryLatencies = [];
+  let dashboardSummaryPayloadBytes = 0;
   const reportGenerationLatencies = [];
   let statePayloadBytes = 0;
   for (let index = 0; index < sampleCount; index += 1) {
@@ -212,6 +214,15 @@ try {
     const payload = await state.arrayBuffer();
     statePayloadBytes = payload.byteLength;
     stateLatencies.push(performance.now() - startedAt);
+    startedAt = performance.now();
+    const summary = await fetch(`${baseUrl}/api/state?view=summary`);
+    assert.equal(summary.ok, true);
+    const summaryPayload = await summary.text();
+    dashboardSummaryPayloadBytes = Buffer.byteLength(summaryPayload);
+    const summaryState = JSON.parse(summaryPayload);
+    assert.ok(summaryState.reports.length <= 50);
+    assert.ok(summaryState.reports.every((report) => !Object.hasOwn(report, 'body')));
+    dashboardSummaryLatencies.push(performance.now() - startedAt);
   }
   workingSetCheckpoints.push({ stage: 'after-state-reads', rssMiB: processRssMiB(child.pid) });
 
@@ -285,6 +296,11 @@ try {
       p95: Number(percentile(reportGenerationLatencies, 0.95).toFixed(2)),
       note: 'Includes prompt preparation, local CLI process startup, and SQLite persistence; excludes model inference.',
     },
+    dashboardSummaryLatencyMs: {
+      p50: Number(percentile(dashboardSummaryLatencies, 0.5).toFixed(2)),
+      p95: Number(percentile(dashboardSummaryLatencies, 0.95).toFixed(2)),
+    },
+    dashboardSummaryPayloadKiB: Number((dashboardSummaryPayloadBytes / 1024).toFixed(1)),
     statePayloadKiB: Number((statePayloadBytes / 1024).toFixed(1)),
     dashboardShellAndAssetsMs: Math.round(dashboardLoadMs),
     dashboardAssetsKiB: Number((assetBytes / 1024).toFixed(1)),

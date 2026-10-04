@@ -1,33 +1,39 @@
+import { useLiveDashboard } from './hooks/useLiveDashboard';
+import { requestJson } from './api-client';
+import {
+  isGenerationJob,
+  isGenerationRequest,
+  isSavedReport,
+  type GenerationRequest,
+  type ReportKind,
+} from '@sidekick/core';
+import { Dialog } from './Dialog';
+import { LeagueDesk } from './LeagueDesk';
+import { ReportsPage, type SendPreview } from './ReportsPage';
+
 import { useEffect, useRef, useState } from 'react';
 import {
-  Activity,
   CalendarDays,
   ChevronDown,
   CircleHelp,
-  ClipboardList,
   FileText,
   Home,
-  Mail,
   MessageCircle,
-  Newspaper,
-  Plus,
   Power,
-  RefreshCw,
   Settings,
   ShieldCheck,
-  Sparkles,
   Users,
   Zap,
 } from 'lucide-react';
-import { espnSeasonBounds, leagueSeasonPhase, rankTeams } from '@sidekick/core';
+import { espnSeasonBounds, parseLeagueInput, type Platform } from '@sidekick/core';
 import { SettingsPage } from './SettingsPage';
 import { SetupWizard } from './SetupWizard';
 import { MemoryPage } from './MemoryPage';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
-import { seasonHeroHeadline, seasonKicker } from './season-copy';
+
 import { SchedulePage, type ScheduledRun } from './SchedulePage';
-import { formatTime } from './date-format';
+
 import { LeaguesPage } from './LeaguesPage';
 import { LoadError, LoadingStatus } from './LoadFeedback.js';
 import {
@@ -43,6 +49,7 @@ const menu = [
   { label: 'League desk', icon: Home },
   { label: 'Leagues', icon: Users },
   { label: 'Schedule', icon: CalendarDays },
+  { label: 'Reports', icon: FileText },
   { label: 'Members & memory', icon: MessageCircle },
   { label: 'Imports', icon: FileText },
   { label: 'Settings', icon: Settings },
@@ -59,8 +66,63 @@ export function App() {
   });
   const [news, setNews] = useState<NewsSnapshot>({ items: [], stale: true });
   const [credentialProviders, setCredentialProviders] = useState<CredentialProvider[]>([]);
-  const [testedCliRuntime, setTestedCliRuntime] = useState('');
+  const [testedRuntimeSignature, setTestedRuntimeSignature] = useState('');
   const [section, setSection] = useState('League desk');
+  const [settingsDirty, setSettingsDirty] = useState(false);
+  const [reportDirty, setReportDirty] = useState(false);
+  const [initialReviewId, setInitialReviewId] = useState('');
+  const [generatingKind, setGeneratingKind] = useState('');
+  const [pendingGeneration, setPendingGeneration] = useState<GenerationRequest | null>(() => {
+    try {
+      const value: unknown = JSON.parse(
+        localStorage.getItem('sidekick.pendingGeneration') ?? 'null',
+      );
+      return isGenerationRequest(value) ? value : null;
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    try {
+      if (pendingGeneration)
+        localStorage.setItem('sidekick.pendingGeneration', JSON.stringify(pendingGeneration));
+      else localStorage.removeItem('sidekick.pendingGeneration');
+    } catch {
+      /* The server still retains this job if browser storage is unavailable. */
+    }
+  }, [pendingGeneration]);
+  const pendingJob = state.generationJobs?.find(
+    (job) => job.requestId === pendingGeneration?.requestId,
+  );
+  useEffect(() => {
+    if (!pendingJob) return;
+    if (pendingJob.status === 'queued' || pendingJob.status === 'running') {
+      setGeneratingKind(pendingJob.kind);
+      return;
+    }
+    setGeneratingKind('');
+    setPendingGeneration(null);
+    if (pendingJob.status === 'completed' && pendingJob.reportId) {
+      setNotice('New draft added to your review queue.');
+      setInitialReviewId(pendingJob.reportId);
+      setSetupInProgress(false);
+      if (!settingsDirty && !reportDirty) setSection('Reports');
+    } else
+      setNotice(pendingJob.error ?? 'Generation needs attention. Check Reports before retrying.');
+  }, [pendingJob?.id, pendingJob?.status, settingsDirty, reportDirty]);
+  const generatingRef = useRef(false);
+  const [setupInProgress, setSetupInProgress] = useState(false);
+  function navigate(next: string) {
+    if (next === section) return;
+    if (
+      (settingsDirty || reportDirty) &&
+      !window.confirm('Discard unsaved changes before leaving this page?')
+    )
+      return;
+    setSettingsDirty(false);
+    setReportDirty(false);
+    setSection(next);
+  }
   const [settingsFocusTarget, setSettingsFocusTarget] = useState<
     'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null
   >(null);
@@ -97,14 +159,19 @@ export function App() {
     }
   }, [activeLeagueId, league?.id]);
 
-  async function refresh() {
+  const refreshSequence = useRef(0);
+  async function refresh(background = false) {
+    const sequence = ++refreshSequence.current;
     if (!stateLoaded) setStateLoading(true);
     try {
-      const response = await fetch('/api/state');
+      const response = await fetch('/api/state?view=summary', {
+        signal: AbortSignal.timeout(15000),
+      });
       if (!response.ok) throw new Error(`Local service returned ${response.status} while loading.`);
       const snapshot: unknown = await response.json();
       if (!isAppState(snapshot))
         throw new Error('Local service returned an invalid state snapshot.');
+      if (sequence !== refreshSequence.current) return;
       setState(snapshot);
       setStateLoaded(true);
       setStateLoadError('');
@@ -113,6 +180,7 @@ export function App() {
         current === 'Local service is unavailable. Start it with npm run dev.' ? '' : current,
       );
 
+      if (background) return;
       const [stories, credentials] = await Promise.allSettled([
         fetch('/api/news'),
         fetch('/api/credentials'),
@@ -166,6 +234,10 @@ export function App() {
   useEffect(() => {
     void refresh();
   }, []);
+  useLiveDashboard(
+    () => refresh(true),
+    stateLoaded && serviceStatus !== 'stopped' && serviceStatus !== 'stopping',
+  );
 
   useEffect(() => {
     if (!setupWizardOpen) return;
@@ -235,13 +307,14 @@ export function App() {
     setBusy(true);
     setNotice('');
     try {
+      const parsed = parseLeagueInput(platform as Platform, leagueId);
       const response = await fetch('/api/leagues', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           platform,
-          leagueId,
-          ...(platform === 'espn' ? { season: espnSeason } : {}),
+          leagueId: parsed.leagueId,
+          ...(platform === 'espn' ? { season: parsed.season ?? espnSeason } : {}),
         }),
       });
       const result = await response.json();
@@ -259,28 +332,48 @@ export function App() {
   }
 
   async function createReport(kind: string) {
+    if (generatingRef.current) return;
     if (!league) {
       setNotice('Connect a league before generating an update.');
       return;
     }
+    const request: GenerationRequest =
+      pendingGeneration?.leagueId === league.id && pendingGeneration.kind === kind
+        ? pendingGeneration
+        : { requestId: crypto.randomUUID(), leagueId: league.id, kind: kind as ReportKind };
     try {
-      const result = await fetch(`/api/reports/${kind}`, {
+      localStorage.setItem('sidekick.pendingGeneration', JSON.stringify(request));
+    } catch {
+      /* The job remains visible in the server's queue. */
+    }
+    generatingRef.current = true;
+    setPendingGeneration(request);
+    setGeneratingKind(kind);
+    try {
+      const job = await requestJson('/api/generation-jobs', isGenerationJob, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ leagueId: league.id }),
+        body: JSON.stringify(request),
       });
-      const report = await result.json();
-      if (!result.ok) throw new Error(report.error);
-      setNotice(
-        report.deliveryError
-          ? `Draft saved, but automatic delivery failed: ${report.deliveryError}`
-          : report.status === 'sent'
-            ? 'Report generated and sent.'
-            : 'New draft added to your review queue.',
-      );
+      setState((current) => ({
+        ...current,
+        generationJobs: [
+          job,
+          ...(current.generationJobs ?? []).filter((item) => item.id !== job.id),
+        ],
+      }));
+      setNotice('Generation queued. You can keep using the app; its progress is saved in Reports.');
+      navigate('Reports');
       await refresh();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not create report');
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : 'Could not connect to generation. Retry to reconnect to this saved request.',
+      );
+      setGeneratingKind('');
+    } finally {
+      generatingRef.current = false;
     }
   }
 
@@ -324,9 +417,15 @@ export function App() {
     }
   }
 
-  async function sendReport(id: string) {
+  async function sendReport(id: string, preview?: SendPreview) {
     if (sendingReportId) return;
-    const report = state.reports.find((item) => item.id === id);
+    let report;
+    try {
+      report = await requestJson(`/api/reports/${encodeURIComponent(id)}`, isSavedReport);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Could not load saved report.');
+      return;
+    }
     if (!report) {
       setNotice('This report is no longer available. Refresh the page and check report history.');
       return;
@@ -335,14 +434,14 @@ export function App() {
     if (retryUncertain) {
       const usesResendIdempotency = report?.deliveryAttempts?.at(-1)?.channel === 'email';
       const confirmed = window.confirm(
-        `The provider may already have delivered this message. Check its delivery history first. ${usesResendIdempotency ? 'Resend reuses this request key for 24 hours; after that, a retry may send a duplicate. Keep the recipient and email thread details identical so the key can be reused. ' : 'This SMS retry has no provider idempotency key and may send a duplicate. '}Retry only if you confirmed it was not delivered.`,
+        `The provider may already have delivered this message. Check its delivery history first. ${usesResendIdempotency ? 'Resend reuses this request key for 24 hours; after that, a retry may send a duplicate. The retry uses the original saved recipient, subject, and text. ' : 'This SMS retry has no provider idempotency key and may send a duplicate. '}Retry only if you confirmed it was not delivered.`,
       );
       if (!confirmed) return;
     }
     const action = state.settings.actions.find((item) => item.kind === report?.kind);
-    let replyToId: string | undefined;
-    let emailSubject: string | undefined;
-    if (action?.channel === 'email') {
+    let replyToId: string | undefined = preview?.replyToId;
+    let emailSubject: string | undefined = preview?.emailSubject;
+    if (action?.channel === 'email' && !preview) {
       const input = window.prompt(
         'Reply in an existing email thread? Enter its Message-ID (optional). Leave blank to send a new email.',
       );
@@ -365,6 +464,7 @@ export function App() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
+          ...preview,
           ...(replyToId ? { replyToId, emailSubject } : {}),
           ...(retryUncertain ? { retryUncertain: true } : {}),
         }),
@@ -409,27 +509,18 @@ export function App() {
   }
 
   const runtime = state.settings.aiRuntime;
-  const aiReady =
-    (runtime !== undefined &&
-      runtime.mode !== 'api' &&
-      testedCliRuntime === `${runtime.mode}\u0000${runtime.command}\u0000${runtime.args}`) ||
-    (runtime?.mode === 'api' &&
-      credentialProviders.some((item) => item.provider === 'openai' && item.configured));
+  const aiReady = Boolean(runtime && testedRuntimeSignature === JSON.stringify(runtime));
   const requiredSetupComplete = Number(Boolean(league)) + Number(aiReady);
   function openSetupWizard() {
     setSetupWizardStep(suggestedSetupStep(Boolean(league), aiReady));
+    setSetupInProgress(true);
     setSetupWizardOpen(true);
   }
-  const currentWeek = Number(league?.settings.currentWeek);
-  const seasonPhase = league ? leagueSeasonPhase(league) : 'unknown';
   const dateLabel = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   }).format(new Date());
-  const ranking = league ? rankTeams(league) : undefined;
-  const rankedTeams = ranking?.basis ? ranking.teams : [];
-  const matchup = league?.matchups?.[0];
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -445,7 +536,7 @@ export function App() {
           {menu.map(({ label, icon: Icon }) => (
             <button
               key={label}
-              onClick={() => setSection(label)}
+              onClick={() => navigate(label)}
               className={`nav-item ${section === label ? 'active' : ''}`}
             >
               <Icon size={17} strokeWidth={1.8} />
@@ -493,7 +584,7 @@ export function App() {
               type="button"
               className="workspace-settings-button"
               aria-label="Open settings"
-              onClick={() => setSection('Settings')}
+              onClick={() => navigate('Settings')}
             >
               <Settings size={16} />
             </button>
@@ -558,6 +649,37 @@ export function App() {
               </button>
             </div>
           )}
+          {setupInProgress && stateLoaded && !setupWizardOpen && (
+            <div className="onboarding-progress" role="status">
+              <strong>Your first report</strong>
+              <span>
+                {!league
+                  ? 'Connect a league'
+                  : !aiReady
+                    ? 'Save and test your AI runtime'
+                    : 'Generate and review your first draft'}
+              </span>
+              <button
+                type="button"
+                className="small-button"
+                onClick={() => {
+                  if (league && aiReady) {
+                    void createReport('power-rankings');
+                  } else openSetupWizard();
+                }}
+                disabled={Boolean(generatingKind)}
+              >
+                {league && aiReady ? 'Generate first draft' : 'Continue setup'}
+              </button>
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => setSetupInProgress(false)}
+              >
+                Finish later
+              </button>
+            </div>
+          )}
           {!stateLoaded ? (
             stateLoading ? (
               <LoadingStatus message="Loading your leagues, reports, and schedule…" />
@@ -574,16 +696,17 @@ export function App() {
               onSaved={(settings) => {
                 setState((current) => ({ ...current, settings }));
               }}
-              onCredentialsChanged={() => void refreshCredentials()}
-              onFocusCredentials={() => setSettingsFocusTarget('credentials')}
+              onCredentialsChanged={() => {
+                setTestedRuntimeSignature('');
+                void refreshCredentials();
+              }}
               onRuntimeTested={(testedRuntime) =>
-                setTestedCliRuntime(
-                  `${testedRuntime.mode}\u0000${testedRuntime.command}\u0000${testedRuntime.args}`,
-                )
+                setTestedRuntimeSignature(JSON.stringify(testedRuntime))
               }
               focusTarget={settingsFocusTarget}
               onFocusTargetHandled={() => setSettingsFocusTarget(null)}
               onRestored={refresh}
+              onDirtyChange={setSettingsDirty}
             />
           ) : section === 'Leagues' ? (
             <LeaguesPage
@@ -599,16 +722,26 @@ export function App() {
               onRefresh={(id) => void refreshLeague(id)}
               onDisconnect={(id) => void removeLeague(id)}
             />
+          ) : section === 'Reports' ? (
+            <ReportsPage
+              reports={state.reports}
+              jobs={state.generationJobs ?? []}
+              leagues={state.leagues}
+              settings={state.settings}
+              sendingReportId={sendingReportId}
+              initialReportId={initialReviewId}
+              onSend={sendReport}
+              onSaved={refresh}
+              onDirtyChange={setReportDirty}
+            />
           ) : section === 'Schedule' ? (
             <SchedulePage
               actions={state.settings.actions}
-              reports={state.reports}
               scheduledRuns={state.scheduledRuns}
               retryingRunId={retryingRunId}
-              sendingReportId={sendingReportId}
+              generatingKind={generatingKind}
               onGenerate={(kind) => void createReport(kind)}
               onRetry={(run) => void retryScheduledRun(run)}
-              onSend={(reportId) => void sendReport(reportId)}
             />
           ) : section === 'Members & memory' || section === 'Imports' ? (
             <>
@@ -638,405 +771,24 @@ export function App() {
               />
             </>
           ) : (
-            <>
-              <section className="welcome-row">
-                <div>
-                  <p className="date-kicker">
-                    THE LEAGUE DESK <span>·</span>{' '}
-                    {league
-                      ? seasonKicker(
-                          seasonPhase,
-                          currentWeek,
-                          league.settings.playoffStartWeekSource === 'derived',
-                          league.season,
-                        )
-                      : 'YOUR LOCAL WORKSPACE'}
-                  </p>
-                  <h1>Sunday’s league desk</h1>
-                  <p className="intro">
-                    {league
-                      ? `Your ${league.displayName} league desk is ready. Let’s make sure everyone knows who’s on top.`
-                      : 'Set up your first league and choose how your new league-mate should work.'}
-                  </p>
-                </div>
-                <button className="primary-button" onClick={() => setModal(true)}>
-                  <Plus size={16} /> Connect a league
-                </button>
-              </section>
-              {(!league || !aiReady) && (
-                <section className="setup-card" aria-labelledby="setup-title">
-                  <div className="setup-heading">
-                    <div>
-                      <p className="section-overline">FIRST-RUN SETUP</p>
-                      <h2 id="setup-title">Get your league-mate ready</h2>
-                      <p>
-                        Connect a league and a working AI runtime. Your data stays on this computer.
-                      </p>
-                    </div>
-                    <div className="setup-actions">
-                      <span className="setup-progress">{requiredSetupComplete} / 2 REQUIRED</span>
-                      <button
-                        ref={setupWizardTriggerRef}
-                        className="small-button"
-                        onClick={openSetupWizard}
-                      >
-                        Guided setup <span aria-hidden="true">→</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="setup-steps">
-                    <SetupStep
-                      complete={Boolean(league)}
-                      number="01"
-                      title="Connect your league"
-                      detail="Choose Sleeper, ESPN, or Yahoo and enter its league ID."
-                      actionLabel={league ? 'Manage leagues' : 'Connect league'}
-                      onClick={() => (league ? setSection('Leagues') : setModal(true))}
-                    />
-                    <SetupStep
-                      complete={aiReady}
-                      number="02"
-                      title="Choose an AI runtime"
-                      detail="Save an API key or select a local AI command, then test it in Settings."
-                      actionLabel={aiReady ? 'Review or test' : 'Set up AI'}
-                      onClick={() => {
-                        setSettingsFocusTarget('ai');
-                        setSection('Settings');
-                      }}
-                    />
-                    <SetupStep
-                      complete={false}
-                      number="03"
-                      title="Set your voice and schedule"
-                      detail="Optional: customize the banter and choose a review schedule."
-                      actionLabel="Personalize"
-                      optional
-                      onClick={() => {
-                        setSettingsFocusTarget('voice');
-                        setSection('Settings');
-                      }}
-                    />
-                  </div>
-                </section>
-              )}
-              <section className="hero-band">
-                <div className="hero-wave hero-wave-back" aria-hidden="true" />
-                <div className="hero-wave hero-wave-front" aria-hidden="true" />
-                <div className="hero-copy">
-                  <div className="hero-icon">
-                    <Sparkles size={19} />
-                  </div>
-                  <div className="hero-text">
-                    <h2>
-                      {seasonHeroHeadline(
-                        seasonPhase,
-                        currentWeek,
-                        league?.settings.playoffStartWeekSource === 'derived',
-                        Boolean(league),
-                      )}
-                    </h2>
-                    <p>
-                      {league
-                        ? `You have ${state.reports.filter((r) => r.status === 'draft').length} drafts waiting for a look. Let's get the conversation started.`
-                        : 'Connect your fantasy league and your new favorite league-mate will get to work.'}
-                    </p>
-                    <button
-                      className="hero-cta"
-                      onClick={() =>
-                        league ? void createReport('power-rankings') : setModal(true)
-                      }
-                    >
-                      {league
-                        ? Number.isInteger(currentWeek) && currentWeek > 0
-                          ? `Generate week ${currentWeek} rankings`
-                          : 'Generate power rankings'
-                        : 'Connect your first league'}{' '}
-                      <span>→</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="hero-ornament">
-                  <div className="field-circle one" />
-                  <div className="field-circle two" />
-                  <div className="field-line" />
-                  <div className="hero-football">🏈</div>
-                  <span className="hero-stamp">
-                    GAME
-                    <br />
-                    ON
-                  </span>
-                </div>
-              </section>
-
-              <section className="stats-row">
-                <div className="stat-item">
-                  <div className="stat-icon orange">
-                    <Users size={16} />
-                  </div>
-                  <div>
-                    <span className="stat-label">CONNECTED LEAGUES</span>
-                    <strong>{state.leagues.length.toString().padStart(2, '0')}</strong>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-icon blue">
-                    <ClipboardList size={16} />
-                  </div>
-                  <div>
-                    <span className="stat-label">DRAFTS TO REVIEW</span>
-                    <strong>
-                      {state.reports
-                        .filter((r) => r.status === 'draft')
-                        .length.toString()
-                        .padStart(2, '0')}
-                    </strong>
-                  </div>
-                  <span className="stat-trend">READY</span>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-icon green">
-                    <MessageCircle size={16} />
-                  </div>
-                  <div>
-                    <span className="stat-label">SCHEDULED RUNS</span>
-                    <strong>{state.scheduledRuns.length.toString().padStart(2, '0')}</strong>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-icon violet">
-                    <Newspaper size={16} />
-                  </div>
-                  <div>
-                    <span className="stat-label">NEWS STORIES</span>
-                    <strong>{news.items.length.toString().padStart(2, '0')}</strong>
-                  </div>
-                </div>
-              </section>
-
-              <div className="section-heading">
-                <div>
-                  <p className="section-overline">THE EARLY READ</p>
-                  <h2>Power rankings</h2>
-                </div>
-                <button className="text-button" onClick={() => void createReport('power-rankings')}>
-                  Full breakdown <span>↗</span>
-                </button>
-              </div>
-              <section className="content-grid">
-                <div className="ranking-panel">
-                  <div className="panel-head">
-                    <div>
-                      <span className="panel-kicker">
-                        {league ? `${league.teamCount} TEAMS` : 'LEAGUE SNAPSHOT'}
-                      </span>
-                      <h3>Power rankings</h3>
-                    </div>
-                    <button className="more-button" onClick={() => setSection('Schedule')}>
-                      •••
-                    </button>
-                  </div>
-                  {rankedTeams.length ? (
-                    <div className="ranking-table">
-                      <div className="table-header">
-                        <span>RANK</span>
-                        <span>TEAM</span>
-                        <span>W–L</span>
-                        <span>PTS</span>
-                      </div>
-                      {rankedTeams.slice(0, 5).map((team, index) => (
-                        <div className="ranking-row" key={team.id}>
-                          <span className="rank-num">
-                            {ranking?.places[index]?.tied ? 'T-' : ''}
-                            {String(ranking?.places[index]?.rank ?? index + 1).padStart(2, '0')}
-                          </span>
-                          <div className="team-name">
-                            <span className="team-badge">{team.name.slice(0, 1)}</span>
-                            <div>
-                              <strong>{team.name}</strong>
-                              <small>{team.owner ?? 'League member'}</small>
-                            </div>
-                          </div>
-                          <span className="record">
-                            {team.wins ?? '—'}–{team.losses ?? '—'}
-                          </span>
-                          <span className="record">{team.pointsFor?.toFixed(1) ?? '—'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-inline">
-                      {league
-                        ? 'Standings are incomplete. Every team needs the same record or points-for data before rankings can be shown.'
-                        : 'Connect a league with current standings to see real rankings.'}
-                    </div>
-                  )}
-                  <div className="ranking-foot">
-                    <span>Updates are saved locally as drafts</span>
-                    <button onClick={() => void createReport('power-rankings')}>
-                      Generate fresh take <span>→</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="matchup-panel">
-                  <div className="matchup-title">
-                    <div>
-                      <span className="panel-kicker">
-                        {matchup ? `WEEK ${matchup.week}` : 'THIS WEEK'} <span>·</span> MATCHUP
-                        PREVIEW
-                      </span>
-                      <h3>{matchup ? 'Matchup on deck' : 'Ready for kickoff?'}</h3>
-                    </div>
-                    <CalendarDays size={18} />
-                  </div>
-                  {matchup ? (
-                    <>
-                      <div className="matchup-teams">
-                        {matchup.teams.map((side, index) => {
-                          const team = league?.teams.find((item) => item.id === side.teamId);
-                          return (
-                            <div className="match-team" key={side.teamId}>
-                              <div
-                                className={`team-emblem ${index === 0 ? 'orange-emblem' : 'navy-emblem'}`}
-                              >
-                                {team?.name.slice(0, 1) ?? 'T'}
-                              </div>
-                              <strong>{team?.name ?? `Team ${side.teamId}`}</strong>
-                              <span>
-                                {side.points === undefined
-                                  ? 'Score pending'
-                                  : `${side.points.toFixed(1)} pts`}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="matchup-blurb">
-                        Current matchup scores are from the connected platform. Player projections
-                        and lineup advice are not available in this snapshot.
-                      </div>
-                    </>
-                  ) : (
-                    <div className="matchup-empty">
-                      <div className="team-emblem muted-emblem">
-                        <CalendarDays size={18} />
-                      </div>
-                      <strong>
-                        {league
-                          ? 'No matchup data in this snapshot.'
-                          : 'Connect a league to preview matchups.'}
-                      </strong>
-                      <span>Matchups will appear when the platform provides schedule data.</span>
-                    </div>
-                  )}
-                  <button
-                    className="matchup-link"
-                    onClick={() => void createReport('matchup-preview')}
-                  >
-                    Create preview draft <span>→</span>
-                  </button>
-                </div>
-              </section>
-
-              <section className="lower-grid">
-                <div className="news-panel">
-                  <div className="panel-head">
-                    <div>
-                      <span className="panel-kicker">
-                        AROUND THE LEAGUE <span>·</span> LATEST
-                      </span>
-                      <h3>Football, worth talking about</h3>
-                    </div>
-                    <button
-                      className="news-refresh"
-                      onClick={() => void refreshNews()}
-                      disabled={refreshingNews}
-                      aria-label="Refresh football news"
-                      title="Refresh headlines"
-                    >
-                      <RefreshCw size={15} className={refreshingNews ? 'spinning' : ''} />
-                    </button>
-                  </div>
-                  <div className="news-list">
-                    {news.items.slice(0, 3).map((item) => (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="news-item"
-                        key={item.url}
-                      >
-                        <span className="news-source">{item.source}</span>
-                        <strong>{item.title}</strong>
-                        <span className="news-time">
-                          {formatTime(item.publishedAt)} <span>↗</span>
-                        </span>
-                      </a>
-                    ))}
-                    {news.items.length === 0 && (
-                      <div className="empty-news">
-                        {news.error ?? 'News feed will appear when a source is available.'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="panel-footer">
-                    <span>
-                      {news.error ??
-                        (news.refreshedAt
-                          ? `Sources linked · Updated ${formatDateTime(news.refreshedAt)}${news.stale ? ' · cached' : ''}`
-                          : 'Sources linked · waiting for first refresh')}
-                    </span>
-                    <ShieldCheck size={14} />
-                  </div>
-                </div>
-                <div className="activity-panel">
-                  <div className="panel-head">
-                    <div>
-                      <span className="panel-kicker">
-                        YOUR ASSISTANT <span>·</span> RECENT ACTIVITY
-                      </span>
-                      <h3>From the locker room</h3>
-                    </div>
-                    <Activity size={18} />
-                  </div>
-                  <div className="activity-list">
-                    {state.reports.slice(0, 3).map((report) => (
-                      <div className="activity-item" key={report.id}>
-                        <span className="activity-glyph">
-                          <FileText size={15} />
-                        </span>
-                        <div>
-                          <strong>{report.title}</strong>
-                          <span>Draft ready · {formatTime(report.createdAt)}</span>
-                        </div>
-                        <span className="activity-status">REVIEW</span>
-                      </div>
-                    ))}
-                    {state.reports.length === 0 && (
-                      <div className="empty-activity">
-                        <div className="empty-graphic">
-                          <Mail size={20} />
-                          <span>✦</span>
-                        </div>
-                        <strong>Quiet in the locker room.</strong>
-                        <p>Your first update is one click away.</p>
-                        <button
-                          onClick={() =>
-                            league ? void createReport('draft-hype') : setModal(true)
-                          }
-                        >
-                          Get things started <span>→</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="panel-footer">
-                    <span>Everything stays on this computer</span>
-                    <ShieldCheck size={14} />
-                  </div>
-                </div>
-              </section>
-            </>
+            <LeagueDesk
+              state={state}
+              league={league}
+              aiReady={aiReady}
+              requiredSetupComplete={requiredSetupComplete}
+              generatingKind={generatingKind}
+              refreshingNews={refreshingNews}
+              news={news}
+              setupWizardTriggerRef={setupWizardTriggerRef}
+              openSetupWizard={openSetupWizard}
+              setModal={setModal}
+              setSettingsFocusTarget={setSettingsFocusTarget}
+              navigate={navigate}
+              createReport={createReport}
+              refreshLeague={refreshLeague}
+              refreshNews={refreshNews}
+              setInitialReviewId={setInitialReviewId}
+            />
           )}
           <footer className="page-footer">
             <span>Built for the love of the game (and the group chat).</span>
@@ -1048,23 +800,26 @@ export function App() {
       </main>
 
       {modal && (
-        <div
-          className="modal-scrim"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setModal(false);
-          }}
+        <Dialog
+          titleId="connect-league-title"
+          className="connect-modal"
+          onClose={() => setModal(false)}
         >
-          <form className="connect-modal" onSubmit={connectLeague}>
-            <button type="button" className="modal-close" onClick={() => setModal(false)}>
+          <form onSubmit={connectLeague}>
+            <button
+              type="button"
+              className="modal-close"
+              aria-label="Close league connection"
+              onClick={() => setModal(false)}
+            >
               ×
             </button>
             <div className="modal-mark">
               <Zap size={18} />
             </div>
-            <h2>Bring your league in.</h2>
+            <h2 id="connect-league-title">Bring your league in.</h2>
             <p>
-              Connect with your league ID. Your settings and scoring format come along for the ride.
+              Paste your league URL or ID. Your settings and scoring format come along for the ride.
             </p>
             <label>
               FANTASY PLATFORM
@@ -1075,12 +830,12 @@ export function App() {
               </select>
             </label>
             <label>
-              LEAGUE ID
+              LEAGUE ID OR URL
               <input
                 required
                 value={leagueId}
                 onChange={(event) => setLeagueId(event.target.value)}
-                placeholder="e.g. 123456789"
+                placeholder="Paste a league URL or ID"
               />
             </label>
             {platform === 'espn' && (
@@ -1115,7 +870,7 @@ export function App() {
                     onClick={() => {
                       setModal(false);
                       setSettingsFocusTarget('yahoo');
-                      setSection('Settings');
+                      navigate('Settings');
                     }}
                   >
                     Set up Yahoo access <span>→</span>
@@ -1134,7 +889,7 @@ export function App() {
                     onClick={() => {
                       setModal(false);
                       setSettingsFocusTarget('credentials');
-                      setSection('Settings');
+                      navigate('Settings');
                     }}
                   >
                     Add ESPN access <span>→</span>
@@ -1155,7 +910,7 @@ export function App() {
               {busy ? 'Connecting…' : 'Connect league'} <span>→</span>
             </button>
           </form>
-        </div>
+        </Dialog>
       )}
       {setupWizardOpen && (
         <SetupWizard
@@ -1170,22 +925,28 @@ export function App() {
           onSetupAi={() => {
             setSetupWizardOpen(false);
             setSettingsFocusTarget('ai');
-            setSection('Settings');
+            navigate('Settings');
+          }}
+          ready={Boolean(league) && aiReady}
+          generating={Boolean(generatingKind)}
+          onGenerate={() => {
+            setSetupWizardOpen(false);
+            void createReport('power-rankings');
           }}
           onPersonalize={() => {
             setSetupWizardOpen(false);
             setSettingsFocusTarget('voice');
-            setSection('Settings');
+            navigate('Settings');
           }}
           onChooseDataDirectory={() => {
             setSetupWizardOpen(false);
             setSettingsFocusTarget('data');
-            setSection('Settings');
+            navigate('Settings');
           }}
           onSetupDelivery={() => {
             setSetupWizardOpen(false);
             setSettingsFocusTarget('credentials');
-            setSection('Settings');
+            navigate('Settings');
           }}
         />
       )}
@@ -1193,47 +954,6 @@ export function App() {
   );
 }
 
-function SetupStep({
-  complete,
-  number,
-  title,
-  detail,
-  actionLabel,
-  optional = false,
-  onClick,
-}: {
-  complete: boolean;
-  number: string;
-  title: string;
-  detail: string;
-  actionLabel: string;
-  optional?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <article className={`setup-step ${complete ? 'complete' : ''}`}>
-      <span className="setup-number">{complete ? '✓' : number}</span>
-      <div className="setup-step-copy">
-        <strong>
-          {title} {optional && <span className="setup-optional">OPTIONAL</span>}
-        </strong>
-        <p>{detail}</p>
-      </div>
-      <button className="text-button" onClick={onClick}>
-        {actionLabel} <span>→</span>
-      </button>
-    </article>
-  );
-}
-
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
-}
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value));
 }

@@ -90,42 +90,45 @@ export function WritingStyleSection({
         </div>
         <ShieldCheck size={18} />
       </div>
-      <label>
-        STARTING STYLE
-        <select
-          value={
-            selectedSavedPreset
-              ? `saved:${selectedSavedPreset.name}`
-              : selectedBuiltInPreset
-                ? `builtin:${selectedBuiltInPreset.name}`
-                : 'custom'
-          }
-          onChange={(event) => {
-            const selectedValue = event.target.value;
-            const preset = selectedValue.startsWith('saved:')
-              ? customPresets.find((item) => item.name === selectedValue.slice('saved:'.length))
-              : selectedValue.startsWith('builtin:')
-                ? writingStylePresets.find(
-                    (item) => item.name === selectedValue.slice('builtin:'.length),
-                  )
-                : undefined;
-            if (preset) onWritingStyleChange(preset.value);
-          }}
-        >
-          <option value="custom">Custom style</option>
-          {writingStylePresets.map((preset) => (
-            <option key={`builtin:${preset.name}`} value={`builtin:${preset.name}`}>
-              {preset.name}
-            </option>
-          ))}
-          {customPresets.map((preset) => (
-            <option key={`saved:${preset.name}`} value={`saved:${preset.name}`}>
-              {preset.name} · saved
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="settings-fields">
+        <label>
+          STARTING STYLE
+          <select
+            value={
+              selectedSavedPreset
+                ? `saved:${selectedSavedPreset.name}`
+                : selectedBuiltInPreset
+                  ? `builtin:${selectedBuiltInPreset.name}`
+                  : 'custom'
+            }
+            onChange={(event) => {
+              const selectedValue = event.target.value;
+              const preset = selectedValue.startsWith('saved:')
+                ? customPresets.find((item) => item.name === selectedValue.slice('saved:'.length))
+                : selectedValue.startsWith('builtin:')
+                  ? writingStylePresets.find(
+                      (item) => item.name === selectedValue.slice('builtin:'.length),
+                    )
+                  : undefined;
+              if (preset) onWritingStyleChange(preset.value);
+            }}
+          >
+            <option value="custom">Custom style</option>
+            {writingStylePresets.map((preset) => (
+              <option key={`builtin:${preset.name}`} value={`builtin:${preset.name}`}>
+                {preset.name}
+              </option>
+            ))}
+            {customPresets.map((preset) => (
+              <option key={`saved:${preset.name}`} value={`saved:${preset.name}`}>
+                {preset.name} · saved
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <textarea
+        aria-label="Writing style"
         value={writingStyle}
         maxLength={1000}
         onChange={(event) => onWritingStyleChange(event.target.value)}

@@ -109,8 +109,8 @@ describe('Node.js runtime requirement', () => {
   it('accepts supported releases and gives an actionable error for older versions', () => {
     assert.equal(isSupportedNodeVersion('22.12.0'), false);
     assert.equal(isSupportedNodeVersion('22.13.0'), true);
-    assert.equal(isSupportedNodeVersion('23.0.0'), true);
+    assert.equal(isSupportedNodeVersion('23.0.0'), false);
     assert.equal(isSupportedNodeVersion('not-a-version'), false);
-    assert.throws(() => assertSupportedNodeVersion('20.11.1'), /Node.js 22.13 or newer/);
+    assert.throws(() => assertSupportedNodeVersion('20.11.1'), /Node.js 22 LTS/);
   });
 });

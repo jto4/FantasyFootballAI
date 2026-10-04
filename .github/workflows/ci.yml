@@ -72,7 +72,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install Linux credential-store dependencies
@@ -108,6 +108,12 @@ jobs:
 
       - name: Build production app
         run: npm run build
+
+      - name: Install Chromium for browser journeys
+        run: npx playwright install --with-deps chromium
+
+      - name: Exercise desktop and mobile browser journeys
+        run: npx playwright test
 
       - name: Start Linux user systemd manager
         if: runner.os == 'Linux'
@@ -160,7 +166,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install Linux package tools

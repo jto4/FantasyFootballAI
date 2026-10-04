@@ -4,13 +4,22 @@ import {
   type AppSettings,
   type LeagueConnection,
   type NewsItem,
-  type SavedReport,
+  isAppSettings,
+  isLeagueConnection,
+  isReportSummary,
+  isGenerationJob,
+  isScheduledRun,
+  record,
+  type ReportSummary,
+  type GenerationJob,
 } from '@sidekick/core';
 import type { ScheduledRun } from './SchedulePage.js';
 
 export type AppState = {
   leagues: LeagueConnection[];
-  reports: SavedReport[];
+  reports: ReportSummary[];
+  generationJobs?: GenerationJob[];
+  reportCounts?: Record<string, { drafts: number; issues: number }>;
   settings: AppSettings;
   scheduledRuns: ScheduledRun[];
 };
@@ -59,18 +68,29 @@ export const initialAppState: AppState = {
   scheduledRuns: [],
 };
 
-/** Validate the minimum state contract before rendering data-dependent pages. */
+/** Validate nested state contracts before rendering data-dependent pages. */
 export function isAppState(value: unknown): value is AppState {
-  if (!value || typeof value !== 'object') return false;
-  const snapshot = value as Record<string, unknown>;
-  const settings = snapshot.settings as Record<string, unknown> | null;
+  if (!record(value)) return false;
   return (
-    Array.isArray(snapshot.leagues) &&
-    Array.isArray(snapshot.reports) &&
-    Array.isArray(snapshot.scheduledRuns) &&
-    settings !== null &&
-    typeof settings === 'object' &&
-    Array.isArray(settings.actions)
+    Array.isArray(value.leagues) &&
+    value.leagues.every(isLeagueConnection) &&
+    Array.isArray(value.reports) &&
+    value.reports.every(isReportSummary) &&
+    isAppSettings(value.settings) &&
+    Array.isArray(value.scheduledRuns) &&
+    value.scheduledRuns.every(isScheduledRun) &&
+    (value.generationJobs === undefined ||
+      (Array.isArray(value.generationJobs) && value.generationJobs.every(isGenerationJob))) &&
+    (value.reportCounts === undefined ||
+      (record(value.reportCounts) &&
+        Object.values(value.reportCounts).every(
+          (count) =>
+            record(count) &&
+            Number.isSafeInteger(count.drafts) &&
+            Number(count.drafts) >= 0 &&
+            Number.isSafeInteger(count.issues) &&
+            Number(count.issues) >= 0,
+        )))
   );
 }
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   isValidEspnSeason,
+  parseLeagueInput,
   type LeagueCalendarEvent,
   type LeagueConnection,
   type Platform,
@@ -33,7 +34,7 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
       !['sleeper', 'espn', 'yahoo'].includes(platform) ||
       typeof leagueId !== 'string' ||
       !leagueId.trim() ||
-      leagueId.trim().length > 128 ||
+      leagueId.trim().length > 2048 ||
       /[\u0000-\u001f\u007f]/.test(leagueId)
     )
       return res.status(400).json({
@@ -50,7 +51,19 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
         .json({ error: 'Choose a valid ESPN fantasy season between 2000 and 2099.' });
 
     try {
-      const normalized = await dependencies.fetchLeague(platform, leagueId.trim(), season);
+      let parsed: ReturnType<typeof parseLeagueInput>;
+      try {
+        parsed = parseLeagueInput(platform, leagueId);
+      } catch (error) {
+        return res
+          .status(400)
+          .json({ error: error instanceof Error ? error.message : 'Invalid league link.' });
+      }
+      const normalized = await dependencies.fetchLeague(
+        platform,
+        parsed.leagueId,
+        parsed.season ?? season,
+      );
       const now = new Date().toISOString();
       const league: LeagueConnection = {
         ...normalized,

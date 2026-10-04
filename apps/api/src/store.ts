@@ -1,3 +1,12 @@
+import {
+  reportSummary,
+  type ReportSummary,
+  type ReportPage,
+  settingsSectionFields,
+  settingsSectionPatch,
+  type GenerationJob,
+  type SettingsSection,
+} from '@sidekick/core';
 import Database from 'better-sqlite3';
 import type { Database as DatabaseHandle } from 'better-sqlite3';
 import { randomUUID } from 'node:crypto';
@@ -14,173 +23,23 @@ import {
 } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
+import { type AppSettings, type SavedReport } from '@sidekick/core';
+import type { AppState, DashboardStateSnapshot } from './store-types.js';
+export * from './store-types.js';
+import { initialState } from './store-defaults.js';
+import { purgeExpiredConversationSources } from './store-retention.js';
+export { purgeExpiredConversationSources } from './store-retention.js';
+import { validateState, makeRestoredStateSafe } from './store-validation.js';
+export { validateState } from './store-validation.js';
 import {
-  defaultActionSettings,
-  defaultLeagueStaleAfterHours,
-  defaultNewsSources,
-  isValidNewsSources,
-  isLeagueStaleAfterHours,
-  isValidWritingStylePresets,
-  normalizeActionSettings,
-  normalizeChannelBoundaries,
-  normalizeLeagueCalendarEvents,
-  normalizeNewsSources,
-  type AppSettings,
-  type LeagueConnection,
-  type MemberMemory,
-  type PlayerProjection,
-  type SavedReport,
-} from '@sidekick/core';
-import { blueBubblesMemorySource, pruneBlueBubblesHistory } from './bluebubbles-memory.js';
-import {
-  pruneTwilioConversationHistory,
-  twilioConversationMemorySource,
-} from './twilio-conversation-memory.js';
-import { pruneConversationImports } from './conversation-import.js';
-import { isValidProjectionSourceUrl } from './projections.js';
+  migrations,
+  replaceRows,
+  replaceMemoryRows,
+  replacePlayerProjectionRows,
+  replaceScheduledRuns,
+  isSafetyBackupName,
+} from './store-database.js';
 
-export interface AppState {
-  settings: AppSettings;
-  leagues: LeagueConnection[];
-  reports: SavedReport[];
-  memories: MemberMemory[];
-  playerProjections: PlayerProjection[];
-  scheduledRuns: ScheduledRun[];
-}
-
-export type DashboardStateSnapshot = Omit<AppState, 'memories' | 'playerProjections'> & {
-  memories: Array<
-    Omit<MemberMemory, 'sourceText' | 'sourceAuthorId'> & {
-      sourceLength: number;
-      canMergeImportedConversation: boolean;
-    }
-  >;
-};
-
-export interface ScheduledRun {
-  id: string;
-  kind: string;
-  startedAt: string;
-  /** Local recurring wall-clock occurrence claimed by the scheduler, if any. */
-  occurrenceKey?: string;
-  finishedAt?: string;
-  status: 'running' | 'succeeded' | 'failed';
-  detail?: string;
-  leagueResults?: ScheduledLeagueResult[];
-  retryOf?: string;
-  calendarEventId?: string;
-  calendarEventTitle?: string;
-}
-
-export interface ScheduledLeagueResult {
-  leagueId: string;
-  displayName: string;
-  status: 'succeeded' | 'failed' | 'skipped';
-  detail?: string;
-}
-
-/** Remove only original imported text; reviewed member notes remain available to the owner. */
-export function purgeExpiredConversationSources(state: AppState, now = Date.now()): number {
-  const days = state.settings.conversationRetentionDays;
-  if (days !== 30 && days !== 90 && days !== 365) return 0;
-  const cutoff = now - days * 24 * 60 * 60 * 1_000;
-  let removed = 0;
-  for (const profile of state.memories) {
-    if (profile.sourceName === twilioConversationMemorySource && profile.sourceText) {
-      const pruned = pruneTwilioConversationHistory(profile.sourceText, cutoff);
-      if (pruned.removed > 0) {
-        profile.sourceText = pruned.sourceText;
-        removed += 1;
-      }
-      continue;
-    }
-    if (profile.sourceName === blueBubblesMemorySource && profile.sourceText) {
-      const pruned = pruneBlueBubblesHistory(profile.sourceText, cutoff);
-      if (pruned.removed > 0) {
-        profile.sourceText = pruned.sourceText;
-        removed += 1;
-      }
-      continue;
-    }
-    if (profile.sourceName === 'Resend received email' && profile.sourceText) {
-      const entries = profile.sourceText.split(/(?=\[\[resend-email:)/g);
-      const retained = entries.filter((entry) => {
-        const timestamp = entry.match(/^\[\[resend-email:[^\]]+\]\]\nDate: ([^\n]+)/)?.[1];
-        const receivedAt = timestamp ? Date.parse(timestamp) : Number.NaN;
-        return !Number.isFinite(receivedAt) || receivedAt >= cutoff;
-      });
-      if (retained.length < entries.length) {
-        profile.sourceText = retained.join('').trim();
-        removed += 1;
-      }
-      continue;
-    }
-    if (profile.sourceText.includes('[[conversation-import:')) {
-      const pruned = pruneConversationImports(profile.sourceText, profile.importedAt, cutoff);
-      if (pruned.removed > 0) {
-        profile.sourceText = pruned.sourceText;
-        removed += 1;
-      }
-      continue;
-    }
-    const importedAt = Date.parse(profile.importedAt);
-    if (profile.sourceText && Number.isFinite(importedAt) && importedAt < cutoff) {
-      profile.sourceText = '';
-      removed += 1;
-    }
-  }
-  return removed;
-}
-
-const initialState: AppState = {
-  settings: {
-    actions: structuredClone(defaultActionSettings),
-    calendarEvents: [],
-    writingStyle: 'Funny, sharp league banter',
-    customWritingStylePresets: [],
-    reportLength: 'standard',
-    leagueStaleAfterHours: defaultLeagueStaleAfterHours,
-    allowProfanity: false,
-    excludedTopics: '',
-    channelBoundaries: {},
-    memoryEnabled: true,
-    analyzeImportsWithAI: false,
-    includeMemberContextInReports: false,
-    includeMemberContextInChatReplies: false,
-    newsRefreshMinutes: 15,
-    newsSources: [...defaultNewsSources],
-    nflInjuryReportsEnabled: false,
-    scheduledSyncRetries: 0,
-    imessageOwnerName: 'League owner',
-    imessageAutoSyncEnabled: false,
-    imessageSyncIntervalMinutes: 15,
-    twilioConversationAutoSyncEnabled: false,
-    twilioConversationSyncIntervalMinutes: 15,
-    chatRepliesEnabled: false,
-    chatRepliesAutoSend: false,
-    chatAgentName: 'Sunday Sidekick',
-    mcpDeliveryEnabled: false,
-    aiRuntime: {
-      mode: 'api',
-      model: 'gpt-4o-mini',
-      command: '',
-      args: '',
-      baseUrl: 'https://api.openai.com/v1',
-      temperature: 0.8,
-      maxOutputTokens: 1200,
-    },
-  },
-  leagues: [],
-  reports: [],
-  memories: [],
-  playerProjections: [],
-  scheduledRuns: [],
-};
-
-/**
- * Conversation source text is immutable string data. Share those string values across state
- * snapshots while cloning the profile objects that callers may mutate.
- */
 function cloneAppState(state: AppState): AppState {
   const { memories, ...stateWithoutMemories } = state;
   return {
@@ -192,88 +51,12 @@ function cloneAppState(state: AppState): AppState {
   };
 }
 
-const migrations: Array<(database: DatabaseHandle) => void> = [
-  (database) => {
-    database.exec(`
-      CREATE TABLE app_state (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        payload TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      ) STRICT;
-    `);
-  },
-  (database) => {
-    database.exec(`
-      CREATE TABLE app_settings (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        payload TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      ) STRICT;
-      CREATE TABLE leagues (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;
-      CREATE TABLE reports (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;
-      CREATE TABLE memories (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;
-      CREATE TABLE scheduled_runs (
-        id TEXT PRIMARY KEY,
-        position INTEGER NOT NULL CHECK (position >= 0),
-        payload TEXT NOT NULL
-      ) STRICT;
-    `);
-
-    const legacy = database.prepare('SELECT payload FROM app_state WHERE id = 1').get() as
-      { payload: string } | undefined;
-    if (legacy) {
-      const state = JSON.parse(legacy.payload) as Partial<AppState>;
-      if (!state.settings || !Array.isArray(state.leagues) || !Array.isArray(state.reports)) {
-        throw new Error(
-          'The existing state database cannot be migrated because its state is invalid.',
-        );
-      }
-      const insertSettings = database.prepare(
-        'INSERT INTO app_settings (id, payload, updated_at) VALUES (1, ?, ?)',
-      );
-      const now = new Date().toISOString();
-      insertSettings.run(JSON.stringify(state.settings), now);
-      migrateRows(database, 'leagues', state.leagues);
-      migrateRows(database, 'reports', state.reports);
-      migrateRows(database, 'memories', Array.isArray(state.memories) ? state.memories : []);
-      const runs = Array.isArray(state.scheduledRuns) ? state.scheduledRuns : [];
-      const insertRun = database.prepare(
-        'INSERT INTO scheduled_runs (id, position, payload) VALUES (?, ?, ?)',
-      );
-      runs.forEach((run, position) => {
-        if (!run || typeof run.id !== 'string')
-          throw new Error('Invalid scheduled run in stored state.');
-        insertRun.run(run.id, position, JSON.stringify(run));
-      });
-    }
-    database.exec('DROP TABLE app_state');
-  },
-  (database) => {
-    database.exec(`
-      CREATE TABLE delivery_claims (
-        report_id TEXT PRIMARY KEY,
-        token TEXT NOT NULL,
-        state TEXT NOT NULL CHECK (state IN ('active', 'failed', 'uncertain', 'sent')),
-        updated_at TEXT NOT NULL
-      ) STRICT;
-    `);
-  },
-  (database) => {
-    database.exec(`
-      CREATE TABLE player_projections (
-        id TEXT PRIMARY KEY,
-        league_id TEXT NOT NULL,
-        payload TEXT NOT NULL
-      ) STRICT;
-      CREATE INDEX player_projections_by_league ON player_projections (league_id);
-    `);
-  },
-];
-
 /**
  * Keep the current state object API while persisting snapshots transactionally in SQLite.
  * Existing JSON state is imported once and left in place as a recoverable migration copy.
  */
+export class SettingsRevisionConflict extends Error {}
+
 export class LocalStore {
   readonly path: string;
   private state: AppState = structuredClone(initialState);
@@ -504,6 +287,76 @@ export class LocalStore {
     };
   }
 
+  dashboardSummarySnapshot(): Omit<DashboardStateSnapshot, 'reports'> & {
+    reports: ReportSummary[];
+    reportCounts: Record<string, { drafts: number; issues: number }>;
+    generationJobs: GenerationJob[];
+  } {
+    const {
+      reports,
+      memories,
+      playerProjections: _projections,
+      generationJobs,
+      ...state
+    } = this.state;
+    void _projections;
+    const reportCounts = Object.create(null) as Record<string, { drafts: number; issues: number }>;
+    for (const report of reports) {
+      const count = (reportCounts[report.leagueId] ??= { drafts: 0, issues: 0 });
+      if (report.status === 'draft' && !report.deliveryState) count.drafts++;
+      if (report.deliveryState === 'failed' || report.deliveryState === 'uncertain') count.issues++;
+    }
+    return {
+      ...structuredClone(state),
+      reports: reports.slice(0, 50).map(reportSummary),
+      reportCounts,
+      generationJobs: structuredClone((generationJobs ?? []).slice(-50).reverse()),
+      memories: memories.map(({ sourceText, sourceAuthorId, ...profile }) => ({
+        ...structuredClone(profile),
+        sourceLength: sourceText.length,
+        canMergeImportedConversation: !sourceAuthorId,
+      })),
+    };
+  }
+
+  generationJobByRequest(requestId: string): GenerationJob | undefined {
+    const job = this.state.generationJobs?.find((item) => item.requestId === requestId);
+    return job ? structuredClone(job) : undefined;
+  }
+
+  reportById(id: string): SavedReport | undefined {
+    const report = this.state.reports.find((item) => item.id === id);
+    return report ? structuredClone(report) : undefined;
+  }
+
+  reportsPage(leagueId?: string, status?: string, cursor?: string, limit = 20): ReportPage {
+    const rows = this.state.reports.filter(
+      (item) =>
+        (!leagueId || item.leagueId === leagueId) &&
+        (!status ||
+          (status === 'draft'
+            ? item.status === 'draft' && !item.deliveryState
+            : status === 'sent'
+              ? item.status === 'sent'
+              : item.deliveryState === status)),
+    );
+    const sorted = [...rows].sort((a, b) => {
+      const left = `${a.createdAt}|${a.id}`,
+        right = `${b.createdAt}|${b.id}`;
+      return left < right ? 1 : left > right ? -1 : 0;
+    });
+    const after = cursor
+      ? sorted.filter((item) => `${item.createdAt}|${item.id}` < cursor)
+      : sorted;
+    const items = after.slice(0, limit).map(reportSummary);
+    const last = items.at(-1);
+    return {
+      items,
+      total: rows.length,
+      ...(after.length > limit && last ? { nextCursor: `${last.createdAt}|${last.id}` } : {}),
+    };
+  }
+
   /** Report generation reads profile notes, never the original imported conversation text. */
   reportSnapshot(): AppState {
     const { memories, ...state } = this.state;
@@ -517,12 +370,39 @@ export class LocalStore {
     };
   }
 
-  async update(mutator: (state: AppState) => void): Promise<void> {
+  async update(
+    mutator: (state: AppState) => void,
+    expected?: { section: SettingsSection; revision: number },
+  ): Promise<void> {
     const operation = this.transaction.then(async () => {
-      const next = cloneAppState(this.state);
-      mutator(next);
-      this.persist(next, this.state);
-      this.state = next;
+      if (!this.database) throw new Error('Local database is not loaded.');
+      this.database
+        .transaction(() => {
+          const stored = this.database!.prepare(
+            'SELECT payload FROM app_settings WHERE id = 1',
+          ).get() as { payload: string };
+          const settings = JSON.parse(stored.payload) as AppSettings;
+          if (
+            expected &&
+            (settings.sectionRevisions?.[expected.section] ?? 0) !== expected.revision
+          )
+            throw new SettingsRevisionConflict();
+          const previous = { ...this.state, settings };
+          const next = cloneAppState(previous);
+          mutator(next);
+          const revisions = { ...settings.sectionRevisions };
+          for (const section of Object.keys(settingsSectionFields) as SettingsSection[]) {
+            if (
+              JSON.stringify(settingsSectionPatch(settings, section)) !==
+              JSON.stringify(settingsSectionPatch(next.settings, section))
+            )
+              revisions[section] = (revisions[section] ?? 0) + 1;
+          }
+          next.settings.sectionRevisions = revisions;
+          this.persist(next, previous);
+          this.state = next;
+        })
+        .immediate();
     });
     this.transaction = operation.catch(() => undefined);
     await operation;
@@ -544,8 +424,65 @@ export class LocalStore {
     return removed;
   }
 
+  /** Editing and sending take the same SQLite write lock, including across API processes. */
+  async editReportDraft(
+    id: string,
+    title: string,
+    body: string,
+    revision: number,
+  ): Promise<{ status: 404 | 409 } | { status: 200; report: SavedReport }> {
+    const operation = this.transaction.then(() => {
+      if (!this.database) throw new Error('Local database is not loaded.');
+      const result = this.database
+        .transaction(() => {
+          const row = this.database!.prepare('SELECT payload FROM reports WHERE id = ?').get(id) as
+            { payload: string } | undefined;
+          if (!row) return { status: 404 as const };
+          const report = JSON.parse(row.payload) as SavedReport;
+          const claim = this.database!.prepare(
+            'SELECT state FROM delivery_claims WHERE report_id = ?',
+          ).get(id);
+          if (
+            report.status !== 'draft' ||
+            report.deliveryState ||
+            report.deliveryAttempts?.length ||
+            claim ||
+            (report.revision ?? 0) !== revision
+          )
+            return { status: 409 as const };
+          const edited: SavedReport = {
+            ...report,
+            title,
+            body,
+            revision: revision + 1,
+            editedAt: new Date().toISOString(),
+          };
+          this.database!.prepare('UPDATE reports SET payload = ? WHERE id = ?').run(
+            JSON.stringify(edited),
+            id,
+          );
+          return { status: 200 as const, report: edited };
+        })
+        .immediate();
+      if (result.status === 200)
+        this.state.reports = this.state.reports.map((report) =>
+          report.id === id ? result.report : report,
+        );
+      return result;
+    });
+    this.transaction = operation.then(
+      () => undefined,
+      () => undefined,
+    );
+    return operation;
+  }
+
   /** Atomically claim a persisted draft across API processes sharing this database. */
-  claimReportDelivery(reportId: string, retryUncertain = false): string | undefined {
+  claimReportDelivery(
+    reportId: string,
+    retryUncertain = false,
+    revision?: number,
+  ): string | undefined {
     if (!this.database) throw new Error('Local database is not loaded.');
     const token = randomUUID();
     const claim = this.database
@@ -556,6 +493,7 @@ export class LocalStore {
         if (!row) return undefined;
         const report = JSON.parse(row.payload) as SavedReport;
         if (
+          (revision !== undefined && (report.revision ?? 0) !== revision) ||
           report.status !== 'draft' ||
           report.deliveryState === 'sending' ||
           (report.deliveryState === 'uncertain' && !retryUncertain)
@@ -684,7 +622,13 @@ export class LocalStore {
       { payload?: string } | undefined;
     if (settingsRow?.payload === undefined) return undefined;
     const readRows = (
-      table: 'leagues' | 'reports' | 'memories' | 'scheduled_runs' | 'player_projections',
+      table:
+        | 'leagues'
+        | 'reports'
+        | 'memories'
+        | 'scheduled_runs'
+        | 'player_projections'
+        | 'generation_jobs',
     ) => {
       const ordering = table === 'scheduled_runs' ? 'position' : 'rowid';
       return (
@@ -700,6 +644,7 @@ export class LocalStore {
       memories: readRows('memories'),
       playerProjections: readRows('player_projections'),
       scheduledRuns: readRows('scheduled_runs'),
+      generationJobs: readRows('generation_jobs'),
     });
   }
 
@@ -713,6 +658,13 @@ export class LocalStore {
       run.detail = run.calendarEventId
         ? 'Calendar event was interrupted before completion; retry failed leagues as drafts after review.'
         : 'Interrupted when the app last stopped.';
+      changed = true;
+    }
+    for (const job of this.state.generationJobs ?? []) {
+      if (job.status !== 'running' && job.status !== 'queued') continue;
+      job.status = 'interrupted';
+      job.finishedAt = finishedAt;
+      job.error = 'Generation was interrupted. Review saved reports before starting a new request.';
       changed = true;
     }
     for (const report of this.state.reports) {
@@ -768,613 +720,11 @@ export class LocalStore {
       settings.run(JSON.stringify(next.settings), updatedAt);
       replaceRows(this.database!, 'leagues', next.leagues);
       replaceRows(this.database!, 'reports', next.reports);
+      replaceRows(this.database!, 'generation_jobs', next.generationJobs ?? []);
       replaceMemoryRows(this.database!, next.memories, previous?.memories);
       replacePlayerProjectionRows(this.database!, next.playerProjections);
       replaceScheduledRuns(this.database!, next.scheduledRuns);
     });
     write(state, new Date().toISOString());
   }
-}
-
-/** Skip serializing large, unchanged imported conversations during unrelated updates. */
-function replaceMemoryRows(
-  database: DatabaseHandle,
-  rows: MemberMemory[],
-  previous?: MemberMemory[],
-): void {
-  const sameOrder =
-    previous?.length === rows.length &&
-    previous.every((profile, index) => profile.id === rows[index]?.id);
-  if (!sameOrder) {
-    replaceRows(database, 'memories', rows);
-    return;
-  }
-
-  const upsert = database.prepare(`
-    INSERT INTO memories (id, payload) VALUES (?, ?)
-    ON CONFLICT(id) DO UPDATE SET payload = excluded.payload
-    WHERE payload != excluded.payload
-  `);
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index]!;
-    const prior = previous![index]!;
-    if (row === prior) continue;
-    if (row.sourceText === prior.sourceText && sameMemoryMetadata(row, prior)) continue;
-    upsert.run(row.id, JSON.stringify(row));
-  }
-}
-
-function sameMemoryMetadata(left: MemberMemory, right: MemberMemory): boolean {
-  const { sourceText: _leftSource, ...leftMetadata } = left;
-  const { sourceText: _rightSource, ...rightMetadata } = right;
-  void _leftSource;
-  void _rightSource;
-  return JSON.stringify(leftMetadata) === JSON.stringify(rightMetadata);
-}
-
-function isSafetyBackupName(name: string): boolean {
-  return /^before-(?:restore|upgrade)-[\dTZ.-]+(?:-salvage)?-[a-f\d]{8}\.sqlite$/.test(name);
-}
-
-function migrateRows(
-  database: DatabaseHandle,
-  table: 'leagues' | 'reports' | 'memories',
-  rows: unknown[],
-): void {
-  const insert = database.prepare(`INSERT INTO ${table} (id, payload) VALUES (?, ?)`);
-  for (const row of rows) {
-    if (!row || typeof row !== 'object' || typeof (row as { id?: unknown }).id !== 'string')
-      throw new Error(`Invalid ${table} item in the state database.`);
-    insert.run((row as { id: string }).id, JSON.stringify(row));
-  }
-}
-
-function replaceRows(
-  database: DatabaseHandle,
-  table: 'leagues' | 'reports' | 'memories',
-  rows: Array<{ id: string }>,
-): void {
-  const upsert = database.prepare(`
-    INSERT INTO ${table} (id, payload) VALUES (?, ?)
-    ON CONFLICT(id) DO UPDATE SET payload = excluded.payload
-    WHERE payload != excluded.payload
-  `);
-  const ids = new Set<string>();
-  for (const row of rows) {
-    if (ids.has(row.id)) throw new Error(`Duplicate ${table} record ID.`);
-    ids.add(row.id);
-    upsert.run(row.id, JSON.stringify(row));
-  }
-  deleteRemovedRows(database, table, ids);
-}
-
-function replaceScheduledRuns(database: DatabaseHandle, runs: ScheduledRun[]): void {
-  const upsert = database.prepare(`
-    INSERT INTO scheduled_runs (id, position, payload) VALUES (?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET position = excluded.position, payload = excluded.payload
-    WHERE position != excluded.position OR payload != excluded.payload
-  `);
-  const ids = new Set<string>();
-  runs.forEach((run, position) => {
-    if (ids.has(run.id)) throw new Error('Duplicate scheduled run ID.');
-    ids.add(run.id);
-    upsert.run(run.id, position, JSON.stringify(run));
-  });
-  deleteRemovedRows(database, 'scheduled_runs', ids);
-}
-
-function replacePlayerProjectionRows(database: DatabaseHandle, rows: PlayerProjection[]): void {
-  const upsert = database.prepare(`
-    INSERT INTO player_projections (id, league_id, payload) VALUES (?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET league_id = excluded.league_id, payload = excluded.payload
-    WHERE league_id != excluded.league_id OR payload != excluded.payload
-  `);
-  const ids = new Set<string>();
-  for (const row of rows) {
-    if (ids.has(row.id)) throw new Error('Duplicate player projection ID.');
-    ids.add(row.id);
-    upsert.run(row.id, row.leagueId, JSON.stringify(row));
-  }
-  deleteRemovedRows(database, 'player_projections', ids);
-}
-
-function deleteRemovedRows(
-  database: DatabaseHandle,
-  table: 'leagues' | 'reports' | 'memories' | 'scheduled_runs' | 'player_projections',
-  retainedIds: Set<string>,
-): void {
-  const existingIds = database.prepare(`SELECT id FROM ${table}`).all() as Array<{ id: string }>;
-  const remove = database.prepare(`DELETE FROM ${table} WHERE id = ?`);
-  for (const { id } of existingIds) if (!retainedIds.has(id)) remove.run(id);
-}
-
-export function validateState(input: unknown): AppState {
-  if (!input || typeof input !== 'object' || Array.isArray(input))
-    throw new Error('Invalid local state file');
-  const candidate = input as Partial<AppState>;
-  if (
-    !candidate.settings ||
-    !Array.isArray(candidate.leagues) ||
-    !Array.isArray(candidate.reports) ||
-    (candidate.playerProjections !== undefined && !Array.isArray(candidate.playerProjections)) ||
-    (candidate.scheduledRuns !== undefined && !Array.isArray(candidate.scheduledRuns))
-  ) {
-    throw new Error('Invalid local state structure');
-  }
-  const rawSettings = candidate.settings as unknown as Record<string, unknown>;
-  if (
-    !rawSettings ||
-    typeof rawSettings !== 'object' ||
-    Array.isArray(rawSettings) ||
-    (rawSettings.writingStyle !== undefined &&
-      (typeof rawSettings.writingStyle !== 'string' || rawSettings.writingStyle.length > 1000)) ||
-    (rawSettings.customWritingStylePresets !== undefined &&
-      !isValidWritingStylePresets(rawSettings.customWritingStylePresets)) ||
-    (rawSettings.reportLength !== undefined &&
-      !['short', 'standard', 'long'].includes(String(rawSettings.reportLength))) ||
-    (rawSettings.leagueStaleAfterHours !== undefined &&
-      !isLeagueStaleAfterHours(rawSettings.leagueStaleAfterHours)) ||
-    (rawSettings.allowProfanity !== undefined && typeof rawSettings.allowProfanity !== 'boolean') ||
-    (rawSettings.excludedTopics !== undefined &&
-      (typeof rawSettings.excludedTopics !== 'string' ||
-        rawSettings.excludedTopics.length > 2000)) ||
-    (rawSettings.memoryEnabled !== undefined && typeof rawSettings.memoryEnabled !== 'boolean') ||
-    (rawSettings.aiRuntime !== undefined && !isValidStoredRuntime(rawSettings.aiRuntime)) ||
-    (rawSettings.emailRecipient !== undefined &&
-      !isOptionalStoredAddress(rawSettings.emailRecipient)) ||
-    (rawSettings.smsRecipient !== undefined &&
-      !isOptionalStoredAddress(rawSettings.smsRecipient)) ||
-    (rawSettings.imessageChatGuid !== undefined &&
-      (typeof rawSettings.imessageChatGuid !== 'string' ||
-        rawSettings.imessageChatGuid.length > 500 ||
-        (rawSettings.imessageChatGuid !== '' && !rawSettings.imessageChatGuid.trim()) ||
-        /[\r\n]/.test(rawSettings.imessageChatGuid))) ||
-    (rawSettings.imessageOwnerName !== undefined &&
-      (typeof rawSettings.imessageOwnerName !== 'string' ||
-        rawSettings.imessageOwnerName.trim().length === 0 ||
-        rawSettings.imessageOwnerName.length > 100)) ||
-    (rawSettings.imessageSyncCursor !== undefined &&
-      !isValidBlueBubblesCursor(rawSettings.imessageSyncCursor)) ||
-    (rawSettings.twilioConversationSyncCursor !== undefined &&
-      !isValidTwilioConversationCursor(rawSettings.twilioConversationSyncCursor)) ||
-    (rawSettings.twilioConversationAutoSyncEnabled !== undefined &&
-      typeof rawSettings.twilioConversationAutoSyncEnabled !== 'boolean') ||
-    (rawSettings.twilioConversationSyncIntervalMinutes !== undefined &&
-      !isBlueBubblesSyncInterval(rawSettings.twilioConversationSyncIntervalMinutes)) ||
-    (rawSettings.mcpDeliveryEnabled !== undefined &&
-      typeof rawSettings.mcpDeliveryEnabled !== 'boolean') ||
-    (rawSettings.analyzeImportsWithAI !== undefined &&
-      typeof rawSettings.analyzeImportsWithAI !== 'boolean') ||
-    (rawSettings.includeMemberContextInReports !== undefined &&
-      typeof rawSettings.includeMemberContextInReports !== 'boolean') ||
-    (rawSettings.includeMemberContextInChatReplies !== undefined &&
-      typeof rawSettings.includeMemberContextInChatReplies !== 'boolean') ||
-    (rawSettings.conversationRetentionDays !== undefined &&
-      rawSettings.conversationRetentionDays !== 30 &&
-      rawSettings.conversationRetentionDays !== 90 &&
-      rawSettings.conversationRetentionDays !== 365) ||
-    (rawSettings.newsRefreshMinutes !== undefined &&
-      (typeof rawSettings.newsRefreshMinutes !== 'number' ||
-        !Number.isInteger(rawSettings.newsRefreshMinutes) ||
-        rawSettings.newsRefreshMinutes < 5 ||
-        rawSettings.newsRefreshMinutes > 1440)) ||
-    (rawSettings.scheduledSyncRetries !== undefined &&
-      (typeof rawSettings.scheduledSyncRetries !== 'number' ||
-        !Number.isInteger(rawSettings.scheduledSyncRetries) ||
-        rawSettings.scheduledSyncRetries < 0 ||
-        rawSettings.scheduledSyncRetries > 3)) ||
-    (rawSettings.newsSources !== undefined && !isValidNewsSources(rawSettings.newsSources)) ||
-    (rawSettings.nflInjuryReportsEnabled !== undefined &&
-      typeof rawSettings.nflInjuryReportsEnabled !== 'boolean')
-  ) {
-    throw new Error('Invalid settings in local state.');
-  }
-  if (
-    candidate.reports.some((report) => {
-      if (!report || typeof report !== 'object' || Array.isArray(report)) return true;
-      const state = report.deliveryState;
-      const updatedAt = report.deliveryUpdatedAt;
-      const attempts = report.deliveryAttempts;
-      const usage = report.aiUsage;
-      const citations = report.citations;
-      return (
-        (usage !== undefined && !isValidAIUsageSummary(usage)) ||
-        (citations !== undefined &&
-          (!Array.isArray(citations) ||
-            citations.length > 20 ||
-            citations.some(
-              (citation) =>
-                !citation ||
-                typeof citation !== 'object' ||
-                typeof citation.title !== 'string' ||
-                citation.title.length > 500 ||
-                /[\u0000-\u001f\u007f]/.test(citation.title) ||
-                !isSafeCitationUrl(citation.url),
-            ))) ||
-        (state !== undefined && !['sending', 'failed', 'uncertain'].includes(String(state))) ||
-        (updatedAt !== undefined && typeof updatedAt !== 'string') ||
-        (attempts !== undefined &&
-          (!Array.isArray(attempts) ||
-            attempts.length > 50 ||
-            attempts.some(
-              (attempt) =>
-                !attempt ||
-                typeof attempt !== 'object' ||
-                !['email', 'sms', 'imessage'].includes(String(attempt.channel)) ||
-                !['sending', 'sent', 'failed', 'uncertain'].includes(String(attempt.status)) ||
-                typeof attempt.startedAt !== 'string' ||
-                (attempt.finishedAt !== undefined && typeof attempt.finishedAt !== 'string') ||
-                (attempt.providerMessageId !== undefined &&
-                  (typeof attempt.providerMessageId !== 'string' ||
-                    attempt.providerMessageId.length > 300)) ||
-                (attempt.idempotencyKey !== undefined &&
-                  (typeof attempt.idempotencyKey !== 'string' ||
-                    attempt.idempotencyKey.length > 256)),
-            )))
-      );
-    })
-  ) {
-    throw new Error('Invalid report delivery state in local data.');
-  }
-  const playerProjections = candidate.playerProjections ?? [];
-  const leagueIds = new Set(candidate.leagues.map((league) => league.id));
-  if (
-    playerProjections.length > 50_000 ||
-    playerProjections.some((projection) => !isValidPlayerProjection(projection, leagueIds)) ||
-    new Set(playerProjections.map((projection) => projection.id)).size !== playerProjections.length
-  )
-    throw new Error('Invalid player projections in local state.');
-  const storedScheduledRuns = candidate.scheduledRuns ?? [];
-  if (
-    storedScheduledRuns.length > 100 ||
-    storedScheduledRuns.some((run) => !isValidScheduledRun(run)) ||
-    new Set(storedScheduledRuns.map((run) => run.id)).size !== storedScheduledRuns.length
-  )
-    throw new Error('Invalid scheduled run history in local state.');
-  // Project validated rows into the public schema so unknown backup fields never escape via the API.
-  const scheduledRuns = storedScheduledRuns.map((run) => ({
-    id: run.id,
-    kind: run.kind,
-    startedAt: run.startedAt,
-    ...(run.occurrenceKey !== undefined ? { occurrenceKey: run.occurrenceKey } : {}),
-    ...(run.finishedAt !== undefined ? { finishedAt: run.finishedAt } : {}),
-    status: run.status,
-    ...(run.detail !== undefined ? { detail: run.detail } : {}),
-    ...(run.leagueResults !== undefined
-      ? {
-          leagueResults: run.leagueResults.map((result) => ({
-            leagueId: result.leagueId,
-            displayName: result.displayName,
-            status: result.status,
-            ...(result.detail !== undefined ? { detail: result.detail } : {}),
-          })),
-        }
-      : {}),
-    ...(run.retryOf !== undefined ? { retryOf: run.retryOf } : {}),
-    ...(run.calendarEventId !== undefined ? { calendarEventId: run.calendarEventId } : {}),
-    ...(run.calendarEventTitle !== undefined ? { calendarEventTitle: run.calendarEventTitle } : {}),
-  }));
-  return {
-    settings: {
-      ...initialState.settings,
-      ...rawSettings,
-      reportLength:
-        rawSettings.reportLength === 'short' || rawSettings.reportLength === 'long'
-          ? rawSettings.reportLength
-          : 'standard',
-      leagueStaleAfterHours: isLeagueStaleAfterHours(rawSettings.leagueStaleAfterHours)
-        ? rawSettings.leagueStaleAfterHours
-        : defaultLeagueStaleAfterHours,
-      actions: normalizeActionSettings(rawSettings.actions),
-      calendarEvents: normalizeLeagueCalendarEvents(rawSettings.calendarEvents, leagueIds),
-      channelBoundaries: normalizeChannelBoundaries(rawSettings.channelBoundaries),
-      newsSources: normalizeNewsSources(rawSettings.newsSources),
-      nflInjuryReportsEnabled: rawSettings.nflInjuryReportsEnabled === true,
-      includeMemberContextInChatReplies: rawSettings.includeMemberContextInChatReplies === true,
-      scheduledSyncRetries:
-        rawSettings.scheduledSyncRetries === 1 ||
-        rawSettings.scheduledSyncRetries === 2 ||
-        rawSettings.scheduledSyncRetries === 3
-          ? rawSettings.scheduledSyncRetries
-          : 0,
-      imessageOwnerName:
-        typeof rawSettings.imessageOwnerName === 'string' && rawSettings.imessageOwnerName.trim()
-          ? rawSettings.imessageOwnerName.trim()
-          : 'League owner',
-      imessageAutoSyncEnabled: rawSettings.imessageAutoSyncEnabled === true,
-      imessageSyncIntervalMinutes: isBlueBubblesSyncInterval(
-        rawSettings.imessageSyncIntervalMinutes,
-      )
-        ? rawSettings.imessageSyncIntervalMinutes
-        : 15,
-      twilioConversationAutoSyncEnabled: rawSettings.twilioConversationAutoSyncEnabled === true,
-      twilioConversationSyncIntervalMinutes: isBlueBubblesSyncInterval(
-        rawSettings.twilioConversationSyncIntervalMinutes,
-      )
-        ? rawSettings.twilioConversationSyncIntervalMinutes
-        : 15,
-      chatRepliesEnabled: rawSettings.chatRepliesEnabled === true,
-      chatRepliesAutoSend: rawSettings.chatRepliesAutoSend === true,
-      chatAgentName:
-        typeof rawSettings.chatAgentName === 'string' &&
-        rawSettings.chatAgentName.trim() &&
-        rawSettings.chatAgentName.length <= 60
-          ? rawSettings.chatAgentName.trim()
-          : 'Sunday Sidekick',
-      ...(typeof rawSettings.chatReplyLeagueId === 'string' &&
-      leagueIds.has(rawSettings.chatReplyLeagueId)
-        ? { chatReplyLeagueId: rawSettings.chatReplyLeagueId }
-        : {}),
-      mcpDeliveryEnabled: rawSettings.mcpDeliveryEnabled === true,
-    } as AppSettings,
-    leagues: candidate.leagues,
-    reports: candidate.reports.map((report) => ({ ...report, citations: report.citations ?? [] })),
-    memories: Array.isArray(candidate.memories) ? candidate.memories : [],
-    playerProjections,
-    scheduledRuns,
-  };
-}
-
-function isValidScheduledRun(value: unknown): value is ScheduledRun {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const run = value as Record<string, unknown>;
-  const validText = (text: unknown, maxLength: number): text is string =>
-    typeof text === 'string' &&
-    text.length > 0 &&
-    text.length <= maxLength &&
-    !/[\u0000-\u001f\u007f]/.test(text);
-  const validTimestamp = (timestamp: unknown): timestamp is string =>
-    typeof timestamp === 'string' &&
-    timestamp.length <= 100 &&
-    Number.isFinite(Date.parse(timestamp));
-  const validOptionalText = (text: unknown, maxLength: number): text is string | undefined =>
-    text === undefined || (validText(text, maxLength) && !/[\u0000-\u001f\u007f]/.test(text));
-  if (
-    !validText(run.id, 100) ||
-    !validText(run.kind, 80) ||
-    !validTimestamp(run.startedAt) ||
-    (run.finishedAt !== undefined && !validTimestamp(run.finishedAt)) ||
-    !['running', 'succeeded', 'failed'].includes(String(run.status)) ||
-    !validOptionalText(run.detail, 1_000) ||
-    !validOptionalText(run.retryOf, 100) ||
-    !validOptionalText(run.calendarEventId, 100) ||
-    !validOptionalText(run.calendarEventTitle, 120) ||
-    !validOptionalText(run.occurrenceKey, 400) ||
-    (run.leagueResults !== undefined &&
-      (!Array.isArray(run.leagueResults) ||
-        run.leagueResults.length > 32 ||
-        run.leagueResults.some((result) => {
-          if (!result || typeof result !== 'object' || Array.isArray(result)) return true;
-          const item = result as Record<string, unknown>;
-          return (
-            !validText(item.leagueId, 200) ||
-            !validText(item.displayName, 200) ||
-            !['succeeded', 'failed', 'skipped'].includes(String(item.status)) ||
-            !validOptionalText(item.detail, 1_000)
-          );
-        })))
-  )
-    return false;
-  return true;
-}
-
-function isSafeCitationUrl(value: unknown): value is string {
-  if (typeof value !== 'string' || value.length > 2048) return false;
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && Boolean(url.hostname) && !url.username && !url.password;
-  } catch {
-    return false;
-  }
-}
-
-function isValidAIUsageSummary(value: unknown): boolean {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const usage = value as Record<string, unknown>;
-  const validRate = (rate: unknown) =>
-    rate === undefined ||
-    (typeof rate === 'number' && Number.isFinite(rate) && rate >= 0 && rate <= 1_000);
-  const hasBothRates =
-    typeof usage.inputUsdPerMillionTokens === 'number' &&
-    typeof usage.outputUsdPerMillionTokens === 'number';
-  return (
-    typeof usage.model === 'string' &&
-    usage.model.length > 0 &&
-    usage.model.length <= 120 &&
-    Number.isInteger(usage.inputTokens) &&
-    Number(usage.inputTokens) >= 0 &&
-    Number(usage.inputTokens) <= 10_000_000 &&
-    Number.isInteger(usage.outputTokens) &&
-    Number(usage.outputTokens) >= 0 &&
-    Number(usage.outputTokens) <= 10_000_000 &&
-    validRate(usage.inputUsdPerMillionTokens) &&
-    validRate(usage.outputUsdPerMillionTokens) &&
-    (usage.estimatedCostUsd === undefined ||
-      (hasBothRates &&
-        typeof usage.estimatedCostUsd === 'number' &&
-        Number.isFinite(usage.estimatedCostUsd) &&
-        usage.estimatedCostUsd >= 0 &&
-        usage.estimatedCostUsd <= 20_000))
-  );
-}
-
-function isValidPlayerProjection(
-  value: unknown,
-  leagueIds: Set<string>,
-): value is PlayerProjection {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const projection = value as Record<string, unknown>;
-  return (
-    typeof projection.id === 'string' &&
-    projection.id.length > 0 &&
-    projection.id.length <= 100 &&
-    typeof projection.leagueId === 'string' &&
-    leagueIds.has(projection.leagueId) &&
-    (projection.sourceId === undefined ||
-      (typeof projection.sourceId === 'string' &&
-        projection.sourceId.length > 0 &&
-        projection.sourceId.length <= 100)) &&
-    (projection.scoringMatched === undefined || typeof projection.scoringMatched === 'boolean') &&
-    typeof projection.playerName === 'string' &&
-    projection.playerName.trim().length > 0 &&
-    projection.playerName.length <= 120 &&
-    !/[\u0000-\u001f\u007f]/.test(projection.playerName) &&
-    (projection.playerId === undefined ||
-      (typeof projection.playerId === 'string' &&
-        projection.playerId.length > 0 &&
-        projection.playerId.length <= 100)) &&
-    (projection.position === undefined ||
-      (typeof projection.position === 'string' &&
-        projection.position.length <= 20 &&
-        !/[\r\n]/.test(projection.position))) &&
-    (projection.nflTeam === undefined ||
-      (typeof projection.nflTeam === 'string' &&
-        projection.nflTeam.length <= 10 &&
-        !/[\r\n]/.test(projection.nflTeam))) &&
-    typeof projection.projectedPoints === 'number' &&
-    Number.isFinite(projection.projectedPoints) &&
-    projection.projectedPoints >= 0 &&
-    projection.projectedPoints <= 3000 &&
-    (projection.averageDraftPosition === undefined ||
-      (typeof projection.averageDraftPosition === 'number' &&
-        Number.isFinite(projection.averageDraftPosition) &&
-        projection.averageDraftPosition >= 1 &&
-        projection.averageDraftPosition <= 600)) &&
-    (projection.week === undefined ||
-      (typeof projection.week === 'number' &&
-        Number.isInteger(projection.week) &&
-        projection.week >= 1 &&
-        projection.week <= 30)) &&
-    typeof projection.sourceName === 'string' &&
-    projection.sourceName.trim().length > 0 &&
-    projection.sourceName.length <= 100 &&
-    !/[\u0000-\u001f\u007f]/.test(projection.sourceName) &&
-    (projection.sourceUrl === undefined || isValidProjectionSourceUrl(projection.sourceUrl)) &&
-    typeof projection.importedAt === 'string' &&
-    Number.isFinite(Date.parse(projection.importedAt))
-  );
-}
-
-function isValidBlueBubblesCursor(value: unknown): boolean {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const cursor = value as Record<string, unknown>;
-  return (
-    typeof cursor.chatGuid === 'string' &&
-    cursor.chatGuid.length > 0 &&
-    cursor.chatGuid.length <= 500 &&
-    typeof cursor.dateCreated === 'number' &&
-    Number.isFinite(cursor.dateCreated) &&
-    Array.isArray(cursor.messageGuids) &&
-    cursor.messageGuids.length <= 200 &&
-    cursor.messageGuids.every((guid) => typeof guid === 'string' && guid.length <= 300)
-  );
-}
-
-function isValidTwilioConversationCursor(value: unknown): boolean {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const cursor = value as Record<string, unknown>;
-  return (
-    typeof cursor.conversationSid === 'string' &&
-    /^CH[0-9a-fA-F]{32}$/.test(cursor.conversationSid) &&
-    typeof cursor.page === 'number' &&
-    Number.isInteger(cursor.page) &&
-    cursor.page >= 0 &&
-    cursor.page <= 1_000_000 &&
-    typeof cursor.lastIndex === 'number' &&
-    Number.isInteger(cursor.lastIndex) &&
-    cursor.lastIndex >= -1 &&
-    cursor.lastIndex <= 2_147_483_647 &&
-    (cursor.initialized === undefined || typeof cursor.initialized === 'boolean')
-  );
-}
-
-function isBlueBubblesSyncInterval(value: unknown): value is 5 | 15 | 30 | 60 {
-  return value === 5 || value === 15 || value === 30 || value === 60;
-}
-
-/** Backups can be untrusted, so imported automation, executables, and credential destinations need reapproval. */
-function makeRestoredStateSafe(state: AppState): AppState {
-  const defaultRuntime = initialState.settings.aiRuntime!;
-  const requiresRuntimeReview =
-    state.settings.aiRuntime?.mode === 'cli' ||
-    state.settings.aiRuntime?.mode === 'apple-cli' ||
-    state.settings.aiRuntime?.baseUrl !== defaultRuntime.baseUrl;
-  const hasAutomaticActions = state.settings.actions.some((action) => action.mode === 'automatic');
-  const hasAutoSync =
-    state.settings.imessageAutoSyncEnabled === true ||
-    state.settings.twilioConversationAutoSyncEnabled === true;
-  const hasMcpDelivery = state.settings.mcpDeliveryEnabled === true;
-  const hasChatReplies =
-    state.settings.chatRepliesEnabled === true || state.settings.chatRepliesAutoSend === true;
-  if (
-    !requiresRuntimeReview &&
-    !hasAutomaticActions &&
-    !hasAutoSync &&
-    !hasMcpDelivery &&
-    !hasChatReplies
-  )
-    return state;
-
-  return {
-    ...state,
-    settings: {
-      ...state.settings,
-      ...(requiresRuntimeReview ? { aiRuntime: structuredClone(defaultRuntime) } : {}),
-      imessageAutoSyncEnabled: false,
-      twilioConversationAutoSyncEnabled: false,
-      mcpDeliveryEnabled: false,
-      chatRepliesEnabled: false,
-      chatRepliesAutoSend: false,
-      ...(requiresRuntimeReview || hasAutomaticActions
-        ? {
-            actions: state.settings.actions.map((action) => ({
-              ...action,
-              mode: 'draft' as const,
-              schedule: { ...action.schedule, enabled: false },
-            })),
-          }
-        : {}),
-    },
-  };
-}
-
-function isValidStoredRuntime(value: unknown): boolean {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  const runtime = value as Record<string, unknown>;
-  return (
-    (runtime.mode === 'api' || runtime.mode === 'cli' || runtime.mode === 'apple-cli') &&
-    typeof runtime.model === 'string' &&
-    runtime.model.length <= 120 &&
-    typeof runtime.command === 'string' &&
-    runtime.command.length <= 300 &&
-    typeof runtime.args === 'string' &&
-    runtime.args.length <= 1000 &&
-    typeof runtime.baseUrl === 'string' &&
-    runtime.baseUrl.length <= 500 &&
-    /^https:\/\//.test(runtime.baseUrl) &&
-    (runtime.temperature === undefined ||
-      (typeof runtime.temperature === 'number' &&
-        Number.isFinite(runtime.temperature) &&
-        runtime.temperature >= 0 &&
-        runtime.temperature <= 2)) &&
-    (runtime.maxOutputTokens === undefined ||
-      (typeof runtime.maxOutputTokens === 'number' &&
-        Number.isInteger(runtime.maxOutputTokens) &&
-        runtime.maxOutputTokens >= 128 &&
-        runtime.maxOutputTokens <= 16_384)) &&
-    (runtime.inputUsdPerMillionTokens === undefined ||
-      (typeof runtime.inputUsdPerMillionTokens === 'number' &&
-        Number.isFinite(runtime.inputUsdPerMillionTokens) &&
-        runtime.inputUsdPerMillionTokens >= 0 &&
-        runtime.inputUsdPerMillionTokens <= 1_000)) &&
-    (runtime.outputUsdPerMillionTokens === undefined ||
-      (typeof runtime.outputUsdPerMillionTokens === 'number' &&
-        Number.isFinite(runtime.outputUsdPerMillionTokens) &&
-        runtime.outputUsdPerMillionTokens >= 0 &&
-        runtime.outputUsdPerMillionTokens <= 1_000))
-  );
-}
-
-function isOptionalStoredAddress(value: unknown): boolean {
-  return value === '' || (typeof value === 'string' && value.length < 320 && !/[\r\n]/.test(value));
 }

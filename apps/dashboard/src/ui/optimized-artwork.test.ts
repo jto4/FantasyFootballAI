@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 const heroAssetPath = fileURLToPath(
   new URL('../../public/images/soft-gradient-waves.webp', import.meta.url),
 );
-const designStylesPath = fileURLToPath(new URL('./design.css', import.meta.url));
+const designStylesPath = fileURLToPath(new URL('./app.css', import.meta.url));
 
 describe('dashboard hero artwork', () => {
   it('serves the optimized local derivative within the image transfer budget', async () => {
