@@ -31,6 +31,7 @@ Use this page to find the right project context and keep the records in sync.
 - [`design/dashboard-visual-direction.md`](design/dashboard-visual-direction.md) — dashboard
   design goals and reference limitations.
 - [`reviews/2026-10-02-workflow-reliability.md`](reviews/2026-10-02-workflow-reliability.md) — durable workflow changes, validation, and manual review.
+- [`reviews/2026-10-04-main-integration.md`](reviews/2026-10-04-main-integration.md) — fresh local and hosted source/package validation for main integration.
 - [`reviews/`](reviews/) — dated manual code and release-workflow review records.
 
 ## Keeping project context current

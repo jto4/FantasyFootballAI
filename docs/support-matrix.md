@@ -2,7 +2,7 @@
 
 Current readiness and gates live in [release status](release-status.md). This matrix retains detailed verification evidence; passing fixtures or package smokes do not prove live account behavior or interactive installation.
 
-The 2026-10-02 source workflow changes are reviewed in [the commissioner workflow record](reviews/2026-10-02-commissioner-workflows.md). Local checks use Node 22.23.3; source commands now support only Node 22 (22.13 minimum), with `.nvmrc` and CI pinned. Older Node 25 measurements below remain historical, not supported-runtime guidance. September package hashes describe September artifacts and do not include this October source slice. Updated hosted CI, current packages, live accounts, signing, and owner-device lifecycle remain release gates.
+The 2026-10-02 source workflow changes are reviewed in [the commissioner workflow record](reviews/2026-10-02-commissioner-workflows.md). Local checks use Node 22.23.3; source commands now support only Node 22 (22.13 minimum), with `.nvmrc` and CI pinned. Older Node 25 measurements below remain historical, not supported-runtime guidance. September package hashes describe September artifacts and do not include this October source slice. Fresh three-OS source and unsigned package checks passed on 2026-10-04; see [integration evidence](reviews/2026-10-04-main-integration.md). Intel Mac distribution, live accounts, signing, and owner-device lifecycle remain release gates.
 
 ## Platforms and runtimes
 

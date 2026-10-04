@@ -32,7 +32,7 @@ Validation and manual review: [2026-10-02 reliability review](reviews/2026-10-02
 
 ## Remaining validation and release work
 
-- [ ] Run updated hosted OS/source/package/browser CI and the minimum-runtime lane.
+- [x] Run updated hosted OS/source/package/browser CI and the minimum-runtime lane; see [2026-10-04 integration evidence](reviews/2026-10-04-main-integration.md).
 - [ ] Verify credentialed signing/notarization, owner-device lifecycle, and a signed published-release upgrade.
 - [ ] Complete owner-authorized live provider/model/delivery checks and broader fantasy-format semantics.
 - [ ] Repeat performance checks on slower hardware and with live providers.
