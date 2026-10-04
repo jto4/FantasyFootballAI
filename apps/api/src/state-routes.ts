@@ -1,17 +1,25 @@
+import type { LocalStore } from './store.js';
 import { Router } from 'express';
-import type { AppState } from './store.js';
+import type { AppState, DashboardStateSnapshot } from './store.js';
 import { summarizeLeagues, summarizeReports } from './mcp-data.js';
 import { summarizeProjectionSources } from './projections.js';
 
 export interface StateRouteDependencies {
   snapshot: () => AppState;
+  dashboardSnapshot?: () => DashboardStateSnapshot;
+  dashboardSummarySnapshot?: LocalStore['dashboardSummarySnapshot'];
+  reportsPage?: LocalStore['reportsPage'];
+  reportById?: LocalStore['reportById'];
 }
 
 /** Read-only local state endpoints are kept separate from API startup and background work. */
 export function createStateRouter(dependencies: StateRouteDependencies): Router {
   const router = Router();
 
-  router.get('/api/state', (_req, res) => {
+  router.get('/api/state', (req, res) => {
+    if (req.query.view === 'summary' && dependencies.dashboardSummarySnapshot)
+      return res.json(dependencies.dashboardSummarySnapshot());
+    if (dependencies.dashboardSnapshot) return res.json(dependencies.dashboardSnapshot());
     const state = dependencies.snapshot();
     const { playerProjections: _projections, ...dashboardState } = state;
     void _projections;
@@ -43,6 +51,37 @@ export function createStateRouter(dependencies: StateRouteDependencies): Router 
     res.json(league);
   });
 
+  router.get('/api/report-history', (req, res) => {
+    const { leagueId, status, cursor, limit } = req.query;
+    if (
+      [leagueId, status, cursor, limit].some(
+        (value) => value !== undefined && typeof value !== 'string',
+      ) ||
+      (typeof leagueId === 'string' && leagueId.length > 256) ||
+      (typeof cursor === 'string' && cursor.length > 512) ||
+      (status !== undefined &&
+        !['draft', 'sent', 'sending', 'failed', 'uncertain'].includes(String(status)))
+    )
+      return res.status(400).json({ error: 'Invalid report filters.', code: 'invalid_request' });
+    const size = limit === undefined ? 20 : Number(limit);
+    if (!Number.isSafeInteger(size) || size < 1 || size > 50)
+      return res
+        .status(400)
+        .json({ error: 'Report page size must be from 1 to 50.', code: 'invalid_request' });
+    if (!dependencies.reportsPage)
+      return res
+        .status(503)
+        .json({ error: 'Report history is unavailable.', code: 'service_unavailable' });
+    return res.json(
+      dependencies.reportsPage(
+        leagueId as string | undefined,
+        status as string | undefined,
+        cursor as string | undefined,
+        size,
+      ),
+    );
+  });
+
   router.get('/api/reports', (req, res) => {
     const rawLeagueId = req.query.leagueId;
     const rawLimit = req.query.limit;
@@ -58,7 +97,9 @@ export function createStateRouter(dependencies: StateRouteDependencies): Router 
   });
 
   router.get('/api/reports/:id', (req, res) => {
-    const report = dependencies.snapshot().reports.find((item) => item.id === req.params.id);
+    const report = dependencies.reportById
+      ? dependencies.reportById(req.params.id)
+      : dependencies.snapshot().reports.find((item) => item.id === req.params.id);
     if (!report) return res.status(404).json({ error: 'Report not found.' });
     res.json(report);
   });

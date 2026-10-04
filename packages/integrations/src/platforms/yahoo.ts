@@ -53,10 +53,10 @@ export class YahooConnector implements LeagueConnector {
     const rawStandings = firstRecord(resources?.standings);
     const teams = yahooTeams(rawStandings);
     const scoring = yahooScoring(rawSettings);
-    const currentWeek = numberOrUndefined(metadata.current_week);
+    const currentWeek = boundedInteger(metadata.current_week, 1, 30);
     const [rawRosters, rawDraft, matchups] = await Promise.all([
       yahooOptionalResource(
-        `league/${encodeURIComponent(leagueKey)}/teams;out=roster`,
+        `league/${encodeURIComponent(leagueKey)}/teams/roster${currentWeek ? `;week=${currentWeek}` : ''}`,
         this.accessToken,
       ),
       yahooOptionalResource(

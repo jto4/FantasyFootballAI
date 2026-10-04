@@ -1,0 +1,13 @@
+/* Shared theme values used by the dashboard. */
+:root {
+  --ink: #27353d;
+  --muted: #777b78;
+  --orange: #bd7351;
+  --line: #e5dfd6;
+  --navy: #f8f6f1;
+  --surface: #fffdf9;
+  --surface-raised: #f0ece5;
+  --green: #568165;
+  --pink: #bd6876;
+  --violet: #806bb0;
+}

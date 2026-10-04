@@ -22,7 +22,6 @@ describe('projection API routes', () => {
       snapshot: () => state,
       update: async (mutator: (current: AppState) => void) => {
         mutator(state);
-        return state;
       },
     } as Pick<LocalStore, 'snapshot' | 'update'>;
     const app = express();

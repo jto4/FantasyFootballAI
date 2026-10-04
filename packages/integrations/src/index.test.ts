@@ -284,7 +284,7 @@ describe('connector selection', () => {
           ],
         },
       },
-      '/league/nfl.l.123/teams;out=roster': {
+      '/league/nfl.l.123/teams/roster': {
         fantasy_content: {
           league: [
             {
@@ -564,6 +564,35 @@ describe('connector selection', () => {
     now += 24 * 60 * 60 * 1_000;
     await catalog.get();
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('accepts current-sized Sleeper player catalogs above the old response cap', async () => {
+    const catalog = new SleeperPlayerCatalog();
+    const body = JSON.stringify(
+      Object.fromEntries(
+        Array.from({ length: 10_000 }, (_, index) => [
+          `player-${index}`,
+          {
+            full_name: `Player ${index}`,
+            position: 'WR',
+            metadata: 'x'.repeat(700),
+          },
+        ]),
+      ),
+    );
+    expect(Buffer.byteLength(body)).toBeGreaterThan(6_000_000);
+    expect(Buffer.byteLength(body)).toBeLessThan(20_000_000);
+    const fetch = vi.fn().mockResolvedValue(new Response(body, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+
+    const players = await catalog.get();
+
+    expect(players.size).toBe(10_000);
+    expect(players.get('player-8123')).toMatchObject({
+      id: 'player-8123',
+      name: 'Player 8123',
+      position: 'WR',
+    });
   });
 
   it('keeps the last good Sleeper player catalog when its daily refresh fails', async () => {

@@ -7,7 +7,7 @@ cross-platform, and clear about the data each integration can provide.
 
 ## Development setup
 
-Use Node.js 22.13 or newer. From a clean checkout, install the lockfile dependencies and
+Use Node.js 22 LTS (22.13 minimum; use the version in `.nvmrc`). From a clean checkout, install the lockfile dependencies and
 start the local development app:
 
 ```sh
@@ -69,3 +69,13 @@ Include the operating system, Node.js version, the command or dashboard action, 
 observable error. Remove credentials, email addresses, phone numbers, league identifiers,
 and private message content from issue text and attachments. For a provider-specific
 failure, say whether it was reproducible with that provider's official interface.
+
+## Browser interaction checks
+
+Use the Node version in `.nvmrc`, run `npx playwright install chromium`, then
+`npm run test:e2e`. The suite builds the dashboard and exercises first-run setup,
+manual draft generation/editing/delivery review, scoped Settings saves, and unsaved
+changes in desktop and mobile Chromium. It serves only loopback port 4201 and mocks
+API responses, so it does not use saved credentials, modify your database, or send
+provider messages. Traces/screenshots are written to the system temporary directory.
+The normal `npm test` includes real local API/persistence/process regression checks.

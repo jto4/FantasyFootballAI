@@ -13,14 +13,19 @@ KWallet to be available on the current user's D-Bus session. This also applies t
 headless background-service account; the smoke command reports failure when no usable
 credential service is available.
 
-To check current ESPN, PFF, and FOX Sports RSS availability, run `npm run news:smoke`. This
+To check current ESPN, PFF, FOX Sports, CBS Sports, and Pro Football Talk RSS availability, run `npm run news:smoke`. This
 opt-in live check reports a headline count, latest publication timestamp, and one citation
 URL per feed. It is not run in CI because feed availability and terms are controlled by their
 publishers.
 
+To verify Sleeper's public player catalog without connecting a league, run
+`npm run sleeper:catalog:smoke`. This opt-in read-only check downloads the bounded public NFL
+catalog, verifies several known player ID/name/position records, and reports the normalized
+catalog size; it does not request league or account data.
+
 ## Local development
 
-Install Node.js 22.13+ and npm, clone the repository, run `npm ci`, then `npm run dev`. On Linux, source builds need the distribution's `libsecret` development package before `npm ci` (`libsecret-1-dev` on Debian/Ubuntu); [Keytar documents the platform dependency](https://github.com/github/node-keytar#on-linux). The start, development, build, and service commands check the Node.js version and print an upgrade instruction when it is too old. `npm ci` installs the exact dependency versions in the lockfile and replaces any existing `node_modules` directory. Visit `http://127.0.0.1:5173`; the API is available at `http://127.0.0.1:4173`. The API currently runs directly without a file watcher so the dashboard's **Stop app** control can stop the combined development session cleanly. API code changes require restarting `npm run dev`; Vite still hot-reloads dashboard changes.
+Install Node.js 22 LTS (22.13 minimum; use `.nvmrc`) and npm, clone the repository, run `npm ci`, then `npm run dev`. On Linux, source builds need the distribution's `libsecret` development package before `npm ci` (`libsecret-1-dev` on Debian/Ubuntu); [Keytar documents the platform dependency](https://github.com/github/node-keytar#on-linux). The start, development, build, and service commands check the Node.js version and print an upgrade instruction when it is too old. `npm ci` installs the exact dependency versions in the lockfile and replaces any existing `node_modules` directory. Visit `http://127.0.0.1:5173`; the API is available at `http://127.0.0.1:4173`. The API currently runs directly without a file watcher so the dashboard's **Stop app** control can stop the combined development session cleanly. API code changes require restarting `npm run dev`; Vite still hot-reloads dashboard changes.
 
 Use **Stop app** at the bottom of the dashboard sidebar to stop the API, scheduled jobs, and development dashboard process. Confirm the prompt to exit. Start again with `npm run dev` from the repository directory.
 
@@ -47,6 +52,10 @@ dashboard, tray icon, and MCP client before keeping the artifact. The MCP check 
 stdio handshake, discovers tools, and calls `list_leagues` against a temporary loopback API.
 These checks do not replace interactive OS install and lifecycle checks.
 
+Linux packaging produces both Debian `.deb` and Fedora/RHEL `.rpm` packages. On Debian or
+Ubuntu build hosts, install `fakeroot`, `dpkg-dev`, `rpm`, and `xvfb` before running the
+desktop packaging command. Electron Forge documents the RPM maker's [RPM build requirement](https://www.electronforge.io/config/makers/rpm).
+
 The desktop app writes its SQLite database under Electron's per-user application data
 directory and stores secrets in the operating system credential manager. Use the in-app
 backup and restore screen to move an existing SQLite backup between the source-checkout
@@ -57,31 +66,30 @@ stop its local API. The **Start hidden in the system tray** option applies at th
 it starts the service without opening the dashboard window. For headless operation,
 use the source-checkout service commands instead.
 
-If the desktop app cannot open its SQLite database, it checks the five most recent valid local safety copies and offers an explicit restore choice. The app preserves the failed database and journal files in a recovery folder, then restores the chosen copy with automatic sends paused and custom AI/CLI runtimes reset for review. If no valid safety copy exists, it leaves the data folder unchanged and displays source-checkout recovery guidance.
+If the desktop app cannot open its SQLite database, startup attempts page or row salvage before checking the five most recent valid local safety copies and offering an explicit restore choice. The app preserves the failed database and journal files in a recovery folder, then restores the chosen copy with automatic sends paused and custom AI/CLI runtimes reset for review. If neither salvage nor a valid safety copy is available, it leaves the data folder unchanged and displays source-checkout recovery guidance.
 Packages are unsigned and are not published for end users yet. Version tags create a draft
-GitHub Release with a zip archive for each OS and a `SHA256SUMS` file; an owner must complete
+GitHub Release with a ZIP for Linux and Windows, plus separate Apple Silicon and Intel macOS
+ZIPs, and a `SHA256SUMS` file; an owner must complete
 the release review and publish it. After downloading the archive and checksum file, run
 `shasum -a 256 -c SHA256SUMS` on macOS or `sha256sum -c SHA256SUMS` on Linux to check for
 accidental corruption or incomplete downloads. On Windows, use `Get-FileHash <archive> -Algorithm
 SHA256` and compare its `Hash` value with that archive's line in `SHA256SUMS`. Checksums alone
-do not authenticate who published the files. macOS ARM is the only installer build verified locally. CI now builds and smoke-checks
-packages on macOS, Windows, and Linux for pushes and pull requests; successful runner results
-and interactive installation checks on each OS are still required before claiming support.
+do not authenticate who published the files. Apple Silicon is the only Mac installer build
+verified locally. Push and pull-request CI smoke-checks Apple Silicon macOS, Windows, and
+Linux packages; the on-demand and tag release workflow now also builds Intel Mac packages,
+and both Linux workflows include RPM tooling for Fedora/RHEL packages. Intel Mac
+hosted verification is pending. Linux DEB/RPM builds have earlier hosted evidence in the support matrix; current-source packages must be rechecked. Successful runner results and interactive installation
+checks on each OS are still required before claiming support.
 
-On the League desk, choose **Guided setup** to walk through league connection, AI runtime
-settings, and optional voice/schedule customization. It resumes at the first incomplete
-required step. Each step opens the existing setup screen, so you can return to the League desk
-and reopen the guide after saving your changes. When multiple leagues are connected,
-choose the active league in the top bar; report generation follows that selection.
-The selection is remembered in this browser on this computer. The credential readiness indicator
-checks whether an OpenAI key is saved or the selected CLI runtime has passed its data-free test.
-The guide does not configure credentials or providers on its own. In the desktop app, its
-personalization step can take you directly to the local data-folder setting; keeping the default
-folder is valid, and changing it copies local data and restarts the app. The guide also links to
-the optional delivery-provider credentials in Settings; configure only the channels you plan to
-use, and automatic sending remains controlled separately by each report action.
+On the League desk, choose **Guided setup** to connect a league, save and test an AI runtime, then generate and review your first draft. Paste an ID or supported HTTPS league URL for Sleeper, ESPN, or Yahoo; ESPN URLs can also supply the season. The URL is parsed locally; it is not fetched. Use **Continue setup** after connecting and **Generate first draft** after a successful data-free runtime test. API and CLI readiness reflects a successful test of the currently saved runtime in this browser session; a saved key alone does not count as a working model. Changing the runtime or credentials requires another test. Voice, delivery providers, and the desktop data folder remain optional.
 
-For an OpenAI-compatible API, enter the endpoint and key under Settings → AI runtime. **Discover
+Settings has AI, Voice, Delivery & access, Schedules & sources, Privacy, and Storage & desktop sections. Each configuration section saves independently. AI testing and model discovery save only AI configuration; pending edits elsewhere remain unsaved. Navigating away or closing the browser warns about pending edits. Credential and storage operations use their own explicit action buttons.
+
+Manual **Generate draft** buttons always save a draft, even when that action has automatic delivery configured. **Reports** filters by league and delivery state and opens review with generation/snapshot/news timestamps and evidence limitations. Edit an unattempted draft and save it before sending. Review the exact channel, configured recipient, and saved message text, including SMS/iMessage truncation. Reports with a delivery attempt cannot be edited because retries must preserve their original content. Stale edits and changed delivery destinations are rejected; reopen the report to review current state. Scheduled actions retain their configured automatic policy.
+
+Choose the active league in the top bar; the selection is remembered in this browser. The League desk highlights waiting drafts, the next scheduled report or calendar milestone, stale league data, and failed or unknown deliveries.
+
+For an OpenAI-compatible API, enter the endpoint and key under Settings → AI. **Discover
 models** sends an authenticated, data-free model-list request to that endpoint and adds returned
 IDs as suggestions; you can still type a model name manually when the endpoint does not expose a
 model list. **Save and test runtime** separately sends a fixed data-free prompt. API settings also let you choose temperature (0–2; default 0.8), a maximum response size (128–16,384 tokens; default 1,200), and optional input/output prices in USD per million tokens. These API-only controls are sent to OpenAI-compatible endpoints; local CLIs use their own configuration. Reports display token counts when the provider returns them. Enter both current token rates to see an approximate cost; estimates exclude discounts, cached-token billing, and other provider adjustments. Missing provider usage or prices is shown as unavailable, not as zero cost.
@@ -100,7 +108,7 @@ model availability details. The CLI receives the report content in process argum
 be visible to local process-inspection tools while it runs. Use it on a trusted Mac. Choose a
 stdin-based CLI for prompts you do not want passed in process arguments.
 
-In Settings → Schedule, an action can run daily, weekly, monthly on a selected day from 1–28, or once on a selected date, time, and timezone. Fresh installs start with monthly offseason updates, Tuesday power rankings, and Wednesday matchup previews scheduled to the dashboard for review; each keeps the device's local timezone. Before played standings exist, a power-ranking report uses owner-imported season projections only when all teams have complete equal-size roster snapshots and every player matches in one scoring-confirmed source; an ID match must also agree on normalized player name, and name-only matches must be unique; totals include bench players and are labeled as roster-strength estimates, not starter scores or win forecasts. If that evidence is incomplete, rankings are withheld. These schedules refresh league data before deciding whether the report fits the confirmed season phase. Active leagues pause offseason updates, completed leagues pause weekly rankings and previews, and unknown phase stays eligible so sparse platform metadata does not silently suppress reports. Generated reports remain drafts unless you explicitly enable automatic delivery for an action. The league desk and report guidance label playoffs only when the current week and a playoff start are available. Yahoo and Sleeper use their league settings; ESPN derives an explicitly marked estimate from H2H schedule settings. Missing or unsupported values stay unconfirmed. In Automatic actions, use the suggested cadence to restore the monthly and weekly schedule recommendations after making custom schedule changes. The button changes only schedules; review and save them, and each action retains its timezone, league scope, channel, and draft-or-automatic policy. The league season calendar lets you add specific draft, season, or playoff milestones per league; each event refreshes just that league and creates a draft for review, even if the action's regular schedule is configured for automatic delivery. For Sleeper, Yahoo, and ESPN leagues, a future platform-reported draft start time can prefill a draft-hype event at the reported start time or a post-draft review and separate power-ranking event for the following day at 9:00 AM in the selected timezone. Review each suggestion, add it, and save Settings; calendar events never send automatically. ESPN support accepts only timezone-qualified ISO timestamps because the endpoint is undocumented. See the [Sleeper draft API](https://docs.sleeper.com/#get-a-specific-draft), [Yahoo Fantasy API documentation](https://sports.yahoo.com/developer/docs/), and [community ESPN API reference](https://github.com/pseudo-r/Public-ESPN-Fantasy-API/blob/main/docs/leagues.md#view-msettings) for source fields.
+In Settings → Schedules & sources, an action can run daily, weekly, monthly on a selected day from 1–28, or once on a selected date, time, and timezone. Fresh installs start with monthly offseason updates, Tuesday power rankings, and Wednesday matchup previews scheduled to the dashboard for review; each keeps the device's local timezone. Before played standings exist, a power-ranking report uses owner-imported season projections only when all teams have complete equal-size roster snapshots and every player matches in one scoring-confirmed source; an ID match must also agree on normalized player name, and name-only matches must be unique; totals include bench players and are labeled as roster-strength estimates, not starter scores or win forecasts. If that evidence is incomplete, rankings are withheld. These schedules refresh league data before deciding whether the report fits the confirmed season phase. Active leagues pause offseason updates, completed leagues pause weekly rankings and previews, and unknown phase stays eligible so sparse platform metadata does not silently suppress reports. Generated reports remain drafts unless you explicitly enable automatic delivery for an action. The league desk and report guidance label playoffs only when the current week and a playoff start are available. Yahoo and Sleeper use their league settings; ESPN derives an explicitly marked estimate from H2H schedule settings. Missing or unsupported values stay unconfirmed. In Automatic actions, use the suggested cadence to restore the monthly and weekly schedule recommendations after making custom schedule changes. The button changes only schedules; review and save them, and each action retains its timezone, league scope, channel, and draft-or-automatic policy. The league season calendar lets you add specific draft, season, or playoff milestones per league; each event refreshes just that league and creates a draft for review, even if the action's regular schedule is configured for automatic delivery. For Sleeper, Yahoo, and ESPN leagues, a future platform-reported draft start time can prefill a draft-hype event at the reported start time or a post-draft review and separate power-ranking event for the following day at 9:00 AM in the selected timezone. Review each suggestion, add it, and save Settings; calendar events never send automatically. ESPN support accepts only timezone-qualified ISO timestamps because the endpoint is undocumented. See the [Sleeper draft API](https://docs.sleeper.com/#get-a-specific-draft), [Yahoo Fantasy API documentation](https://sports.yahoo.com/developer/docs/), and [community ESPN API reference](https://github.com/pseudo-r/Public-ESPN-Fantasy-API/blob/main/docs/leagues.md#view-msettings) for source fields.
 One-time events catch up later on that same local date if the service starts after the chosen
 time; if the app starts after the scheduled local date, the report is skipped and a failed
 run is recorded on the Schedule page. Keep the app or its background service running on
@@ -134,20 +142,26 @@ The `.sidekick/` directory under the current user's home directory holds local a
 
 Use **Settings → Local backup and restore** to download a portable `.ssb` backup containing the database and generated images. Enter and confirm a passphrase of 12–200 characters; the archive is encrypted with AES-256-GCM and a per-file scrypt-derived key. Keep the passphrase separately because it cannot be recovered. Restore accepts encrypted archives up to 201 MB, older ZIP archives up to 200 MB, and legacy SQLite files up to 50 MB. The service validates the archive before replacing local data and preserves the pre-restore database in `.sidekick/backups/`. Provider secrets are not included because they stay in the OS credential manager. Restored automatic actions return to draft mode with schedules disabled. Custom AI endpoints and local CLI runtimes return to the default API configuration, so a backup cannot silently choose an executable or a destination for your API key. Review AI and delivery settings, then explicitly re-enable any automation you want. Restoring an older SQLite-only backup clears the generated-image library. Local safety copies remain protected by filesystem permissions and are not passphrase-encrypted.
 
-If the desktop app cannot open its database and neither salvage nor an existing safety copy works,
-startup offers to start with an empty library. Choosing it moves the unreadable database and
-SQLite journals into a private `recovery-*` folder first; data in those files will not appear in
-the new library. Keep that folder if you may seek specialist data recovery later.
+If the desktop app cannot open its database, startup first tries SQLite raw-page recovery when a
+local SQLite CLI with `.recover` support is installed. It validates the recovered data, then
+creates a labeled backup for the owner to review. Otherwise, or if page recovery fails, startup
+tries a labeled partial-salvage backup from independently readable and valid rows. Malformed rows
+are omitted; the original database and journals remain preserved. Raw-page recovery depends on
+the system CLI and is not available in every packaged environment.
 
-When SQLite can still read some normalized tables, startup first creates a labeled partial-salvage
-backup from independently valid rows and offers it with the other safety copies. Malformed rows
-are omitted; the original database and journals remain preserved. From a source checkout, run
-`npm run build` followed by `npm run db:recover -- --salvage` to create that backup without
-replacing the source database.
+If neither salvage method nor an existing safety copy works, startup offers to start with an empty
+library. Choosing it moves the unreadable database and SQLite journals into a private
+`recovery-*` folder first; data in those files will not appear in the new library. Keep that folder
+if you may seek specialist data recovery later.
+
+From a source checkout, run `npm run build` followed by `npm run db:recover -- --salvage` to create
+a salvage backup without replacing the source database. This also attempts `.recover` when the
+local SQLite CLI supports it. If the CLI is unavailable or recovery fails, row-level salvage still
+preserves independently readable records.
 
 If a source-checkout database will not open, stop Sunday Sidekick and run `npm run db:recover -- --check` to inspect the current database and recognized safety copies. Use `--restore-backup <filename>` only with a listed, valid copy; the command validates it again and saves the previous database and any SQLite journal files in a private `recovery-*` folder before replacing `state.sqlite`. For a desktop install, use `--data-dir` with the selected local data folder shown in Desktop Settings. Keep the recovery folder until you have reviewed the restored data. This command does not reconstruct data when no valid safety copy exists; preserve the data folder and its recovery files for manual assistance rather than deleting them.
 
-Generated GPT Image files are stored privately in the selected local data folder's `images/` directory. Use **Settings → Credentials → Saved images** to preview, download, or delete them. Encrypted Settings backups include both the SQLite database and generated images; older ZIP and SQLite-only backups can still be restored, and restoring an SQLite-only file clears the current generated-image library. Image prompts are sent to OpenAI when you generate an image, and generation may incur API charges.
+Generated OpenAI GPT Image and Stability AI Stable Image Core files are stored privately in the selected local data folder's `images/` directory. Choose the provider in **Settings → Credentials** and save its key in the OS credential store. The selected provider is remembered in this browser. OpenAI image keys use the **OpenAI image generation key** field; Stability keys use **Stability AI image generation key**. Stability documents the [Stable Image Core API](https://platform.stability.ai/docs/api-reference). Use **Settings → Credentials → Saved images** to preview, download, or delete them. Encrypted Settings backups include both the SQLite database and generated images; older ZIP and SQLite-only backups can still be restored, and restoring an SQLite-only file clears the current generated-image library. Image prompts are sent to the selected provider when you generate an image, and generation may incur API charges.
 
 Use **Settings → AI privacy → Imported source retention** to keep imported conversation text until you delete it, or purge it after 30, 90, or 365 days. Cleanup runs when you save the setting, when the app starts, and daily while it is running. The profile, editable notes, and banter preferences stay available after source text expires. The local database enables SQLite secure-delete and checkpoints its write-ahead log after purging. Retention does not alter downloaded backups or pre-restore safety copies: delete the copies in **Settings → Local backup and restore**, and manually delete downloaded files from wherever you saved them, if those copies should also be removed. Use **Enable member memory** to pause conversation imports, AI analysis of imports, and use of member notes with AI. Report prompts and group-chat reply prompts have separate sharing opt-ins in Settings; pausing member memory blocks both while keeping existing profiles stored locally for later review or re-enabling. **Members & memory → Delete all memory** removes every member profile and its imported source messages; deleting an individual profile removes its source messages too.
 
@@ -219,3 +233,13 @@ The command builds the app and registers a LaunchAgent on macOS, a systemd user 
 Manage it with `npm run service -- status`, `npm run service -- start`, and `npm run service -- stop`. **Stop app** in the dashboard also stops the service process; it remains installed and will start at the next sign-in. Remove the startup entry with `npm run service -- uninstall`. Logs are written to `~/.sidekick/logs/` and rotated on service startup.
 
 The service refers to the current repository directory and installed Node.js runtime. Keep both in place while it is installed. To update the compiled app, pull the new version, run `npm ci` if dependencies changed, and then run `npm run service -- update`; this rebuilds the code and reinstalls/restarts the per-user service. This provides background operation from a source checkout; signed installers and a bundled runtime are still not included. The source service writes its process output under `~/.sidekick/logs/`. The desktop app stores structured API JSON events under `<selected data folder>/logs/api.log` and keeps three rotated copies; unstructured API stderr is discarded. Log fields use an allowlist and omit request bodies, prompts, credentials, and raw provider error text.
+
+## Generation, concurrent editing, and delivery retries
+
+Generation is saved as a background job. You can keep using the dashboard or reload it while the request runs; Reports shows its progress. If the app stops before completion, the job becomes interrupted. Review Reports before explicitly starting a new generation. A retry of the same request ID retrieves that job and cannot generate a second report. The queue accepts up to 20 pending/running requests.
+
+Settings saves apply one section and its current revision. If another window or background action changed that section, your pending edits stay visible. Choose **Reload section** to discard that section’s edits and load the latest values; other pending sections remain intact. Direct local API clients must send `If-Match: <section revision>` with section PATCH requests. The older full-settings PUT remains available for compatibility.
+
+Report history loads in pages. Open a report to fetch its saved body, review its evidence, and edit it before any delivery attempt. Visible dashboard windows refresh background activity without replacing unsaved edits.
+
+Retries use the saved recipient, sender, subject/thread, and rendered text. If sender/account configuration changed, restore the original configuration before retrying. Resend credential changes also block retry, even when the sender address matches. An older uncertain attempt without saved delivery details has no retry control. Check the provider’s history before creating another report. Email idempotency remains subject to the provider’s retention window; SMS/iMessage retries still require confirmation because a previous delivery can be uncertain.

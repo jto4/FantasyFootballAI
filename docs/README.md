@@ -6,9 +6,9 @@ Use this page to find the right project context and keep the records in sync.
 
 - [`../AGENTS.md`](../AGENTS.md) — repository-wide instructions, code conventions, commands,
   and the owner's requirement not to run automated security scans.
-- [`implementation-plan.md`](implementation-plan.md) — product scope, current readiness, and
-  remaining release work.
-- [`tasks.md`](tasks.md) — implementation checklist and evidence notes for completed slices.
+- [`release-status.md`](release-status.md) — current readiness and remaining release gates.
+- [`implementation-plan.md`](implementation-plan.md) — product scope and future direction.
+- [`tasks.md`](tasks.md) — active implementation checklist; dated evidence lives in review records.
 - [`support-matrix.md`](support-matrix.md) — what has been implemented versus verified on a
   real provider or operating system.
 - [`memory.md`](memory.md) — durable behavior, privacy invariants, and architectural context;
@@ -25,9 +25,13 @@ Use this page to find the right project context and keep the records in sync.
 - [`mcp.md`](mcp.md) — MCP server behavior and client configuration.
 - [`performance.md`](performance.md) — repeatable local performance smoke measurements and
   their limits.
+- [`maintenance-review.md`](maintenance-review.md) — quarterly manual code, security, and
+  refactoring review checklist used by the GitHub reminder workflow.
 - [`release-install.md`](release-install.md) — building and installing release artifacts.
 - [`design/dashboard-visual-direction.md`](design/dashboard-visual-direction.md) — dashboard
   design goals and reference limitations.
+- [`reviews/2026-10-02-workflow-reliability.md`](reviews/2026-10-02-workflow-reliability.md) — durable workflow changes, validation, and manual review.
+- [`reviews/2026-10-04-main-integration.md`](reviews/2026-10-04-main-integration.md) — fresh local and hosted source/package validation for main integration.
 - [`reviews/`](reviews/) — dated manual code and release-workflow review records.
 
 ## Keeping project context current
@@ -36,7 +40,8 @@ Use this page to find the right project context and keep the records in sync.
   what works, the evidence that supports it, and remaining gaps.
 - Update `support-matrix.md` only from recorded tests, live checks, or native platform
   verification. A mocked test is not evidence of live-provider or OS behavior.
-- Update `implementation-plan.md` when product scope, readiness, or release gates change.
+- Update `implementation-plan.md` when product scope changes; update `release-status.md` when
+  readiness or release gates change.
 - Record durable architecture changes in `decisions.md`; keep `memory.md` for stable
   constraints and behaviors, not dates, temporary investigations, or pending tasks.
 - Put dated review evidence in `reviews/` and benchmark results in `performance.md`.

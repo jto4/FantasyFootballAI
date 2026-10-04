@@ -2,7 +2,7 @@ import type { DeliveryAttempt } from '@sidekick/core';
 
 export type OutboundChannel = DeliveryAttempt['channel'];
 
-/** Reuse Resend's key only when retrying the same uncertain email request. */
+/** Attempted reports are immutable: every email retry keeps its saved request key. */
 export function makeDeliveryAttempt(
   channel: OutboundChannel,
   startedAt: string,
@@ -11,7 +11,7 @@ export function makeDeliveryAttempt(
 ): DeliveryAttempt {
   const idempotencyKey =
     channel === 'email'
-      ? previous?.status === 'uncertain' && previous.channel === 'email'
+      ? previous?.channel === 'email'
         ? (previous.idempotencyKey ?? newIdempotencyKey)
         : newIdempotencyKey
       : undefined;

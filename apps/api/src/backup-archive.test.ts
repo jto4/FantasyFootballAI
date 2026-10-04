@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { zipSync } from 'fflate';
+import { Zip, ZipPassThrough, zipSync } from 'fflate';
 import {
   createPortableBackup,
   decryptPortableBackup,
@@ -13,6 +13,28 @@ import {
 import { listLocalImages, replaceLocalImages, saveGeneratedImage } from './image-library.js';
 
 let directory = '';
+
+function archiveWithRepeatedManifest(): Buffer {
+  const chunks: Buffer[] = [];
+  const archive = new Zip();
+  archive.ondata = (error, chunk) => {
+    if (error) throw error;
+    if (chunk) chunks.push(Buffer.from(chunk));
+  };
+  const addFile = (name: string, contents: Buffer) => {
+    const file = new ZipPassThrough(name);
+    archive.add(file);
+    file.push(contents, true);
+  };
+  addFile('database.sqlite', Buffer.from('SQLite format 3\0fixture database'));
+  addFile(
+    'manifest.json',
+    Buffer.from(JSON.stringify({ format: 'sunday-sidekick-backup', version: 1 })),
+  );
+  addFile('manifest.json', Buffer.from(JSON.stringify({ format: 'unknown', version: 99 })));
+  archive.end();
+  return Buffer.concat(chunks);
+}
 
 afterEach(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
@@ -53,6 +75,12 @@ describe('portable local backups', () => {
       '../outside.txt': Buffer.from('not allowed'),
     });
     expect(() => parsePortableBackup(Buffer.from(malicious))).toThrow(/unsupported path/i);
+  });
+
+  it('rejects repeated archive paths instead of choosing one by entry order', () => {
+    expect(() => parsePortableBackup(archiveWithRepeatedManifest())).toThrow(
+      /repeats a file path/i,
+    );
   });
 
   it('encrypts portable archives and authenticates the passphrase and contents', async () => {

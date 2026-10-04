@@ -39,6 +39,7 @@ export type {
   NFLInjuryReportSnapshot,
 } from './injuries.js';
 export { fetchFootballNews as getFootballNews, FootballNewsCache } from './news.js';
+export type { FootballNewsLoad, FootballNewsSnapshot } from './news.js';
 
 export {
   connectorFor,

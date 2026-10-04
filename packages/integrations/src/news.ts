@@ -4,10 +4,12 @@ import {
   type NewsItem,
   type NewsSourceId,
 } from '@sidekick/core';
-import { readBoundedText } from './http.js';
+import { fetchRetryingResponse, readBoundedText } from './http.js';
 
 const requestTimeoutMs = 8_000;
+const requestAttempts = 3;
 const defaultCacheMs = 15 * 60 * 1000;
+const allowedPublicationClockSkewMs = 5 * 60 * 1000;
 const sourceDetails: Record<NewsSourceId, { name: string; url: string }> = {
   espn: { name: 'ESPN', url: 'https://www.espn.com/espn/rss/nfl/news' },
   pff: { name: 'PFF', url: 'https://www.pff.com/feed' },
@@ -15,6 +17,8 @@ const sourceDetails: Record<NewsSourceId, { name: string; url: string }> = {
     name: 'FOX Sports',
     url: 'https://api.foxsports.com/v2/content/optimized-rss?partnerKey=MB0Wehpmuj2lUhuRhQaafhBjAJqaPU244mlTDK1i&size=30&tags=fs%2Fnfl',
   },
+  cbs: { name: 'CBS Sports', url: 'https://www.cbssports.com/rss/headlines/nfl/' },
+  pft: { name: 'Pro Football Talk', url: 'https://www.nbcsports.com/profootballtalk.rss' },
 };
 
 export interface FootballNewsSnapshot {
@@ -75,10 +79,11 @@ function sourceNames(sources: NewsSourceId[]): string {
 
 async function fetchFeed(source: NewsSourceId): Promise<NewsItem[]> {
   const details = sourceDetails[source];
-  const response = await fetch(details.url, {
-    signal: AbortSignal.timeout(requestTimeoutMs),
-    headers: { accept: 'application/rss+xml, application/xml, text/xml' },
-  });
+  const response = await fetchRetryingResponse(
+    details.url,
+    { headers: { accept: 'application/rss+xml, application/xml, text/xml' } },
+    { maxAttempts: requestAttempts, timeoutMs: requestTimeoutMs },
+  );
   if (!response.ok) throw new Error(`${details.name} news source failed (${response.status}).`);
   const xml = await readBoundedText(response, 1_000_000);
   const entries = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
@@ -101,7 +106,13 @@ async function fetchFeed(source: NewsSourceId): Promise<NewsItem[]> {
         source: details.name,
       };
     })
-    .filter((item) => item.title.length > 0 && item.title.length <= 500 && isSafeNewsUrl(item.url));
+    .filter(
+      (item) =>
+        item.title.length > 0 &&
+        item.title.length <= 500 &&
+        Date.parse(item.publishedAt) <= Date.now() + allowedPublicationClockSkewMs &&
+        isSafeNewsUrl(item.url),
+    );
   if (!items.length) throw new Error(`${details.name} news source returned no usable headlines.`);
   return items;
 }

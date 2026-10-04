@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { fetchRetryingJson, readBoundedJson, readBoundedText } from './http.js';
+import {
+  fetchRetryingJson,
+  fetchRetryingResponse,
+  readBoundedJson,
+  readBoundedText,
+} from './http.js';
 
 describe('bounded provider responses', () => {
   it('reads text within its byte budget', async () => {
@@ -88,5 +93,34 @@ describe('retrying JSON requests', () => {
       ),
     ).rejects.toThrow('network unavailable');
     expect(calls).toBe(1);
+  });
+});
+
+describe('retrying response requests', () => {
+  it('retries transient feed failures and returns the response for bounded parsing', async () => {
+    let calls = 0;
+    const delays: number[] = [];
+    const response = await fetchRetryingResponse(
+      'https://example.test/feed.xml',
+      { headers: { accept: 'application/rss+xml' } },
+      {
+        fetcher: async (_url, init) => {
+          calls += 1;
+          expect(init?.headers).toMatchObject({ accept: 'application/rss+xml' });
+          return calls === 1
+            ? new Response('temporarily unavailable', { status: 503 })
+            : new Response('<rss><channel /></rss>', {
+                headers: { 'content-type': 'application/rss+xml' },
+              });
+        },
+        sleep: async (milliseconds) => {
+          delays.push(milliseconds);
+        },
+      },
+    );
+
+    expect(calls).toBe(2);
+    expect(delays).toEqual([250]);
+    await expect(readBoundedText(response, 64)).resolves.toContain('<rss>');
   });
 });

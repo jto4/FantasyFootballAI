@@ -10,6 +10,7 @@ export function LeaguesPage({
   activeLeagueId,
   staleAfterHours,
   refreshingLeagueId,
+  disconnectingLeagueId,
   onConnect,
   onSetActive,
   onRefresh,
@@ -19,6 +20,7 @@ export function LeaguesPage({
   activeLeagueId?: string;
   staleAfterHours?: number;
   refreshingLeagueId: string;
+  disconnectingLeagueId: string;
   onConnect: () => void;
   onSetActive: (leagueId: string) => void;
   onRefresh: (leagueId: string) => void;
@@ -82,7 +84,7 @@ export function LeaguesPage({
               <button
                 className="small-button"
                 onClick={() => onRefresh(league.id)}
-                disabled={refreshingLeagueId === league.id}
+                disabled={refreshingLeagueId === league.id || disconnectingLeagueId === league.id}
               >
                 <RefreshCw size={14} />{' '}
                 {refreshingLeagueId === league.id ? 'Refreshing…' : 'Refresh'}
@@ -90,9 +92,11 @@ export function LeaguesPage({
               <button
                 className="small-button danger"
                 onClick={() => onDisconnect(league.id)}
+                disabled={disconnectingLeagueId === league.id || refreshingLeagueId === league.id}
                 aria-label={`Disconnect ${league.displayName}`}
               >
-                <Trash2 size={14} /> Disconnect
+                <Trash2 size={14} />{' '}
+                {disconnectingLeagueId === league.id ? 'Disconnecting…' : 'Disconnect'}
               </button>
             </article>
           );

@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.13.0 <23"
   },
   "overrides": {
     "@electron/rebuild": "^4.0.1"
@@ -24,6 +24,7 @@
     "db:recover": "node scripts/recover-database.mjs",
     "credentials:smoke": "npm run build --workspace @sidekick/api && node scripts/credential-store-smoke.mjs",
     "news:smoke": "npm run build --workspace @sidekick/core && npm run build --workspace @sidekick/integrations && node scripts/news-smoke.mjs",
+    "sleeper:catalog:smoke": "npm run build --workspace @sidekick/core && npm run build --workspace @sidekick/integrations && node scripts/sleeper-catalog-smoke.mjs",
     "dev": "npm --workspace @sidekick/core run build && npm --workspace @sidekick/integrations run build && concurrently --success first -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "npm --workspace @sidekick/api run dev",
     "dev:web": "npm --workspace @sidekick/dashboard run dev",
@@ -32,10 +33,11 @@
     "desktop:make": "npm run build && npm run make --workspace @sidekick/desktop",
     "desktop:update-lock": "npm run build && node scripts/desktop-package.mjs --update-lock",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test:service && npm run test:release && npm run test:dependencies && npm run test:service:integration && npm run test:workspaces",
-    "test:release": "node --test scripts/assemble-release-assets.test.mjs",
-    "test:service": "node --test scripts/service-config.test.mjs scripts/service-lifecycle.integration.test.mjs scripts/windows-task-scheduler.integration.test.mjs scripts/macos-launch-agent.integration.test.mjs scripts/portable-symlinks.test.mjs scripts/recover-database.test.mjs apps/desktop/login-startup.test.mjs apps/desktop/log-writer.test.mjs apps/desktop/database-recovery-flow.test.mjs apps/desktop/mcp-endpoint.test.mjs apps/desktop/data-directory.test.mjs apps/desktop/background-tray.test.mjs apps/desktop/startup-preference.test.mjs apps/desktop/update-check.test.mjs",
-    "test:service:integration": "npm run build --workspace @sidekick/api && node --test scripts/service-runner.integration.test.mjs scripts/recover-database-salvage.test.mjs scripts/memory-import.integration.test.mjs scripts/backup-archive.integration.test.mjs scripts/mcp-delivery.integration.test.mjs scripts/projection-sources.integration.test.mjs",
+    "test": "npm run test:runtime && npm run test:service && npm run test:maintenance && npm run test:release && npm run test:dependencies && npm run test:service:integration && npm run test:workspaces",
+    "test:maintenance": "node --test scripts/quarterly-maintenance.test.mjs",
+    "test:release": "node --test scripts/assemble-release-assets.test.mjs scripts/release-version.test.mjs scripts/verify-macos-package.test.mjs",
+    "test:service": "node --test scripts/service-config.test.mjs scripts/service-lifecycle.integration.test.mjs scripts/windows-task-scheduler.integration.test.mjs scripts/macos-launch-agent.integration.test.mjs scripts/portable-symlinks.test.mjs scripts/recover-database.test.mjs scripts/desktop-smoke-plan.test.mjs apps/desktop/login-startup.test.mjs apps/desktop/log-writer.test.mjs apps/desktop/database-recovery-flow.test.mjs apps/desktop/mcp-endpoint.test.mjs apps/desktop/data-directory.test.mjs apps/desktop/background-tray.test.mjs apps/desktop/background-mode.test.mjs apps/desktop/startup-preference.test.mjs apps/desktop/update-check.test.mjs apps/desktop/native-updater.test.mjs apps/desktop/forge-config.test.mjs",
+    "test:service:integration": "npm run build --workspace @sidekick/api && node --test scripts/service-runner.integration.test.mjs scripts/recover-database-salvage.test.mjs scripts/memory-import.integration.test.mjs scripts/twilio-conversation-sync.integration.test.mjs scripts/report-memory-consent.integration.test.mjs scripts/backup-archive.integration.test.mjs scripts/mcp-delivery.integration.test.mjs scripts/projection-sources.integration.test.mjs",
     "test:linux-service": "node --test scripts/linux-background-service.integration.test.mjs",
     "test:windows-service": "node --test scripts/windows-background-service.integration.test.mjs",
     "test:dependencies": "npm run build --workspace @sidekick/core && npm run build --workspace @sidekick/integrations",
@@ -43,12 +45,15 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "mcp": "npm --workspace @sidekick/api run mcp"
+    "mcp": "npm --workspace @sidekick/api run mcp",
+    "test:e2e": "npm run build && playwright test",
+    "test:runtime": "node --test scripts/runtime-check.test.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.58.2",
     "@types/node": "^22.15.30",
     "concurrently": "^9.1.2",
     "eslint": "^10.11.0",

@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { LoadError, LoadingStatus } from './LoadFeedback.js';
 
 export type YahooOAuthStatus = {
   clientConfigured: boolean;
@@ -11,6 +12,8 @@ export type YahooOAuthStatus = {
 type YahooConnectionSectionProps = {
   headingRef: Ref<HTMLHeadingElement>;
   status: YahooOAuthStatus;
+  statusLoading: boolean;
+  statusError: string;
   clientId: string;
   clientSecret: string;
   authorizationUrl: string;
@@ -22,12 +25,15 @@ type YahooConnectionSectionProps = {
   onAuthorize: () => void;
   onDisconnect: () => void;
   onCompleteAuthorization: () => void;
+  onRetryStatus: () => void;
 };
 
 /** Keep Yahoo's multi-step OAuth controls together and isolate them from general settings UI. */
 export function YahooConnectionSection({
   headingRef,
   status,
+  statusLoading,
+  statusError,
   clientId,
   clientSecret,
   authorizationUrl,
@@ -39,6 +45,7 @@ export function YahooConnectionSection({
   onAuthorize,
   onDisconnect,
   onCompleteAuthorization,
+  onRetryStatus,
 }: YahooConnectionSectionProps) {
   return (
     <section className="settings-card">
@@ -107,19 +114,23 @@ export function YahooConnectionSection({
           </button>
         )}
       </div>
-      <span
-        className={
-          status.authorized && !status.requiresReconnect
-            ? 'credential-status ready'
-            : 'credential-status'
-        }
-      >
-        {status.requiresReconnect
-          ? 'RECONNECT REQUIRED'
-          : status.authorized
-            ? 'AUTHORIZED'
-            : 'NOT CONNECTED'}
-      </span>
+      {statusLoading && <LoadingStatus message="Checking Yahoo connection status…" />}
+      {statusError && <LoadError message={statusError} onRetry={onRetryStatus} />}
+      {!statusLoading && !statusError && (
+        <span
+          className={
+            status.authorized && !status.requiresReconnect
+              ? 'credential-status ready'
+              : 'credential-status'
+          }
+        >
+          {status.requiresReconnect
+            ? 'RECONNECT REQUIRED'
+            : status.authorized
+              ? 'AUTHORIZED'
+              : 'NOT CONNECTED'}
+        </span>
+      )}
       {authorizationUrl && (
         <div className="settings-fields">
           <a href={authorizationUrl} target="_blank" rel="noreferrer">

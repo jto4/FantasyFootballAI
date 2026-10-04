@@ -15,12 +15,15 @@ npm start
 
 > **Showcase:** Sunday Sidekick is featured on Jimmy's project site at [sdeqst.app/projects/sunday-sidekick](https://www.sdeqst.app/projects/sunday-sidekick), with an overview, screenshots, and setup steps.
 
-> Early development: a desktop packaging pipeline now creates a bundled macOS, Windows, or Linux app, and the macOS ARM build has passed a packaged runtime smoke check. Version tags assemble platform packages and a SHA-256 manifest into a draft GitHub Release for manual review; public releases, code signing, Windows/Linux runtime checks, and platform lifecycle verification are still open. See the [implementation plan](docs/implementation-plan.md) and [task status](docs/tasks.md) for current gaps before connecting accounts or enabling automatic delivery.
+> Contributor preview: source and earlier native build checks are recorded in [current release status](docs/release-status.md) and the [support matrix](docs/support-matrix.md). Signed publication, live provider coverage, and owner-device installation/upgrade remain release gates. Earlier artifacts do not include the latest source changes.
 
 ## Requirements
 
-- Node.js 22.13 or newer and npm
+- [Node.js 22 LTS (22.13 minimum; use the version in `.nvmrc`)](https://nodejs.org/en/download) and npm
 - macOS, Windows, or Linux
+
+On Linux, install the `libsecret` development package before `npm ci`; see the
+[setup guide](docs/setup.md#local-development) for the Debian/Ubuntu package name.
 
 ## Start the development app
 
@@ -56,10 +59,11 @@ npm ci
 npm run desktop:make
 ```
 
-The installer is written to `apps/desktop/out/make/`. macOS ARM packaging and the bundled
-API/dashboard smoke check have been verified locally; Windows and Linux builds run through
-the dedicated GitHub Actions workflow and remain to be verified. Packages are currently
-unsigned, and this repository does not yet publish user-ready releases. Desktop Settings
+The installer is written to `apps/desktop/out/make/`. Apple Silicon macOS packaging and the
+bundled API/dashboard smoke check have been verified locally; the dedicated GitHub Actions
+workflow builds Intel macOS, Windows, and Linux packages. Packages are currently
+unsigned, and hosted Intel Mac verification is pending. This repository does not yet publish
+user-ready releases. Desktop Settings
 can enable launch at sign-in on macOS, Windows, and Linux and choose to start hidden in the
 tray on the next sign-in. Closing the desktop window hides it to the system tray while scheduled tasks continue. Use the tray menu to reopen the
 dashboard or choose **Quit Sunday Sidekick** to stop the local service. Headless background
@@ -71,7 +75,7 @@ Platform access must be authorized by the league owner. Sleeper uses its public 
 
 Compatible local AI clients can use the stdio MCP server and reusable skill. MCP sending is a separate tool and stays disabled until the owner opts in through Settings. See the [MCP setup guide](docs/mcp.md) for Claude Desktop, Cursor, and Visual Studio Code configuration examples and the current desktop-app limitation.
 
-See the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
+See [current release status](docs/release-status.md), the [support matrix](docs/support-matrix.md), [setup guide](docs/setup.md), [troubleshooting guide](docs/troubleshooting.md), [desktop release installation guide](docs/release-install.md), [maintainer release process](docs/release-process.md), [performance checks](docs/performance.md), [architecture](docs/architecture.md), [security policy](SECURITY.md), [contribution guide](CONTRIBUTING.md), and [MIT license](LICENSE).
 
 ## Development
 

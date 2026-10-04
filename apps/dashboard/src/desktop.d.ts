@@ -12,6 +12,14 @@ interface DesktopUpdateCheckResult {
   currentVersion: string;
   latestVersion?: string;
   message?: string;
+  nativeUpdateSupported?: boolean;
+  nativeUpdate?: DesktopNativeUpdateState;
+}
+
+interface DesktopNativeUpdateState {
+  state: 'idle' | 'unsupported' | 'checking' | 'current' | 'downloading' | 'downloaded' | 'error';
+  percent?: number;
+  message?: string;
 }
 
 interface Window {
@@ -23,6 +31,9 @@ interface Window {
     getDataDirectory(): Promise<string>;
     chooseDataDirectory(): Promise<DesktopDataDirectoryResult>;
     checkForUpdates(): Promise<DesktopUpdateCheckResult>;
+    getUpdateStatus(): Promise<DesktopNativeUpdateState>;
+    installUpdate(): Promise<boolean>;
+    onUpdateStatus(listener: (status: DesktopNativeUpdateState) => void): () => void;
     openReleasePage(): Promise<void>;
   };
 }

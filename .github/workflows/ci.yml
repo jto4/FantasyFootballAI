@@ -52,7 +52,7 @@ jobs:
         run: node scripts/performance-smoke.mjs
 
       - name: Upload minimum-runtime performance sample
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: performance-macos-node-22.13
           path: performance-macos-node-22.13.json
@@ -72,7 +72,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install Linux credential-store dependencies
@@ -109,6 +109,12 @@ jobs:
       - name: Build production app
         run: npm run build
 
+      - name: Install Chromium for browser journeys
+        run: npx playwright install --with-deps chromium
+
+      - name: Exercise desktop and mobile browser journeys
+        run: npx playwright test
+
       - name: Start Linux user systemd manager
         if: runner.os == 'Linux'
         run: |
@@ -140,7 +146,7 @@ jobs:
         run: node scripts/performance-smoke.mjs
 
       - name: Upload platform performance sample
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: performance-${{ runner.os }}-node-22
           path: performance-${{ runner.os }}-node-22.json
@@ -160,12 +166,12 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install Linux package tools
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install --yes fakeroot dpkg-dev xvfb libsecret-1-dev
+        run: sudo apt-get update && sudo apt-get install --yes fakeroot dpkg-dev rpm xvfb libsecret-1-dev
 
       - name: Install dependencies
         run: npm ci

@@ -2,21 +2,24 @@
 
 This guide applies to published, signed Sunday Sidekick releases. Current desktop artifacts
 are unsigned and are still in pre-release verification; do not bypass operating-system
-publisher warnings to install an unsigned package. macOS ARM is the only package verified
-locally, and Windows/Linux interactive installation has not yet been verified.
+publisher warnings to install an unsigned package. Apple Silicon is the only Mac package
+verified locally; hosted Intel Mac packaging verification and Windows/Linux interactive
+installation remain outstanding.
 
 ## Choose the package for your computer
 
-Download the platform ZIP and `SHA256SUMS` from the same GitHub Release. Extract the ZIP and
+Download the platform ZIP matching your operating system and architecture and `SHA256SUMS`
+from the same GitHub Release. Extract the ZIP and
 follow the platform steps below. The ZIP contains this install guide, the MIT license, and the
 native installer artifacts for that platform.
 
-- **macOS:** Open the `.dmg` and drag Sunday Sidekick to Applications. Launch it from
-  Applications. A signed and notarized release is required for the normal Gatekeeper flow.
+- **macOS:** Download the ZIP matching your processor: ARM64 for Apple Silicon or x64 for
+  Intel. Open its `.dmg` and drag Sunday Sidekick to Applications. Launch it from Applications.
+  A signed and notarized release is required for the normal Gatekeeper flow.
 - **Windows:** Run `Setup.exe` from the extracted package. The Squirrel installer installs
   the app for the current user.
-- **Linux:** For Debian or Ubuntu, open the `.deb` package with the desktop package installer.
-  Other Linux distributions are not yet verified.
+- **Linux:** Choose the `.deb` package for Debian or Ubuntu, or the `.rpm` package for Fedora
+  or RHEL-compatible distributions. Other Linux distributions are not yet verified.
 
 The package checksum detects accidental corruption or incomplete downloads, but it does not
 authenticate the publisher. Compare the selected ZIP against its entry in `SHA256SUMS` using
@@ -35,15 +38,26 @@ In Settings, enable **Launch at sign-in** to start the app in the background whe
 Closing the dashboard window hides the app to the system tray; choose **Quit Sunday Sidekick**
 from the tray menu to stop scheduled work.
 
+For scripted or headless desktop use, launch the packaged executable with
+`--sidekick-headless`. This starts the local API and scheduled work without opening a dashboard
+or tray icon. The service remains bound to loopback. Send SIGINT or SIGTERM to stop it cleanly
+on macOS and Linux. A regular launch using the same user-data directory can open the dashboard
+in the existing headless app process. This advanced mode is smoke-tested in the macOS package;
+Windows and Linux device lifecycle verification remains outstanding.
+
 ## Check for updates
 
 In the desktop app, open **Settings → Desktop updates** and choose **Check for updates**. The
-check asks GitHub for the latest published stable release; it sends no league, profile, or
-credential data. When an update is available, choose **View version** to open the official
-release page in your browser, then download and install the package for your operating system
-using the steps above. Back up local data before installing.
+check sends only the app version to GitHub. If a newer stable release exists, signed macOS and
+Windows packages check Electron's public update feed and download the update in the background.
+Sunday Sidekick asks before restarting to apply it; it never restarts automatically. If the
+native updater is unavailable, **View version** opens the official release page for a manual
+install. Linux updates use the distribution package or a manual release download.
 
-Downloads are installed manually; the app does not silently replace or restart itself. The
-repository still needs a published signed release, and interactive installation, upgrade, data
-folder migration, background-service, and credential-storage checks on each supported operating
-system before claiming full platform support.
+The updater sends the app version, operating system, and architecture to Electron's update
+service and downloads the matching public release asset. It does not send league, profile,
+message, or credential data. macOS automatic updates require a signed app; tagged releases also
+need the Squirrel.Windows `RELEASES`, full package, and installer assets. There is no public
+stable signed release yet, so automatic updates cannot be verified end to end. Interactive
+installation, upgrade, data-folder migration, background-service, and credential-storage checks
+on each supported operating system are still required before claiming full platform support.

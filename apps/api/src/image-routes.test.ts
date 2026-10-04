@@ -71,6 +71,31 @@ describe('image API routes', () => {
     expect(generateImage).not.toHaveBeenCalled();
   });
 
+  it('selects the Stability credential only for a validated Stability request', async () => {
+    const readImageGenerationKey = vi.fn(async (provider: 'openai' | 'stability') =>
+      provider === 'stability' ? 'stability-key' : undefined,
+    );
+    const generateImage = vi.fn(async () => ({ src: 'https://images.example.test/result.png' }));
+    const baseUrl = await startServer({ readImageGenerationKey, generateImage });
+
+    const unsupported = await fetch(`${baseUrl}/api/images`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt: 'A logo', provider: 'custom' }),
+    });
+    expect(unsupported.status).toBe(400);
+    expect(readImageGenerationKey).not.toHaveBeenCalled();
+
+    const stability = await fetch(`${baseUrl}/api/images`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt: 'A logo', provider: 'stability' }),
+    });
+    expect(stability.status).toBe(200);
+    expect(readImageGenerationKey).toHaveBeenCalledWith('stability');
+    expect(generateImage).toHaveBeenCalledWith('stability-key', 'A logo', 'stability');
+  });
+
   it('stores generated data images and serves, downloads, lists, and deletes them', async () => {
     const imageBytes = Buffer.from('bounded generated image bytes');
     const baseUrl = await startServer({
