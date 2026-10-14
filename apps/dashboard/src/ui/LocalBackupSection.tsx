@@ -1,3 +1,6 @@
+import { requestResponse, readJsonResponse } from './api-client';
+import { isSafetyBackupList, isBackupValidation } from './operations-data';
+import { isAppSettings, record } from '@sidekick/core';
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import { Download, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import type { AppSettings } from '@sidekick/core';
@@ -24,10 +27,10 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
     setSafetyBackupsLoading(true);
     setSafetyBackupsError('');
     try {
-      const response = await fetch('/api/backups');
+      const response = await requestResponse('/api/backups');
       if (!response.ok)
         throw new Error(`Could not read local safety backups (${response.status}).`);
-      const backups = (await response.json()) as SafetyBackup[];
+      const backups = await readJsonResponse(response, isSafetyBackupList);
       if (!Array.isArray(backups)) throw new Error('The local safety backup list was invalid.');
       setSafetyBackups(backups);
     } catch (error) {
@@ -55,16 +58,19 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
     setBackupBusy(true);
     onNotice('Encrypting local backup…');
     try {
-      const response = await fetch('/api/backup/export', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ passphrase: backupPassphrase }),
-      });
-      if (!response.ok) {
-        const result = (await response.json()) as { error?: string };
-        throw new Error(result.error ?? 'Could not create a local backup.');
-      }
+      const response = await requestResponse(
+        '/api/backup/export',
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ passphrase: backupPassphrase }),
+        },
+        180000,
+      );
+
       const backup = await response.blob();
+      if (backup.size > 201 * 1024 * 1024)
+        throw new Error('The backup exceeds the download size limit.');
       const url = URL.createObjectURL(backup);
       const link = document.createElement('a');
       link.href = url;
@@ -87,16 +93,22 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
 
   async function deleteSafetyBackup(name: string) {
     if (!window.confirm(`Permanently delete safety backup ${name}?`)) return;
-    const response = await fetch(`/api/backups/${encodeURIComponent(name)}`, { method: 'DELETE' });
-    if (!response.ok) {
-      onNotice('Could not delete that safety backup.');
-      return;
+    try {
+      const response = await requestResponse(`/api/backups/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        onNotice('Could not delete that safety backup.');
+        return;
+      }
+      setSafetyBackups((backups) => backups.filter((backup) => backup.name !== name));
+      onNotice('Safety backup deleted from this computer.');
+    } catch (error) {
+      onNotice(error instanceof Error ? error.message : 'Could not delete safety backup.');
     }
-    setSafetyBackups((backups) => backups.filter((backup) => backup.name !== name));
-    onNotice('Safety backup deleted from this computer.');
   }
 
-  async function restoreBackup(event: ChangeEvent<HTMLInputElement>) {
+  async function restoreBackup(event: ChangeEvent<HTMLInputElement>, validateOnly = false) {
     const backup = event.currentTarget.files?.[0];
     event.currentTarget.value = '';
     if (!backup) return;
@@ -104,38 +116,70 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
       onNotice('Choose a backup file no larger than 201 MB.');
       return;
     }
-    const confirmed = window.confirm(
-      'Restore this backup? Current settings, leagues, reports, member memory, scheduled history, and generated images will be replaced. Automatic actions will return to draft mode; custom AI endpoints and local CLI runtimes will return to the default until you review and save those settings. A safety copy of the current database will be kept in the local backups folder.',
-    );
+    const confirmed =
+      validateOnly ||
+      window.confirm(
+        'Restore this backup? Current settings, leagues, reports, member memory, scheduled history, and generated images will be replaced. Automatic actions will return to draft mode; custom AI endpoints and local CLI runtimes will return to the default until you review and save those settings. A safety copy of the current database will be kept in the local backups folder.',
+      );
     if (!confirmed) return;
 
     setBackupBusy(true);
-    onNotice('Validating and restoring backup…');
+    onNotice(
+      validateOnly
+        ? 'Validating backup without changing current data…'
+        : 'Validating and restoring backup…',
+    );
     try {
-      const response = await fetch('/api/backup', {
-        method: 'PUT',
-        headers: {
-          'content-type': backup.name.toLowerCase().endsWith('.ssb')
-            ? 'application/vnd.sunday-sidekick.encrypted-backup'
-            : backup.name.toLowerCase().endsWith('.zip')
-              ? 'application/vnd.sunday-sidekick.backup'
-              : 'application/vnd.sqlite3',
-          ...(restorePassphrase
-            ? { 'x-sidekick-backup-passphrase': encodeURIComponent(restorePassphrase) }
-            : {}),
+      const response = await requestResponse(
+        validateOnly ? '/api/backup/validate' : '/api/backup',
+        {
+          method: validateOnly ? 'POST' : 'PUT',
+          headers: {
+            'content-type': backup.name.toLowerCase().endsWith('.ssb')
+              ? 'application/vnd.sunday-sidekick.encrypted-backup'
+              : backup.name.toLowerCase().endsWith('.zip')
+                ? 'application/vnd.sunday-sidekick.backup'
+                : 'application/vnd.sqlite3',
+            ...(restorePassphrase
+              ? { 'x-sidekick-backup-passphrase': encodeURIComponent(restorePassphrase) }
+              : {}),
+          },
+          body: backup,
         },
-        body: backup,
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? 'Could not restore this backup.');
+        180000,
+      );
+      if (validateOnly) {
+        const result = await readJsonResponse(response, isBackupValidation);
+        onNotice(
+          'Backup validated: ' +
+            result.leagues +
+            ' leagues, ' +
+            result.reports +
+            ' reports, ' +
+            result.profiles +
+            ' profiles, ' +
+            result.images +
+            ' images. Current data was preserved.',
+        );
+        return;
+      }
+      const result = await readJsonResponse(
+        response,
+        (value): value is { restored: true; settings: AppSettings; safetyCopy: string } =>
+          record(value) &&
+          value.restored === true &&
+          isAppSettings(value.settings) &&
+          typeof value.safetyCopy === 'string' &&
+          !/[\\/\r\n]/.test(value.safetyCopy),
+      );
       const restoredSettings = result.settings as AppSettings;
       onSettingsRestored({
         ...restoredSettings,
         actions: normalizeActionSettings(restoredSettings.actions),
       });
       await onRestored();
-      const backupsResponse = await fetch('/api/backups');
-      if (backupsResponse.ok) setSafetyBackups(await backupsResponse.json());
+      const backupsResponse = await requestResponse('/api/backups');
+      setSafetyBackups(await readJsonResponse(backupsResponse, isSafetyBackupList));
       onNotice(
         `Backup restored. Review AI and delivery settings before enabling automation. Safety copy: ${result.safetyCopy}`,
       );
@@ -151,7 +195,9 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
     <section className="settings-card">
       <div className="settings-card-title">
         <div>
-          <h2>Local backup and restore</h2>
+          <h2 data-search-target="local-backup" tabIndex={-1}>
+            Local backup and restore
+          </h2>
           <p>
             Download or restore a consistent backup of your database and generated image library.
             Older SQLite-only backups remain supported. Provider secrets stay in the operating
@@ -197,6 +243,17 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
         >
           <Download size={14} /> Download backup
         </button>
+        <label className="small-button backup-restore-label" data-search-target="validate-backup">
+          <ShieldCheck size={14} /> Validate backup
+          <input
+            type="file"
+            className="backup-file-input"
+            accept=".ssb,.zip,.sqlite"
+            onChange={(event) => void restoreBackup(event, true)}
+            disabled={backupBusy}
+            aria-label="Choose a backup to validate without restoring"
+          />
+        </label>
         <label className="small-button backup-restore-label">
           <Upload size={14} /> Restore backup
           <input
@@ -209,17 +266,19 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
           />
         </label>
       </div>
-      <label className="backup-passphrase-restore">
-        Passphrase for encrypted backup
-        <input
-          type="password"
-          autoComplete="current-password"
-          maxLength={200}
-          value={restorePassphrase}
-          onChange={(event) => setRestorePassphrase(event.target.value)}
-          placeholder="Only needed for .ssb backups"
-        />
-      </label>
+      <div className="settings-fields backup-passphrase-restore">
+        <label>
+          Passphrase for encrypted backup
+          <input
+            type="password"
+            autoComplete="current-password"
+            maxLength={200}
+            value={restorePassphrase}
+            onChange={(event) => setRestorePassphrase(event.target.value)}
+            placeholder="Only needed for .ssb backups"
+          />
+        </label>
+      </div>
       {safetyBackupsLoading && <LoadingStatus message="Loading local safety backups…" />}
       {safetyBackupsError && (
         <LoadError message={safetyBackupsError} onRetry={() => void refreshSafetyBackups()} />

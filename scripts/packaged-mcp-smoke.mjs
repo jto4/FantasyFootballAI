@@ -33,8 +33,7 @@ const app = spawn(executable, [...runtimeArguments, '--sidekick-mcp'], {
   env: {
     ...process.env,
     SIDEKICK_USER_DATA_DIR: dataDirectory,
-    HOME: dataDirectory,
-    USERPROFILE: dataDirectory,
+    SIDEKICK_VERIFICATION_ROOT: dataDirectory,
   },
 });
 let stderr = '';

@@ -390,3 +390,33 @@ report bodies. Dashboard shell/assets fetched in 4 ms locally. RSS checkpoints w
 after startup, 122.3 MiB after state reads, and 123.8, 126.4, and 126.7 MiB after reports
 1, 5, and 10. These are single-host synthetic measurements; they exclude live provider sync,
 real model inference, browser paint, slower hardware, and native-platform release validation.
+
+## Local operations sample recorded on 2026-10-05
+
+macOS ARM / Node 22.23.3, the same synthetic eight-league fixture (96 teams, 80 profiles,
+4.53 MiB of conversation source text, 300 reports), 30 request samples and ten fixed-CLI reports:
+startup 173 ms; health p50/p95 0.50/1.05 ms; full state 2.44/3.93 ms; dashboard summary
+2.64/3.42 ms; synthetic report generation 39.49/48.50 ms; summary payload 160.9 KiB versus
+465.3 KiB full state; API working set 129.7 MiB after ten reports. The measured dashboard
+assets were 475.3 KiB. These are local observations, not release thresholds, and exclude live
+providers, browser painting, slower hardware, and long-running resource behavior.
+
+## Context model observations — October 12, 2026
+
+A cold current public Rams–Bills moneyline preparation took 4.28 seconds with
+new pregame context; subsequent spread/total calls took approximately 169 ms and
+1.162 seconds. Full four-season production replay took 77.98 seconds under
+concurrent test load. These are scoped observations on this machine, not provider
+latency promises. Provider enrichment has a combined 60-second budget, individual
+bounded timeouts/responses and six-hour history caching; the historical worker
+retains a separate 120-second limit. See the [context review](reviews/2026-10-12-model-v4-comparison.md).
+
+## Personnel research versus production work
+
+The complete public-data/pregame/current-price/numeric lifecycle took 58.81 seconds
+in a cold check under simultaneous research/browser load, including historical
+personnel downloads. Earlier checks using a prepared local history are not
+comparable. Since those corrections were rejected, production history now skips
+the bulk QB/snap corpus; current descriptive roles load only two relevant seasons
+with six-hour bounded caches. Full historical role loading is research-only.
+Provider failures and partial weather coverage remain visible.

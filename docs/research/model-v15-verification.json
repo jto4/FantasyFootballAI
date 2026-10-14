@@ -1,0 +1,28 @@
+{
+  "verifiedAt": "2026-10-13T22:04:30.863Z",
+  "checks": {
+    "tests": "842 workspace tests plus root suites passed under supported Node 22; seven new tests rerun after optional-field fixture typing cleanup",
+    "typecheck": "all passed after test fixture typing cleanup; frozen model/source unchanged",
+    "lint": "all passed; final added test/replay script lint also passed",
+    "format": "all passed",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "replay": "Freshly decompressed original data and retained direction patch reconstruct corrected snapshot byte-for-byte. All three policy audits then reproduce every probability, metric and row; only scoredAt differs. No raw-response or network dependency for replay.",
+  "preserved": "Original v11-v14 source records, parent settings/audit and v6/v11 issued forecast seals unchanged. Legacy parser defect disclosed, not silently overwritten.",
+  "canonicalEvidence": "117,536 normalized Kalshi rows joined to original SHA-verified raw responses; canonical same-bit pairs agree; 70,673 directions corrected. Polymarket records and other source fields unchanged.",
+  "manualReview": "Scoped ordinary manual code/security review of provider semantics, raw identity/time/size/price/hash joins, bounded data/patch input, canonical schema marker, pre-cap aggregation and size classification, temporal eligibility, prior-only feedback, frozen parameters and exact non-total dispatch. No automated security scan or market-data/credential/configuration/wager/owner-journal action.",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "patchSha256": "760350ef5570225e0fa3c47c4f0637cac4a787b7f5668a290fa2d5a1357719af",
+  "diagnosisSha256": "02e655d0b685240844e6bf95c54c6ce0d4bcf081e1b61b64ad3d939a6f0c77aa",
+  "frozenSettingsSha256": "8f9eb8c4899cd4051a452ee27e8a958c28252fe9af5d4459b3124db95fd19046",
+  "auditSha256": "615af92cf6d5bf07cccba79383cf1347fd05711ce961fa2c30685389cfd04b67",
+  "repairReplayScriptSha256": "9e408b8e0b46f753c3823f512000882c331f2912ab22d16b33e7e3907993d247",
+  "nonTotalMaximumProductionDifference": {
+    "direction-fix-only": 0,
+    "innovation": 0,
+    "confirmed": 0
+  }
+}

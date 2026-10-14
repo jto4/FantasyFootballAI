@@ -112,6 +112,33 @@ const request = {
   kind: 'power-rankings' as const,
 };
 describe('durable workflow boundaries', () => {
+  it('cancels queued work without calling AI and blocks late results from cancelled running work', async () => {
+    const f = await fixture();
+    f.hold();
+    await f.queue.enqueue(request);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(f.calls()).toBe(1);
+    const queued = { ...request, requestId: 'queued-cancel-request' };
+    await f.queue.enqueue(queued);
+    expect((await f.queue.cancel(queued.requestId)).status).toBe('cancelled');
+    expect((await f.queue.cancel(request.requestId)).status).toBe('cancelled');
+    expect((await f.queue.wait(request.requestId)).status).toBe('cancelled');
+    f.release();
+    await f.queue.idle();
+    expect(f.calls()).toBe(1);
+    expect(f.store.snapshot().reports).toEqual([]);
+    expect((await f.queue.enqueue(request)).status).toBe('cancelled');
+    expect((await f.queue.cancel(request.requestId)).status).toBe('cancelled');
+    await expect(f.queue.cancel('unknown-request-id')).rejects.toThrow('not found');
+  });
+  it('keeps a completed request and its saved report when cancellation arrives late', async () => {
+    const f = await fixture();
+    await f.queue.enqueue(request);
+    const completed = await f.queue.wait(request.requestId);
+    expect(completed.status).toBe('completed');
+    expect(await f.queue.cancel(request.requestId)).toEqual(completed);
+    expect(f.store.snapshot().reports).toHaveLength(1);
+  });
   it('deduplicates concurrent request IDs and atomically links one persisted report', async () => {
     const f = await fixture();
     f.hold();

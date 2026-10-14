@@ -438,6 +438,8 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     projections: 0,
     runs: 0,
     jobs: 0,
+    advice: 0,
+    predictions: 0,
   };
   const rawRecords = {
     leagues: [],
@@ -446,6 +448,8 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     playerProjections: [],
     scheduledRuns: [],
     generationJobs: [],
+    adviceResults: [],
+    predictionRecords: [],
   };
 
   try {
@@ -480,6 +484,8 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
       player_projections: legacyState?.playerProjections,
       scheduled_runs: legacyState?.scheduledRuns,
       generation_jobs: legacyState?.generationJobs,
+      advice_results: legacyState?.adviceResults,
+      prediction_records: legacyState?.predictionRecords,
     };
     const sourceTables = {
       leagues: 'leagues',
@@ -488,12 +494,20 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
       playerProjections: 'player_projections',
       scheduledRuns: 'scheduled_runs',
       generationJobs: 'generation_jobs',
+      archivedGenerationJobs: 'archived_generation_jobs',
+      adviceResults: 'advice_results',
+      predictionRecords: 'prediction_records',
     };
     for (const [target, table] of Object.entries(sourceTables)) {
       const skippedKey =
-        { playerProjections: 'projections', scheduledRuns: 'runs', generationJobs: 'jobs' }[
-          target
-        ] ?? target;
+        {
+          playerProjections: 'projections',
+          scheduledRuns: 'runs',
+          generationJobs: 'jobs',
+          archivedGenerationJobs: 'jobs',
+          adviceResults: 'advice',
+          predictionRecords: 'predictions',
+        }[target] ?? target;
       if (tables.has(table)) {
         try {
           const rows = database
@@ -512,7 +526,9 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
                 skipped[skippedKey] += 1;
                 continue;
               }
-              rawRecords[target].push(value);
+              rawRecords[target === 'archivedGenerationJobs' ? 'generationJobs' : target].push(
+                value,
+              );
             } catch {
               skipped[skippedKey] += 1;
             }
@@ -521,7 +537,11 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
           // Keep rows read before a damaged page; a broken table must not discard other tables.
         }
       }
-      if (!rawRecords[target].length && Array.isArray(legacyArrays[table])) {
+      if (
+        target !== 'archivedGenerationJobs' &&
+        !rawRecords[target].length &&
+        Array.isArray(legacyArrays[table])
+      ) {
         rawRecords[target] = legacyArrays[table].filter(
           (value) => value && typeof value === 'object' && !Array.isArray(value),
         );
@@ -572,6 +592,7 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     playerProjections: [],
     scheduledRuns: [],
     generationJobs: [],
+    adviceResults: [],
   };
   const uniqueLeagues = uniqueRecords(rawRecords.leagues);
   skipped.leagues += rawRecords.leagues.length - uniqueLeagues.length;
@@ -627,6 +648,23 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
       skipped.jobs++;
     }
   }
+  for (const advice of uniqueRecords(rawRecords.adviceResults)) {
+    try {
+      validateState({ ...state, adviceResults: [...state.adviceResults, advice] });
+      state.adviceResults.push(advice);
+    } catch {
+      skipped.advice++;
+    }
+  }
+  state.predictionRecords ??= [];
+  for (const prediction of uniqueRecords(rawRecords.predictionRecords)) {
+    try {
+      validateState({ ...state, predictionRecords: [...state.predictionRecords, prediction] });
+      state.predictionRecords.push(prediction);
+    } catch {
+      skipped.predictions++;
+    }
+  }
   const salvaged = validateState(state);
   const counts = {
     leagues: salvaged.leagues.length,
@@ -635,6 +673,8 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     projections: salvaged.playerProjections.length,
     runs: salvaged.scheduledRuns.length,
     jobs: salvaged.generationJobs.length,
+    advice: salvaged.adviceResults.length,
+    predictions: salvaged.predictionRecords.length,
     skipped: Object.values(skipped).reduce((sum, count) => sum + count, 0),
   };
   const recoveredRecords =
@@ -643,7 +683,9 @@ export async function salvageDamagedDatabase(dataDirectory, internalRecovery = {
     counts.memories +
     counts.projections +
     counts.runs +
-    counts.jobs;
+    counts.jobs +
+    counts.advice +
+    counts.predictions;
   if (recoveredRecords === 0 && (!isRecord(rawSettings) || Object.keys(rawSettings).length === 0))
     throw new Error('No independently valid Sunday Sidekick records could be salvaged.');
 

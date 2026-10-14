@@ -1,17 +1,31 @@
+import { useWorkspaceRoute } from './hooks/useWorkspaceRoute';
 import { useLiveDashboard } from './hooks/useLiveDashboard';
 import { requestJson } from './api-client';
 import {
   isGenerationJob,
   isGenerationRequest,
   isSavedReport,
+  scheduleRecommendations,
   type GenerationRequest,
   type ReportKind,
 } from '@sidekick/core';
 import { Dialog } from './Dialog';
+import { GuidedAISetup } from './GuidedAISetup';
+import { ReportComposer } from './ReportComposer';
+import { FriendlyError } from './FriendlyError';
+import { WorkspaceSearch } from './WorkspaceSearch';
+import { HomeStatus } from './HomeStatus';
+import { WeeklyHome } from './WeeklyHome';
+import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
+import type { SchedulePrefill } from './ScheduleEditor';
+import type { SearchTask } from './search-tasks';
+import type { SearchDestination } from './search-catalog';
+import { readSetupProgress, saveSetupProgress } from './setup-progress';
+import type { ActionSetting } from '@sidekick/core';
 import { LeagueDesk } from './LeagueDesk';
 import { ReportsPage, type SendPreview } from './ReportsPage';
 
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   CalendarDays,
   ChevronDown,
@@ -22,11 +36,18 @@ import {
   Power,
   Settings,
   ShieldCheck,
+  Sparkles,
   Users,
   Zap,
 } from 'lucide-react';
-import { espnSeasonBounds, parseLeagueInput, type Platform } from '@sidekick/core';
+import {
+  espnSeasonBounds,
+  parseLeagueInput,
+  detectLeagueLink,
+  type Platform,
+} from '@sidekick/core';
 import { SettingsPage } from './SettingsPage';
+import { ThemeSwitch } from './Appearance';
 import { SetupWizard } from './SetupWizard';
 import { MemoryPage } from './MemoryPage';
 import { resolveActiveLeague } from './league-selection';
@@ -45,32 +66,92 @@ import {
   type CredentialProvider,
   type NewsSnapshot,
 } from './app-state';
+const HelpPage = lazy(() => import('./HelpPage').then((module) => ({ default: module.HelpPage })));
+const AdvicePage = lazy(() =>
+  import('./AdvicePage').then((module) => ({ default: module.AdvicePage })),
+);
+const SampleExperience = lazy(() =>
+  import('./SampleExperience').then((module) => ({ default: module.SampleExperience })),
+);
+const ScheduleEditor = lazy(() =>
+  import('./ScheduleEditor').then((module) => ({ default: module.ScheduleEditor })),
+);
+const DeliveryTask = lazy(() =>
+  import('./DeliveryTask').then((module) => ({ default: module.DeliveryTask })),
+);
 const menu = [
-  { label: 'League desk', icon: Home },
-  { label: 'Leagues', icon: Users },
-  { label: 'Schedule', icon: CalendarDays },
-  { label: 'Reports', icon: FileText },
-  { label: 'Members & memory', icon: MessageCircle },
-  { label: 'Imports', icon: FileText },
-  { label: 'Settings', icon: Settings },
+  { section: 'League desk', label: 'Home', icon: Home },
+  { section: 'Advice', label: 'Advice', icon: Sparkles },
+  { section: 'Reports', label: 'Reports', icon: FileText },
+  { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
+  { section: 'Settings', label: 'Settings', icon: Settings },
+];
+const tools = [
+  { section: 'Leagues', label: 'Leagues', icon: Users },
+  { section: 'Members & memory', label: 'League members', icon: MessageCircle },
+  { section: 'Imports', label: 'Imports', icon: FileText },
+  { section: 'Help', label: 'Help', icon: CircleHelp },
 ];
 
 export function App() {
+  const [verificationMode] = useState(
+    () => typeof window !== 'undefined' && window.sidekickDesktop?.isVerificationMode?.() === true,
+  );
+  const [setupProgress] = useState(readSetupProgress);
+  const [sampleOpen, setSampleOpen] = useState(false);
+  const [scheduleEditor, setScheduleEditor] = useState<{
+    kind: ActionSetting['kind'];
+    prefill?: SchedulePrefill;
+  } | null>(null);
+  const [deliveryTask, setDeliveryTask] = useState<Extract<
+    SearchTask,
+    { type: 'delivery' }
+  > | null>(null);
+  const [scheduleDirty, setScheduleDirty] = useState(false);
+  const [adviceDirty, setAdviceDirty] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!sidebarRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry)
+        document.documentElement.style.setProperty(
+          '--sidekick-nav-height',
+          `${entry.target.getBoundingClientRect().height}px`,
+        );
+    });
+    observer.observe(sidebarRef.current);
+    return () => observer.disconnect();
+  }, []);
   const [state, setState] = useState<AppState>(initialAppState);
-  const [activeLeagueId, setActiveLeagueId] = useState(() => {
-    try {
-      return window.localStorage.getItem('sidekick.activeLeagueId') ?? '';
-    } catch {
-      return '';
-    }
-  });
   const [news, setNews] = useState<NewsSnapshot>({ items: [], stale: true });
   const [credentialProviders, setCredentialProviders] = useState<CredentialProvider[]>([]);
   const [testedRuntimeSignature, setTestedRuntimeSignature] = useState('');
-  const [section, setSection] = useState('League desk');
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [reportDirty, setReportDirty] = useState(false);
-  const [initialReviewId, setInitialReviewId] = useState('');
+  const [settingsNavigationKey, setSettingsNavigationKey] = useState(0);
+  const [searchFocusRevision, setSearchFocusRevision] = useState(0);
+  const { route, update: updateRoute } = useWorkspaceRoute(() => {
+    if (
+      (settingsDirty || reportDirty || scheduleDirty || adviceDirty) &&
+      !window.confirm('Discard unsaved changes before leaving this page?')
+    )
+      return false;
+    if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
+    setSettingsDirty(false);
+    setReportDirty(false);
+    setScheduleDirty(false);
+    setAdviceDirty(false);
+    setScheduleEditor(null);
+    setDeliveryTask(null);
+    return true;
+  });
+  const { section, leagueId: activeLeagueId, reportId: initialReviewId } = route;
+  useEffect(() => {
+    if (tools.some((tool) => tool.section === section)) setShowTools(true);
+  }, [section]);
+  const setSection = (section: string) => updateRoute({ section });
+  const setActiveLeagueId = (leagueId: string) => updateRoute({ leagueId, reportId: '' });
+  const setInitialReviewId = (reportId: string) => updateRoute({ reportId }, false, false);
   const [generatingKind, setGeneratingKind] = useState('');
   const [pendingGeneration, setPendingGeneration] = useState<GenerationRequest | null>(() => {
     try {
@@ -104,43 +185,76 @@ export function App() {
     setPendingGeneration(null);
     if (pendingJob.status === 'completed' && pendingJob.reportId) {
       setNotice('New draft added to your review queue.');
-      setInitialReviewId(pendingJob.reportId);
       setSetupInProgress(false);
-      if (!settingsDirty && !reportDirty) setSection('Reports');
+      if (!settingsDirty && !reportDirty && !scheduleDirty && !adviceDirty)
+        updateRoute({ section: 'Reports', reportId: pendingJob.reportId }, false, false);
     } else
-      setNotice(pendingJob.error ?? 'Generation needs attention. Check Reports before retrying.');
-  }, [pendingJob?.id, pendingJob?.status, settingsDirty, reportDirty]);
+      showFailure(
+        'Your report couldn’t be created. Open Reports to check its saved progress before trying again.',
+        pendingJob.error,
+        'reports',
+      );
+  }, [pendingJob?.id, pendingJob?.status, settingsDirty, reportDirty, scheduleDirty, adviceDirty]);
   const generatingRef = useRef(false);
-  const [setupInProgress, setSetupInProgress] = useState(false);
+  const [setupInProgress, setSetupInProgress] = useState(setupProgress?.inProgress ?? false);
   function navigate(next: string) {
-    if (next === section) return;
-    if (
-      (settingsDirty || reportDirty) &&
-      !window.confirm('Discard unsaved changes before leaving this page?')
-    )
-      return;
-    setSettingsDirty(false);
-    setReportDirty(false);
     setSection(next);
   }
   const [settingsFocusTarget, setSettingsFocusTarget] = useState<
     'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null
   >(null);
   const [modal, setModal] = useState(false);
+  const [connectionError, setConnectionError] = useState('');
+  const [composerKind, setComposerKind] = useState<ReportKind | null>(null);
+  const [setupBusy, setSetupBusy] = useState(false);
+  const [aiCheckError, setAiCheckError] = useState('');
+  const [aiChecking, setAiChecking] = useState(false);
+  const [aiCredentialRevision, setAiCredentialRevision] = useState(0);
+  const [showTools, setShowTools] = useState(false);
   const [setupWizardOpen, setSetupWizardOpen] = useState(false);
-  const [setupWizardStep, setSetupWizardStep] = useState(0);
+  const [setupWizardStep, setSetupWizardStep] = useState(setupProgress?.step ?? 0);
   const setupWizardTriggerRef = useRef<HTMLButtonElement>(null);
   const setupWizardCloseRef = useRef<HTMLButtonElement>(null);
-  const [platform, setPlatform] = useState('sleeper');
-  const [leagueId, setLeagueId] = useState('');
-  const [espnSeason, setEspnSeason] = useState(new Date().getFullYear());
+  const [platform, setPlatform] = useState(setupProgress?.platform ?? 'sleeper');
+  const [leagueId, setLeagueId] = useState(setupProgress?.leagueInput ?? '');
+  const [espnSeason, setEspnSeason] = useState(setupProgress?.season ?? new Date().getFullYear());
+  useEffect(() => {
+    saveSetupProgress({
+      inProgress: setupInProgress,
+      step: setupWizardStep,
+      platform,
+      season: espnSeason,
+      leagueInput: leagueId,
+    });
+  }, [setupInProgress, setupWizardStep, platform, espnSeason, leagueId]);
+  useEffect(() => {
+    if (!scheduleDirty || verificationMode) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [scheduleDirty, verificationMode]);
   const [busy, setBusy] = useState(false);
   const [refreshingLeagueId, setRefreshingLeagueId] = useState('');
   const [disconnectingLeagueId, setDisconnectingLeagueId] = useState('');
   const [refreshingNews, setRefreshingNews] = useState(false);
   const [retryingRunId, setRetryingRunId] = useState('');
   const [sendingReportId, setSendingReportId] = useState('');
-  const [notice, setNotice] = useState('');
+  const [noticeInfo, setNoticeInfo] = useState({ message: '', detail: '', action: '' });
+  const notice = noticeInfo.message;
+  function setNotice(value: string | ((current: string) => string)) {
+    setNoticeInfo((current) =>
+      typeof value === 'function'
+        ? { ...current, message: value(current.message) }
+        : { message: value, detail: '', action: '' },
+    );
+  }
+  function showFailure(message: string, error: unknown, action = 'retry') {
+    setNoticeInfo({
+      message,
+      detail: error instanceof Error ? error.message : typeof error === 'string' ? error : '',
+      action,
+    });
+  }
   const [stateLoaded, setStateLoaded] = useState(false);
   const [stateLoading, setStateLoading] = useState(true);
   const [stateLoadError, setStateLoadError] = useState('');
@@ -148,10 +262,28 @@ export function App() {
     'checking' | 'running' | 'stopping' | 'stopped' | 'unavailable'
   >('checking');
   const league = resolveActiveLeague(state.leagues, activeLeagueId);
+  const [teamSelections, setTeamSelections] = useState(readTeamSelections);
+  const homeTeamId = selectedTeamId(league, teamSelections);
+  function chooseTeam(id: string) {
+    if (!league?.teams.some((team) => team.id === id)) return;
+    const next = Object.fromEntries([
+      ...Object.entries(teamSelections)
+        .filter(([key]) => key !== league.id)
+        .slice(-99),
+      [league.id, id],
+    ]);
+    void saveTeamSelections(next).catch(() =>
+      setNotice(
+        'Your team choice is active for this session, but could not be saved on this device.',
+      ),
+    );
+    setTeamSelections(next);
+  }
 
   useEffect(() => {
     if (!league) return;
-    if (activeLeagueId !== league.id) setActiveLeagueId(league.id);
+    if (activeLeagueId !== league.id && stateLoaded)
+      updateRoute({ leagueId: league.id }, true, false);
     try {
       window.localStorage.setItem('sidekick.activeLeagueId', league.id);
     } catch {
@@ -172,12 +304,29 @@ export function App() {
       if (!isAppState(snapshot))
         throw new Error('Local service returned an invalid state snapshot.');
       if (sequence !== refreshSequence.current) return;
+      if (
+        pendingGeneration &&
+        !snapshot.generationJobs?.some((job) => job.requestId === pendingGeneration.requestId)
+      ) {
+        try {
+          const job = await requestJson(
+            '/api/generation-jobs/' + encodeURIComponent(pendingGeneration.requestId),
+            isGenerationJob,
+          );
+          snapshot.generationJobs = [job, ...(snapshot.generationJobs ?? [])];
+        } catch {
+          /* Preserve the saved request through transient errors; retry reuses its ID. */
+        }
+      }
+      if (sequence !== refreshSequence.current) return;
       setState(snapshot);
       setStateLoaded(true);
       setStateLoadError('');
       setServiceStatus('running');
       setNotice((current) =>
-        current === 'Local service is unavailable. Start it with npm run dev.' ? '' : current,
+        current === 'Sunday Sidekick could not load. Reopen the app, then try again.'
+          ? ''
+          : current,
       );
 
       if (background) return;
@@ -224,7 +373,7 @@ export function App() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Local service is unavailable. Start it with npm run dev.';
+          : 'Sunday Sidekick could not load. Reopen the app, then try again.';
       setStateLoadError(message);
       if (stateLoaded) setNotice(`Could not refresh local league data. ${message}`);
     } finally {
@@ -270,7 +419,11 @@ export function App() {
       if (!response.ok) throw new Error(result.error ?? 'Could not refresh football news.');
       setNews(result);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not refresh football news.');
+      showFailure(
+        'Football news couldn’t be updated. Try refreshing it again later.',
+        error,
+        'news',
+      );
     } finally {
       setRefreshingNews(false);
     }
@@ -296,7 +449,11 @@ export function App() {
       setNotice('Retry finished. Any generated reports are drafts waiting for review.');
       await refresh();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not retry this scheduled run.');
+      showFailure(
+        'The scheduled report needs attention. Check its saved progress before trying again.',
+        error,
+        'reports',
+      );
     } finally {
       setRetryingRunId('');
     }
@@ -305,16 +462,18 @@ export function App() {
   async function connectLeague(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setNotice('');
+    setConnectionError('');
     try {
-      const parsed = parseLeagueInput(platform as Platform, leagueId);
+      const detected = detectLeagueLink(leagueId);
+      const selectedPlatform = detected?.platform ?? (platform as Platform);
+      const parsed = detected ?? parseLeagueInput(selectedPlatform, leagueId);
       const response = await fetch('/api/leagues', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          platform,
+          platform: selectedPlatform,
           leagueId: parsed.leagueId,
-          ...(platform === 'espn' ? { season: parsed.season ?? espnSeason } : {}),
+          ...(selectedPlatform === 'espn' ? { season: parsed.season ?? espnSeason } : {}),
         }),
       });
       const result = await response.json();
@@ -324,14 +483,33 @@ export function App() {
       setNotice(`Connected ${result.displayName}`);
       await refresh();
       if (typeof result.id === 'string') setActiveLeagueId(result.id);
+      if (setupInProgress) {
+        setSetupWizardStep(1);
+        setSetupWizardOpen(true);
+      }
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Unable to connect');
+      setConnectionError(error instanceof Error ? error.message : 'Unable to connect');
     } finally {
       setBusy(false);
     }
   }
 
   async function createReport(kind: string) {
+    if (!league) {
+      setModal(true);
+      return;
+    }
+    if (settingsDirty || reportDirty) {
+      if (!window.confirm('Discard unsaved changes before creating a report?')) return;
+      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
+      setSettingsDirty(false);
+      setReportDirty(false);
+    }
+    if (section === 'Reports' && initialReviewId) setInitialReviewId('');
+    setComposerKind(kind as ReportKind);
+  }
+
+  async function generateReport(kind: string) {
     if (generatingRef.current) return;
     if (!league) {
       setNotice('Connect a league before generating an update.');
@@ -366,10 +544,10 @@ export function App() {
       navigate('Reports');
       await refresh();
     } catch (error) {
-      setNotice(
-        error instanceof Error
-          ? error.message
-          : 'Could not connect to generation. Retry to reconnect to this saved request.',
+      showFailure(
+        'Report creation needs attention. Open Reports to check the saved request before trying again.',
+        error,
+        'reports',
       );
       setGeneratingKind('');
     } finally {
@@ -393,7 +571,11 @@ export function App() {
       setNotice(`${disconnectedLeague.displayName} disconnected.`);
       await refresh();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not disconnect this league.');
+      showFailure(
+        'Your league couldn’t be disconnected. Try again from Leagues.',
+        error,
+        'leagues',
+      );
     } finally {
       setDisconnectingLeagueId('');
     }
@@ -410,7 +592,11 @@ export function App() {
       setNotice(`Refreshed ${result.displayName}.`);
       await refresh();
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not refresh league.');
+      showFailure(
+        'Your league data couldn’t be updated. Check the league connection and try again.',
+        error,
+        'leagues',
+      );
       await refresh();
     } finally {
       setRefreshingLeagueId('');
@@ -423,7 +609,11 @@ export function App() {
     try {
       report = await requestJson(`/api/reports/${encodeURIComponent(id)}`, isSavedReport);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : 'Could not load saved report.');
+      showFailure(
+        'Your saved report couldn’t be loaded. Open Reports and try again.',
+        error,
+        'reports',
+      );
       return;
     }
     if (!report) {
@@ -471,7 +661,11 @@ export function App() {
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok) {
-        setNotice(result.error ?? 'Could not send draft.');
+        showFailure(
+          'Delivery needs attention. Your saved report is still available; check its delivery history before retrying.',
+          result.error,
+          'reports',
+        );
         await refresh();
         return;
       }
@@ -488,9 +682,11 @@ export function App() {
   }
 
   async function stopApplication() {
-    const confirmed = window.confirm(
-      'Stop Sunday Sidekick? This stops the local service and scheduled jobs. If you installed the background service, start it with npm run service -- start. Otherwise run npm start or npm run dev.',
-    );
+    const confirmed =
+      verificationMode ||
+      window.confirm(
+        'Stop Sunday Sidekick? This stops the local service and scheduled jobs. If you installed the background service, start it with npm run service -- start. Otherwise run npm start or npm run dev.',
+      );
     if (!confirmed) return;
 
     setServiceStatus('stopping');
@@ -509,12 +705,100 @@ export function App() {
   }
 
   const runtime = state.settings.aiRuntime;
-  const aiReady = Boolean(runtime && testedRuntimeSignature === JSON.stringify(runtime));
+  const aiReady = Boolean(
+    runtime &&
+    testedRuntimeSignature === JSON.stringify(runtime) &&
+    (runtime.mode !== 'api' ||
+      credentialProviders.some(
+        (provider) => provider.provider === 'openai' && provider.configured,
+      )),
+  );
   const requiredSetupComplete = Number(Boolean(league)) + Number(aiReady);
+  const lastCheckedRuntime = useRef('');
+  // Check an existing connection once per configuration, without sending any league data.
+  useEffect(() => {
+    if (setupBusy || !stateLoaded || !runtime || testedRuntimeSignature === JSON.stringify(runtime))
+      return;
+    if (
+      runtime.mode === 'api' &&
+      !credentialProviders.some((provider) => provider.provider === 'openai' && provider.configured)
+    )
+      return;
+    const signature = JSON.stringify(runtime);
+    if (lastCheckedRuntime.current === signature) return;
+    lastCheckedRuntime.current = signature;
+    const abort = new AbortController();
+    setAiChecking(true);
+    setAiCheckError('');
+    void requestJson(
+      '/api/ai/test',
+      (value): value is { ok: true } =>
+        Boolean(value && typeof value === 'object' && 'ok' in value && value.ok === true),
+      { method: 'POST', signal: abort.signal },
+      60000,
+    )
+      .then(() => setTestedRuntimeSignature(signature))
+      .catch((error) => {
+        if (!abort.signal.aborted)
+          setAiCheckError(
+            error instanceof Error ? error.message : 'Could not test your AI connection.',
+          );
+      })
+      .finally(() => {
+        if (!abort.signal.aborted) setAiChecking(false);
+      });
+    return () => {
+      abort.abort();
+      setAiChecking(false);
+    };
+  }, [
+    stateLoaded,
+    setupBusy,
+    aiCredentialRevision,
+    runtime && JSON.stringify(runtime),
+    credentialProviders.map((provider) => `${provider.provider}:${provider.configured}`).join('|'),
+  ]);
   function openSetupWizard() {
-    setSetupWizardStep(suggestedSetupStep(Boolean(league), aiReady));
+    setSetupWizardStep(league && !homeTeamId ? 1 : suggestedSetupStep(Boolean(league), aiReady));
     setSetupInProgress(true);
     setSetupWizardOpen(true);
+  }
+  function searchNavigate(destination: SearchDestination, check = true) {
+    const reviewedDiscard = Boolean(
+      check && destination.task && (settingsDirty || reportDirty || scheduleDirty || adviceDirty),
+    );
+    if (reviewedDiscard) {
+      if (!window.confirm('Discard unsaved changes before opening this task?')) return false;
+      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
+      setSettingsDirty(false);
+      setReportDirty(false);
+      setScheduleDirty(false);
+      setAdviceDirty(false);
+    }
+    const accepted = updateRoute(
+      {
+        section: destination.section,
+        leagueId: destination.leagueId ?? activeLeagueId,
+        reportId: destination.reportId ?? '',
+        settingId: destination.settingId ?? '',
+        helpId: destination.helpId ?? '',
+        adviceMode: destination.adviceMode ?? 'lineup',
+        adviceId: destination.adviceId ?? '',
+      },
+      false,
+      check && !reviewedDiscard,
+    );
+    if (accepted) {
+      setSettingsFocusTarget(null);
+      setSearchFocusRevision((current) => current + 1);
+      if (destination.task?.type === 'schedule')
+        setScheduleEditor({
+          kind: destination.task.prefill.kind,
+          prefill: destination.task.prefill,
+        });
+      else if (destination.task?.type === 'delivery') setDeliveryTask(destination.task);
+    }
+    return accepted;
   }
   const dateLabel = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
@@ -523,7 +807,7 @@ export function App() {
   }).format(new Date());
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <aside ref={sidebarRef} className="sidebar">
         <div className="brand">
           <div className="brand-mark">
             <Zap size={19} fill="currentColor" />
@@ -533,17 +817,36 @@ export function App() {
           </span>
         </div>
         <nav className="nav-list">
-          {menu.map(({ label, icon: Icon }) => (
+          {menu.map(({ section: destination, label, icon: Icon }) => (
             <button
               key={label}
-              onClick={() => navigate(label)}
-              className={`nav-item ${section === label ? 'active' : ''}`}
+              aria-current={section === destination ? 'page' : undefined}
+              onClick={() => navigate(destination)}
+              className={`nav-item ${section === destination ? 'active' : ''}`}
             >
               <Icon size={17} strokeWidth={1.8} />
               <span>{label}</span>
-              {label === 'League desk' && <i className="nav-dot" />}
+              {label === 'Home' && <i className="nav-dot" />}
             </button>
           ))}
+          <details
+            className="more-tools"
+            open={showTools}
+            onToggle={(event) => setShowTools(event.currentTarget.open)}
+          >
+            <summary>More tools</summary>
+            {tools.map(({ section: destination, label, icon: Icon }) => (
+              <button
+                type="button"
+                key={destination}
+                className={`nav-item ${section === destination ? 'active' : ''}`}
+                onClick={() => navigate(destination)}
+              >
+                <Icon size={17} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </details>
         </nav>
         <div className="sidebar-bottom">
           <div className="service-status">
@@ -566,14 +869,9 @@ export function App() {
           >
             <Power size={15} /> <span>Stop app</span>
           </button>
-          <a
-            className="help-link"
-            href="https://github.com/jto4/FantasyFootballAI/blob/main/README.md"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <CircleHelp size={16} /> Help & documentation
-          </a>
+          <button type="button" className="help-link" onClick={() => navigate('Help')}>
+            <CircleHelp size={16} /> Help & FAQ
+          </button>
           <div className="user-chip">
             <div className="user-avatar">C</div>
             <div>
@@ -628,35 +926,72 @@ export function App() {
               <ChevronDown size={15} aria-hidden="true" />
             </div>
           </div>
+          <WorkspaceSearch
+            leagues={state.leagues}
+            reports={state.reports}
+            onNavigate={searchNavigate}
+          />
           <div className="top-actions">
             <span className="date-label">{dateLabel}</span>
+            <ThemeSwitch />
             <span className={`status-pulse ${serviceStatus !== 'running' ? 'offline' : ''}`} />
             <span
               className="date-label"
               title={serviceStatus === 'running' ? 'Local service running' : 'Local service'}
             >
-              {serviceStatus === 'running' ? 'Running' : 'Service'}
+              {serviceStatus === 'running'
+                ? verificationMode
+                  ? 'Test profile'
+                  : 'Running'
+                : 'Service'}
             </span>
           </div>
         </header>
 
         <div className="page-content">
-          {notice && (
-            <div className="notice" role="status">
-              {notice}
-              <button onClick={() => setNotice('')} aria-label="Dismiss">
-                ×
+          {notice && noticeInfo.detail ? (
+            <>
+              <FriendlyError
+                message={notice}
+                detail={noticeInfo.detail}
+                action={
+                  noticeInfo.action === 'reports'
+                    ? 'Open Reports'
+                    : noticeInfo.action === 'leagues'
+                      ? 'Check league connection'
+                      : noticeInfo.action === 'news'
+                        ? 'Refresh news'
+                        : 'Try again'
+                }
+                onAction={() => {
+                  if (noticeInfo.action === 'reports') navigate('Reports');
+                  else if (noticeInfo.action === 'leagues') navigate('Leagues');
+                  else if (noticeInfo.action === 'news') void refreshNews();
+                  else void refresh();
+                }}
+              />
+              <button type="button" className="text-button" onClick={() => setNotice('')}>
+                Dismiss message
               </button>
-            </div>
+            </>
+          ) : (
+            notice && (
+              <div className="notice" role="status">
+                {notice}
+                <button onClick={() => setNotice('')} aria-label="Dismiss">
+                  ×
+                </button>
+              </div>
+            )
           )}
           {setupInProgress && stateLoaded && !setupWizardOpen && (
             <div className="onboarding-progress" role="status">
-              <strong>Your first report</strong>
+              <strong>Continue setting up your league</strong>
               <span>
                 {!league
                   ? 'Connect a league'
                   : !aiReady
-                    ? 'Save and test your AI runtime'
+                    ? 'Connect your AI writer'
                     : 'Generate and review your first draft'}
               </span>
               <button
@@ -665,11 +1000,16 @@ export function App() {
                 onClick={() => {
                   if (league && aiReady) {
                     void createReport('power-rankings');
-                  } else openSetupWizard();
+                  } else if (!league && leagueId.trim()) setModal(true);
+                  else openSetupWizard();
                 }}
                 disabled={Boolean(generatingKind)}
               >
-                {league && aiReady ? 'Generate first draft' : 'Continue setup'}
+                {league && aiReady
+                  ? 'Create first report'
+                  : !league && leagueId.trim()
+                    ? 'Resume league connection'
+                    : 'Continue setup'}
               </button>
               <button
                 type="button"
@@ -680,7 +1020,15 @@ export function App() {
               </button>
             </div>
           )}
-          {!stateLoaded ? (
+          {aiCheckError && section === 'League desk' && (
+            <FriendlyError
+              message="Your AI connection needs attention before you can create a report."
+              detail={aiCheckError}
+              action="Fix AI connection"
+              onAction={openSetupWizard}
+            />
+          )}
+          {!stateLoaded && section !== 'Help' ? (
             stateLoading ? (
               <LoadingStatus message="Loading your leagues, reports, and schedule…" />
             ) : (
@@ -689,21 +1037,65 @@ export function App() {
                 onRetry={() => void refresh()}
               />
             )
+          ) : section === 'Help' ? (
+            <Suspense fallback={<LoadingStatus message="Opening help…" />}>
+              <HelpPage
+                key={searchFocusRevision}
+                articleId={route.helpId ?? ''}
+                onNavigate={searchNavigate}
+                onSample={() => setSampleOpen(true)}
+              />
+            </Suspense>
+          ) : section === 'Advice' ? (
+            <Suspense fallback={<LoadingStatus message="Opening advice…" />}>
+              <AdvicePage
+                key={`${activeLeagueId}:${route.adviceMode ?? 'lineup'}:${route.adviceId ?? ''}`}
+                leagues={state.leagues}
+                leagueId={activeLeagueId}
+                preferredTeamId={homeTeamId}
+                onTeamSelect={chooseTeam}
+                mode={route.adviceMode ?? 'lineup'}
+                resultId={route.adviceId ?? ''}
+                onNavigate={searchNavigate}
+                onDirtyChange={setAdviceDirty}
+              />
+            </Suspense>
           ) : section === 'Settings' ? (
             <SettingsPage
+              key={settingsNavigationKey}
               settings={state.settings}
               leagues={state.leagues}
+              onGuidedSetup={() => {
+                if (
+                  !settingsDirty ||
+                  window.confirm('Discard unsaved settings before guided setup?')
+                ) {
+                  if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
+                  setSettingsDirty(false);
+                  setSetupWizardStep(1);
+                  setSetupInProgress(true);
+                  setSetupWizardOpen(true);
+                }
+              }}
               onSaved={(settings) => {
                 setState((current) => ({ ...current, settings }));
               }}
-              onCredentialsChanged={() => {
-                setTestedRuntimeSignature('');
+              onCredentialsChanged={(provider) => {
+                if (provider === 'openai') {
+                  setTestedRuntimeSignature('');
+                  setAiCredentialRevision((current) => current + 1);
+                  lastCheckedRuntime.current = '';
+                }
                 void refreshCredentials();
               }}
-              onRuntimeTested={(testedRuntime) =>
-                setTestedRuntimeSignature(JSON.stringify(testedRuntime))
-              }
+              onRuntimeTested={(testedRuntime) => {
+                setTestedRuntimeSignature(JSON.stringify(testedRuntime));
+                setAiCheckError('');
+              }}
               focusTarget={settingsFocusTarget}
+              searchSettingId={route.settingId}
+              searchFocusRevision={searchFocusRevision}
+              onSearchSettingClear={() => updateRoute({ settingId: '' }, true, false)}
               onFocusTargetHandled={() => setSettingsFocusTarget(null)}
               onRestored={refresh}
               onDirtyChange={setSettingsDirty}
@@ -730,9 +1122,44 @@ export function App() {
               settings={state.settings}
               sendingReportId={sendingReportId}
               initialReportId={initialReviewId}
+              onReviewChange={setInitialReviewId}
+              onCreate={() => void createReport('power-rankings')}
+              onDeliverySetup={() => {
+                setSettingsFocusTarget('credentials');
+                navigate('Settings');
+              }}
               onSend={sendReport}
               onSaved={refresh}
               onDirtyChange={setReportDirty}
+              league={league}
+              generating={Boolean(generatingKind)}
+              onCreateKind={(kind) => void createReport(kind)}
+              onSchedule={(kind) => {
+                const action = state.settings.actions.find((item) => item.kind === kind);
+                if (
+                  action?.enabled &&
+                  action.schedule.enabled &&
+                  (action.leagueIds === undefined ||
+                    (league && action.leagueIds.includes(league.id)))
+                ) {
+                  setScheduleEditor({ kind });
+                } else {
+                  const recommendation = scheduleRecommendations[kind];
+                  setScheduleEditor({
+                    kind,
+                    prefill: {
+                      kind,
+                      source: 'report-library',
+                      frequency: recommendation?.frequency ?? 'once',
+                      weekday: recommendation?.weekday,
+                      dayOfMonth: recommendation?.dayOfMonth,
+                      time: recommendation?.time ?? '09:00',
+                      channel: 'dashboard',
+                      leagueIds: league ? [league.id] : [],
+                    },
+                  });
+                }
+              }}
             />
           ) : section === 'Schedule' ? (
             <SchedulePage
@@ -741,6 +1168,12 @@ export function App() {
               retryingRunId={retryingRunId}
               generatingKind={generatingKind}
               onGenerate={(kind) => void createReport(kind)}
+              onEditSchedule={() =>
+                updateRoute({ section: 'Settings', settingId: 'automatic-actions' })
+              }
+              leagueName={league?.displayName}
+              settings={state.settings}
+              onEditAction={(kind) => setScheduleEditor({ kind })}
               onRetry={(run) => void retryScheduledRun(run)}
             />
           ) : section === 'Members & memory' || section === 'Imports' ? (
@@ -750,15 +1183,21 @@ export function App() {
                 leagues={state.leagues.map(({ id, displayName }) => ({ id, displayName }))}
                 memoryEnabled={state.settings.memoryEnabled}
                 analyzeImportsWithAI={state.settings.analyzeImportsWithAI}
-                imessageConfigured={credentialProviders.some(
-                  (item) => item.provider === 'bluebubbles' && item.configured,
-                )}
+                imessageConfigured={
+                  state.settings.imessageProvider === 'imsg'
+                    ? navigator.platform.toLowerCase().startsWith('mac') &&
+                      Boolean(state.settings.imsgChatId)
+                    : credentialProviders.some(
+                        (item) => item.provider === 'bluebubbles' && item.configured,
+                      )
+                }
                 twilioConfigured={credentialProviders.some(
                   (item) => item.provider === 'twilio' && item.configured,
                 )}
                 resendConfigured={credentialProviders.some(
                   (item) => item.provider === 'resend' && item.configured,
                 )}
+                imessageProvider={state.settings.imessageProvider ?? 'bluebubbles'}
                 {...(state.settings.imessageChatGuid
                   ? { imessageChatGuid: state.settings.imessageChatGuid }
                   : {})}
@@ -771,24 +1210,60 @@ export function App() {
               />
             </>
           ) : (
-            <LeagueDesk
-              state={state}
-              league={league}
-              aiReady={aiReady}
-              requiredSetupComplete={requiredSetupComplete}
-              generatingKind={generatingKind}
-              refreshingNews={refreshingNews}
-              news={news}
-              setupWizardTriggerRef={setupWizardTriggerRef}
-              openSetupWizard={openSetupWizard}
-              setModal={setModal}
-              setSettingsFocusTarget={setSettingsFocusTarget}
-              navigate={navigate}
-              createReport={createReport}
-              refreshLeague={refreshLeague}
-              refreshNews={refreshNews}
-              setInitialReviewId={setInitialReviewId}
-            />
+            <>
+              <LeagueDesk
+                weekly={
+                  <WeeklyHome
+                    league={league}
+                    settings={state.settings}
+                    teamId={homeTeamId}
+                    onTeamChange={chooseTeam}
+                    onSavedAdvice={(id, mode) =>
+                      searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: id })
+                    }
+                    onAdvice={(mode) =>
+                      searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
+                    }
+                    onRefresh={() => {
+                      if (league) void refreshLeague(league.id);
+                    }}
+                    onSetup={openSetupWizard}
+                  />
+                }
+                state={state}
+                league={league}
+                aiReady={aiReady}
+                aiChecking={aiChecking}
+                requiredSetupComplete={requiredSetupComplete}
+                generatingKind={generatingKind}
+                refreshingNews={refreshingNews}
+                news={news}
+                setupWizardTriggerRef={setupWizardTriggerRef}
+                openSetupWizard={openSetupWizard}
+                setModal={setModal}
+                setSettingsFocusTarget={setSettingsFocusTarget}
+                navigate={navigate}
+                createReport={createReport}
+                refreshLeague={refreshLeague}
+                refreshNews={refreshNews}
+                setInitialReviewId={setInitialReviewId}
+                onSample={() => setSampleOpen(true)}
+                status={
+                  <HomeStatus
+                    settings={state.settings}
+                    league={league}
+                    aiReady={aiReady}
+                    aiChecking={aiChecking}
+                    onAI={openSetupWizard}
+                    onLeagues={() => navigate('Leagues')}
+                    onSchedules={() => navigate('Schedule')}
+                    onDelivery={() =>
+                      searchNavigate({ section: 'Settings', settingId: 'automatic-actions' })
+                    }
+                  />
+                }
+              />
+            </>
           )}
           <footer className="page-footer">
             <span>Built for the love of the game (and the group chat).</span>
@@ -799,11 +1274,76 @@ export function App() {
         </div>
       </main>
 
+      {sampleOpen && (
+        <Suspense fallback={<LoadingStatus message="Opening preview…" />}>
+          <SampleExperience
+            onClose={() => setSampleOpen(false)}
+            onSetup={() => {
+              setSampleOpen(false);
+              openSetupWizard();
+            }}
+          />
+        </Suspense>
+      )}
+      {scheduleEditor && (
+        <Suspense fallback={<LoadingStatus message="Opening preview…" />}>
+          <ScheduleEditor
+            key={`${scheduleEditor.kind}:${searchFocusRevision}`}
+            settings={state.settings}
+            leagues={state.leagues}
+            kind={scheduleEditor.kind}
+            prefill={scheduleEditor.prefill}
+            onClose={() => {
+              setScheduleEditor(null);
+              setScheduleDirty(false);
+            }}
+            onSaved={(settings) => {
+              setState((current) => ({ ...current, settings }));
+              setNotice('Schedule saved. The next planned run is shown on Schedule.');
+            }}
+            onDirtyChange={setScheduleDirty}
+          />
+        </Suspense>
+      )}
+      {deliveryTask && (
+        <Suspense fallback={<LoadingStatus message="Opening preview…" />}>
+          <DeliveryTask
+            task={deliveryTask}
+            settings={state.settings}
+            onSaved={(settings) => setState((current) => ({ ...current, settings }))}
+            onClose={() => setDeliveryTask(null)}
+            onDeliverySetup={() => {
+              setDeliveryTask(null);
+              searchNavigate({ section: 'Settings', settingId: 'email-recipient' });
+            }}
+          />
+        </Suspense>
+      )}
+      {composerKind && league && (
+        <ReportComposer
+          key={`${league.id}:${composerKind}`}
+          league={league}
+          initialKind={composerKind}
+          busy={Boolean(generatingKind)}
+          ready={aiReady}
+          onClose={() => setComposerKind(null)}
+          onSetup={() => {
+            setComposerKind(null);
+            openSetupWizard();
+          }}
+          onCreate={(kind) => {
+            setComposerKind(null);
+            void generateReport(kind);
+          }}
+        />
+      )}
       {modal && (
         <Dialog
           titleId="connect-league-title"
           className="connect-modal"
-          onClose={() => setModal(false)}
+          onClose={() => {
+            if (!busy) setModal(false);
+          }}
         >
           <form onSubmit={connectLeague}>
             <button
@@ -822,8 +1362,15 @@ export function App() {
               Paste your league URL or ID. Your settings and scoring format come along for the ride.
             </p>
             <label>
-              FANTASY PLATFORM
-              <select value={platform} onChange={(event) => setPlatform(event.target.value)}>
+              Fantasy platform
+              <select
+                disabled={busy}
+                value={platform}
+                onChange={(event) => {
+                  setPlatform(event.target.value as Platform);
+                  setConnectionError('');
+                }}
+              >
                 <option value="sleeper">Sleeper</option>
                 <option value="espn">ESPN</option>
                 <option value="yahoo">Yahoo</option>
@@ -834,10 +1381,48 @@ export function App() {
               <input
                 required
                 value={leagueId}
-                onChange={(event) => setLeagueId(event.target.value)}
+                disabled={busy}
+                maxLength={2048}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setLeagueId(value);
+                  setConnectionError('');
+                  const detected = detectLeagueLink(value);
+                  if (detected) {
+                    setPlatform(detected.platform);
+                    if (detected.season) setEspnSeason(detected.season);
+                  }
+                }}
                 placeholder="Paste a league URL or ID"
               />
             </label>
+            {detectLeagueLink(leagueId) && (
+              <p role="status">
+                ✓ {capitalize(detectLeagueLink(leagueId)!.platform)} league recognized. We’ll check
+                access when you connect.
+              </p>
+            )}
+            <details className="connection-help">
+              <summary>Where do I find my league link?</summary>
+              <p>
+                Open your league in a web browser, then copy the address from the address bar. Paste
+                it above.
+              </p>
+              <p>
+                {platform === 'sleeper'
+                  ? 'Sleeper: open your league on sleeper.com. Use the league page, rather than an invite link.'
+                  : platform === 'espn'
+                    ? 'ESPN: open Fantasy Football, select your league, and copy the League home address. The link may include the season year.'
+                    : 'Yahoo: open Fantasy Football, select your league, and copy its home-page address.'}
+              </p>
+              <p>If you only have a league ID, select your platform and enter the ID instead.</p>
+            </details>
+            {connectionError && (
+              <FriendlyError
+                message="We couldn’t connect your league. Check the link and any private-league access below, then try Connect league again."
+                detail={connectionError}
+              />
+            )}
             {platform === 'espn' && (
               <label>
                 ESPN SEASON
@@ -856,14 +1441,18 @@ export function App() {
               </label>
             )}
             <small className="modal-hint">
-              Private leagues require account-authorized platform access.
+              Public leagues can connect directly. Private leagues need permission from your own
+              account.
             </small>
             {platform === 'yahoo' &&
               !credentialProviders.some(
                 (credential) => credential.provider === 'yahoo' && credential.configured,
               ) && (
                 <div className="provider-setup-callout" role="note">
-                  <p>Yahoo requires owner-authorized Fantasy Sports OAuth before connecting.</p>
+                  <p>
+                    Sign in to Yahoo and authorize league access before connecting. If account
+                    connection has not been set up, the Yahoo settings include the required steps.
+                  </p>
                   <button
                     type="button"
                     className="text-button"
@@ -882,7 +1471,11 @@ export function App() {
                 (credential) => credential.provider === 'espn' && credential.configured,
               ) && (
                 <div className="provider-setup-callout" role="note">
-                  <p>Private ESPN leagues need your owner-authorized session cookie.</p>
+                  <p>
+                    For a private ESPN league, add your own ESPN access details first. The ESPN
+                    access card explains how to find them. Public leagues can connect without this
+                    step.
+                  </p>
                   <button
                     type="button"
                     className="text-button"
@@ -915,9 +1508,67 @@ export function App() {
       {setupWizardOpen && (
         <SetupWizard
           step={setupWizardStep}
+          busy={setupBusy}
+          teamSetup={
+            league && (
+              <section>
+                <h3>Choose your team</h3>
+                <p>
+                  Pick the roster you manage. The choice stays on this device and does not change
+                  platform ownership.
+                </p>
+                <label>
+                  Your team
+                  <select
+                    value={homeTeamId ?? ''}
+                    onChange={(event) => chooseTeam(event.target.value)}
+                  >
+                    <option value="">Choose your team</option>
+                    {league.teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {!homeTeamId && <p>Choose a team to continue to AI setup.</p>}
+              </section>
+            )
+          }
+          aiSetup={
+            homeTeamId ? (
+              <GuidedAISetup
+                settings={state.settings}
+                onSaved={(settings) => setState((current) => ({ ...current, settings }))}
+                onCredentialsChanged={(provider) => {
+                  if (provider === 'openai') {
+                    setTestedRuntimeSignature('');
+                    setAiCredentialRevision((current) => current + 1);
+                    lastCheckedRuntime.current = '';
+                  }
+                  void refreshCredentials();
+                }}
+                onReady={(testedRuntime) => {
+                  setTestedRuntimeSignature(JSON.stringify(testedRuntime));
+                  setAiCheckError('');
+                  setSetupWizardStep(2);
+                }}
+                onBusyChange={setSetupBusy}
+                onAdvanced={() => {
+                  setSetupWizardOpen(false);
+                  setSettingsFocusTarget('ai');
+                  navigate('Settings');
+                }}
+              />
+            ) : (
+              <p>Your league can be browsed without AI. Select a team first.</p>
+            )
+          }
           closeButtonRef={setupWizardCloseRef}
           onStepChange={setSetupWizardStep}
-          onClose={() => setSetupWizardOpen(false)}
+          onClose={() => {
+            if (!setupBusy) setSetupWizardOpen(false);
+          }}
           onConnectLeague={() => {
             setSetupWizardOpen(false);
             setModal(true);
@@ -927,7 +1578,7 @@ export function App() {
             setSettingsFocusTarget('ai');
             navigate('Settings');
           }}
-          ready={Boolean(league) && aiReady}
+          ready={Boolean(league) && Boolean(homeTeamId) && aiReady}
           generating={Boolean(generatingKind)}
           onGenerate={() => {
             setSetupWizardOpen(false);
@@ -945,8 +1596,7 @@ export function App() {
           }}
           onSetupDelivery={() => {
             setSetupWizardOpen(false);
-            setSettingsFocusTarget('credentials');
-            navigate('Settings');
+            searchNavigate({ section: 'Settings', settingId: 'imessage-group' });
           }}
         />
       )}

@@ -1,3 +1,4 @@
+import { ImsgSetup } from './ImsgSetup.js';
 import type { Dispatch, SetStateAction } from 'react';
 import { Copy } from 'lucide-react';
 import type { AppSettings, LeagueConnection } from '@sidekick/core';
@@ -49,15 +50,24 @@ export function DeliveryChannelsSection({
   const validTwilioConversationTarget = /^CH[0-9a-fA-F]{32}$/.test(
     settings.smsRecipient?.trim() ?? '',
   );
+  const localImsg = settings.imessageProvider === 'imsg';
+  const macPlatform = navigator.platform.toLowerCase().startsWith('mac');
+  const imessageReady = localImsg
+    ? macPlatform && /^iMessage;[+-];[^\s\u0000-\u001f]+$/.test(settings.imessageChatGuid ?? '')
+    : blueBubblesConfigured;
+  const syncReady =
+    imessageReady &&
+    (!localImsg || (Number.isSafeInteger(settings.imsgChatId) && Number(settings.imsgChatId) > 0));
   const chatReplyDestinationReady =
     (validTwilioConversationTarget && twilioConfigured) ||
-    (Boolean(settings.imessageChatGuid?.trim()) && blueBubblesConfigured);
+    (Boolean(settings.imessageChatGuid?.trim()) && imessageReady);
   return (
     <>
       <div className="settings-fields two recipients">
         <label>
           EMAIL RECIPIENT
           <input
+            data-search-target="email-recipient"
             value={settings.emailRecipient ?? ''}
             onChange={(event) =>
               setSettings((current) => ({ ...current, emailRecipient: event.target.value }))
@@ -68,6 +78,7 @@ export function DeliveryChannelsSection({
         <label>
           SMS RECIPIENT OR TWILIO GROUP SID
           <input
+            data-search-target="sms-recipient"
             value={settings.smsRecipient ?? ''}
             onChange={(event) =>
               setSettings((current) => ({ ...current, smsRecipient: event.target.value }))
@@ -80,24 +91,50 @@ export function DeliveryChannelsSection({
           </small>
         </label>
         <label>
+          IMESSAGE PROVIDER
+          <select
+            value={settings.imessageProvider ?? 'bluebubbles'}
+            onChange={(event) =>
+              setSettings((current) => ({
+                ...current,
+                imessageProvider: event.target.value as 'bluebubbles' | 'imsg',
+                imessageAutoSyncEnabled: false,
+                chatRepliesAutoSend: false,
+              }))
+            }
+          >
+            <option value="bluebubbles">BlueBubbles server</option>
+            <option value="imsg">Local Messages via imsg (macOS)</option>
+          </select>
+        </label>
+        <label>
           IMESSAGE GROUP CHAT ID
           <input
+            data-search-target="imessage-group"
             value={settings.imessageChatGuid ?? ''}
             onChange={(event) =>
               setSettings((current) => ({ ...current, imessageChatGuid: event.target.value }))
             }
-            placeholder="iMessage chat GUID from BlueBubbles"
+            placeholder={localImsg ? 'iMessage;+;chat…' : 'iMessage chat GUID from BlueBubbles'}
           />
-          <small>
-            BlueBubbles runs on a Mac signed into Messages. Sunday Sidekick can run on macOS,
-            Windows, or Linux; its local service must be able to reach that server. Use the chat
-            GUID for the group you want to receive reports.
-          </small>
+          {localImsg ? (
+            <small>
+              Use a stable iMessage GUID. Find iMessage chats below to fill both the GUID and local
+              history ID.
+            </small>
+          ) : (
+            <small>
+              BlueBubbles runs on a Mac signed into Messages. Sunday Sidekick can run on macOS,
+              Windows, or Linux; its local service must be able to reach that server. Use the chat
+              GUID for the group you want to receive reports.
+            </small>
+          )}
         </label>
         <label>
           YOUR NAME IN THE GROUP CHAT
           <input
             required
+            data-search-target="owner-name"
             value={settings.imessageOwnerName ?? 'League owner'}
             maxLength={100}
             onChange={(event) =>
@@ -108,9 +145,17 @@ export function DeliveryChannelsSection({
           <small>Used to identify messages sent from your own iMessage account.</small>
         </label>
       </div>
+      {localImsg && <ImsgSetup settings={settings} setSettings={setSettings} />}
+      {localImsg && !macPlatform && (
+        <p role="status">
+          Local imsg is available only when the service runs on macOS. Use BlueBubbles to connect
+          from Windows or Linux.
+        </p>
+      )}
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="sms-sync"
           checked={settings.twilioConversationAutoSyncEnabled ?? false}
           disabled={!settings.memoryEnabled || !validTwilioConversationTarget || !twilioConfigured}
           onChange={(event) =>
@@ -167,10 +212,9 @@ export function DeliveryChannelsSection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="imessage-sync"
           checked={settings.imessageAutoSyncEnabled}
-          disabled={
-            !settings.memoryEnabled || !settings.imessageChatGuid?.trim() || !blueBubblesConfigured
-          }
+          disabled={!settings.memoryEnabled || !settings.imessageChatGuid?.trim() || !syncReady}
           onChange={(event) =>
             setSettings((current) => ({
               ...current,
@@ -206,67 +250,69 @@ export function DeliveryChannelsSection({
         text stays local unless conversation analysis is separately enabled. Turning off member
         memory disables polling. Retention settings still apply.
       </p>
-      {!blueBubblesConfigured && (
+      {!localImsg && !blueBubblesConfigured && (
         <p className="schedule-explainer">
           Save BlueBubbles server settings in Credentials before enabling automatic sync.
         </p>
       )}
-      <div className="schedule-fields">
-        <div>
-          <strong>Live message webhook</strong>
-          <p className="schedule-explainer">
-            Optional when BlueBubbles and Sunday Sidekick run on the same computer. Create a private
-            local URL, then add it as a <code>new-message</code> webhook in BlueBubbles. It triggers
-            the same bounded history sync and memory settings as polling. The URL contains a secret
-            and is shown once; regenerate it if you lose it.
-          </p>
-          {blueBubblesWebhookLoading && (
-            <LoadingStatus message="Checking BlueBubbles webhook status…" />
-          )}
-          {blueBubblesWebhookError && (
-            <LoadError message={blueBubblesWebhookError} onRetry={onRetryWebhookStatus} />
-          )}
-          <div className="button-row">
-            <button
-              type="button"
-              className="small-button"
-              disabled={blueBubblesWebhookLoading || Boolean(blueBubblesWebhookError)}
-              onClick={() => void onCreateWebhook()}
-            >
-              {blueBubblesWebhookConfigured ? 'Regenerate webhook URL' : 'Create webhook URL'}
-            </button>
-            {blueBubblesWebhookConfigured && (
-              <button
-                type="button"
-                className="small-button danger"
-                onClick={() => void onRevokeWebhook()}
-              >
-                Revoke webhook
-              </button>
+      {!localImsg && (
+        <div className="schedule-fields">
+          <div>
+            <strong>Live message webhook</strong>
+            <p className="schedule-explainer">
+              Optional when BlueBubbles and Sunday Sidekick run on the same computer. Create a
+              private local URL, then add it as a <code>new-message</code> webhook in BlueBubbles.
+              It triggers the same bounded history sync and memory settings as polling. The URL
+              contains a secret and is shown once; regenerate it if you lose it.
+            </p>
+            {blueBubblesWebhookLoading && (
+              <LoadingStatus message="Checking BlueBubbles webhook status…" />
             )}
-          </div>
-          {blueBubblesWebhookUrl && (
-            <div className="credential-test">
-              <input
-                type="text"
-                readOnly
-                value={blueBubblesWebhookUrl}
-                aria-label="Private BlueBubbles webhook URL"
-              />
+            {blueBubblesWebhookError && (
+              <LoadError message={blueBubblesWebhookError} onRetry={onRetryWebhookStatus} />
+            )}
+            <div className="button-row">
               <button
                 type="button"
                 className="small-button"
-                onClick={() => {
-                  void navigator.clipboard.writeText(blueBubblesWebhookUrl);
-                  onNotice('Webhook URL copied. Paste it into BlueBubbles.');
-                }}
+                disabled={blueBubblesWebhookLoading || Boolean(blueBubblesWebhookError)}
+                onClick={() => void onCreateWebhook()}
               >
-                <Copy size={13} /> Copy URL
+                {blueBubblesWebhookConfigured ? 'Regenerate webhook URL' : 'Create webhook URL'}
               </button>
+              {blueBubblesWebhookConfigured && (
+                <button
+                  type="button"
+                  className="small-button danger"
+                  onClick={() => void onRevokeWebhook()}
+                >
+                  Revoke webhook
+                </button>
+              )}
             </div>
-          )}
+            {blueBubblesWebhookUrl && (
+              <div className="credential-test">
+                <input
+                  type="text"
+                  readOnly
+                  value={blueBubblesWebhookUrl}
+                  aria-label="Private BlueBubbles webhook URL"
+                />
+                <button
+                  type="button"
+                  className="small-button"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(blueBubblesWebhookUrl);
+                    onNotice('Webhook URL copied. Paste it into BlueBubbles.');
+                  }}
+                >
+                  <Copy size={13} /> Copy URL
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       {imessageAutoSyncStatus?.lastCheckedAt && (
         <p className="schedule-explainer" role="status">
           Last automatic check: {new Date(imessageAutoSyncStatus.lastCheckedAt).toLocaleString()}.
@@ -281,6 +327,7 @@ export function DeliveryChannelsSection({
           <input
             maxLength={60}
             required
+            data-search-target="chat-agent-name"
             value={settings.chatAgentName ?? 'Sunday Sidekick'}
             onChange={(event) =>
               setSettings((current) => ({ ...current, chatAgentName: event.target.value }))
@@ -291,6 +338,7 @@ export function DeliveryChannelsSection({
         <label>
           LEAGUE CONTEXT FOR CHAT REPLIES
           <select
+            data-search-target="chat-reply-league"
             value={settings.chatReplyLeagueId ?? ''}
             disabled={leagues.length === 0}
             onChange={(event) =>
@@ -309,6 +357,7 @@ export function DeliveryChannelsSection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="chat-replies"
           checked={settings.chatRepliesEnabled === true}
           disabled={!settings.memoryEnabled || !chatReplyDestinationReady || leagues.length === 0}
           onChange={(event) =>
@@ -320,11 +369,20 @@ export function DeliveryChannelsSection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="chat-auto-send"
           checked={settings.chatRepliesAutoSend === true}
           disabled={settings.chatRepliesEnabled !== true}
-          onChange={(event) =>
-            setSettings((current) => ({ ...current, chatRepliesAutoSend: event.target.checked }))
-          }
+          onChange={(event) => {
+            const enabled = event.target.checked;
+            if (
+              enabled &&
+              !window.confirm(
+                'Enable automatic chat replies? Generated replies can be sent to the configured group conversation without your review. Confirm the selected league and group before saving.',
+              )
+            )
+              return;
+            setSettings((current) => ({ ...current, chatRepliesAutoSend: enabled }));
+          }}
         />
         Send generated chat replies automatically
       </label>

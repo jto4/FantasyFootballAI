@@ -52,13 +52,14 @@ export function createStateRouter(dependencies: StateRouteDependencies): Router 
   });
 
   router.get('/api/report-history', (req, res) => {
-    const { leagueId, status, cursor, limit } = req.query;
+    const { leagueId, status, cursor, limit, search } = req.query;
     if (
-      [leagueId, status, cursor, limit].some(
+      [leagueId, status, cursor, limit, search].some(
         (value) => value !== undefined && typeof value !== 'string',
       ) ||
       (typeof leagueId === 'string' && leagueId.length > 256) ||
       (typeof cursor === 'string' && cursor.length > 512) ||
+      (typeof search === 'string' && search.length > 120) ||
       (status !== undefined &&
         !['draft', 'sent', 'sending', 'failed', 'uncertain'].includes(String(status)))
     )
@@ -78,6 +79,7 @@ export function createStateRouter(dependencies: StateRouteDependencies): Router 
         status as string | undefined,
         cursor as string | undefined,
         size,
+        search as string | undefined,
       ),
     );
   });

@@ -1,20 +1,10 @@
+import { sanitizeLogFields } from './logger.js';
 import { open } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { FileHandle } from 'node:fs/promises';
 
 const MAX_LOG_BYTES = 128 * 1024;
 const MAX_LOG_ENTRIES = 200;
-const allowedFields = new Set([
-  'action',
-  'component',
-  'count',
-  'durationMs',
-  'errorName',
-  'host',
-  'port',
-  'reason',
-  'status',
-]);
 
 export type DiagnosticLogEntry = {
   timestamp: string;
@@ -55,14 +45,7 @@ export async function readApiLogTail(
           !/^[a-z][a-z0-9_.-]{0,79}$/.test(parsed.event)
         )
           continue;
-        const fields: Record<string, string | number> = {};
-        for (const [key, value] of Object.entries(parsed)) {
-          if (!allowedFields.has(key)) continue;
-          if (typeof value === 'string' && /^[A-Za-z0-9_.:/ -]{1,120}$/.test(value))
-            fields[key] = value;
-          else if (typeof value === 'number' && Number.isFinite(value))
-            fields[key] = Math.max(-1_000_000_000, Math.min(1_000_000_000, value));
-        }
+        const fields = sanitizeLogFields(parsed);
         entries.push({
           timestamp: new Date(parsed.timestamp).toISOString(),
           level: parsed.level as DiagnosticLogEntry['level'],

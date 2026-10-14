@@ -1,0 +1,11 @@
+{
+  "retrievedAt": "2026-10-12T18:33:07.708Z",
+  "seconds": 0.415,
+  "season": 2026,
+  "quarterbackRows": 180,
+  "snapRows": 7277,
+  "epaRows": 174,
+  "normalizedSha256": "73896b5af1d3fa89ab1c8eecf32f28f0d5fd4b4aa30c327f906beec7766a56ec",
+  "source": "https://github.com/nflverse/nflverse-data",
+  "historicalPublicationTimingVerified": false
+}

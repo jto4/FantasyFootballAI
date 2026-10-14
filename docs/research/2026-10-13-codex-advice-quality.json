@@ -1,0 +1,479 @@
+{
+  "completedAt": "2026-10-14T00:06:03.812Z",
+  "connection": "codex-cli",
+  "nativeVersion": "codex-cli 0.162.0-alpha.17.2",
+  "model": "gpt-6.1-sol",
+  "reasoning": "high",
+  "command": "node scripts/evaluate-advice.mjs --connection codex-cli --explain-failures",
+  "summary": {
+    "passed": 23,
+    "cases": 23,
+    "attempted": 23,
+    "cancelled": false,
+    "scope": "Fictional decision-process evaluation; not prospective football accuracy or betting profit.",
+    "modelPasses": 46,
+    "firstPassValidationFailures": 0,
+    "reviewValidationFailures": 0
+  },
+  "byMode": {
+    "waivers": {
+      "cases": 6,
+      "passed": 6,
+      "modelPasses": 12
+    },
+    "draft-plan": {
+      "cases": 4,
+      "passed": 4,
+      "modelPasses": 8
+    },
+    "lineup": {
+      "cases": 7,
+      "passed": 7,
+      "modelPasses": 14
+    },
+    "draft-review": {
+      "cases": 2,
+      "passed": 2,
+      "modelPasses": 4
+    },
+    "trade": {
+      "cases": 3,
+      "passed": 3,
+      "modelPasses": 6
+    },
+    "betting": {
+      "cases": 1,
+      "passed": 1,
+      "modelPasses": 2
+    }
+  },
+  "sourceHashes": {
+    "packages/integrations/src/signed-in-codex.ts": "3fc22c4fc5d4e8a93b30579436e3d0dfc154b3a87b56dceece718ce2f2ddb755",
+    "scripts/verify-codex-isolation.mjs": "12f72a63264188c066dca6b9c5207852dce5e208898151cb61ca772e52f4b432",
+    "scripts/evaluate-advice.mjs": "b3e34226ad7d029b43e03678dc4d057ec7ae38980472dbec640dd94ebb0f4416",
+    "scripts/advice-evaluation-cases.mjs": "56c03c7daa5dcc195ea05fdc9794077e85c3b2322264bc226aa91c1a043ff6cf",
+    "apps/api/src/advice-service.ts": "819ef39c1104a90b7ce7fb9ed810e218845d2f8b843ec28b16bf5ab81ade9380"
+  },
+  "cases": [
+    {
+      "case": "rookie-public-forecast",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 58787,
+      "mode": "waivers"
+    },
+    {
+      "case": "rookie-missing-forecast",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "insufficient",
+      "selectedPlayers": [],
+      "confidence": 0,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 47770,
+      "mode": "draft-plan"
+    },
+    {
+      "case": "defense-start-sit",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["BUF"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 57592,
+      "mode": "lineup"
+    },
+    {
+      "case": "kicker-start-sit",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["k1"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 53429,
+      "mode": "lineup"
+    },
+    {
+      "case": "focused-start-sit",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["w4"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 25399,
+      "mode": "lineup"
+    },
+    {
+      "case": "focused-contextual-start-sit",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["w1"],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 41145,
+      "mode": "lineup"
+    },
+    {
+      "case": "lineup",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["q1", "w4", "r1"],
+      "confidence": 70,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 50049,
+      "mode": "lineup"
+    },
+    {
+      "case": "draft-plan",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 70,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 61558,
+      "mode": "draft-plan"
+    },
+    {
+      "case": "draft-review",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 70,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 58489,
+      "mode": "draft-review"
+    },
+    {
+      "case": "trade",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 40700,
+      "mode": "trade"
+    },
+    {
+      "case": "waivers",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 50800,
+      "mode": "waivers"
+    },
+    {
+      "case": "betting",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 49,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 27042,
+      "mode": "betting"
+    },
+    {
+      "case": "waiver-drop-loss",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 50144,
+      "mode": "waivers"
+    },
+    {
+      "case": "waiver-drop-upgrade",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 60385,
+      "mode": "waivers"
+    },
+    {
+      "case": "missing-season-evidence",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "insufficient",
+      "selectedPlayers": [],
+      "confidence": 20,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 46925,
+      "mode": "draft-plan"
+    },
+    {
+      "case": "injured-starter",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["q1", "w1", "r1"],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 54963,
+      "mode": "lineup"
+    },
+    {
+      "case": "contextual-lineup",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["q1", "w1", "r1"],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 42816,
+      "mode": "lineup"
+    },
+    {
+      "case": "mixed-media-waivers",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 85,
+      "perception": {
+        "tone": "mixed",
+        "sourceIds": ["news-0", "news-1"],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 72123,
+      "mode": "waivers"
+    },
+    {
+      "case": "stale-media-waivers",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "stale"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 53420,
+      "mode": "waivers"
+    },
+    {
+      "case": "beneficial-trade",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r2"],
+      "confidence": 85,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 46643,
+      "mode": "trade"
+    },
+    {
+      "case": "automatic-draft-plan",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r3"],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 65915,
+      "mode": "draft-plan"
+    },
+    {
+      "case": "automatic-draft-review",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "hold",
+      "selectedPlayers": [],
+      "confidence": 50,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 75002,
+      "mode": "draft-review"
+    },
+    {
+      "case": "automatic-beneficial-trade",
+      "passed": true,
+      "failures": [],
+      "firstPassValid": true,
+      "verdict": "lean",
+      "selectedPlayers": ["r2"],
+      "confidence": 59,
+      "perception": {
+        "tone": "unknown",
+        "sourceIds": [],
+        "feedStatus": "current"
+      },
+      "modelPasses": 2,
+      "validationFailures": [],
+      "elapsedMs": 60744,
+      "mode": "trade"
+    }
+  ],
+  "limitations": [
+    "One full fictional decision-process sweep with independently fixed expectations; not a guarantee of future model reliability.",
+    "Raw reviewed answers and saved results are graded; no rubric or advice prompt was changed for this run.",
+    "No owner league/settings/history or vault writes; native login remains in its original location.",
+    "No prospective NFL accuracy, calibrated confidence, betting returns or sportsbook edge is established."
+  ]
+}

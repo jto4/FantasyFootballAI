@@ -1,5 +1,8 @@
 import type { ActionSetting, LeagueConnection } from '@sidekick/core';
 import { scheduleRecommendations } from '@sidekick/core';
+import { scheduleSummary } from './beginner-flow';
+import { timezoneLabel } from './timezone-label';
+import { useState } from 'react';
 
 const actionNames: Record<string, string> = {
   'offseason-update': 'Offseason updates',
@@ -11,6 +14,8 @@ const actionNames: Record<string, string> = {
 
 type Props = {
   actions: ActionSetting[];
+  confirmAutomatic?: boolean;
+  showSummary?: boolean;
   leagues: LeagueConnection[];
   onApplySuggestions: () => void;
   onActionChange: (kind: ActionSetting['kind'], patch: Partial<ActionSetting>) => void;
@@ -23,41 +28,53 @@ type Props = {
 
 export function AutomaticActionsSection({
   actions,
+  confirmAutomatic = true,
+  showSummary = true,
   leagues,
   onApplySuggestions,
   onActionChange,
   onScheduleChange,
   onActionLeague,
 }: Props) {
+  // Keep configured custom zones available when a user tries another choice before saving.
+  const [configuredTimezones] = useState(() => actions.map((action) => action.schedule.timezone));
   return (
     <>
-      <div className="settings-card-title">
-        <div>
-          <h2>Automatic actions</h2>
-          <p>Choose when each update runs, where it goes, and whether it needs review first.</p>
-        </div>
-        <button
-          type="button"
-          className="small-button"
-          onClick={onApplySuggestions}
-          aria-label="Apply suggested report schedules"
-        >
-          Use suggested times
-        </button>
-      </div>
-      <small className="schedule-explainer">
-        Suggested cadence: offseason updates on the{' '}
-        {scheduleRecommendations['offseason-update']!.label} at 9:00 AM, power rankings on{' '}
-        {scheduleRecommendations['power-rankings']!.label} at 9:00 AM, and matchup previews on{' '}
-        {scheduleRecommendations['matchup-preview']!.label} at 9:00 AM. Each action keeps its
-        current timezone, league scope, channel, and review or send policy.
-      </small>
+      {actions.length > 1 && (
+        <>
+          <div className="settings-card-title">
+            <div>
+              <h2 data-search-target="automatic-actions" tabIndex={-1}>
+                Automatic actions
+              </h2>
+              <p>Choose when each update runs, where it goes, and whether it needs review first.</p>
+            </div>
+            <button
+              type="button"
+              className="small-button"
+              onClick={onApplySuggestions}
+              aria-label="Apply suggested report schedules"
+            >
+              Use suggested times
+            </button>
+          </div>
+          <small className="schedule-explainer">
+            Suggested cadence: offseason updates on the{' '}
+            {scheduleRecommendations['offseason-update']!.label} at 9:00 AM, power rankings on{' '}
+            {scheduleRecommendations['power-rankings']!.label} at 9:00 AM, and matchup previews on{' '}
+            {scheduleRecommendations['matchup-preview']!.label} at 9:00 AM. Each action keeps its
+            current timezone, league scope, channel, and review or send policy.
+          </small>
+        </>
+      )}
       <div className="action-settings">
         {actions.map((action) => {
           const schedule = action.schedule;
+          const recommendation = scheduleRecommendations[action.kind];
           const timezones = [
             ...new Set([
               schedule.timezone,
+              ...configuredTimezones,
               'America/New_York',
               'America/Chicago',
               'America/Denver',
@@ -67,6 +84,42 @@ export function AutomaticActionsSection({
           ];
           return (
             <div className="action-block" key={action.kind}>
+              {recommendation && (
+                <button
+                  type="button"
+                  className="small-button schedule-preset"
+                  onClick={() => {
+                    onActionChange(action.kind, {
+                      enabled: true,
+                      mode: 'draft',
+                      schedule: {
+                        enabled: true,
+                        frequency: recommendation.frequency,
+                        weekday: recommendation.weekday ?? schedule.weekday,
+                        dayOfMonth: recommendation.dayOfMonth ?? schedule.dayOfMonth ?? 1,
+                        time: '09:00',
+                        timezone: schedule.timezone,
+                      },
+                    });
+                  }}
+                >
+                  Create {actionNames[action.kind]?.toLowerCase()}{' '}
+                  {recommendation.frequency === 'monthly'
+                    ? `on day ${recommendation.dayOfMonth} each month`
+                    : `every ${recommendation.label}`}{' '}
+                  at 9 AM
+                </button>
+              )}
+              {showSummary && (
+                <p className="schedule-summary">
+                  {scheduleSummary(
+                    action,
+                    leagues
+                      .filter((league) => action.leagueIds?.includes(league.id))
+                      .map((league) => league.displayName),
+                  )}
+                </p>
+              )}
               <div className="action-row">
                 <strong>{actionNames[action.kind] ?? action.kind}</strong>
                 <label className="switch-label">
@@ -79,32 +132,46 @@ export function AutomaticActionsSection({
                   />
                   <span>Enabled</span>
                 </label>
-                <select
-                  aria-label={`${actionNames[action.kind]} delivery channel`}
-                  value={action.channel}
-                  onChange={(event) =>
-                    onActionChange(action.kind, {
-                      channel: event.target.value as ActionSetting['channel'],
-                    })
-                  }
-                >
-                  <option value="dashboard">Dashboard draft</option>
-                  <option value="email">Email</option>
-                  <option value="sms">SMS</option>
-                  <option value="imessage">iMessage via BlueBubbles</option>
-                </select>
-                <select
-                  aria-label={`${actionNames[action.kind]} delivery policy`}
-                  value={action.mode}
-                  onChange={(event) =>
-                    onActionChange(action.kind, {
-                      mode: event.target.value as 'draft' | 'automatic',
-                    })
-                  }
-                >
-                  <option value="draft">Review before send</option>
-                  <option value="automatic">Send automatically</option>
-                </select>
+                <label className="action-delivery-field">
+                  <span>Delivery channel</span>
+                  <select
+                    aria-label={`${actionNames[action.kind]} delivery channel`}
+                    value={action.channel}
+                    onChange={(event) =>
+                      onActionChange(action.kind, {
+                        channel: event.target.value as ActionSetting['channel'],
+                      })
+                    }
+                  >
+                    <option value="dashboard">Dashboard draft</option>
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                    <option value="imessage">iMessage</option>
+                  </select>
+                </label>
+                <label className="action-delivery-field">
+                  <span>Delivery policy</span>
+                  <select
+                    aria-label={`${actionNames[action.kind]} delivery policy`}
+                    value={action.mode}
+                    onChange={(event) => {
+                      if (
+                        event.target.value === 'automatic' &&
+                        confirmAutomatic &&
+                        !window.confirm(
+                          `Enable automatic delivery for ${actionNames[action.kind]}? When this report is scheduled, it can send through the configured ${action.channel === 'sms' ? 'text message' : action.channel} destination without your review. Check the recipient in Delivery & access before saving.`,
+                        )
+                      )
+                        return;
+                      onActionChange(action.kind, {
+                        mode: event.target.value as 'draft' | 'automatic',
+                      });
+                    }}
+                  >
+                    <option value="draft">Review before send</option>
+                    <option value="automatic">Send automatically</option>
+                  </select>
+                </label>
               </div>
               <div className="action-schedule">
                 <label className="schedule-toggle">
@@ -214,9 +281,11 @@ export function AutomaticActionsSection({
                           }
                         />
                       </label>
-                      <label>
-                        TIMEZONE
+                      <label className="schedule-timezone">
+                        <span>TIMEZONE</span>
                         <select
+                          aria-label="TIMEZONE"
+                          aria-describedby={`schedule-timezone-${action.kind}`}
                           value={schedule.timezone}
                           onChange={(event) =>
                             onScheduleChange(action.kind, { timezone: event.target.value })
@@ -224,10 +293,13 @@ export function AutomaticActionsSection({
                         >
                           {timezones.map((timezone) => (
                             <option key={timezone} value={timezone}>
-                              {timezone}
+                              {timezoneLabel(timezone)}
                             </option>
                           ))}
                         </select>
+                        <small className="timezone-id" id={`schedule-timezone-${action.kind}`}>
+                          Timezone ID: {schedule.timezone}
+                        </small>
                       </label>
                     </div>
                     <div className="news-source-settings">

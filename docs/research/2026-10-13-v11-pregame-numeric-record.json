@@ -1,0 +1,672 @@
+{
+  "version": 1,
+  "issuedAt": "2026-10-13T19:16:36.120Z",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "bb7565509c7d41dfde02d78fc1bb49a2493e3588ef3b35eca1db5fb2b4676eb8",
+  "frozenSha256": "ad060f6291868c39b5305b474f4a4786b1535a0c2f4655bb8b0c727235404836",
+  "pending": [
+    {
+      "gameId": "2026_06_HOU_JAX",
+      "kickoffAt": "2026-10-18T13:30:00.000Z",
+      "issuedAt": "2026-10-13T19:16:31.380Z",
+      "line": 42.5,
+      "book": 0.5173641257162701,
+      "production": 0.5080169240810521,
+      "probabilities": {
+        "price": 0.5054466844386541,
+        "flow": 0.5080169240810521,
+        "media": 0.5080169240810521,
+        "combined": 0.5043515300069368
+      },
+      "bookQuotes": [
+        {
+          "id": "682ab012d3956a51724a99cf27bec308dfcc88a18b79eac4ab87ca76a6371bff",
+          "gameId": "2026_06_HOU_JAX",
+          "espnId": "401872996",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 42.5,
+          "americanOdds": -118,
+          "oppositeAmericanOdds": -102,
+          "observedAt": "2026-10-13T19:13:24.436Z",
+          "kickoffAt": "2026-10-18T13:30:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872996"
+        },
+        {
+          "id": "4bf65433b17c5cfeda31384b675e4b4d8c9c04ca295d6a7e0b46cd6de469ad8c",
+          "gameId": "2026_06_HOU_JAX",
+          "espnId": "401872996",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 42.5,
+          "americanOdds": -102,
+          "oppositeAmericanOdds": -118,
+          "observedAt": "2026-10-13T19:13:24.436Z",
+          "kickoffAt": "2026-10-18T13:30:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872996"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_SEA_DEN",
+      "kickoffAt": "2026-10-16T00:15:00.000Z",
+      "issuedAt": "2026-10-13T19:16:31.820Z",
+      "line": 40.5,
+      "book": 0.5043297540699689,
+      "production": 0.498335822515492,
+      "probabilities": {
+        "price": 0.5058902186664074,
+        "flow": 0.5051258380749146,
+        "media": 0.498335822515492,
+        "combined": 0.5102655696113196
+      },
+      "bookQuotes": [
+        {
+          "id": "b054afd70550aff2fb7cefa9741ae201045cf42835243b2b59e119853bc2fa37",
+          "gameId": "2026_06_SEA_DEN",
+          "espnId": "401872995",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 40.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "observedAt": "2026-10-13T19:13:24.439Z",
+          "kickoffAt": "2026-10-16T00:15:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+        },
+        {
+          "id": "ab5f3473f9bcbebc964381fa907aea58ca0801596276381134ed4203f312858d",
+          "gameId": "2026_06_SEA_DEN",
+          "espnId": "401872995",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 40.5,
+          "americanOdds": -108,
+          "oppositeAmericanOdds": -112,
+          "observedAt": "2026-10-13T19:13:24.439Z",
+          "kickoffAt": "2026-10-16T00:15:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_CHI_ATL",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:32.174Z",
+      "line": 49.5,
+      "book": 0.4956702459300312,
+      "production": 0.49048452764621053,
+      "probabilities": {
+        "price": 0.49544823915169667,
+        "flow": 0.49048452764621053,
+        "media": 0.49048452764621053,
+        "combined": 0.4922749511462534
+      },
+      "bookQuotes": [
+        {
+          "id": "e8c15a72063ab4544c2034896085c4a3dfd0a2c0e6488bd25c2c266b7461c325",
+          "gameId": "2026_06_CHI_ATL",
+          "espnId": "401872999",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 49.5,
+          "americanOdds": -108,
+          "oppositeAmericanOdds": -112,
+          "observedAt": "2026-10-13T19:13:25.509Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872999"
+        },
+        {
+          "id": "e8af673d12bd3a422a410945df8e8974b6c80829bd94268a4cee4ccd0b4d671a",
+          "gameId": "2026_06_CHI_ATL",
+          "espnId": "401872999",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 49.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "observedAt": "2026-10-13T19:13:25.509Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872999"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_BAL_CLE",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:32.528Z",
+      "line": 41.5,
+      "book": 0.4956702459300312,
+      "production": 0.48420734047597463,
+      "probabilities": {
+        "price": 0.4917234582171479,
+        "flow": 0.48420734047597463,
+        "media": 0.48420734047597463,
+        "combined": 0.4896402984866014
+      },
+      "bookQuotes": [
+        {
+          "id": "8b502f46c56461393cb6dc6f236d643ffdf5ea50ec718621dd3c4c24f20d2180",
+          "gameId": "2026_06_BAL_CLE",
+          "espnId": "401872997",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 41.5,
+          "americanOdds": -108,
+          "oppositeAmericanOdds": -112,
+          "observedAt": "2026-10-13T19:13:25.810Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872997"
+        },
+        {
+          "id": "62041c128efbe934a4de40d3170db3da332e9e32b2de285b18c74e44b5c099f7",
+          "gameId": "2026_06_BAL_CLE",
+          "espnId": "401872997",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 41.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "observedAt": "2026-10-13T19:13:25.810Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872997"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_TEN_IND",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:32.882Z",
+      "line": 44.5,
+      "book": 0.4826358742837298,
+      "production": 0.47263789957274843,
+      "probabilities": {
+        "price": 0.4775693992458719,
+        "flow": 0.47263789957274843,
+        "media": 0.47263789957274843,
+        "combined": 0.4744034173801413
+      },
+      "bookQuotes": [
+        {
+          "id": "c4dacd1ed4ee67467dc85fa9d95d88fa020fd1202d484b11e909dda4530feb55",
+          "gameId": "2026_06_TEN_IND",
+          "espnId": "401873003",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 44.5,
+          "americanOdds": -102,
+          "oppositeAmericanOdds": -118,
+          "observedAt": "2026-10-13T19:13:27.625Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873003"
+        },
+        {
+          "id": "3e1b36e4b93ad1ad16869d0dc1b4deac7d3c846af3c07bee0c585896dc0c3165",
+          "gameId": "2026_06_TEN_IND",
+          "espnId": "401873003",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 44.5,
+          "americanOdds": -118,
+          "oppositeAmericanOdds": -102,
+          "observedAt": "2026-10-13T19:13:27.625Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873003"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_NYJ_NE",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:33.235Z",
+      "line": 43.5,
+      "book": 0.5108342361863489,
+      "production": 0.5019797548084699,
+      "probabilities": {
+        "price": 0.5095293302349043,
+        "flow": 0.5019797548084699,
+        "media": 0.5019797548084699,
+        "combined": 0.5074481987845741
+      },
+      "bookQuotes": [
+        {
+          "id": "fbc63750489a181e0a1febf650cc5dd48fa85b068fc6d87313a9ee11615bb1de",
+          "gameId": "2026_06_NYJ_NE",
+          "espnId": "401873001",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 43.5,
+          "americanOdds": -115,
+          "oppositeAmericanOdds": -105,
+          "observedAt": "2026-10-13T19:13:27.813Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873001"
+        },
+        {
+          "id": "9a894a1f8bbc9efdb86579bf072e8d6063adaa2fbc4e6189a99d0b14b2615077",
+          "gameId": "2026_06_NYJ_NE",
+          "espnId": "401873001",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 43.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "observedAt": "2026-10-13T19:13:27.813Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873001"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_NO_NYG",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:33.585Z",
+      "line": 45.5,
+      "book": 0.4956702459300312,
+      "production": 0.4878935541050185,
+      "probabilities": {
+        "price": 0.4954596333474509,
+        "flow": 0.4878935541050185,
+        "media": 0.4878935541050185,
+        "combined": 0.4933789980917114
+      },
+      "bookQuotes": [
+        {
+          "id": "97d2cdd97639c62fa15b62a13d223c5cb45702835c95afb97bd856bf3c043c44",
+          "gameId": "2026_06_NO_NYG",
+          "espnId": "401873000",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 45.5,
+          "americanOdds": -108,
+          "oppositeAmericanOdds": -112,
+          "observedAt": "2026-10-13T19:13:29.568Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873000"
+        },
+        {
+          "id": "09bb9d6bf1fd6d186f5208b4ae430479e7e0e0d30f8ee63e27e619fbc583d414",
+          "gameId": "2026_06_NO_NYG",
+          "espnId": "401873000",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 45.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "observedAt": "2026-10-13T19:13:29.568Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873000"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_CAR_PHI",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:33.937Z",
+      "line": 40.5,
+      "book": 0.5,
+      "production": 0.47106985491694287,
+      "probabilities": {
+        "price": 0.4758723275554328,
+        "flow": 0.47106985491694287,
+        "media": 0.47106985491694287,
+        "combined": 0.4727011558375824
+      },
+      "bookQuotes": [
+        {
+          "id": "749ad83b4f012f425e866b8d574f6165f52d3d1dd01d4a8f316e82941eb1b383",
+          "gameId": "2026_06_CAR_PHI",
+          "espnId": "401872998",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 40.5,
+          "americanOdds": -110,
+          "oppositeAmericanOdds": -110,
+          "observedAt": "2026-10-13T19:13:29.706Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872998"
+        },
+        {
+          "id": "7f37a34d67ec2b09e872c805764494f1f052eef8fcf444bd58b23914264f0dbc",
+          "gameId": "2026_06_CAR_PHI",
+          "espnId": "401872998",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 40.5,
+          "americanOdds": -110,
+          "oppositeAmericanOdds": -110,
+          "observedAt": "2026-10-13T19:13:29.706Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872998"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_PIT_TB",
+      "kickoffAt": "2026-10-18T17:00:00.000Z",
+      "issuedAt": "2026-10-13T19:16:34.292Z",
+      "line": 40.5,
+      "book": 0.4891657638136511,
+      "production": 0.4781574056714249,
+      "probabilities": {
+        "price": 0.4830706639555491,
+        "flow": 0.4781574056714249,
+        "media": 0.4781574056714249,
+        "combined": 0.47990079133633107
+      },
+      "bookQuotes": [
+        {
+          "id": "7a7fdace588f5463169765316589158cbc56a29a1b2eef9f317d504210f7185f",
+          "gameId": "2026_06_PIT_TB",
+          "espnId": "401873002",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 40.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "observedAt": "2026-10-13T19:13:31.175Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873002"
+        },
+        {
+          "id": "271fad8e6a5f7f7be53efcd3501a38caa5c43dd5db515df064b21e8351e9052d",
+          "gameId": "2026_06_PIT_TB",
+          "espnId": "401873002",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 40.5,
+          "americanOdds": -115,
+          "oppositeAmericanOdds": -105,
+          "observedAt": "2026-10-13T19:13:31.175Z",
+          "kickoffAt": "2026-10-18T17:00:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873002"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_ARI_LA",
+      "kickoffAt": "2026-10-18T20:05:00.000Z",
+      "issuedAt": "2026-10-13T19:16:34.643Z",
+      "line": 52.5,
+      "book": 0.5,
+      "production": 0.49565709646059575,
+      "probabilities": {
+        "price": 0.5032301631664082,
+        "flow": 0.49565709646059575,
+        "media": 0.49565709646059575,
+        "combined": 0.5011488494867876
+      },
+      "bookQuotes": [
+        {
+          "id": "23c156d925e17c6453d6bbe2553864ddb1fa7849cc44b430cb9980e1d1548481",
+          "gameId": "2026_06_ARI_LA",
+          "espnId": "401873004",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 52.5,
+          "americanOdds": -110,
+          "oppositeAmericanOdds": -110,
+          "observedAt": "2026-10-13T19:13:31.991Z",
+          "kickoffAt": "2026-10-18T20:05:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873004"
+        },
+        {
+          "id": "a0a94882b158f4b48c08eab1a00c13cbd8b2c1afb63eaf2beffc1c1ac670f050",
+          "gameId": "2026_06_ARI_LA",
+          "espnId": "401873004",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 52.5,
+          "americanOdds": -110,
+          "oppositeAmericanOdds": -110,
+          "observedAt": "2026-10-13T19:13:31.991Z",
+          "kickoffAt": "2026-10-18T20:05:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873004"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_LAC_KC",
+      "kickoffAt": "2026-10-18T20:25:00.000Z",
+      "issuedAt": "2026-10-13T19:16:34.998Z",
+      "line": 42.5,
+      "book": 0.4956702459300312,
+      "production": 0.4897362723069471,
+      "probabilities": {
+        "price": 0.49474917583126554,
+        "flow": 0.4897362723069471,
+        "media": 0.4897362723069471,
+        "combined": 0.4915730463736746
+      },
+      "bookQuotes": [
+        {
+          "id": "c216bf395ae50f8194b26b2992ca73f2ce4e5aeac907ebf46335138524cbaa5e",
+          "gameId": "2026_06_LAC_KC",
+          "espnId": "401873006",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 42.5,
+          "americanOdds": -108,
+          "oppositeAmericanOdds": -112,
+          "observedAt": "2026-10-13T19:13:33.377Z",
+          "kickoffAt": "2026-10-18T20:25:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873006"
+        },
+        {
+          "id": "b0128d733d6dd50f88ce160db72aba8eef74eb2eeb625b5396f1357e8527f70b",
+          "gameId": "2026_06_LAC_KC",
+          "espnId": "401873006",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 42.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "observedAt": "2026-10-13T19:13:33.377Z",
+          "kickoffAt": "2026-10-18T20:25:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873006"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_BUF_LV",
+      "kickoffAt": "2026-10-18T20:25:00.000Z",
+      "issuedAt": "2026-10-13T19:16:35.354Z",
+      "line": 53.5,
+      "book": 0.4891657638136511,
+      "production": 0.48801351895861184,
+      "probabilities": {
+        "price": 0.49552541017593105,
+        "flow": 0.48801351895861184,
+        "media": 0.48801351895861184,
+        "combined": 0.4934448796595016
+      },
+      "bookQuotes": [
+        {
+          "id": "d3fffb7e019db59c02f6336b2e4d160073ef7b2af43a1ffec4959c332067d8a7",
+          "gameId": "2026_06_BUF_LV",
+          "espnId": "401873005",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 53.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "observedAt": "2026-10-13T19:13:33.459Z",
+          "kickoffAt": "2026-10-18T20:25:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873005"
+        },
+        {
+          "id": "33c6f72985be864df130631824e23272856eebbc6056519541afbb3e105e4a2d",
+          "gameId": "2026_06_BUF_LV",
+          "espnId": "401873005",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 53.5,
+          "americanOdds": -115,
+          "oppositeAmericanOdds": -105,
+          "observedAt": "2026-10-13T19:13:33.459Z",
+          "kickoffAt": "2026-10-18T20:25:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873005"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_DAL_GB",
+      "kickoffAt": "2026-10-19T00:20:00.000Z",
+      "issuedAt": "2026-10-13T19:16:35.777Z",
+      "line": 52.5,
+      "book": 0.5108342361863489,
+      "production": 0.49944476436742014,
+      "probabilities": {
+        "price": 0.5070071538395889,
+        "flow": 0.5032806940412484,
+        "media": 0.49944476436742014,
+        "combined": 0.5085702060156294
+      },
+      "bookQuotes": [
+        {
+          "id": "853c3c2dcae106d47859fc8c2b7b885cc102152b579460277e21e27035a2e67b",
+          "gameId": "2026_06_DAL_GB",
+          "espnId": "401873007",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 52.5,
+          "americanOdds": -115,
+          "oppositeAmericanOdds": -105,
+          "observedAt": "2026-10-13T19:13:35.367Z",
+          "kickoffAt": "2026-10-19T00:20:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873007"
+        },
+        {
+          "id": "ba625a90de413e907c7b1f9942568071d620690d317fb0accc46b2709e75853a",
+          "gameId": "2026_06_DAL_GB",
+          "espnId": "401873007",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 52.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "observedAt": "2026-10-13T19:13:35.367Z",
+          "kickoffAt": "2026-10-19T00:20:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873007"
+        }
+      ],
+      "outcome": "pending"
+    },
+    {
+      "gameId": "2026_06_WAS_SF",
+      "kickoffAt": "2026-10-20T00:15:00.000Z",
+      "issuedAt": "2026-10-13T19:16:36.120Z",
+      "line": 50.5,
+      "book": 0.5217391304347826,
+      "production": 0.5143484491584552,
+      "probabilities": {
+        "price": 0.5219304739853424,
+        "flow": 0.5143484491584552,
+        "media": 0.5143484491584552,
+        "combined": 0.5198509819761058
+      },
+      "bookQuotes": [
+        {
+          "id": "a76545f2a8b759f92d49e60541a7dd256c76dbe1fc5366a8131d5cd63ade3c40",
+          "gameId": "2026_06_WAS_SF",
+          "espnId": "401873008",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "over",
+          "line": 50.5,
+          "americanOdds": -120,
+          "oppositeAmericanOdds": 100,
+          "observedAt": "2026-10-13T19:13:35.683Z",
+          "kickoffAt": "2026-10-20T00:15:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873008"
+        },
+        {
+          "id": "61b9499c678e6ef807697fab07da4e41d1b7276bcb61f1657daa97700b6c4d6b",
+          "gameId": "2026_06_WAS_SF",
+          "espnId": "401873008",
+          "sportsbook": "DraftKings",
+          "providerId": "100",
+          "kind": "total",
+          "side": "under",
+          "line": 50.5,
+          "americanOdds": 100,
+          "oppositeAmericanOdds": -120,
+          "observedAt": "2026-10-13T19:13:35.683Z",
+          "kickoffAt": "2026-10-20T00:15:00.000Z",
+          "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401873008"
+        }
+      ],
+      "outcome": "pending"
+    }
+  ],
+  "warnings": [
+    "2026 Weeks 1–5 are reused retrospective research; fixed parameters, no later-outcome tuning. Minimum 30 earlier supported games before any correction.",
+    "Sentiment is only a current captured headline-language proxy. No representative social sample or historical sentiment is claimed.",
+    "Anonymous large-trade flow is not proof of wallet skill. No current holder/leaderboard data used. Moneyline and spread outputs unchanged."
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "developmentSeasons": [2018, 2021],
+  "candidates": [
+    {
+      "family": "all",
+      "penalty": 200,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21086747500295824,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24924477449957796,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24985383461797991,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "family": "all",
+      "penalty": 1000,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21083251484891904,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24910828591676482,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24971883904456887,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "family": "quarterback",
+      "penalty": 200,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21085129140739628,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.2490964403937201,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.2496861315244048,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "family": "quarterback",
+      "penalty": 1000,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21083187184580893,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.2490756727801149,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24967785310870985,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "family": "injuries",
+      "penalty": 200,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21084294454006827,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24921918806319002,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24984771750974016,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "family": "injuries",
+      "penalty": 1000,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21082747557034934,
+          "previousBrier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24910297856670074,
+          "previousBrier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24971710797483307,
+          "previousBrier": 0.24967575998436367,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "moneyline": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "moneyline",
+      "n": 1034,
+      "brier": 0.210826837347873,
+      "previousBrier": 0.210826837347873,
+      "bookBrier": 0.21082834472930922
+    },
+    "spread": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "spread",
+      "n": 1016,
+      "brier": 0.2490703366103935,
+      "previousBrier": 0.2490703366103935,
+      "bookBrier": 0.24946182670687445
+    },
+    "total": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "total",
+      "n": 1027,
+      "brier": 0.24967575998436367,
+      "previousBrier": 0.24967575998436367,
+      "bookBrier": 0.24993866188950456
+    }
+  }
+}

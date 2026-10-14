@@ -35,8 +35,8 @@ export function AIRuntimeSection({
     <section className="settings-card">
       <div className="settings-card-title">
         <div>
-          <h2 ref={headingRef} tabIndex={-1}>
-            AI runtime
+          <h2 ref={headingRef} tabIndex={-1} data-search-target="ai-runtime-heading">
+            AI connection
           </h2>
           <p>
             API mode sends the league report context to your configured provider. A local CLI
@@ -47,24 +47,12 @@ export function AIRuntimeSection({
         <KeyRound size={18} />
       </div>
       <div className="settings-fields two">
-        <label>
-          RUNTIME
-          <select
-            value={runtime.mode}
-            onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
-          >
-            <option value="api">OpenAI-compatible API</option>
-            <option value="cli">Local AI CLI</option>
-            <option value="apple-cli" disabled={!appleCliPlatform}>
-              Apple Foundation Models CLI (macOS 27+)
-            </option>
-          </select>
-        </label>
         {runtime.mode === 'api' ? (
           <>
             <label>
               MODEL
               <input
+                data-search-target="ai-model"
                 value={runtime.model}
                 onChange={(event) => onChange('model', event.target.value)}
                 placeholder="gpt-4o-mini"
@@ -76,90 +64,129 @@ export function AIRuntimeSection({
                 ))}
               </datalist>
             </label>
-            <label className="wide">
-              API BASE URL
-              <input
-                value={runtime.baseUrl}
-                onChange={(event) => onChange('baseUrl', event.target.value)}
-                placeholder="https://api.openai.com/v1"
-              />
-            </label>
-            <label>
-              TEMPERATURE
-              <input
-                type="number"
-                min={0}
-                max={2}
-                step={0.1}
-                value={runtime.temperature ?? 0.8}
-                onChange={(event) =>
-                  onChange(
-                    'temperature',
-                    event.target.value === '' ? 0.8 : Number(event.target.value),
-                  )
-                }
-              />
-              <small>Lower is steadier; higher is more varied. Range: 0–2.</small>
-            </label>
-            <label>
-              MAXIMUM OUTPUT TOKENS
-              <input
-                type="number"
-                min={128}
-                max={16_384}
-                step={128}
-                value={runtime.maxOutputTokens ?? 1200}
-                onChange={(event) =>
-                  onChange(
-                    'maxOutputTokens',
-                    event.target.value === '' ? 1200 : Number(event.target.value),
-                  )
-                }
-              />
-              <small>Caps response size for supported OpenAI-compatible models.</small>
-            </label>
-            <label>
-              INPUT PRICE (USD / 1M TOKENS)
-              <input
-                type="number"
-                min={0}
-                max={1000}
-                step={0.0001}
-                value={runtime.inputUsdPerMillionTokens ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    'inputUsdPerMillionTokens',
-                    event.target.value === '' ? undefined : Number(event.target.value),
-                  )
-                }
-                placeholder="Enter current input rate"
-              />
-            </label>
-            <label>
-              OUTPUT PRICE (USD / 1M TOKENS)
-              <input
-                type="number"
-                min={0}
-                max={1000}
-                step={0.0001}
-                value={runtime.outputUsdPerMillionTokens ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    'outputUsdPerMillionTokens',
-                    event.target.value === '' ? undefined : Number(event.target.value),
-                  )
-                }
-                placeholder="Enter current output rate"
-              />
-            </label>
-            <p className="schedule-explainer">
-              Cost estimates use these owner-entered rates and the token counts returned by the
-              provider. Enter both current rates to see a dollar estimate; discounts and other
-              provider billing adjustments are not included.
-            </p>
+            <details className="advanced-settings wide">
+              <summary>Advanced AI options</summary>
+              <div className="settings-fields two">
+                {' '}
+                <label>
+                  Connection type
+                  <select
+                    data-search-target="ai-runtime"
+                    value={runtime.mode}
+                    onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+                  >
+                    <option value="api">AI service (OpenAI or compatible)</option>
+                    <option value="cli">Local AI tool (advanced)</option>
+                    <option value="apple-cli" disabled={!appleCliPlatform}>
+                      Apple Foundation Models CLI (macOS 27+)
+                    </option>
+                  </select>
+                </label>
+                <label className="wide">
+                  AI server address (API BASE URL)
+                  <input
+                    data-search-target="ai-endpoint"
+                    value={runtime.baseUrl}
+                    onChange={(event) => onChange('baseUrl', event.target.value)}
+                    placeholder="https://api.openai.com/v1"
+                  />
+                </label>
+                <label>
+                  Creativity
+                  <input
+                    type="number"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    data-search-target="ai-temperature"
+                    value={runtime.temperature ?? 0.8}
+                    onChange={(event) =>
+                      onChange(
+                        'temperature',
+                        event.target.value === '' ? 0.8 : Number(event.target.value),
+                      )
+                    }
+                  />
+                  <small>Lower is steadier; higher is more varied. Range: 0–2.</small>
+                </label>
+                <label>
+                  Maximum response size (tokens)
+                  <input
+                    type="number"
+                    min={128}
+                    max={16_384}
+                    step={128}
+                    data-search-target="ai-output"
+                    value={runtime.maxOutputTokens ?? 1200}
+                    onChange={(event) =>
+                      onChange(
+                        'maxOutputTokens',
+                        event.target.value === '' ? 1200 : Number(event.target.value),
+                      )
+                    }
+                  />
+                  <small>Caps response size for supported OpenAI-compatible models.</small>
+                </label>
+                <label>
+                  INPUT PRICE (USD / 1M TOKENS)
+                  <input
+                    type="number"
+                    min={0}
+                    max={1000}
+                    step={0.0001}
+                    data-search-target="ai-pricing"
+                    value={runtime.inputUsdPerMillionTokens ?? ''}
+                    onChange={(event) =>
+                      onChange(
+                        'inputUsdPerMillionTokens',
+                        event.target.value === '' ? undefined : Number(event.target.value),
+                      )
+                    }
+                    placeholder="Enter current input rate"
+                  />
+                </label>
+                <label>
+                  OUTPUT PRICE (USD / 1M TOKENS)
+                  <input
+                    type="number"
+                    min={0}
+                    max={1000}
+                    step={0.0001}
+                    value={runtime.outputUsdPerMillionTokens ?? ''}
+                    onChange={(event) =>
+                      onChange(
+                        'outputUsdPerMillionTokens',
+                        event.target.value === '' ? undefined : Number(event.target.value),
+                      )
+                    }
+                    placeholder="Enter current output rate"
+                  />
+                </label>
+                <p className="schedule-explainer">
+                  Cost estimates use these owner-entered rates and the token counts returned by the
+                  provider. Enter both current rates to see a dollar estimate; discounts and other
+                  provider billing adjustments are not included.
+                </p>
+              </div>
+            </details>
           </>
         ) : runtime.mode === 'cli' ? (
           <>
+            {' '}
+            <label>
+              Connection type
+              <select
+                data-search-target="ai-runtime"
+                value={runtime.mode}
+                onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+              >
+                <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="cli">Local AI tool (advanced)</option>
+                <option value="apple-cli" disabled={!appleCliPlatform}>
+                  Apple Foundation Models CLI (macOS 27+)
+                </option>
+              </select>
+            </label>
             <label>
               EXECUTABLE
               <input
@@ -181,12 +208,29 @@ export function AIRuntimeSection({
             </label>
           </>
         ) : (
-          <p className="schedule-explainer">
-            Uses Apple’s `fm respond` command with the on-device Foundation Model. Requires a
-            supported Mac running macOS 27 or later. The CLI receives report content in its process
-            arguments, which may be visible to local process-inspection tools while it runs. Test
-            runtime verifies that `fm` is available.
-          </p>
+          <>
+            {' '}
+            <label>
+              Connection type
+              <select
+                data-search-target="ai-runtime"
+                value={runtime.mode}
+                onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+              >
+                <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="cli">Local AI tool (advanced)</option>
+                <option value="apple-cli" disabled={!appleCliPlatform}>
+                  Apple Foundation Models CLI (macOS 27+)
+                </option>
+              </select>
+            </label>
+            <p className="schedule-explainer">
+              Uses Apple’s `fm respond` command with the on-device Foundation Model. Requires a
+              supported Mac running macOS 27 or later. The CLI receives report content in its
+              process arguments, which may be visible to local process-inspection tools while it
+              runs. Test runtime verifies that `fm` is available.
+            </p>
+          </>
         )}
       </div>
       <div className="settings-fields two">
@@ -196,7 +240,7 @@ export function AIRuntimeSection({
           </button>
         )}
         <button type="button" className="small-button" onClick={onTestRuntime} disabled={busy}>
-          {busy ? 'Testing…' : 'Save and test runtime'}
+          {busy ? 'Testing…' : 'Test connection'}
         </button>
       </div>
       {runtime.mode === 'api' && (

@@ -41,6 +41,7 @@ export function AIMemoryPrivacySection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="member-memory"
           checked={memoryEnabled}
           onChange={(event) => onMemoryEnabledChange(event.target.checked)}
         />
@@ -53,6 +54,7 @@ export function AIMemoryPrivacySection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="import-analysis"
           checked={analyzeImportsWithAI}
           disabled={!memoryEnabled}
           onChange={(event) => onAnalyzeImportsChange(event.target.checked)}
@@ -67,6 +69,7 @@ export function AIMemoryPrivacySection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="report-memory"
           checked={includeMemberContextInReports}
           disabled={!memoryEnabled}
           onChange={(event) => onIncludeMemberContextChange(event.target.checked)}
@@ -80,6 +83,7 @@ export function AIMemoryPrivacySection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="chat-memory"
           checked={includeMemberContextInChatReplies}
           disabled={!memoryEnabled}
           onChange={(event) => onIncludeMemberContextInChatRepliesChange(event.target.checked)}
@@ -94,6 +98,7 @@ export function AIMemoryPrivacySection({
       <label>
         IMPORTED SOURCE RETENTION
         <select
+          data-search-target="source-retention"
           value={conversationRetentionDays ?? 'never'}
           onChange={(event) => {
             const value = event.target.value;

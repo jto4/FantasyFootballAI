@@ -1,0 +1,139 @@
+{
+  "scoredAt": "2026-10-12T10:52:18.323Z",
+  "parametersUnchanged": true,
+  "purpose": "Diagnostic retraining with individual context groups only; eligibility/coverage differs and these results do not change the frozen procedure.",
+  "reports": [
+    {
+      "mode": "injury-only",
+      "pooled": {
+        "n": 1079,
+        "brier": 0.24984950713231707,
+        "v3Brier": 0.24976721771849572,
+        "bookBrier": 0.2501173189296667,
+        "active": 802
+      },
+      "seasons": [
+        {
+          "season": 2022,
+          "n": 268,
+          "brier": 0.2492509379998728,
+          "v3Brier": 0.2489232110182635,
+          "bookBrier": 0.2502122792134749,
+          "active": 265
+        },
+        {
+          "season": 2023,
+          "n": 270,
+          "brier": 0.2482820556269987,
+          "v3Brier": 0.24823442170774404,
+          "bookBrier": 0.25006922521405495,
+          "active": 269
+        },
+        {
+          "season": 2024,
+          "n": 269,
+          "brier": 0.2510958775347583,
+          "v3Brier": 0.251140121816382,
+          "bookBrier": 0.24977944777848365,
+          "active": 268
+        },
+        {
+          "season": 2025,
+          "n": 272,
+          "brier": 0.2507625762340612,
+          "v3Brier": 0.2507625762340612,
+          "bookBrier": 0.2504056398371012,
+          "active": 0
+        }
+      ]
+    },
+    {
+      "mode": "weather-only",
+      "pooled": {
+        "n": 1079,
+        "brier": 0.24967330081633543,
+        "v3Brier": 0.24976721771849572,
+        "bookBrier": 0.2501173189296667,
+        "active": 673
+      },
+      "seasons": [
+        {
+          "season": 2022,
+          "n": 268,
+          "brier": 0.24854676015112728,
+          "v3Brier": 0.2489232110182635,
+          "bookBrier": 0.2502122792134749,
+          "active": 167
+        },
+        {
+          "season": 2023,
+          "n": 270,
+          "brier": 0.2480206295168044,
+          "v3Brier": 0.24823442170774404,
+          "bookBrier": 0.25006922521405495,
+          "active": 168
+        },
+        {
+          "season": 2024,
+          "n": 269,
+          "brier": 0.25145249118890955,
+          "v3Brier": 0.251140121816382,
+          "bookBrier": 0.24977944777848365,
+          "active": 167
+        },
+        {
+          "season": 2025,
+          "n": 272,
+          "brier": 0.2506642270623884,
+          "v3Brier": 0.2507625762340612,
+          "bookBrier": 0.2504056398371012,
+          "active": 171
+        }
+      ]
+    },
+    {
+      "mode": "chart-only",
+      "pooled": {
+        "n": 1079,
+        "brier": 0.2497602225579578,
+        "v3Brier": 0.24976721771849572,
+        "bookBrier": 0.2501173189296667,
+        "active": 48
+      },
+      "seasons": [
+        {
+          "season": 2022,
+          "n": 268,
+          "brier": 0.2489232110182635,
+          "v3Brier": 0.2489232110182635,
+          "bookBrier": 0.2502122792134749,
+          "active": 0
+        },
+        {
+          "season": 2023,
+          "n": 270,
+          "brier": 0.24823442170774404,
+          "v3Brier": 0.24823442170774404,
+          "bookBrier": 0.25006922521405495,
+          "active": 0
+        },
+        {
+          "season": 2024,
+          "n": 269,
+          "brier": 0.251140121816382,
+          "v3Brier": 0.251140121816382,
+          "bookBrier": 0.24977944777848365,
+          "active": 0
+        },
+        {
+          "season": 2025,
+          "n": 272,
+          "brier": 0.2507348270494255,
+          "v3Brier": 0.2507625762340612,
+          "bookBrier": 0.2504056398371012,
+          "active": 48
+        }
+      ]
+    }
+  ]
+}

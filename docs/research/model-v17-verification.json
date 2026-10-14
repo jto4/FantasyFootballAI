@@ -1,0 +1,50 @@
+{
+  "verifiedAt": "2026-10-13T22:38:07.818Z",
+  "originalScoredAt": "2026-10-13T22:31:42.894Z",
+  "checks": {
+    "tests": "857 workspace tests (313 API, 84 dashboard, 237 core, 223 integrations) plus root suites passed under supported Node 22; all six new tests rerun after strengthening the distinct-week-only gate fixture",
+    "typecheck": "final passed",
+    "lint": "final passed",
+    "format": "passed; all new evidence formatted before sealing, no new format exemptions",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "replay": "Fresh decomposition of durable shared context/original/corrected snapshots; retained selected PBP reconstructs 3,822 normalized team-game rows byte-for-byte. All eight candidate audits reproduce every row, forecast and metric, excluding only scoredAt. No network or original temporary inputs needed.",
+  "sourceProbabilityMaximumDifference": 0,
+  "sourceProbabilityCasesPerCandidate": 890,
+  "nonTotalMaximumProductionDifference": {
+    "feedback-2-0.5-reset": 0,
+    "feedback-2-0.5-seed": 0,
+    "feedback-2-1-reset": 0,
+    "feedback-2-1-seed": 0,
+    "feedback-4-0.5-reset": 0,
+    "feedback-4-0.5-seed": 0,
+    "feedback-4-1-reset": 0,
+    "feedback-4-1-seed": 0
+  },
+  "preservedParentHashes": {
+    "docs/research/2026-10-13-v16-frozen-settings.json": "673e659e6229a0d47be2ceeaed54addba9f321c8bdacbb5d3ee7dc2e56d1aa3e",
+    "docs/research/2026-10-13-v16-audit.json": "000b2578e0bf7d260594308a217a0557a13d66a7e0fff4f28b831eb3cc063101"
+  },
+  "preservedIssuedSeals": {
+    "docs/research/2026-10-12-v6-pregame-numeric-record.json": "c34a06cd0c54562866d46797103b66619cee0b4191a4fbe6b8b49601c3082fc0",
+    "docs/research/2026-10-13-v11-pregame-numeric-record.json": "8f686cf56fecd12624b2bebca9f3896530606d2409ab34d94915ddb4ce2f5fce"
+  },
+  "frozenSettingsSha256": "495208d2b6b9c554a3e46d452336c9bf11880cf0426f3b76e2511fac8de19891",
+  "auditSha256": "529132e9c57e3f919bafb7a03d570d8e77a562d68f3a52e2bc820c1858153bc5",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "driveStatsSha256": "eb69a73e18dd90926dd6ddf43ae85802423de376a2f377cfabeb37d598fbbba3",
+  "additionalHashes": {
+    "docs/research/2026-10-13-v17-feedback-diagnosis.json": "9fe27468d33f24758a7f58427570932b8a4e622cb68eca949b17e5b035b6ac46",
+    "docs/research/2026-10-13-v17-result-diagnostics.json": "492a690afc161132570e3a29825667e6d11daed0cc2b44a1a59d9e829a13e683",
+    "packages/core/src/recent-total-feedback.test.ts": "e10fdcd268088f5d443e268a396df50b1d1648b016fafd9bc4d55f4d6980dee0",
+    ".prettierrc.json": "a3dc4f8c7844728f33351f65f7b26b426c46aac4c45518f1c306a8fbee8118e2"
+  },
+  "primary": "feedback-2-0.5-reset",
+  "selected": { "halfLifeWeeks": 2, "maxWeight": 0.5, "priorSeed": false },
+  "manualReview": "Scoped ordinary manual code/security review of fixed source and parent integrity, bounded artifact input, row identity/duplicate/probability validation, prior-only 48-hour eligibility, current six-week window, bounded seed/no amplification/fade, effective/distinct-week evidence gates, cap/convex probability bounds, raw-outcome feedback while abstaining, development-only selection and exact non-total delegation. No automated security scan.",
+  "production": "Only a separate research feedback adapter is added. Live dispatch, moneyline/spreads, production totals, owner credentials/configuration/Advice journal and issued numeric records remain unchanged. No wager, AI call or network acquisition.",
+  "limits": "Reused development/audit, latest revised historical PBP without certified publication vintages, quotes without observation times, only five 2026 week clusters; all conservative intervals include zero and full 2023/2024 lose. No consistent or independent prospective edge established."
+}

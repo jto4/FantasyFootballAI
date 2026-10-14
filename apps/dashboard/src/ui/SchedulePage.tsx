@@ -1,5 +1,8 @@
 import type { AppSettings, ScheduledRun } from '@sidekick/core';
+import { reportName } from './beginner-flow';
 import { formatTime } from './date-format';
+import { SchedulePlan } from './SchedulePlan';
+import { timezoneLabel } from './timezone-label';
 
 export type { ScheduledRun } from '@sidekick/core';
 
@@ -9,14 +12,22 @@ export function SchedulePage({
   retryingRunId,
   onGenerate,
   generatingKind = '',
+  onEditSchedule,
+  leagueName,
   onRetry,
+  settings,
+  onEditAction,
 }: {
   actions: AppSettings['actions'];
   scheduledRuns: ScheduledRun[];
   retryingRunId: string;
   onGenerate: (kind: string) => void;
   generatingKind?: string;
+  onEditSchedule?: () => void;
+  leagueName?: string | undefined;
   onRetry: (run: ScheduledRun) => void;
+  settings?: AppSettings;
+  onEditAction?: (kind: AppSettings['actions'][number]['kind']) => void;
 }) {
   return (
     <>
@@ -25,23 +36,42 @@ export function SchedulePage({
           <p className="section-overline">REPORTING & DELIVERY</p>
           <h1>Schedule</h1>
           <p>
-            Scheduled jobs follow each action’s draft or automatic delivery policy. Manual
-            generation always creates a draft.
+            Choose when reports are created and whether you review them first. Creating a report
+            yourself always saves a draft.
           </p>
+          {leagueName && (
+            <p>
+              Selected league: <strong>{leagueName}</strong>
+            </p>
+          )}
         </div>
+        {onEditSchedule && (
+          <button type="button" className="primary-button" onClick={onEditSchedule}>
+            Set up schedules
+          </button>
+        )}
       </div>
       <div className="schedule-grid">
         {actions.map((action) => (
           <article className="schedule-card" key={action.kind}>
             <span className="panel-kicker">{action.channel.toUpperCase()}</span>
-            <h2>{action.kind.replaceAll('-', ' ')}</h2>
+            <h2>{reportName(action.kind)}</h2>
+            <SchedulePlan action={action} />
+            {settings && (
+              <p>
+                Destination:{' '}
+                {action.channel === 'dashboard'
+                  ? 'Saved draft in Reports'
+                  : `${action.channel} · ${action.channel === 'email' ? settings.emailRecipient || 'No recipient chosen' : action.channel === 'sms' ? settings.smsRecipient || 'No recipient chosen' : settings.imessageChatGuid || 'No conversation chosen'}`}
+              </p>
+            )}
             <p>
               {!action.enabled
                 ? 'Action disabled'
                 : action.schedule.enabled
                   ? action.schedule.frequency === 'once'
-                    ? `Runs once on ${formatScheduleDate(action.schedule.date)} at ${action.schedule.time} · ${action.schedule.timezone}${action.schedule.completedAt ? ' · completed' : ''}`
-                    : `Runs ${action.schedule.frequency === 'daily' ? 'daily' : action.schedule.frequency === 'monthly' ? `monthly on day ${action.schedule.dayOfMonth}` : `every ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][action.schedule.weekday]}`} at ${action.schedule.time} · ${action.schedule.timezone}`
+                    ? `Runs once on ${formatScheduleDate(action.schedule.date)} at ${action.schedule.time} · ${timezoneLabel(action.schedule.timezone)}${action.schedule.completedAt ? ' · completed' : ''}`
+                    : `Runs ${action.schedule.frequency === 'daily' ? 'daily' : action.schedule.frequency === 'monthly' ? `monthly on day ${action.schedule.dayOfMonth}` : `every ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][action.schedule.weekday]}`} at ${action.schedule.time} · ${timezoneLabel(action.schedule.timezone)}`
                   : action.mode === 'automatic'
                     ? 'No schedule · manual generation saves a draft'
                     : 'No automatic schedule · save as a draft'}
@@ -69,9 +99,22 @@ export function SchedulePage({
             >
               {generatingKind === action.kind ? 'Generating…' : 'Generate draft'} <span>→</span>
             </button>
+            {onEditAction && (
+              <button
+                type="button"
+                className="small-button"
+                onClick={() => onEditAction(action.kind)}
+              >
+                Edit {reportName(action.kind).toLowerCase()} schedule
+              </button>
+            )}
           </article>
         ))}
       </div>
+      <p>
+        The next run is a planned time. Keep the local service running and your computer awake.
+        League season, stale data, or a connection problem can pause a report.
+      </p>
       <div className="section-heading drafts-heading">
         <div>
           <p className="section-overline">JOB HISTORY</p>

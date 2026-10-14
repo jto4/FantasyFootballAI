@@ -1,0 +1,50 @@
+{
+  "verifiedAt": "2026-10-13T22:51:19.269Z",
+  "originalScoredAt": "2026-10-13T22:46:00.571Z",
+  "checks": {
+    "tests": "863 workspace tests (313 API, 84 dashboard, 243 core, 223 integrations) plus root suites passed under supported Node 22",
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed; new evidence canonically formatted before sealing",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "replay": "Fresh decomposition of shared context/original/corrected snapshots and byte-exact reconstruction of 3,822 drive rows from retained PBP fields. All six candidate audits reproduce every probability, metric and row, excluding scoredAt only. No network or original temporary data needed.",
+  "sourceProbabilityMaximumDifference": 0,
+  "sourceProbabilityCasesPerCandidate": 890,
+  "nonTotalMaximumProductionDifference": {
+    "stable-cluster-0.5-pooled": 0,
+    "stable-cluster-1-pooled": 0,
+    "stable-leave-week-out-1-pooled": 0,
+    "stable-cluster-0.5-directional": 0,
+    "stable-cluster-1-directional": 0,
+    "stable-leave-week-out-1-directional": 0
+  },
+  "preservedParentHashes": {
+    "docs/research/2026-10-13-v17-frozen-settings.json": "495208d2b6b9c554a3e46d452336c9bf11880cf0426f3b76e2511fac8de19891",
+    "docs/research/2026-10-13-v17-audit.json": "529132e9c57e3f919bafb7a03d570d8e77a562d68f3a52e2bc820c1858153bc5"
+  },
+  "preservedIssuedSeals": {
+    "docs/research/2026-10-12-v6-pregame-numeric-record.json": "c34a06cd0c54562866d46797103b66619cee0b4191a4fbe6b8b49601c3082fc0",
+    "docs/research/2026-10-13-v11-pregame-numeric-record.json": "8f686cf56fecd12624b2bebca9f3896530606d2409ab34d94915ddb4ce2f5fce"
+  },
+  "frozenSettingsSha256": "a7028a4e3ef25dd459814871c2af9cc3c6fb8225cb5f262f15442da5449fb85b",
+  "auditSha256": "7659a163561cd1027a8f3ab6e02714299fcca9a1a7b96c4dc81b5ef12cf7a919",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "driveStatsSha256": "eb69a73e18dd90926dd6ddf43ae85802423de376a2f377cfabeb37d598fbbba3",
+  "additionalHashes": {
+    "docs/research/2026-10-13-v18-older-season-diagnosis.json": "9a9dfc4d148f095d25ac990627ac1916b8684c92992917e82e01204e5771fcd9",
+    "docs/research/2026-10-13-v18-result-diagnostics.json": "5562322e560dd84e8d806e0cd673451b6cc07b9195e130b956e426397deb502e",
+    "packages/core/src/stable-total-feedback.test.ts": "e8a720d3fd1215b38eb74c4389eda266c2edabd5179d8011e88613ad644b589c",
+    ".prettierrc.json": "a3dc4f8c7844728f33351f65f7b26b426c46aac4c45518f1c306a8fbee8118e2"
+  },
+  "primary": "stable-cluster-1-pooled",
+  "selected": { "method": "cluster", "strength": 1, "scope": "pooled" },
+  "development": "537 matched 2021-2022 totals; no new feedback setting selected on the 2023-2026 retest. Inherited source settings were selected later in previous rounds, so this is still retrospective research.",
+  "manualReview": "Scoped ordinary manual code/security review of bounded artifact input, inherited identity/time/duplicate validation, prior-only clustered contributions, centering by effective week mass, unchanged ridge and no amplification on omission, sparse directional evidence, separate direction cache keys, frozen policy/reliability results, convex bounds, sealed source/parent input and exact non-total delegation. No automated security scan.",
+  "decision": "Reject replacement: primary reduces weak-season excess losses but still loses both, and regresses 2025/full-sample performance. No alternative wins all seasons or full comparison; 2024 leave-week ties are exact book copies.",
+  "production": "Live predictions, moneyline/spreads, production totals, credentials/configuration, owner Advice journal and issued records unchanged. No new network acquisition, wager or AI call.",
+  "limits": "Reused diagnosis and retest; later-selected inherited settings; revised PBP without certified publication vintage; sportsbook quotes lack observation times; only five current-season week clusters. No consistent, untouched prospective or executable edge established."
+}

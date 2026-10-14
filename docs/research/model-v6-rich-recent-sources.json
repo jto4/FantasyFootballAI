@@ -1,0 +1,53 @@
+{
+  "preparedAt": "2026-10-12T18:32:45.467Z",
+  "season": 2026,
+  "cutoff": "2026-10-12T18:32:36Z",
+  "targets": 74,
+  "epaBoth": 73,
+  "reportsBoth": 0,
+  "chartsBoth": 74,
+  "sources": [
+    {
+      "file": "stats2025.txt",
+      "sha256": "e5e0615b3d96a3eaebfaee91e55afb4a4e7fe0caf057454177bcd7d6ad4bcfc2",
+      "rows": 664,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2025.csv"
+    },
+    {
+      "file": "snaps2025.txt",
+      "sha256": "3fc2deb0e9ad86d34d4578cb80bb21c95253e088ee22ca028adf46f7485eff1f",
+      "rows": 25396,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2025.csv"
+    },
+    {
+      "file": "stats2026.txt",
+      "sha256": "be274edeaf5e47c581117a2ac4de165c0ec66f37b7b2cfddfeb739760a5518a9",
+      "rows": 180,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2026.csv"
+    },
+    {
+      "file": "snaps2026.txt",
+      "sha256": "8957f4ea47c0e6655f4c79f38268595a5678e0583692ac8f182924ade1a19017",
+      "rows": 7277,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2026.csv"
+    },
+    {
+      "file": "injuries2026.csv",
+      "sha256": "8dd06b0e55128af411713591a14c22d3fe7135dbdfab0731c597ea1cf16037f4",
+      "rows": 1413,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2026.csv"
+    },
+    {
+      "file": "qb2026.csv",
+      "sha256": "fdbbd0177134e65aca90ee625c2aecb41d415b3b370dea9fd380943d92419a32",
+      "rows": 7380,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+    }
+  ],
+  "snapshotSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "warnings": [
+    "This is retrospective reconstruction after outcomes, not a prospective holdout.",
+    "Undated injury rows are excluded. Weather/official reports are not invented for missing recent contexts.",
+    "Only games with at least 24 hours since kickoff and completed scores are prepared."
+  ]
+}

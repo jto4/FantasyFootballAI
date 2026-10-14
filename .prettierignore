@@ -1,0 +1,5 @@
+# Generated research records retain the exact byte format sealed by their SHA-256 hashes.
+docs/research/2026-10-13-v16-frozen-settings.json
+docs/research/2026-10-13-v16-flow-diagnosis.json
+docs/research/2026-10-13-v16-audit.json
+docs/research/model-v16-drive-provenance.json

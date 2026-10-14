@@ -24,6 +24,11 @@ interface DesktopNativeUpdateState {
 
 interface Window {
   sidekickDesktop?: {
+    isVerificationMode?(): boolean;
+    getTheme?(): 'light' | 'dark';
+    getTeamSelections?(): Record<string, string>;
+    setTeamSelections?(teams: Record<string, string>): Promise<Record<string, string>>;
+    setTheme?(theme: 'light' | 'dark'): Promise<'light' | 'dark'>;
     getLaunchAtLogin(): Promise<DesktopStartupSetting>;
     setLaunchAtLogin(enabled: boolean): Promise<DesktopStartupSetting>;
     getStartHidden(): Promise<DesktopStartupSetting>;

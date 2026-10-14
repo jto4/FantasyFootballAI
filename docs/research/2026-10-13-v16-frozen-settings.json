@@ -1,0 +1,424 @@
+{
+  "version": 1,
+  "frozenAt": "2026-10-13T22:17:27.207Z",
+  "selected": {
+    "penalty": 100,
+    "flow": false
+  },
+  "primary": "drive-residual-100-football-only",
+  "specs": [
+    {
+      "penalty": 25,
+      "flow": false
+    },
+    {
+      "penalty": 25,
+      "flow": true
+    },
+    {
+      "penalty": 100,
+      "flow": false
+    },
+    {
+      "penalty": 100,
+      "flow": true
+    }
+  ],
+  "selection": "Four predeclared variants, selected by 2024 plus 2025 weeks 1-8 Brier only. No audit outcome tuning. Retrospective development and audit have been inspected in earlier rounds; neither is untouched.",
+  "driveSignalParameters": {
+    "halfLifeWeeks": 8,
+    "priorSeasonWeight": 0.25,
+    "teamPenaltyGames": 4,
+    "iterations": 12,
+    "publicationLagHours": 48,
+    "minimumWeightedGames": 2,
+    "maxRows": 12000
+  },
+  "driveResidualParameters": {
+    "featureCount": 18,
+    "minimumTrainingGames": 40,
+    "minimumFeedbackGames": 30,
+    "currentHalfLifeWeeks": 8,
+    "priorHalfLifeWeeks": 26,
+    "priorSeasonWeight": 0.5,
+    "feedbackRidge": 0.02,
+    "maxAddedLogit": 0.35,
+    "residualClip": 35,
+    "fitSeasons": 3
+  },
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "driveStatsSha256": "eb69a73e18dd90926dd6ddf43ae85802423de376a2f377cfabeb37d598fbbba3",
+  "driveProvenanceSha256": "d3b8e8a2e378a185d7af8aa9dabf3f4be7fd1e57a92636d770a9cd562d131144",
+  "diagnosisSha256": "064b4779e29d0df038701520fa0fee27581920cd42a5ff06f065c88b11c735df",
+  "parentSettingsSha256": "8f9eb8c4899cd4051a452ee27e8a958c28252fe9af5d4459b3124db95fd19046",
+  "parentAuditSha256": "615af92cf6d5bf07cccba79383cf1347fd05711ce961fa2c30685389cfd04b67",
+  "codeHashes": {
+    "packages/core/src/expanded-total-tape.ts": "fb900b10431555d259561477ad0eaccf3634b17637d61df02bbab7e13121e1f8",
+    "packages/core/src/expanded-external-totals-model.ts": "4f3007fc0d35ddc3bffaa39e0c138c50cc17e9054c8a88ce68dd8403f78133d8",
+    "packages/core/src/external-total-signals.ts": "ef4949d804eb07efe837faf7172e64e417543f9402dbac7b20dc4bb930718c7b",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/core/src/market-context.ts": "f2b1a3be210252acc8875cd2fa13b04fe32586a16405dfabcc3dea5727c43bc8",
+    "packages/integrations/src/historical-prediction-market-data.ts": "43bfe9f4105997a63bf1f93e13ceae7e1bf9e58e121cfc2856520865f1700ac2",
+    "packages/integrations/src/prediction-market-data.ts": "0dc0db14ebdeb8e1bd67f01e9cb71b685ad8205b933acc068f00257154d24580",
+    "scripts/expanded-total-evaluation.mjs": "c97af8c355bff7b32e21037b86f88680da183130db4bfd7a46e46d80f2d0f7a4",
+    "packages/integrations/src/historical-total-catalog.ts": "4be8c6c186c1e34d0cdc295fbabf0072fdf6e356a9d1efc0d3d6b37f197bb1e6",
+    "scripts/retry-historical-external-totals.mjs": "339742849ac869621eeec5d3c1b063d0fa72e594d94b44fe9ffdb89808822588",
+    "scripts/prepare-expanded-total-snapshot.mjs": "444efad851fbb2b9bd6cc74f01e959180923f6f8343129bf796490f9e0e32be1",
+    "scripts/freeze-expanded-total-revision.mjs": "6df0e851f602b0130eb4d1b852abd1888b73869f7250d76ee658b779e66395ea",
+    "scripts/audit-expanded-totals.mjs": "78f79ed3124565e9f11a694c88f94de00d9fdfd8de0ca80f8e5bbf6933ca86e0",
+    "scripts/develop-expanded-totals.mjs": "210ecc4ad7194bd3fe57d97097cd4ff142bf54483ba481456482a1da9d915dda",
+    "packages/core/src/seasonal-external-totals-model.ts": "3f8a9bd39744b5a64153da6dddff14c08a9e004751d7559cc738e9e09b8e2b22",
+    "scripts/seasonal-external-evaluation.mjs": "6f609557f7c970b653baca10f16b53c35407be3dc2e1a2f7ba77b986a2868c19",
+    "scripts/develop-seasonal-external-totals.mjs": "8379460f72278cb75d59224e97622f2a8625fd992bda91265909309013961142",
+    "scripts/audit-seasonal-external-totals.mjs": "408aae51e17f7b2881eba7d059d5133cfb907043aa152dc446653f1e785f3e49",
+    "packages/core/src/directional-seasonal-totals-model.ts": "dc56df05b4edfd470123cb8448be60897056c91e4c7f9049b00a424db04dba13",
+    "scripts/directional-total-evaluation.mjs": "cc5bfb73c59e31b3a7d80f089cd3e7727817d3af60b5ffa0d8cdb92710f07039",
+    "scripts/diagnose-seasonal-total-losses.mjs": "b48510062a2d7c4144e683ff1c1b94c76a832b25302e1afd49cb27fb3a2e4023",
+    "scripts/freeze-directional-totals.mjs": "e9bb1582942f9545539c328fcbbdd79d1f715a62dbe4052d92c6e8b029affa92",
+    "scripts/audit-directional-totals.mjs": "c8fcec9f9553d16788954425065212f70edb915f1478a63caffcacb9ac6b6e9d",
+    "packages/core/src/robust-total-trade-flow.ts": "3321afaf7696cc268cb32fa7be5455634c6d710173d68a0e3427c802176d43ab",
+    "packages/integrations/src/canonical-prediction-trades.ts": "c3cc7b496eea478513a9b8a41b17cd9e2f896db0193ec077a4718ef769af40c2",
+    "scripts/correct-historical-trade-directions.mjs": "730dde4fe6f5c8406c86c0b57067de4783e6456f1c3b79712b945b9dcc9f1244",
+    "scripts/trade-flow-evaluation.mjs": "09b4efa95f8ab970fd9a346c34f4717a687a372028a0d7ac182a60379a1dac02",
+    "scripts/diagnose-signed-total-flow.mjs": "f174ed364d3a99182a3f89a7ef0ff8c7910aa3a02c0fef0c66758e4fdca794de",
+    "scripts/freeze-robust-total-flow.mjs": "1d0d29ba52da30c4676ab8568e87cbc00124461fa03ad2d14def13c80f5c76dc",
+    "scripts/audit-robust-total-flow.mjs": "3417f0042676c1ba52d5d9542725b94b36255ad685548b09a02da2b8324894a0",
+    "packages/core/src/drive-total-signals.ts": "a1e65a90b1678fb415932f88e5f10a9db3bf82931558fb03952869fa18f21859",
+    "packages/core/src/drive-residual-totals-model.ts": "37b1d5628c189e2d37a45a19676de89b785014e63fa309ab69d9a11cf803c58c",
+    "packages/integrations/src/game-drive-signals.ts": "484a9f97aafed50bdf98d030c57d7a6029a390e92bbbcd243ae7663caec0ed48",
+    "scripts/capture-game-drive-signals.mjs": "9adf89ec325244f83f62bb61bd106a29ceed6bf2e3a33db6527ae970224a7aa1",
+    "scripts/retain-drive-sources.mjs": "c231aca8530149b5fb105da132ca29ebd3955b4dece7bb39767009a90b4a0820",
+    "scripts/replay-drive-signals.mjs": "1183f1757eb3ac05ba2938886c962189a70af051f0a3dd002b1bd96ee743e921",
+    "scripts/diagnose-robust-flow-value.mjs": "3c82fac30d442ab30937708cec424bcc39618a5002ffd7b8a7f3337029b8cc0c",
+    "scripts/drive-total-evaluation.mjs": "e284d6cabcde5fca6ee24b4fe1a7744492c067f1d7a079be5b7b35febecb3d82",
+    "scripts/develop-drive-totals.mjs": "f5f2088c9e9b91944e7d98bcff83a9fbc7b48d2d61eb963e7e05836f88b82edf",
+    "scripts/audit-drive-totals.mjs": "81d00023b7a5640a91d3fab686babf4ff51fbc5498c09c1a2b1fbac2781da7d0"
+  },
+  "development": [
+    {
+      "spec": {
+        "penalty": 25,
+        "flow": false
+      },
+      "id": "drive-residual-25-football-only",
+      "totals": {
+        "n": 390,
+        "brier": 0.25090961395916894,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6949756910364635,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0024007676060729963,
+          0.0005635181786497474
+        ],
+        "previousImprovementInterval": [
+          -0.0033119072272948004,
+          0.004028290273492833
+        ],
+        "simultaneousBookInterval": [
+          -0.0030853512593662356,
+          0.0012481018319429869
+        ]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.25014134665489857,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6934312394964978,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0038511085365193296,
+          0.0035503937176368325
+        ],
+        "previousImprovementInterval": [
+          -0.004618411544599539,
+          0.006871329199338323
+        ],
+        "simultaneousBookInterval": [
+          -0.005560440166796772,
+          0.005259725347914275
+        ]
+      },
+      "v15": {
+        "n": 390,
+        "brier": 0.24999099523018156,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296210948426,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -1.777861417050603e-8,
+          5.809165682591996e-9
+        ],
+        "previousImprovementInterval": [
+          -0.0013787139304033882,
+          0.0039323344345761815
+        ],
+        "simultaneousBookInterval": [
+          -2.322606751260033e-8,
+          1.1256619024686293e-8
+        ]
+      },
+      "pairedV15Improvement": [
+        -0.0024007621065773237,
+        0.0005635246486025629
+      ],
+      "coverage": 383,
+      "flowCoverage": 80,
+      "changed": 232,
+      "materialChangesAt1e3": 211,
+      "meanAbsoluteBookCorrection": 0.007661482269003058,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "penalty": 25,
+        "flow": true
+      },
+      "id": "drive-residual-25-with-flow",
+      "totals": {
+        "n": 390,
+        "brier": 0.25091485316786777,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6949862150786598,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.00240862246324428,
+          0.0005608946184233791
+        ],
+        "previousImprovementInterval": [
+          -0.0033177383094087926,
+          0.004023642938209173
+        ],
+        "simultaneousBookInterval": [
+          -0.0030944142525385996,
+          0.0012466864077176985
+        ]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2501518731254816,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6934524142428938,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0038643770058506785,
+          0.003542609245802126
+        ],
+        "previousImprovementInterval": [
+          -0.004629442815190708,
+          0.006861307528763436
+        ],
+        "simultaneousBookInterval": [
+          -0.005574975131774475,
+          0.005253207371725923
+        ]
+      },
+      "v15": {
+        "n": 390,
+        "brier": 0.24999099523018156,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296210948426,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -1.777861417050603e-8,
+          5.809165682591996e-9
+        ],
+        "previousImprovementInterval": [
+          -0.0013787139304033882,
+          0.0039323344345761815
+        ],
+        "simultaneousBookInterval": [
+          -2.322606751260033e-8,
+          1.1256619024686293e-8
+        ]
+      },
+      "pairedV15Improvement": [
+        -0.002408616821065231,
+        0.0005609009456928177
+      ],
+      "coverage": 383,
+      "flowCoverage": 80,
+      "changed": 232,
+      "materialChangesAt1e3": 211,
+      "meanAbsoluteBookCorrection": 0.0076793836639650215,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "penalty": 100,
+        "flow": false
+      },
+      "id": "drive-residual-100-football-only",
+      "totals": {
+        "n": 390,
+        "brier": 0.2503927862954666,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6939362103894277,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0011709971936140515,
+          0.0003674030935955394
+        ],
+        "previousImprovementInterval": [
+          -0.0021862828692671274,
+          0.0039363212428698965
+        ],
+        "simultaneousBookInterval": [
+          -0.0015262813211678378,
+          0.0007226872211493257
+        ]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2499789737728486,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931078399112495,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0022423973489215194,
+          0.002266428294138932
+        ],
+        "previousImprovementInterval": [
+          -0.003230695722486101,
+          0.005808359141324795
+        ],
+        "simultaneousBookInterval": [
+          -0.003283683026131373,
+          0.0033077139713487856
+        ]
+      },
+      "v15": {
+        "n": 390,
+        "brier": 0.24999099523018156,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296210948426,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -1.777861417050603e-8,
+          5.809165682591996e-9
+        ],
+        "previousImprovementInterval": [
+          -0.0013787139304033882,
+          0.0039323344345761815
+        ],
+        "simultaneousBookInterval": [
+          -2.322606751260033e-8,
+          1.1256619024686293e-8
+        ]
+      },
+      "pairedV15Improvement": [
+        -0.0011709932986641767,
+        0.00036741116809415263
+      ],
+      "coverage": 383,
+      "flowCoverage": 80,
+      "changed": 97,
+      "materialChangesAt1e3": 97,
+      "meanAbsoluteBookCorrection": 0.0034661947773443917,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "penalty": 100,
+        "flow": true
+      },
+      "id": "drive-residual-100-with-flow",
+      "totals": {
+        "n": 390,
+        "brier": 0.25039429387086787,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6939392296822847,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0011722573777407529,
+          0.00036564812691965306
+        ],
+        "previousImprovementInterval": [
+          -0.0021874478134435694,
+          0.003934471036243751
+        ],
+        "simultaneousBookInterval": [
+          -0.0015274272382940859,
+          0.0007208179874729861
+        ]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2499820944874784,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931140917093128,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -0.0022450414107615915,
+          0.002262830926719414
+        ],
+        "previousImprovementInterval": [
+          -0.0032330692072926664,
+          0.00580449119687177
+        ],
+        "simultaneousBookInterval": [
+          -0.0032861069278844373,
+          0.0033038964438422596
+        ]
+      },
+      "v15": {
+        "n": 390,
+        "brier": 0.24999099523018156,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296210948426,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [
+          -1.777861417050603e-8,
+          5.809165682591996e-9
+        ],
+        "previousImprovementInterval": [
+          -0.0013787139304033882,
+          0.0039323344345761815
+        ],
+        "simultaneousBookInterval": [
+          -2.322606751260033e-8,
+          1.1256619024686293e-8
+        ]
+      },
+      "pairedV15Improvement": [
+        -0.0011722534221891728,
+        0.000365656140816561
+      ],
+      "coverage": 383,
+      "flowCoverage": 80,
+      "changed": 97,
+      "materialChangesAt1e3": 97,
+      "meanAbsoluteBookCorrection": 0.003470083744184336,
+      "nonTotalMaximumProductionDifference": 0
+    }
+  ],
+  "joinedRows": 3822,
+  "rejectedJoinRows": 0
+}

@@ -1,0 +1,2622 @@
+{
+  "scoredAt": "2026-10-13T05:06:54.889Z",
+  "frozenAt": "2026-10-13T05:06:15.715Z",
+  "contextSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "frozenSha256": "e52cfcd3a8ee095539aaae26936ed0f8b0e183c2ebbdb6a41a8c0141eb1a8788",
+  "selection": {
+    "id": "hybrid-unadapted",
+    "spec": null,
+    "brier": 0.248752653739635
+  },
+  "bestAdaptive": {
+    "id": "experts-16-0.05-0.5-0.25",
+    "spec": {
+      "learningRate": 16,
+      "share": 0.05,
+      "bookPrior": 0.5,
+      "seasonCarry": 0.25
+    },
+    "brier": 0.2495291861337395
+  },
+  "selected": {
+    "pooled": {
+      "n": 3221,
+      "brier": 0.23638752370893468,
+      "previousBrier": 0.2365868597405654,
+      "bookBrier": 0.2366663484876148,
+      "logLoss": 0.6639557643374412,
+      "previousLogLoss": 0.6643533423096291,
+      "bookLogLoss": 0.6645047843897722,
+      "bookImprovementInterval": [-0.00033695546505871094, 0.0008946050224189734],
+      "previousImprovementInterval": [-0.0002012214609767068, 0.0005998935242381472],
+      "simultaneousBookInterval": [-0.0006213768194754324, 0.0011790263768356947]
+    },
+    "markets": [
+      {
+        "season": 2022,
+        "kind": "moneyline",
+        "n": 269,
+        "brier": 0.21083148660671813,
+        "previousBrier": 0.21083148660671813,
+        "bookBrier": 0.21082110150076128,
+        "logLoss": 0.6085971946393567,
+        "previousLogLoss": 0.6085971946393567,
+        "bookLogLoss": 0.6085460268644323,
+        "bookImprovementInterval": [-0.00008145378573293682, 0.000060683573819224736],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00011427953869277659, 0.0000935093267790645]
+      },
+      {
+        "season": 2022,
+        "kind": "spread",
+        "n": 261,
+        "brier": 0.24819035213566945,
+        "previousBrier": 0.24819035213566945,
+        "bookBrier": 0.24853204884571245,
+        "logLoss": 0.6895119140128516,
+        "previousLogLoss": 0.6895119140128516,
+        "bookLogLoss": 0.690206748133678,
+        "bookImprovementInterval": [-0.0011797641965647081, 0.0018631576166507062],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0018825083591932578, 0.002565901779279256]
+      },
+      {
+        "season": 2022,
+        "kind": "total",
+        "n": 268,
+        "brier": 0.24858507635398477,
+        "previousBrier": 0.24888108341056356,
+        "bookBrier": 0.2502122792134749,
+        "logLoss": 0.6903131461229097,
+        "previousLogLoss": 0.6909080066962537,
+        "bookLogLoss": 0.6935710418420938,
+        "bookImprovementInterval": [-0.000849651375746596, 0.0041040570947268205],
+        "previousImprovementInterval": [-0.0018244422185397587, 0.002416456331697327],
+        "simultaneousBookInterval": [-0.0019936800181750616, 0.005248085737155286]
+      },
+      {
+        "season": 2023,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.21871339632507586,
+        "previousBrier": 0.21871339632507586,
+        "bookBrier": 0.2187095146255924,
+        "logLoss": 0.627464438283765,
+        "previousLogLoss": 0.627464438283765,
+        "bookLogLoss": 0.6273487972171233,
+        "bookImprovementInterval": [-0.00020249363749374384, 0.0001947302385268348],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029423005967778206, 0.00028646666071087303]
+      },
+      {
+        "season": 2023,
+        "kind": "spread",
+        "n": 258,
+        "brier": 0.2507307155465004,
+        "previousBrier": 0.2507307155465004,
+        "bookBrier": 0.2500004625992449,
+        "logLoss": 0.6946105047519431,
+        "previousLogLoss": 0.6946105047519431,
+        "bookLogLoss": 0.6931483711346293,
+        "bookImprovementInterval": [-0.0027484666112143133, 0.0012879607167033472],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.003680654789776522, 0.002220148895265556]
+      },
+      {
+        "season": 2023,
+        "kind": "total",
+        "n": 270,
+        "brier": 0.24902448292924545,
+        "previousBrier": 0.24804127883945298,
+        "bookBrier": 0.25006922521405495,
+        "logLoss": 0.6912029205487774,
+        "previousLogLoss": 0.6892258963235339,
+        "bookLogLoss": 0.6932856626453789,
+        "bookImprovementInterval": [-0.0037844050109940063, 0.005873889580613],
+        "previousImprovementInterval": [-0.003452101290834707, 0.0014856931112497739],
+        "simultaneousBookInterval": [-0.006014929014509777, 0.008104413584128771]
+      },
+      {
+        "season": 2024,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.20009656252586755,
+        "previousBrier": 0.20009656252586755,
+        "bookBrier": 0.20016161878885597,
+        "logLoss": 0.587321397394949,
+        "previousLogLoss": 0.587321397394949,
+        "bookLogLoss": 0.5874888995056523,
+        "bookImprovementInterval": [-0.0000781593524634618, 0.000208271878440295],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00014430889158008705, 0.00027442141755692025]
+      },
+      {
+        "season": 2024,
+        "kind": "spread",
+        "n": 268,
+        "brier": 0.25092003543216984,
+        "previousBrier": 0.25092003543216984,
+        "bookBrier": 0.25107183948242473,
+        "logLoss": 0.694988880905053,
+        "previousLogLoss": 0.694988880905053,
+        "bookLogLoss": 0.6952918193457789,
+        "bookImprovementInterval": [-0.001062148667903621, 0.001365756768413399],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0016228585636938757, 0.0019264666642036536]
+      },
+      {
+        "season": 2024,
+        "kind": "total",
+        "n": 269,
+        "brier": 0.24884641614080777,
+        "previousBrier": 0.25135219413954935,
+        "bookBrier": 0.24977944777848365,
+        "logLoss": 0.6908456960489837,
+        "previousLogLoss": 0.6958556966320367,
+        "bookLogLoss": 0.6927062239462438,
+        "bookImprovementInterval": [-0.0019641852897673033, 0.0038302485651190736],
+        "previousImprovementInterval": [-0.00012105962869626667, 0.005132615626179419],
+        "simultaneousBookInterval": [-0.00330237431242767, 0.00516843758777944]
+      },
+      {
+        "season": 2025,
+        "kind": "moneyline",
+        "n": 271,
+        "brier": 0.21221429694628238,
+        "previousBrier": 0.21221429694628238,
+        "bookBrier": 0.21213896835079188,
+        "logLoss": 0.6095302843428569,
+        "previousLogLoss": 0.6095302843428569,
+        "bookLogLoss": 0.6093832198972615,
+        "bookImprovementInterval": [-0.0002601317080175753, 0.00010947451703656805],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0003454900027985743, 0.00019483281181756704]
+      },
+      {
+        "season": 2025,
+        "kind": "spread",
+        "n": 271,
+        "brier": 0.2500252881532331,
+        "previousBrier": 0.2500252881532331,
+        "bookBrier": 0.24958671312680858,
+        "logLoss": 0.6932015483850972,
+        "previousLogLoss": 0.6932015483850972,
+        "bookLogLoss": 0.6923205180550237,
+        "bookImprovementInterval": [-0.001488990639980556, 0.0006118405871315042],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0019741647496500834, 0.0010970146968010317]
+      },
+      {
+        "season": 2025,
+        "kind": "total",
+        "n": 272,
+        "brier": 0.24999056908079642,
+        "previousBrier": 0.2505572686738165,
+        "bookBrier": 0.2504056398371012,
+        "logLoss": 0.6931303448045101,
+        "previousLogLoss": 0.6942600595057417,
+        "bookLogLoss": 0.6939590876085676,
+        "bookImprovementInterval": [-0.0023981586274074884, 0.0032283001400170053],
+        "previousImprovementInterval": [-0.0016425665147299959, 0.0027759657007701585],
+        "simultaneousBookInterval": [-0.003697554832037436, 0.004527696344646953]
+      }
+    ],
+    "totals": {
+      "n": 1079,
+      "brier": 0.24911448710437284,
+      "previousBrier": 0.24970953933595932,
+      "bookBrier": 0.2501173189296667,
+      "logLoss": 0.6913787374727641,
+      "previousLogLoss": 0.6925655758864963,
+      "bookLogLoss": 0.6933818481918389,
+      "bookImprovementInterval": [-0.00065718286001572, 0.0026628465106034614],
+      "previousImprovementInterval": [-0.0006011131132192312, 0.0017912175763922008],
+      "simultaneousBookInterval": [-0.0014239233164497875, 0.0034295869670375287]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 369,
+        "brier": 0.2489554566944882,
+        "previousBrier": 0.25004340133880076,
+        "bookBrier": 0.2507981983289962,
+        "logLoss": 0.6910589355047188,
+        "previousLogLoss": 0.693233721992774,
+        "bookLogLoss": 0.694744014236929,
+        "bookImprovementInterval": [-0.001996684601334028, 0.005682167870349994],
+        "previousImprovementInterval": [-0.0007363648893555553, 0.0029122541779806653],
+        "simultaneousBookInterval": [-0.0037700685662869736, 0.007455551835302939]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 342,
+        "brier": 0.25032079209540464,
+        "previousBrier": 0.249510067250118,
+        "bookBrier": 0.24998685815425747,
+        "logLoss": 0.6937995550763582,
+        "previousLogLoss": 0.6921656124812251,
+        "bookLogLoss": 0.6931209705922977,
+        "bookImprovementInterval": [-0.0028788944021700636, 0.0022110265198757263],
+        "previousImprovementInterval": [-0.0031689614028841367, 0.0015475117123108745],
+        "simultaneousBookInterval": [-0.004054380476335384, 0.0033865125940410463]
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 368,
+        "brier": 0.24815287274109654,
+        "previousBrier": 0.24956014904875634,
+        "bookBrier": 0.2495558327525937,
+        "logLoss": 0.6894496268906459,
+        "previousLogLoss": 0.6922673192870027,
+        "bookLogLoss": 0.6922584266386196,
+        "bookImprovementInterval": [-0.0004820157901392094, 0.0032879358131335],
+        "previousImprovementInterval": [-0.0006195482944936041, 0.003434100909813203],
+        "simultaneousBookInterval": [-0.001352663031578695, 0.0041585830545729854]
+      }
+    ],
+    "consistency": {
+      "beatsBook": 7,
+      "tiesBook": 0,
+      "losesBook": 5,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [0, 1, 0, 0],
+    "weeklyWeights": [
+      {
+        "season": 2022,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 3,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 5,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 6,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 7,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 8,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 9,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 11,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 12,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 13,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 14,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 17,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 6,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 7,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 8,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 9,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 11,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 12,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 13,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 14,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 6,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 7,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 8,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 9,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 10,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 11,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 12,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 13,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 14,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 6,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 7,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 8,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 9,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 11,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 12,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 13,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 14,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      }
+    ]
+  },
+  "recent": {
+    "pooled": {
+      "n": 224,
+      "brier": 0.2419324348107504,
+      "previousBrier": 0.24102045793398988,
+      "bookBrier": 0.24112677302235283,
+      "logLoss": 0.6769120353422187,
+      "previousLogLoss": 0.6750858192269638,
+      "bookLogLoss": 0.6752861725679277,
+      "bookImprovementInterval": [-0.004122998853439315, 0.00251167527664415],
+      "previousImprovementInterval": [-0.003612992853264319, 0.001789039099743251],
+      "simultaneousBookInterval": [-0.005655236223328234, 0.004043912646533069]
+    },
+    "markets": [
+      {
+        "season": 2026,
+        "kind": "moneyline",
+        "n": 76,
+        "brier": 0.22500500866347006,
+        "previousBrier": 0.22500500866347006,
+        "bookBrier": 0.22494425373182197,
+        "logLoss": 0.6428470055721068,
+        "previousLogLoss": 0.6428470055721068,
+        "bookLogLoss": 0.642697910125553,
+        "bookImprovementInterval": [-0.00022269323115398724, 0.00010118336785781083],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029749054877780887, 0.00017598068548163248]
+      },
+      {
+        "season": 2026,
+        "kind": "spread",
+        "n": 71,
+        "brier": 0.2482596047630854,
+        "previousBrier": 0.2482596047630854,
+        "bookBrier": 0.24877558512974057,
+        "logLoss": 0.6896629763363943,
+        "previousLogLoss": 0.6896629763363943,
+        "bookLogLoss": 0.6906984012341777,
+        "bookImprovementInterval": [-0.0010632290473432796, 0.002095189780653635],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0017926465384110364, 0.0028246072717213917]
+      },
+      {
+        "season": 2026,
+        "kind": "total",
+        "n": 77,
+        "brier": 0.25280588053253655,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6987773009518542,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+        "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+        "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+      }
+    ],
+    "totals": {
+      "n": 77,
+      "brier": 0.25280588053253655,
+      "previousBrier": 0.2501528568910508,
+      "bookBrier": 0.25004632895035056,
+      "logLoss": 0.6987773009518542,
+      "previousLogLoss": 0.6934646722529307,
+      "bookLogLoss": 0.6932399350395704,
+      "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+      "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+      "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 77,
+        "brier": 0.25280588053253655,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6987773009518542,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+        "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+        "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 0
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 0
+      }
+    ],
+    "consistency": {
+      "beatsBook": 1,
+      "tiesBook": 0,
+      "losesBook": 2,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [0, 1, 0, 0],
+    "weeklyWeights": [
+      {
+        "season": 2026,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 5,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      }
+    ]
+  },
+  "adapted": {
+    "pooled": {
+      "n": 3221,
+      "brier": 0.23657705717693325,
+      "previousBrier": 0.2365868597405654,
+      "bookBrier": 0.2366663484876148,
+      "logLoss": 0.6643340435891903,
+      "previousLogLoss": 0.6643533423096291,
+      "bookLogLoss": 0.6645047843897722,
+      "bookImprovementInterval": [-0.0002650391544594427, 0.000443621775822553],
+      "previousImprovementInterval": [-0.0002861774898366891, 0.0003057826171009774],
+      "simultaneousBookInterval": [-0.0004287000575676802, 0.0006072826789307905]
+    },
+    "markets": [
+      {
+        "season": 2022,
+        "kind": "moneyline",
+        "n": 269,
+        "brier": 0.21083148660671813,
+        "previousBrier": 0.21083148660671813,
+        "bookBrier": 0.21082110150076128,
+        "logLoss": 0.6085971946393567,
+        "previousLogLoss": 0.6085971946393567,
+        "bookLogLoss": 0.6085460268644323,
+        "bookImprovementInterval": [-0.00008145378573293682, 0.000060683573819224736],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00011427953869277659, 0.0000935093267790645]
+      },
+      {
+        "season": 2022,
+        "kind": "spread",
+        "n": 261,
+        "brier": 0.24819035213566945,
+        "previousBrier": 0.24819035213566945,
+        "bookBrier": 0.24853204884571245,
+        "logLoss": 0.6895119140128516,
+        "previousLogLoss": 0.6895119140128516,
+        "bookLogLoss": 0.690206748133678,
+        "bookImprovementInterval": [-0.0011797641965647081, 0.0018631576166507062],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0018825083591932578, 0.002565901779279256]
+      },
+      {
+        "season": 2022,
+        "kind": "total",
+        "n": 268,
+        "brier": 0.24927095757775586,
+        "previousBrier": 0.24888108341056356,
+        "bookBrier": 0.2502122792134749,
+        "logLoss": 0.6916875832806733,
+        "previousLogLoss": 0.6909080066962537,
+        "bookLogLoss": 0.6935710418420938,
+        "bookImprovementInterval": [-0.00007576324649609173, 0.0019584065179341476],
+        "previousImprovementInterval": [-0.0014153483258207025, 0.0006355999914361024],
+        "simultaneousBookInterval": [-0.0005455422994906569, 0.0024281855709287125]
+      },
+      {
+        "season": 2023,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.21871339632507586,
+        "previousBrier": 0.21871339632507586,
+        "bookBrier": 0.2187095146255924,
+        "logLoss": 0.627464438283765,
+        "previousLogLoss": 0.627464438283765,
+        "bookLogLoss": 0.6273487972171233,
+        "bookImprovementInterval": [-0.00020249363749374384, 0.0001947302385268348],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029423005967778206, 0.00028646666071087303]
+      },
+      {
+        "season": 2023,
+        "kind": "spread",
+        "n": 258,
+        "brier": 0.2507307155465004,
+        "previousBrier": 0.2507307155465004,
+        "bookBrier": 0.2500004625992449,
+        "logLoss": 0.6946105047519431,
+        "previousLogLoss": 0.6946105047519431,
+        "bookLogLoss": 0.6931483711346293,
+        "bookImprovementInterval": [-0.0027484666112143133, 0.0012879607167033472],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.003680654789776522, 0.002220148895265556]
+      },
+      {
+        "season": 2023,
+        "kind": "total",
+        "n": 270,
+        "brier": 0.2494970125834496,
+        "previousBrier": 0.24804127883945298,
+        "bookBrier": 0.25006922521405495,
+        "logLoss": 0.6921416535441302,
+        "previousLogLoss": 0.6892258963235339,
+        "bookLogLoss": 0.6932856626453789,
+        "bookImprovementInterval": [-0.0017486542242460667, 0.0028930794854567354],
+        "previousImprovementInterval": [-0.0027019992136134647, -0.00020946827437979317],
+        "simultaneousBookInterval": [-0.002820634205724114, 0.0039650594669347825]
+      },
+      {
+        "season": 2024,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.20009656252586755,
+        "previousBrier": 0.20009656252586755,
+        "bookBrier": 0.20016161878885597,
+        "logLoss": 0.587321397394949,
+        "previousLogLoss": 0.587321397394949,
+        "bookLogLoss": 0.5874888995056523,
+        "bookImprovementInterval": [-0.0000781593524634618, 0.000208271878440295],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00014430889158008705, 0.00027442141755692025]
+      },
+      {
+        "season": 2024,
+        "kind": "spread",
+        "n": 268,
+        "brier": 0.25092003543216984,
+        "previousBrier": 0.25092003543216984,
+        "bookBrier": 0.25107183948242473,
+        "logLoss": 0.694988880905053,
+        "previousLogLoss": 0.694988880905053,
+        "bookLogLoss": 0.6952918193457789,
+        "bookImprovementInterval": [-0.001062148667903621, 0.001365756768413399],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0016228585636938757, 0.0019264666642036536]
+      },
+      {
+        "season": 2024,
+        "kind": "total",
+        "n": 269,
+        "brier": 0.2498098086035781,
+        "previousBrier": 0.25135219413954935,
+        "bookBrier": 0.24977944777848365,
+        "logLoss": 0.6927675117670078,
+        "previousLogLoss": 0.6958556966320367,
+        "bookLogLoss": 0.6927062239462438,
+        "bookImprovementInterval": [-0.001063437725157005, 0.0010027160749681164],
+        "previousImprovementInterval": [-0.00035697284615313334, 0.003441743918095627],
+        "simultaneousBookInterval": [-0.0015406032953746763, 0.0014798816451857878]
+      },
+      {
+        "season": 2025,
+        "kind": "moneyline",
+        "n": 271,
+        "brier": 0.21221429694628238,
+        "previousBrier": 0.21221429694628238,
+        "bookBrier": 0.21213896835079188,
+        "logLoss": 0.6095302843428569,
+        "previousLogLoss": 0.6095302843428569,
+        "bookLogLoss": 0.6093832198972615,
+        "bookImprovementInterval": [-0.0002601317080175753, 0.00010947451703656805],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0003454900027985743, 0.00019483281181756704]
+      },
+      {
+        "season": 2025,
+        "kind": "spread",
+        "n": 271,
+        "brier": 0.2500252881532331,
+        "previousBrier": 0.2500252881532331,
+        "bookBrier": 0.24958671312680858,
+        "logLoss": 0.6932015483850972,
+        "previousLogLoss": 0.6932015483850972,
+        "bookLogLoss": 0.6923205180550237,
+        "bookImprovementInterval": [-0.001488990639980556, 0.0006118405871315042],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0019741647496500834, 0.0010970146968010317]
+      },
+      {
+        "season": 2025,
+        "kind": "total",
+        "n": 272,
+        "brier": 0.25013739096804594,
+        "previousBrier": 0.2505572686738165,
+        "bookBrier": 0.2504056398371012,
+        "logLoss": 0.6934232197115281,
+        "previousLogLoss": 0.6942600595057417,
+        "bookLogLoss": 0.6939590876085676,
+        "bookImprovementInterval": [-0.0008896023494347305, 0.0014261000875452168],
+        "previousImprovementInterval": [-0.001964813366925096, 0.002804568778466228],
+        "simultaneousBookInterval": [-0.001424399649485227, 0.001960897387595713]
+      }
+    ],
+    "totals": {
+      "n": 1079,
+      "brier": 0.24968027700281792,
+      "previousBrier": 0.24970953933595932,
+      "bookBrier": 0.2501173189296667,
+      "logLoss": 0.6925079658971235,
+      "previousLogLoss": 0.6925655758864963,
+      "bookLogLoss": 0.6933818481918389,
+      "bookImprovementInterval": [-0.00029540358835358587, 0.0011694874420511685],
+      "previousImprovementInterval": [-0.0008543034310080471, 0.0009128280972908581],
+      "simultaneousBookInterval": [-0.0006337112031049696, 0.0015077950568025522]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 369,
+        "brier": 0.25026098074452113,
+        "previousBrier": 0.25004340133880076,
+        "bookBrier": 0.2507981983289962,
+        "logLoss": 0.6936699162173618,
+        "previousLogLoss": 0.693233721992774,
+        "bookLogLoss": 0.694744014236929,
+        "bookImprovementInterval": [-0.0011965364165654102, 0.002270971585515527],
+        "previousImprovementInterval": [-0.0022955940786343423, 0.0018604352671936033],
+        "simultaneousBookInterval": [-0.0019973361600051738, 0.00307177132895529]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 342,
+        "brier": 0.24971606836361457,
+        "previousBrier": 0.249510067250118,
+        "bookBrier": 0.24998685815425747,
+        "logLoss": 0.6925799932960586,
+        "previousLogLoss": 0.6921656124812251,
+        "bookLogLoss": 0.6931209705922977,
+        "bookImprovementInterval": [-0.0008189011403561622, 0.0013604807216419737],
+        "previousImprovementInterval": [-0.001414391589958747, 0.0010023893629656337],
+        "simultaneousBookInterval": [-0.0013222160382303744, 0.0018637956195161859]
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 368,
+        "brier": 0.24906473263846873,
+        "previousBrier": 0.24956014904875634,
+        "bookBrier": 0.2495558327525937,
+        "logLoss": 0.6912759195965694,
+        "previousLogLoss": 0.6922673192870027,
+        "bookLogLoss": 0.6922584266386196,
+        "bookImprovementInterval": [-0.0003395787411285199, 0.0013217789693784274],
+        "previousImprovementInterval": [-0.0006228028466288493, 0.0016136356672040652],
+        "simultaneousBookInterval": [-0.00072325913279228, 0.0017054593610421876]
+      }
+    ],
+    "consistency": {
+      "beatsBook": 6,
+      "tiesBook": 0,
+      "losesBook": 6,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [
+      0.48379784217647714, 0.1809014772134677, 0.15937624074749446, 0.17592443986256057
+    ],
+    "weeklyWeights": [
+      {
+        "season": 2022,
+        "week": 1,
+        "n": 16,
+        "weights": [
+          0.49938315604210354, 0.1708105220226624, 0.15866863135343548, 0.1711376905817987
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 2,
+        "n": 16,
+        "weights": [
+          0.49109968225313866, 0.170578687099173, 0.15607242695001516, 0.18224920369767306
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 3,
+        "n": 15,
+        "weights": [
+          0.47421463763020616, 0.18437063147330204, 0.1542769243813719, 0.18713780651511996
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 4,
+        "n": 16,
+        "weights": [
+          0.48271525111662794, 0.18942182084951326, 0.1410102699207367, 0.18685265811312182
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 5,
+        "n": 16,
+        "weights": [
+          0.47628402263482456, 0.19789459092014938, 0.14336925905083145, 0.1824521273941945
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 6,
+        "n": 14,
+        "weights": [
+          0.4601160267131951, 0.20310009066690574, 0.16513379084130378, 0.17165009177859542
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 7,
+        "n": 14,
+        "weights": [
+          0.4472539568266169, 0.21714496830544835, 0.1562365032785631, 0.17936457158937164
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 8,
+        "n": 14,
+        "weights": [
+          0.45877503508276823, 0.20543916355255162, 0.15497833091501007, 0.18080747044966988
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 9,
+        "n": 13,
+        "weights": [0.454955479598907, 0.19807277178879107, 0.16420994579564854, 0.1827618028166535]
+      },
+      {
+        "season": 2022,
+        "week": 10,
+        "n": 14,
+        "weights": [
+          0.45378905295254596, 0.18648753171149518, 0.16523614338654796, 0.19448727194941065
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 11,
+        "n": 14,
+        "weights": [
+          0.4731303501448307, 0.18150230730606823, 0.1564836473199676, 0.18888369522913356
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 12,
+        "n": 16,
+        "weights": [0.5053550628700061, 0.1660213813758476, 0.1373943482568656, 0.1912292074972806]
+      },
+      {
+        "season": 2022,
+        "week": 13,
+        "n": 14,
+        "weights": [0.501302209993047, 0.15963890208823356, 0.14690206329783972, 0.1921568246208796]
+      },
+      {
+        "season": 2022,
+        "week": 14,
+        "n": 13,
+        "weights": [0.513271616623956, 0.14778387261635856, 0.14496702707488424, 0.1939774836848011]
+      },
+      {
+        "season": 2022,
+        "week": 15,
+        "n": 16,
+        "weights": [
+          0.5015987808457887, 0.15668272986000004, 0.1592311192398088, 0.18248737005440233
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 16,
+        "n": 16,
+        "weights": [0.49786073567739186, 0.1627796541589968, 0.1571171845756319, 0.1822424255879795]
+      },
+      {
+        "season": 2022,
+        "week": 17,
+        "n": 15,
+        "weights": [
+          0.46415073960530767, 0.1698238197691828, 0.18224561851428997, 0.18377982211121976
+        ]
+      },
+      {
+        "season": 2022,
+        "week": 18,
+        "n": 16,
+        "weights": [
+          0.4397079645215323, 0.18366098688044608, 0.1992988509352718, 0.17733219766274957
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 1,
+        "n": 16,
+        "weights": [0.4807387232096334, 0.172785265066458, 0.1769596561759674, 0.1695163555479411]
+      },
+      {
+        "season": 2023,
+        "week": 2,
+        "n": 16,
+        "weights": [0.4343045717098191, 0.1884587342948782, 0.19502331387635422, 0.1822133801189483]
+      },
+      {
+        "season": 2023,
+        "week": 3,
+        "n": 16,
+        "weights": [
+          0.5247160084950033, 0.1511312437028926, 0.14995766204452016, 0.17419508575758394
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 4,
+        "n": 16,
+        "weights": [
+          0.5136043767810675, 0.1720138230306753, 0.12480806833952518, 0.18957373184873202
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 5,
+        "n": 14,
+        "weights": [
+          0.5210432621864518, 0.16750073483367592, 0.11742502882198246, 0.19403097415788978
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 6,
+        "n": 14,
+        "weights": [
+          0.5063590372076616, 0.17985442662597143, 0.11587116479312883, 0.19791537137323803
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 7,
+        "n": 13,
+        "weights": [
+          0.44594701799503395, 0.20457373178407637, 0.13969525208186645, 0.20978399813902324
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 8,
+        "n": 16,
+        "weights": [
+          0.42801991795873406, 0.2036204736344901, 0.15024637197529986, 0.21811323643147584
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 9,
+        "n": 14,
+        "weights": [
+          0.44144848043471013, 0.19074916285278395, 0.14840957444387298, 0.21939278226863299
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 10,
+        "n": 14,
+        "weights": [0.3851115239862274, 0.2185682250167282, 0.181426122880421, 0.21489412811662353]
+      },
+      {
+        "season": 2023,
+        "week": 11,
+        "n": 13,
+        "weights": [
+          0.411657566154144, 0.19909796519212894, 0.16735769234334444, 0.22188677631038253
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 12,
+        "n": 16,
+        "weights": [
+          0.3929860052751056, 0.19561191505343245, 0.17969514387672628, 0.23170693579473547
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 13,
+        "n": 13,
+        "weights": [
+          0.4100320850374262, 0.1856493329847789, 0.16683841538632854, 0.23748016659146612
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 14,
+        "n": 15,
+        "weights": [
+          0.45075527226431694, 0.17966100919842262, 0.13865547405617012, 0.23092824448109014
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 15,
+        "n": 16,
+        "weights": [
+          0.4548669063108938, 0.1794932185598094, 0.14490039814141933, 0.22073947698787733
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 16,
+        "n": 16,
+        "weights": [
+          0.45309702438973276, 0.17623698978318267, 0.13547650654966015, 0.23518947927742404
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 17,
+        "n": 16,
+        "weights": [
+          0.45541142709607585, 0.17551466585023906, 0.1410362319184257, 0.22803767513525927
+        ]
+      },
+      {
+        "season": 2023,
+        "week": 18,
+        "n": 16,
+        "weights": [
+          0.44792264654234626, 0.18372902860048346, 0.15282661866563713, 0.215521706191533
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 1,
+        "n": 16,
+        "weights": [
+          0.48916848895935855, 0.1711191514515322, 0.16122998389346493, 0.17848237569564449
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 2,
+        "n": 16,
+        "weights": [
+          0.5108572351213898, 0.16047561544166328, 0.1626615786013996, 0.16600557083554718
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 3,
+        "n": 16,
+        "weights": [
+          0.4787553101951083, 0.17637361345689792, 0.1670110544331371, 0.17786002191485656
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 4,
+        "n": 16,
+        "weights": [
+          0.45667098317754024, 0.18660315213968412, 0.17398896971971128, 0.1827368949630642
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 5,
+        "n": 14,
+        "weights": [
+          0.48946360203417255, 0.173598087931302, 0.16804478206053947, 0.16889352797398577
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 6,
+        "n": 13,
+        "weights": [
+          0.49208616242086006, 0.1742062174968771, 0.16829399644527898, 0.16541362363698392
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 7,
+        "n": 15,
+        "weights": [
+          0.5264313727317279, 0.16244510824628652, 0.16986852571798264, 0.14125499330400285
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 8,
+        "n": 16,
+        "weights": [0.526305058136815, 0.17211395002324184, 0.1495436382594479, 0.15203735358049525]
+      },
+      {
+        "season": 2024,
+        "week": 9,
+        "n": 15,
+        "weights": [
+          0.5226300667414331, 0.18463327694417322, 0.15429783887289367, 0.13843881744149986
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 10,
+        "n": 13,
+        "weights": [
+          0.5169714096070245, 0.1964992042628118, 0.14955550109083318, 0.13697388503933045
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 11,
+        "n": 14,
+        "weights": [
+          0.5259026007084432, 0.1803190098128718, 0.14163285308537693, 0.15214553639330836
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 12,
+        "n": 13,
+        "weights": [
+          0.5326685715944663, 0.18479949368732204, 0.13204776566125268, 0.1504841690569589
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 13,
+        "n": 15,
+        "weights": [
+          0.5232147430080791, 0.19433852382624503, 0.14016583066739433, 0.14228090249828157
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 14,
+        "n": 13,
+        "weights": [
+          0.5325583826484499, 0.18895226823464234, 0.13959204414028467, 0.1388973049766231
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 15,
+        "n": 16,
+        "weights": [0.5298415270521372, 0.18752083544735235, 0.1360601763770384, 0.146577461123472]
+      },
+      {
+        "season": 2024,
+        "week": 16,
+        "n": 16,
+        "weights": [
+          0.5306696286288713, 0.18384248473379905, 0.13854545435899787, 0.14694243227833187
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 17,
+        "n": 16,
+        "weights": [
+          0.5334716794448883, 0.17916176423271662, 0.14089233152415262, 0.14647422479824265
+        ]
+      },
+      {
+        "season": 2024,
+        "week": 18,
+        "n": 16,
+        "weights": [
+          0.5154039962451709, 0.20952638880241958, 0.13916529409296774, 0.13590432085944168
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 1,
+        "n": 16,
+        "weights": [
+          0.5026213244789373, 0.17675655197327642, 0.16322046804860307, 0.15740165549918347
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 2,
+        "n": 16,
+        "weights": [
+          0.4607454855180179, 0.19471206966077728, 0.14787880519731494, 0.1966636396238899
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 3,
+        "n": 16,
+        "weights": [
+          0.48078399420978174, 0.18803275113915538, 0.14875429802385595, 0.18242895662720707
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 4,
+        "n": 16,
+        "weights": [
+          0.4901000815803378, 0.1882332141356466, 0.14177811735351292, 0.17988858693050278
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 5,
+        "n": 14,
+        "weights": [
+          0.5133796309715457, 0.1686138303926536, 0.15049001099729736, 0.16751652763850314
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 6,
+        "n": 15,
+        "weights": [
+          0.5056593936190764, 0.17178946983998525, 0.17362621241932205, 0.14892492412161615
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 7,
+        "n": 15,
+        "weights": [
+          0.4819738216263969, 0.1920879511425449, 0.17258341339946434, 0.15335481383159405
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 8,
+        "n": 13,
+        "weights": [
+          0.495650815491297, 0.17754163510748208, 0.17687766721178816, 0.14992988218943282
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 9,
+        "n": 14,
+        "weights": [
+          0.5151106632132494, 0.16630105567415404, 0.1744979559009146, 0.14409032521168186
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 10,
+        "n": 14,
+        "weights": [
+          0.4968190200666687, 0.16545670657523262, 0.20255939406141413, 0.13516487929668447
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 11,
+        "n": 15,
+        "weights": [
+          0.5000437862926017, 0.17131228534659113, 0.18845537362494952, 0.14018855473585728
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 12,
+        "n": 14,
+        "weights": [
+          0.5069888788552132, 0.16622387783103545, 0.1817796212551352, 0.14500762205861625
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 13,
+        "n": 16,
+        "weights": [
+          0.47916000359372196, 0.18034468869094364, 0.195712207268651, 0.14478310044668352
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 14,
+        "n": 14,
+        "weights": [
+          0.4848725402562056, 0.18066415016797405, 0.18282694051482287, 0.15163636906099742
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 15,
+        "n": 16,
+        "weights": [
+          0.47207036193601487, 0.1801506915371013, 0.20814263291129367, 0.13963631361559006
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 16,
+        "n": 16,
+        "weights": [
+          0.49611927959060487, 0.17201992796746732, 0.17768140815495362, 0.15417938428697436
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 17,
+        "n": 16,
+        "weights": [
+          0.48138363770951914, 0.17842029293522957, 0.18560676947823038, 0.1545892998770208
+        ]
+      },
+      {
+        "season": 2025,
+        "week": 18,
+        "n": 16,
+        "weights": [
+          0.4783405112877244, 0.17665944590533803, 0.1948223509428639, 0.15017769186407376
+        ]
+      }
+    ]
+  },
+  "recentAdapted": {
+    "pooled": {
+      "n": 224,
+      "brier": 0.24112543792218508,
+      "previousBrier": 0.24102045793398988,
+      "bookBrier": 0.24112677302235283,
+      "logLoss": 0.6752922683225779,
+      "previousLogLoss": 0.6750858192269638,
+      "bookLogLoss": 0.6752861725679277,
+      "bookImprovementInterval": [-0.0010331239076793552, 0.0010357941080148636],
+      "previousImprovementInterval": [-0.0010134763215725387, 0.000803516345182144],
+      "simultaneousBookInterval": [-0.001510927856558941, 0.0015135980568944493]
+    },
+    "markets": [
+      {
+        "season": 2026,
+        "kind": "moneyline",
+        "n": 76,
+        "brier": 0.22500500866347006,
+        "previousBrier": 0.22500500866347006,
+        "bookBrier": 0.22494425373182197,
+        "logLoss": 0.6428470055721068,
+        "previousLogLoss": 0.6428470055721068,
+        "bookLogLoss": 0.642697910125553,
+        "bookImprovementInterval": [-0.00022269323115398724, 0.00010118336785781083],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029749054877780887, 0.00017598068548163248]
+      },
+      {
+        "season": 2026,
+        "kind": "spread",
+        "n": 71,
+        "brier": 0.2482596047630854,
+        "previousBrier": 0.2482596047630854,
+        "bookBrier": 0.24877558512974057,
+        "logLoss": 0.6896629763363943,
+        "previousLogLoss": 0.6896629763363943,
+        "bookLogLoss": 0.6906984012341777,
+        "bookImprovementInterval": [-0.0010632290473432796, 0.002095189780653635],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0017926465384110364, 0.0028246072717213917]
+      },
+      {
+        "season": 2026,
+        "kind": "total",
+        "n": 77,
+        "brier": 0.25045825322034615,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6940652514401741,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.0026223320160319048, 0.001798483476040726],
+        "previousImprovementInterval": [-0.0029467406029530067, 0.0023359479443623536],
+        "simultaneousBookInterval": [-0.00364329228770878, 0.0028194437477176014]
+      }
+    ],
+    "totals": {
+      "n": 77,
+      "brier": 0.25045825322034615,
+      "previousBrier": 0.2501528568910508,
+      "bookBrier": 0.25004632895035056,
+      "logLoss": 0.6940652514401741,
+      "previousLogLoss": 0.6934646722529307,
+      "bookLogLoss": 0.6932399350395704,
+      "bookImprovementInterval": [-0.0026223320160319048, 0.001798483476040726],
+      "previousImprovementInterval": [-0.0029467406029530067, 0.0023359479443623536],
+      "simultaneousBookInterval": [-0.00364329228770878, 0.0028194437477176014]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 77,
+        "brier": 0.25045825322034615,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6940652514401741,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.0026223320160319048, 0.001798483476040726],
+        "previousImprovementInterval": [-0.0029467406029530067, 0.0023359479443623536],
+        "simultaneousBookInterval": [-0.00364329228770878, 0.0028194437477176014]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 0
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 0
+      }
+    ],
+    "consistency": {
+      "beatsBook": 1,
+      "tiesBook": 0,
+      "losesBook": 2,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [
+      0.4949972380033882, 0.17301894206059992, 0.17231322090747966, 0.15967059902853192
+    ],
+    "weeklyWeights": [
+      {
+        "season": 2026,
+        "week": 1,
+        "n": 16,
+        "weights": [0.4976580385782434, 0.169441250685794, 0.16902903613210127, 0.16387167460386123]
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "n": 16,
+        "weights": [
+          0.5066797960868844, 0.16677543491385063, 0.17257506808742124, 0.15396970091184373
+        ]
+      },
+      {
+        "season": 2026,
+        "week": 3,
+        "n": 16,
+        "weights": [
+          0.4859565858786048, 0.19024539285408565, 0.16568269709183575, 0.15811532417547397
+        ]
+      },
+      {
+        "season": 2026,
+        "week": 4,
+        "n": 16,
+        "weights": [
+          0.47949505866951453, 0.18284269067396416, 0.17959716440246917, 0.1580650862540524
+        ]
+      },
+      {
+        "season": 2026,
+        "week": 5,
+        "n": 13,
+        "weights": [
+          0.5075504352960721, 0.15181401789408452, 0.17522881218882197, 0.16540673462102132
+        ]
+      }
+    ]
+  },
+  "unadapted": {
+    "pooled": {
+      "n": 3221,
+      "brier": 0.23638752370893468,
+      "previousBrier": 0.2365868597405654,
+      "bookBrier": 0.2366663484876148,
+      "logLoss": 0.6639557643374412,
+      "previousLogLoss": 0.6643533423096291,
+      "bookLogLoss": 0.6645047843897722,
+      "bookImprovementInterval": [-0.00033695546505871094, 0.0008946050224189734],
+      "previousImprovementInterval": [-0.0002012214609767068, 0.0005998935242381472],
+      "simultaneousBookInterval": [-0.0006213768194754324, 0.0011790263768356947]
+    },
+    "markets": [
+      {
+        "season": 2022,
+        "kind": "moneyline",
+        "n": 269,
+        "brier": 0.21083148660671813,
+        "previousBrier": 0.21083148660671813,
+        "bookBrier": 0.21082110150076128,
+        "logLoss": 0.6085971946393567,
+        "previousLogLoss": 0.6085971946393567,
+        "bookLogLoss": 0.6085460268644323,
+        "bookImprovementInterval": [-0.00008145378573293682, 0.000060683573819224736],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00011427953869277659, 0.0000935093267790645]
+      },
+      {
+        "season": 2022,
+        "kind": "spread",
+        "n": 261,
+        "brier": 0.24819035213566945,
+        "previousBrier": 0.24819035213566945,
+        "bookBrier": 0.24853204884571245,
+        "logLoss": 0.6895119140128516,
+        "previousLogLoss": 0.6895119140128516,
+        "bookLogLoss": 0.690206748133678,
+        "bookImprovementInterval": [-0.0011797641965647081, 0.0018631576166507062],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0018825083591932578, 0.002565901779279256]
+      },
+      {
+        "season": 2022,
+        "kind": "total",
+        "n": 268,
+        "brier": 0.24858507635398477,
+        "previousBrier": 0.24888108341056356,
+        "bookBrier": 0.2502122792134749,
+        "logLoss": 0.6903131461229097,
+        "previousLogLoss": 0.6909080066962537,
+        "bookLogLoss": 0.6935710418420938,
+        "bookImprovementInterval": [-0.000849651375746596, 0.0041040570947268205],
+        "previousImprovementInterval": [-0.0018244422185397587, 0.002416456331697327],
+        "simultaneousBookInterval": [-0.0019936800181750616, 0.005248085737155286]
+      },
+      {
+        "season": 2023,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.21871339632507586,
+        "previousBrier": 0.21871339632507586,
+        "bookBrier": 0.2187095146255924,
+        "logLoss": 0.627464438283765,
+        "previousLogLoss": 0.627464438283765,
+        "bookLogLoss": 0.6273487972171233,
+        "bookImprovementInterval": [-0.00020249363749374384, 0.0001947302385268348],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029423005967778206, 0.00028646666071087303]
+      },
+      {
+        "season": 2023,
+        "kind": "spread",
+        "n": 258,
+        "brier": 0.2507307155465004,
+        "previousBrier": 0.2507307155465004,
+        "bookBrier": 0.2500004625992449,
+        "logLoss": 0.6946105047519431,
+        "previousLogLoss": 0.6946105047519431,
+        "bookLogLoss": 0.6931483711346293,
+        "bookImprovementInterval": [-0.0027484666112143133, 0.0012879607167033472],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.003680654789776522, 0.002220148895265556]
+      },
+      {
+        "season": 2023,
+        "kind": "total",
+        "n": 270,
+        "brier": 0.24902448292924545,
+        "previousBrier": 0.24804127883945298,
+        "bookBrier": 0.25006922521405495,
+        "logLoss": 0.6912029205487774,
+        "previousLogLoss": 0.6892258963235339,
+        "bookLogLoss": 0.6932856626453789,
+        "bookImprovementInterval": [-0.0037844050109940063, 0.005873889580613],
+        "previousImprovementInterval": [-0.003452101290834707, 0.0014856931112497739],
+        "simultaneousBookInterval": [-0.006014929014509777, 0.008104413584128771]
+      },
+      {
+        "season": 2024,
+        "kind": "moneyline",
+        "n": 272,
+        "brier": 0.20009656252586755,
+        "previousBrier": 0.20009656252586755,
+        "bookBrier": 0.20016161878885597,
+        "logLoss": 0.587321397394949,
+        "previousLogLoss": 0.587321397394949,
+        "bookLogLoss": 0.5874888995056523,
+        "bookImprovementInterval": [-0.0000781593524634618, 0.000208271878440295],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00014430889158008705, 0.00027442141755692025]
+      },
+      {
+        "season": 2024,
+        "kind": "spread",
+        "n": 268,
+        "brier": 0.25092003543216984,
+        "previousBrier": 0.25092003543216984,
+        "bookBrier": 0.25107183948242473,
+        "logLoss": 0.694988880905053,
+        "previousLogLoss": 0.694988880905053,
+        "bookLogLoss": 0.6952918193457789,
+        "bookImprovementInterval": [-0.001062148667903621, 0.001365756768413399],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0016228585636938757, 0.0019264666642036536]
+      },
+      {
+        "season": 2024,
+        "kind": "total",
+        "n": 269,
+        "brier": 0.24884641614080777,
+        "previousBrier": 0.25135219413954935,
+        "bookBrier": 0.24977944777848365,
+        "logLoss": 0.6908456960489837,
+        "previousLogLoss": 0.6958556966320367,
+        "bookLogLoss": 0.6927062239462438,
+        "bookImprovementInterval": [-0.0019641852897673033, 0.0038302485651190736],
+        "previousImprovementInterval": [-0.00012105962869626667, 0.005132615626179419],
+        "simultaneousBookInterval": [-0.00330237431242767, 0.00516843758777944]
+      },
+      {
+        "season": 2025,
+        "kind": "moneyline",
+        "n": 271,
+        "brier": 0.21221429694628238,
+        "previousBrier": 0.21221429694628238,
+        "bookBrier": 0.21213896835079188,
+        "logLoss": 0.6095302843428569,
+        "previousLogLoss": 0.6095302843428569,
+        "bookLogLoss": 0.6093832198972615,
+        "bookImprovementInterval": [-0.0002601317080175753, 0.00010947451703656805],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0003454900027985743, 0.00019483281181756704]
+      },
+      {
+        "season": 2025,
+        "kind": "spread",
+        "n": 271,
+        "brier": 0.2500252881532331,
+        "previousBrier": 0.2500252881532331,
+        "bookBrier": 0.24958671312680858,
+        "logLoss": 0.6932015483850972,
+        "previousLogLoss": 0.6932015483850972,
+        "bookLogLoss": 0.6923205180550237,
+        "bookImprovementInterval": [-0.001488990639980556, 0.0006118405871315042],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0019741647496500834, 0.0010970146968010317]
+      },
+      {
+        "season": 2025,
+        "kind": "total",
+        "n": 272,
+        "brier": 0.24999056908079642,
+        "previousBrier": 0.2505572686738165,
+        "bookBrier": 0.2504056398371012,
+        "logLoss": 0.6931303448045101,
+        "previousLogLoss": 0.6942600595057417,
+        "bookLogLoss": 0.6939590876085676,
+        "bookImprovementInterval": [-0.0023981586274074884, 0.0032283001400170053],
+        "previousImprovementInterval": [-0.0016425665147299959, 0.0027759657007701585],
+        "simultaneousBookInterval": [-0.003697554832037436, 0.004527696344646953]
+      }
+    ],
+    "totals": {
+      "n": 1079,
+      "brier": 0.24911448710437284,
+      "previousBrier": 0.24970953933595932,
+      "bookBrier": 0.2501173189296667,
+      "logLoss": 0.6913787374727641,
+      "previousLogLoss": 0.6925655758864963,
+      "bookLogLoss": 0.6933818481918389,
+      "bookImprovementInterval": [-0.00065718286001572, 0.0026628465106034614],
+      "previousImprovementInterval": [-0.0006011131132192312, 0.0017912175763922008],
+      "simultaneousBookInterval": [-0.0014239233164497875, 0.0034295869670375287]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 369,
+        "brier": 0.2489554566944882,
+        "previousBrier": 0.25004340133880076,
+        "bookBrier": 0.2507981983289962,
+        "logLoss": 0.6910589355047188,
+        "previousLogLoss": 0.693233721992774,
+        "bookLogLoss": 0.694744014236929,
+        "bookImprovementInterval": [-0.001996684601334028, 0.005682167870349994],
+        "previousImprovementInterval": [-0.0007363648893555553, 0.0029122541779806653],
+        "simultaneousBookInterval": [-0.0037700685662869736, 0.007455551835302939]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 342,
+        "brier": 0.25032079209540464,
+        "previousBrier": 0.249510067250118,
+        "bookBrier": 0.24998685815425747,
+        "logLoss": 0.6937995550763582,
+        "previousLogLoss": 0.6921656124812251,
+        "bookLogLoss": 0.6931209705922977,
+        "bookImprovementInterval": [-0.0028788944021700636, 0.0022110265198757263],
+        "previousImprovementInterval": [-0.0031689614028841367, 0.0015475117123108745],
+        "simultaneousBookInterval": [-0.004054380476335384, 0.0033865125940410463]
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 368,
+        "brier": 0.24815287274109654,
+        "previousBrier": 0.24956014904875634,
+        "bookBrier": 0.2495558327525937,
+        "logLoss": 0.6894496268906459,
+        "previousLogLoss": 0.6922673192870027,
+        "bookLogLoss": 0.6922584266386196,
+        "bookImprovementInterval": [-0.0004820157901392094, 0.0032879358131335],
+        "previousImprovementInterval": [-0.0006195482944936041, 0.003434100909813203],
+        "simultaneousBookInterval": [-0.001352663031578695, 0.0041585830545729854]
+      }
+    ],
+    "consistency": {
+      "beatsBook": 7,
+      "tiesBook": 0,
+      "losesBook": 5,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [0, 1, 0, 0],
+    "weeklyWeights": [
+      {
+        "season": 2022,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 3,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 5,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 6,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 7,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 8,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 9,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 11,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 12,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 13,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 14,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 17,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2022,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 6,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 7,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 8,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 9,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 11,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 12,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 13,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 14,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2023,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 6,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 7,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 8,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 9,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 10,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 11,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 12,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 13,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 14,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2024,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 5,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 6,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 7,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 8,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 9,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 10,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 11,
+        "n": 15,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 12,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 13,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 14,
+        "n": 14,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 15,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 16,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 17,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2025,
+        "week": 18,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      }
+    ]
+  },
+  "recentUnadapted": {
+    "pooled": {
+      "n": 224,
+      "brier": 0.2419324348107504,
+      "previousBrier": 0.24102045793398988,
+      "bookBrier": 0.24112677302235283,
+      "logLoss": 0.6769120353422187,
+      "previousLogLoss": 0.6750858192269638,
+      "bookLogLoss": 0.6752861725679277,
+      "bookImprovementInterval": [-0.004122998853439315, 0.00251167527664415],
+      "previousImprovementInterval": [-0.003612992853264319, 0.001789039099743251],
+      "simultaneousBookInterval": [-0.005655236223328234, 0.004043912646533069]
+    },
+    "markets": [
+      {
+        "season": 2026,
+        "kind": "moneyline",
+        "n": 76,
+        "brier": 0.22500500866347006,
+        "previousBrier": 0.22500500866347006,
+        "bookBrier": 0.22494425373182197,
+        "logLoss": 0.6428470055721068,
+        "previousLogLoss": 0.6428470055721068,
+        "bookLogLoss": 0.642697910125553,
+        "bookImprovementInterval": [-0.00022269323115398724, 0.00010118336785781083],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.00029749054877780887, 0.00017598068548163248]
+      },
+      {
+        "season": 2026,
+        "kind": "spread",
+        "n": 71,
+        "brier": 0.2482596047630854,
+        "previousBrier": 0.2482596047630854,
+        "bookBrier": 0.24877558512974057,
+        "logLoss": 0.6896629763363943,
+        "previousLogLoss": 0.6896629763363943,
+        "bookLogLoss": 0.6906984012341777,
+        "bookImprovementInterval": [-0.0010632290473432796, 0.002095189780653635],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0017926465384110364, 0.0028246072717213917]
+      },
+      {
+        "season": 2026,
+        "kind": "total",
+        "n": 77,
+        "brier": 0.25280588053253655,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6987773009518542,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+        "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+        "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+      }
+    ],
+    "totals": {
+      "n": 77,
+      "brier": 0.25280588053253655,
+      "previousBrier": 0.2501528568910508,
+      "bookBrier": 0.25004632895035056,
+      "logLoss": 0.6987773009518542,
+      "previousLogLoss": 0.6934646722529307,
+      "bookLogLoss": 0.6932399350395704,
+      "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+      "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+      "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+    },
+    "phases": [
+      {
+        "from": 1,
+        "to": 6,
+        "n": 77,
+        "brier": 0.25280588053253655,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6987773009518542,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.011602165553907586, 0.0060830623895356],
+        "previousImprovementInterval": [-0.010470278989178626, 0.005164231706207166],
+        "simultaneousBookInterval": [-0.01568646067054001, 0.010167357506168026]
+      },
+      {
+        "from": 7,
+        "to": 12,
+        "n": 0
+      },
+      {
+        "from": 13,
+        "to": 18,
+        "n": 0
+      }
+    ],
+    "consistency": {
+      "beatsBook": 1,
+      "tiesBook": 0,
+      "losesBook": 2,
+      "simultaneousPositive": 0
+    },
+    "bookFallbackFraction": 0,
+    "nonTotalMaximumProductionDifference": 0,
+    "meanExpertWeights": [0, 1, 0, 0],
+    "weeklyWeights": [
+      {
+        "season": 2026,
+        "week": 1,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 2,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 3,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 4,
+        "n": 16,
+        "weights": [0, 1, 0, 0]
+      },
+      {
+        "season": 2026,
+        "week": 5,
+        "n": 13,
+        "weights": [0, 1, 0, 0]
+      }
+    ]
+  },
+  "warnings": [
+    "All later data is reused retrospective evidence; the 2026 sample still stops at the prior snapshot.",
+    "No subgroup-based wagers, prospective v9 forecasts or profitability are established.",
+    "Expert weights use only forecasts and outcomes from earlier NFL weeks; book matches are ties."
+  ]
+}

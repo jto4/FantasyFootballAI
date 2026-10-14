@@ -164,6 +164,7 @@ export function DesktopSettingsSections({
           <label className="settings-toggle">
             <input
               type="checkbox"
+              data-search-target="desktop-startup"
               checked={launchAtLogin.enabled}
               disabled={!launchAtLogin.supported || launchAtLoginBusy || startHiddenBusy}
               onChange={(event) => void changeLaunchAtLogin(event.currentTarget.checked)}
@@ -174,6 +175,7 @@ export function DesktopSettingsSections({
             <label className="settings-toggle">
               <input
                 type="checkbox"
+                data-search-target="desktop-hidden"
                 checked={startHidden.enabled}
                 disabled={!startHidden.supported || launchAtLoginBusy || startHiddenBusy}
                 onChange={(event) => void changeStartHidden(event.currentTarget.checked)}
@@ -191,7 +193,9 @@ export function DesktopSettingsSections({
         <section className="settings-card" aria-labelledby="desktop-updates-title">
           <div className="settings-card-title">
             <div>
-              <h2 id="desktop-updates-title">Desktop updates</h2>
+              <h2 id="desktop-updates-title" data-search-target="desktop-updates" tabIndex={-1}>
+                Desktop updates
+              </h2>
               <p>
                 Check for stable releases. macOS and Windows packages can download updates in the
                 app.
@@ -259,7 +263,7 @@ export function DesktopSettingsSections({
         <section className="settings-card">
           <div className="settings-card-title">
             <div>
-              <h2 ref={dataDirectoryHeadingRef} tabIndex={-1}>
+              <h2 ref={dataDirectoryHeadingRef} tabIndex={-1} data-search-target="data-folder">
                 Local data folder
               </h2>
               <p>

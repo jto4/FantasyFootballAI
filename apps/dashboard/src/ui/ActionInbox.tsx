@@ -162,12 +162,12 @@ export function ActionInbox({
           {!league
             ? 'Connect your league'
             : freshness === 'fresh'
-              ? 'Snapshot is current'
+              ? 'League data is up to date'
               : freshness === 'stale'
                 ? 'Refresh recommended'
-                : 'Snapshot age unknown'}
+                : 'Last update unknown'}
         </h3>
-        <p>{league?.lastSyncError ?? 'Reports use the latest saved league snapshot.'}</p>
+        <p>{league?.lastSyncError ?? 'Reports use the latest saved league data.'}</p>
         <button type="button" className="text-button" disabled={!league} onClick={onRefresh}>
           Refresh league →
         </button>

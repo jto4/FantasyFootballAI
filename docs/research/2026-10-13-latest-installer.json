@@ -1,0 +1,237 @@
+{
+  "checkedAt": "2026-10-14T03:25:15.697Z",
+  "status": "passed",
+  "sourceBase": "890ffcb8599dc5598dd7cfc7d9082bbb64ed2938",
+  "sourceScope": "Current accumulated working tree; no release commit or tag.",
+  "runtime": {
+    "packaged": true,
+    "version": "0.1.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "electron": "44.4.5"
+  },
+  "artifacts": {
+    "dmg": {
+      "path": "apps/desktop/out/make/Sunday Sidekick-0.1.0-arm64.dmg",
+      "sha256": "3364d82e978a318b7abe3ecc729539fd94fd19777d588acfa06df079a4966195"
+    },
+    "zip": {
+      "path": "apps/desktop/out/make/zip/darwin/arm64/Sunday Sidekick-darwin-arm64-0.1.0.zip",
+      "sha256": "63ced2569a554973c59bb06c452477f6e225777be069d4c12803b26e67e5628b"
+    },
+    "applicationPayloadSha256": "0945614abdef9d0266ac15d878b344b08c0a8149127a831116c18173a471671d"
+  },
+  "generationLineage": {
+    "initialPayloadSha256": "95be5dbf4a72ff0cc0391113c0f488ccdbeca37522f2e05f7b5397bf8d557eef",
+    "changedCompiledFiles": ["apps/api/dist/store.js"],
+    "explanation": "Ten fresh API analyses on the initial rebuild. Final rebuild changes only store.js to restore history chronology; all numerical, advice-service, adapter and dashboard compiled files are identical. Final package replays all ten requests, generates another fresh start/sit result and verifies ordered restart."
+  },
+  "sourceData": {
+    "asOf": "2026-10-14T02:58:08.341Z",
+    "season": 2026,
+    "week": 6,
+    "playerGameRows": 45108,
+    "catalogPlayers": 12229,
+    "publicForecastRows": 6035,
+    "snapshotSha256": "90b4b2e4310399e11c13c6eb05a14ba36f78b339494fbbeaede888a505cc27f8",
+    "scope": "Public NFL evidence and explicit synthetic PPR rosters; no owner league connection or transaction."
+  },
+  "advice": {
+    "cases": [
+      {
+        "case": "lineup",
+        "mode": "lineup",
+        "id": "b08f6516-3bcf-49fe-b851-13fbb6910d96",
+        "status": "passed",
+        "verdict": "lean",
+        "headline": "Start Nacua and Bowers; retain Lamb only if available",
+        "seconds": 101.683,
+        "arithmeticChecks": 13,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nTentative choice · Josh Allen, James Cook, Jonathan Taylor, Puka Nacua, CeeDee Lamb, Brock Bowers, Chris Olave.\n\nExpected change\n\nSelected lineup compared with recorded starters: 16.9 points. Conditional on supplied estimates; not a realized gain.\n\nStrongest alternative\n\nIf Lamb is inactive, use Wilson at WR and retain Olave at FLEX. Wilson's weekly estimate is 14.63 points/week versus Lamb's conditional 18.55 points/week. Credible evidence of restricted usage could also favor Wilson, but no supplied evidence quantifies that restriction. The displayed optimized total would no longer apply to this fallback lineup.\n\nEvidence: ESPN weekly player forecasts · page 1 · Connected fantasy league snapshot · nflverse injury reports (retrieval date; report dates vary) · nflverse schedules and results\nReconsider if\n\nStale evidence, uncertain injury availability, an unconfirmed waiver drop or a statistical estimate without prospective validation supports a tentative comparison rather than a firm recommendation.\n\nLamb remains Questionable, and no uniquely matched injury report confirms current availability for the selected players. Active catalog status is not proof of health. Confirm current game designations and roster locks before kickoff; retrieval dates are not report update times.\n\nEvidence: Connected fantasy league snapshot · nflverse injury reports (retrieval date; report dates vary)"
+      },
+      {
+        "case": "start-sit",
+        "mode": "lineup",
+        "id": "144036a9-323e-4df3-b3b9-facbcc91040c",
+        "status": "passed",
+        "verdict": "lean",
+        "headline": "Lean Puka Nacua for the shared receiver spot",
+        "seconds": 67.611,
+        "arithmeticChecks": 2,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nTentative choice · Puka Nacua.\n\nExpected change\n\nChosen weekly estimate compared with the highest alternative: 8.15 points. Conditional on supplied estimates; not a realized gain.\n\nStrongest alternative\n\nWilson is a credible fallback if confirmed available and Nacua is unavailable or restricted. His expected receptions are 6.29 receptions, compared with Nacua's 7.2 receptions, preserving a reception-based scoring path. That countercase does not overturn Nacua's overall estimate advantage without new availability or role evidence.\n\nEvidence: ESPN weekly player forecasts · page 1\nReconsider if\n\nStale evidence, uncertain injury availability, an unconfirmed waiver drop or a statistical estimate without prospective validation supports a tentative comparison rather than a firm recommendation.\n\nNeither player has a uniquely matched current injury report here. Their catalog status remains Active, but availability is unconfirmed. Check final designations, inactive lists, quarterback status and workload restrictions before kickoff. Retrieval dates do not establish when reports or forecasts were updated.\n\nEvidence: nflverse injury reports (retrieval date; report dates vary) · ESPN weekly player forecasts · page 1"
+      },
+      {
+        "case": "draft-plan-complete",
+        "mode": "draft-plan",
+        "id": "33b0e6d3-db0d-4933-a14a-70ce99149b53",
+        "status": "passed",
+        "verdict": "lean",
+        "headline": "Hubbard leads this conditional comparison as running back depth",
+        "seconds": 118.167,
+        "arithmeticChecks": 13,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nTentative choice · Chuba Hubbard.\n\nExpected change\n\nNo complete decision-level improvement is quantified. Compare the supported estimates below.\n\nStrongest alternative\n\nHampton is the running back countercase: his historical scoring average is 14.48 points/game, versus Hubbard's 10.81 points/game, although current workload and remaining expectations favor Hubbard. Odunze offers receiver insurance, with recent targets 8 targets/game versus Shaheed's 3.5 targets/game. Atlanta's recorded receiver allowance is 33.44 position points/game, but that position aggregate is not Odunze's projection. Verified role changes or materially different acquisition costs could change the preference.\n\nEvidence: nflverse weekly player stats 2026 · nflverse weekly player stats 2025 · nflverse schedules and results · Connected fantasy league snapshot\nReconsider if\n\nStale evidence, uncertain injury availability, an unconfirmed waiver drop or a statistical estimate without prospective validation supports a tentative comparison rather than a firm recommendation.\n\nNo candidate has a uniquely matched current injury report. Catalog Active status does not establish health, and Lamb's Questionable flag could change receiver-depth needs. Retrieval dates are not publisher or injury-report update times.\n\nEvidence: nflverse injury reports (retrieval date; report dates vary) · ESPN weekly player forecasts · page 1 · ESPN weekly player forecasts · page 2"
+      },
+      {
+        "case": "draft-review-complete",
+        "mode": "draft-review",
+        "id": "7e060bbf-f231-4a08-bfd7-a90db81dae6c",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Supported roster strengths, but no defensible historical draft grade",
+        "seconds": 125.294,
+        "arithmeticChecks": 9,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nNo complete decision-level improvement is quantified. Compare the supported estimates below.\n\nStrongest alternative\n\nKeeping quarterback and receiver insurance is a credible countercase to reallocating depth. Obtain actual trade offers before comparing starting value and lost coverage. Check live waiver availability, roster capacity, locks and FAAB before evaluating running-back or tight-end additions. Weekly forecasts and verified game status are needed before changing saved starters; no specific transaction or lineup selection is established here.\n\nEvidence: Connected fantasy league snapshot · nflverse schedules and results · nflverse injury reports (retrieval date; report dates vary)\nReconsider if\n\nStale evidence, uncertain injury availability, an unconfirmed waiver drop or a statistical estimate without prospective validation supports a tentative comparison rather than a firm recommendation.\n\nLamb remains Questionable. No roster player has a uniquely matched regular-season injury report here; Active catalog status or an absent report does not establish availability. Retrieval timestamps are not injury-report or publisher update times.\n\nEvidence: nflverse injury reports (retrieval date; report dates vary) · Connected fantasy league snapshot · ESPN weekly player forecasts · page 1"
+      },
+      {
+        "case": "trade-complete",
+        "mode": "trade",
+        "id": "a4033b24-c503-4d47-8a77-6a8c86ca4b1b",
+        "status": "passed",
+        "verdict": "lean",
+        "headline": "Tentatively favor trading James Cook for Bijan Robinson",
+        "seconds": 95.177,
+        "arithmeticChecks": 15,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nTentative choice · Bijan Robinson.\n\nExpected change\n\nRemaining starting-slot estimate change: 53.79 points. Conditional on supplied estimates; not a realized gain.\n\nStrongest alternative\n\nKeep Cook if verified Robinson availability or role information undermines the forecast advantage. Separately explore using surplus quarterback or tight-end depth to acquire running-back coverage; no available replacement or acquisition cost is established here.\n\nEvidence: Connected fantasy league snapshot\nReconsider if\n\nStale evidence, uncertain injury availability, an unconfirmed waiver drop or a statistical estimate without prospective validation supports a tentative comparison rather than a firm recommendation.\n\nNeither trade player nor Taylor has a uniquely matched current injury report. Active catalog status does not establish health. An absence would expose the running-back depth shortage, which exists before and after this exchange.\n\nEvidence: nflverse injury reports (retrieval date; report dates vary) · Connected fantasy league snapshot"
+      },
+      {
+        "case": "waivers",
+        "mode": "waivers",
+        "id": "0091b420-b039-4068-9750-921b5ae050ed",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Keep your current lineup for now",
+        "seconds": 99.03,
+        "arithmeticChecks": 23,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nBest quantified compared add/drop change: -2.74 points. Conditional on supplied estimates; not a realized gain.\n\nStrongest alternative\n\nA depth-oriented comparison would require a different legal drop and longer-term role and availability estimates. This evidence supports declining the specified Olave swaps for immediate scoring, but does not quantify stash value or justify a FAAB bid.\n\nEvidence: Connected fantasy league snapshot\nReconsider if\n\nNone of the compared add/drop moves improves the supported weekly starting-lineup estimate. Longer-term stash value is not quantified by this weekly comparison.\n\nThe optimization includes CeeDee Lamb conditionally despite his Questionable status, excludes Saquon Barkley because he is recorded Out, and excludes Ja'Marr Chase because of his bye. Lamb's eventual availability could change the comparison. No uniquely matched injury report confirms current availability for Olave or the candidates.\n\nEvidence: Connected fantasy league snapshot · nflverse schedules and results · nflverse injury reports (retrieval date; report dates vary)"
+      },
+      {
+        "case": "reserve-waivers",
+        "mode": "waivers",
+        "id": "0b11468c-f41c-41c0-b7cc-1ae3c2ebc358",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Keep your current lineup for now",
+        "seconds": 81.54,
+        "arithmeticChecks": 14,
+        "readiness": "limited",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nBest quantified compared add/drop change: -2.75 points. Conditional on supplied estimates; not a realized gain.\n\nStrongest alternative\n\nA different-drop comparison could evaluate running-back depth without sacrificing Olave, but requires separate legal-lineup optimization and opportunity-cost analysis. Updated activation information and longer-term workload estimates are needed to assess stash value.\n\nEvidence: Connected fantasy league snapshot\nReconsider if\n\nNone of the compared add/drop moves improves the supported weekly starting-lineup estimate. Longer-term stash value is not quantified by this weekly comparison.\n\nCeeDee Lamb is Questionable and Ja'Marr Chase has a bye, making Olave useful receiver insurance. Availability changes require another optimization. Uniquely matched current injury reports are missing; an Active catalog designation does not establish health or clearance.\n\nEvidence: Connected fantasy league snapshot · nflverse injury reports (retrieval date; report dates vary) · nflverse schedules and results"
+      },
+      {
+        "case": "betting-moneyline",
+        "mode": "betting",
+        "id": "1bb922ae-0c74-4b70-9336-0f20ed2302ec",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Pass on Denver: no supported betting edge",
+        "seconds": 80.081,
+        "arithmeticChecks": 3,
+        "readiness": "ready",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nNo complete decision-level improvement is quantified. Compare the supported estimates below.\n\nStrongest alternative\n\nAbstain rather than switch sides without supporting value evidence. Reconsider only with a refreshed executable quote, verified availability and a conservatively supported advantage; an uncalibrated AI opinion cannot supply the missing edge.\n\nEvidence: DraftKings pregame price displayed by ESPN · nflverse schedules and results\nReconsider if\n\nThe rolling forecast lacks sufficient evaluation support or a conservative advantage at the entered price. An uncalibrated AI forecast and historical hit rates cannot establish a betting edge.\n\nThe similar-estimate calibration band runs from 39.72 % to 62.75 %. It spans break-even, but describes earlier similar estimates rather than guaranteed uncertainty for this game. Its favorable endpoint cannot establish an edge.\n\nEvidence: nflverse schedules and results · DraftKings pregame price displayed by ESPN · nflverse injury reports (retrieval date; report dates vary) · NFL injury archive 2026 (date coverage varies) · NFL injury archive 2025 (date coverage varies) · NFL injury archive 2024 (date coverage varies) · NFL injury archive 2023 (date coverage varies) · NFL injury archive 2022 (date coverage varies) · NFL injury archive 2021 (date coverage varies) · NFL injury archive 2020 (date coverage varies) · NFL injury archive 2019 (date coverage varies) · NFL injury archive 2018 (date coverage varies) · NFL injury archive 2017 (date coverage varies) · NFL injury archive 2016 (date coverage varies) · Dated official NFL injury articles 2025 (partial pregame coverage) · Dated official NFL injury articles 2026 (partial pregame coverage) · Dated NFL quarterback charts 2026 · Dated NFL quarterback charts 2025 · Open-Meteo JMA GSM 48-hour-lead regional forecasts · ESPN current captured quarterback depth charts (not confirmed starters) · ESPN dated event-linked injury statuses (IR omitted) · Earlier completed-game quarterback performance and snap roles"
+      },
+      {
+        "case": "betting-spread",
+        "mode": "betting",
+        "id": "449a9f10-2e00-46d5-8f0d-54d669e40382",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Pass on Denver’s spread: no supported betting edge",
+        "seconds": 56.394,
+        "arithmeticChecks": 3,
+        "readiness": "ready",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nNo complete decision-level improvement is quantified. Compare the supported estimates below.\n\nStrongest alternative\n\nAbstain rather than switch to Seattle: a marginal model correction against Denver does not establish an opposite-side edge after sportsbook margin. Reassess with refreshed paired prices, verified availability and independently supported forecast advantage.\n\nEvidence: DraftKings pregame price displayed by ESPN · nflverse schedules and results\nReconsider if\n\nThe rolling forecast lacks sufficient evaluation support or a conservative advantage at the entered price. An uncalibrated AI forecast and historical hit rates cannot establish a betting edge.\n\nThe DraftKings price displayed by ESPN is a retrieved pregame snapshot, not a guaranteed executable offer. Retrieval freshness does not establish publisher update timing, and archived schedule odds are not current quotes.\n\nEvidence: DraftKings pregame price displayed by ESPN · nflverse schedules and results"
+      },
+      {
+        "case": "betting-total",
+        "mode": "betting",
+        "id": "6810450a-a1c6-4d2b-9fb7-02e32601bf55",
+        "status": "passed",
+        "verdict": "hold",
+        "headline": "Pass on the over; no supported betting edge",
+        "seconds": 59.091,
+        "arithmeticChecks": 3,
+        "readiness": "ready",
+        "uiSummary": "Decision in brief\nRecommendation\n\nHold off.\n\nExpected change\n\nNo complete decision-level improvement is quantified. Compare the supported estimates below.\n\nStrongest alternative\n\nRemain abstinent rather than automatically switching to the under: lack of support for the over does not establish an opposing edge after sportsbook margin. Reassess with refreshed prices, confirmed participation and independently supported price-adjusted evidence.\n\nEvidence: DraftKings pregame price displayed by ESPN · nflverse schedules and results\nReconsider if\n\nThe rolling forecast lacks sufficient evaluation support or a conservative advantage at the entered price. An uncalibrated AI forecast and historical hit rates cannot establish a betting edge.\n\nThe similar-estimate calibration band runs from 37.25 % to 60.28 %. It describes historical comparable estimates, not guaranteed individual-game uncertainty; future personnel changes, market drift and source-publication timing remain limitations.\n\nEvidence: nflverse schedules and results · DraftKings pregame price displayed by ESPN · nflverse injury reports (retrieval date; report dates vary) · NFL injury archive 2026 (date coverage varies) · NFL injury archive 2025 (date coverage varies) · NFL injury archive 2024 (date coverage varies) · NFL injury archive 2023 (date coverage varies) · NFL injury archive 2022 (date coverage varies) · NFL injury archive 2021 (date coverage varies) · NFL injury archive 2020 (date coverage varies) · NFL injury archive 2019 (date coverage varies) · NFL injury archive 2018 (date coverage varies) · NFL injury archive 2017 (date coverage varies) · NFL injury archive 2016 (date coverage varies) · Dated official NFL injury articles 2025 (partial pregame coverage) · Dated official NFL injury articles 2026 (partial pregame coverage) · Dated NFL quarterback charts 2026 · Dated NFL quarterback charts 2025 · Open-Meteo JMA GSM 48-hour-lead regional forecasts · ESPN current captured quarterback depth charts (not confirmed starters) · ESPN dated event-linked injury statuses (IR omitted) · Earlier completed-game quarterback performance and snap roles"
+      }
+    ],
+    "postHistoryFresh": {
+      "id": "a85cd8d6-97d8-47c4-b7a0-1d343148b6b7",
+      "mode": "lineup",
+      "verdict": "lean",
+      "headline": "Lean Puka Nacua for the shared receiver spot",
+      "arithmeticChecks": 2
+    },
+    "successfulAnalyses": 11,
+    "arithmeticChecks": 100,
+    "allSixModes": true,
+    "readAfterSave": true,
+    "idempotentReplay": true,
+    "newestFirstRestart": true,
+    "scope": "Independent final-result arithmetic and legal-choice checks. Raw native responses are not separately captured or graded in this packaged run; each analysis uses the production analysis/review validation path."
+  },
+  "native": {
+    "outputApp": "passed",
+    "mountedDmg": "passed",
+    "checks": [
+      "packaged GUI launch",
+      "team preference survives restart and cleared renderer storage",
+      "isolated preferences, single-instance profile, database and OS credential namespace",
+      "API child sees a disposable credential in the independently populated verification namespace",
+      "rendered league desk",
+      "local API health",
+      "packaged numerical code fingerprint for prospective cohorts",
+      "storage and backup status",
+      "white default and black dark mode survive restart with cleared renderer storage",
+      "diagnostics",
+      "dashboard stop",
+      "flushed API shutdown"
+    ],
+    "allTenViews": "passed",
+    "desktopAndNarrowViewports": [
+      {
+        "width": 1280,
+        "height": 900
+      },
+      {
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "rendererErrors": [],
+    "unexpectedViewDialogs": []
+  },
+  "sourceChecks": {
+    "workspaceTests": 907,
+    "api": 328,
+    "dashboard": 87,
+    "core": 261,
+    "integrations": 231,
+    "rootSuites": "passed",
+    "expectedPlatformSkips": 2,
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed",
+    "format": "passed",
+    "numericalSealFiles": 51
+  },
+  "initialFailures": [
+    {
+      "kind": "saved-view-timeout",
+      "description": "Initial reserve-player native view wait timed out. The API result had validated; the result was not retained before cleanup. Explicit two-view reproduction, fresh retry and complete ten-view final passes succeeded without unexpected navigation dialogs. Original failure retained."
+    },
+    {
+      "kind": "history-order",
+      "description": "Restart restored SQLite insertion order rather than newest-first advice. Fixed validated load chronology and added production API/restart/backup/replay regression. The first resume also used an async fixture mutator incorrectly; fixed synchronous fixture seeding. No owner data was involved."
+    }
+  ],
+  "limitations": [
+    "Unsigned macOS ARM contributor build; no Developer ID/notarization or published upgrade verification.",
+    "No live owner Messages/TCC, real fantasy transaction or other-platform interactive verification.",
+    "This does not establish future forecast accuracy, executed profit or consistent sportsbook superiority."
+  ]
+}

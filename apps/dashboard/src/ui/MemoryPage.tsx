@@ -1,8 +1,15 @@
+import { requestResponse, readJsonResponse } from './api-client';
 import { useEffect, useRef, useState } from 'react';
 import { Download, FileUp, Save, Trash2 } from 'lucide-react';
 import { LoadError, LoadingStatus } from './LoadFeedback.js';
 import {
   isProjectionSummaryList,
+  isConversationImportResult,
+  isConversationPreview,
+  isProjectionImportResult,
+  isChatSyncResult,
+  isEmailImportResult,
+  isSavedMemory,
   isReceivedEmailList,
   isSavedMemoryList,
   type ProjectionSummary,
@@ -30,6 +37,7 @@ export function MemoryPage({
   twilioConfigured,
   resendConfigured,
   imessageChatGuid,
+  imessageProvider,
   smsRecipient,
   conversationRetentionDays,
 }: {
@@ -41,6 +49,7 @@ export function MemoryPage({
   twilioConfigured: boolean;
   resendConfigured: boolean;
   imessageChatGuid?: string;
+  imessageProvider?: 'bluebubbles' | 'imsg';
   smsRecipient?: string;
   conversationRetentionDays?: 30 | 90 | 365;
 }) {
@@ -70,7 +79,7 @@ export function MemoryPage({
     setProfilesLoading(true);
     setProfilesError('');
     try {
-      const response = await fetch('/api/state');
+      const response = await requestResponse('/api/state?view=summary');
       if (!response.ok) throw new Error(`Could not load member profiles (${response.status}).`);
       const state: unknown = await response.json();
       if (
@@ -119,7 +128,7 @@ export function MemoryPage({
     setProjectionSetsLoading(true);
     setProjectionSetsError('');
     try {
-      const response = await fetch('/api/projections');
+      const response = await requestResponse('/api/projections');
       if (!response.ok)
         throw new Error(`Could not load imported projection sources (${response.status}).`);
       const summaries: unknown = await response.json();
@@ -144,26 +153,23 @@ export function MemoryPage({
       if (file.size > 250_000) throw new Error('Export exceeds the 250 KB import limit.');
       const content = await file.text();
       if (content.length > 250_000) throw new Error('Export exceeds the 250 KB import limit.');
-      const response = await fetch('/api/memory/import', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          sourceName: file.name,
-          content,
-          profileByAuthor: Object.fromEntries(
-            Object.entries(importProfileTargets).filter(([, profileId]) => profileId),
-          ),
-        }),
-      });
-      const result = (await response.json()) as {
-        error?: string;
-        imported?: number;
-        updated?: number;
-        duplicates?: number;
-        analysisFailures?: number;
-      };
-      if (!response.ok) throw new Error(result.error);
+      const response = await requestResponse(
+        '/api/memory/import',
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            sourceName: file.name,
+            content,
+            profileByAuthor: Object.fromEntries(
+              Object.entries(importProfileTargets).filter(([, profileId]) => profileId),
+            ),
+          }),
+        },
+        180000,
+      );
+      const result = await readJsonResponse(response, isConversationImportResult);
       setName('');
       setFile(null);
       setImportParticipants([]);
@@ -195,17 +201,13 @@ export function MemoryPage({
     try {
       if (selectedFile.size > 250_000) throw new Error('Export exceeds the 250 KB import limit.');
       const content = await selectedFile.text();
-      const response = await fetch('/api/memory/import/preview', {
+      const response = await requestResponse('/api/memory/import/preview', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ name: fallbackName, content }),
       });
-      const result = (await response.json()) as {
-        error?: string;
-        participants?: ImportParticipant[];
-      };
+      const result = await readJsonResponse(response, isConversationPreview);
       if (requestId !== previewRequestId.current) return;
-      if (!response.ok) throw new Error(result.error ?? 'Could not preview the export.');
       const participants = result.participants ?? [];
       setImportParticipants(participants);
       setImportProfileTargets(Object.fromEntries(participants.map(({ name }) => [name, ''])));
@@ -239,19 +241,22 @@ export function MemoryPage({
       if (projectionFile.size > 250_000)
         throw new Error('Projection CSV exceeds the 250 KB import limit.');
       const csv = await projectionFile.text();
-      const response = await fetch('/api/projections/import', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          leagueId: projectionLeagueId,
-          sourceName: projectionSourceName,
-          sourceUrl: projectionSourceUrl,
-          scoringMatched: projectionScoringMatched,
-          csv,
-        }),
-      });
-      const result = (await response.json()) as { error?: string; imported?: number };
-      if (!response.ok) throw new Error(result.error ?? 'Could not import projections.');
+      const response = await requestResponse(
+        '/api/projections/import',
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            leagueId: projectionLeagueId,
+            sourceName: projectionSourceName,
+            sourceUrl: projectionSourceUrl,
+            scoringMatched: projectionScoringMatched,
+            csv,
+          }),
+        },
+        180000,
+      );
+      const result = await readJsonResponse(response, isProjectionImportResult);
       setProjectionFile(null);
       setProjectionSourceName('');
       setProjectionSourceUrl('');
@@ -266,35 +271,35 @@ export function MemoryPage({
   }
 
   async function deleteProjections(source: ProjectionSummary) {
-    if (!window.confirm(`Delete ${source.count} projections from ${source.sourceName}?`)) return;
-    const response = await fetch(
-      `/api/projections/${encodeURIComponent(source.leagueId)}/source/${encodeURIComponent(source.sourceId)}`,
-      {
-        method: 'DELETE',
-      },
-    );
-    if (!response.ok) {
-      setNotice('Could not delete imported projections.');
-      return;
+    try {
+      if (!window.confirm(`Delete ${source.count} projections from ${source.sourceName}?`)) return;
+      const response = await requestResponse(
+        `/api/projections/${encodeURIComponent(source.leagueId)}/source/${encodeURIComponent(source.sourceId)}`,
+        {
+          method: 'DELETE',
+        },
+      );
+      if (!response.ok) {
+        setNotice('Could not delete imported projections.');
+        return;
+      }
+      setNotice('Imported projections deleted.');
+      await refreshProjectionSets();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'The local request failed.');
     }
-    setNotice('Imported projections deleted.');
-    await refreshProjectionSets();
   }
 
   async function syncIMessages() {
     setBusy(true);
     setNotice('');
     try {
-      const response = await fetch('/api/memory/imessage-sync', { method: 'POST' });
-      const result = (await response.json()) as {
-        error?: string;
-        addedMessages?: number;
-        profilesUpdated?: number;
-        analysisFailures?: number;
-        chatReplyDrafts?: number;
-        chatRepliesSent?: number;
-      };
-      if (!response.ok) throw new Error(result.error ?? 'Could not sync iMessage history.');
+      const response = await requestResponse(
+        '/api/memory/imessage-sync',
+        { method: 'POST' },
+        180000,
+      );
+      const result = await readJsonResponse(response, isChatSyncResult);
       const analysis = result.analysisFailures
         ? ` AI analysis failed for ${result.analysisFailures} member profile(s); messages remain saved locally.`
         : analyzeImportsWithAI
@@ -315,19 +320,12 @@ export function MemoryPage({
     setBusy(true);
     setNotice('');
     try {
-      const response = await fetch('/api/memory/twilio-conversation-sync', { method: 'POST' });
-      const result = (await response.json()) as {
-        error?: string;
-        addedMessages?: number;
-        profilesUpdated?: number;
-        analysisFailures?: number;
-        checkedMessages?: number;
-        hasMore?: boolean;
-        chatReplyDrafts?: number;
-        chatRepliesSent?: number;
-      };
-      if (!response.ok)
-        throw new Error(result.error ?? 'Could not sync Twilio Conversations history.');
+      const response = await requestResponse(
+        '/api/memory/twilio-conversation-sync',
+        { method: 'POST' },
+        180000,
+      );
+      const result = await readJsonResponse(response, isChatSyncResult);
       const analysis = result.analysisFailures
         ? ` AI analysis failed for ${result.analysisFailures} member profile(s); messages remain saved locally.`
         : analyzeImportsWithAI
@@ -350,9 +348,8 @@ export function MemoryPage({
     setBusy(true);
     setNotice('');
     try {
-      const response = await fetch('/api/email/received');
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? 'Could not read the Resend inbox.');
+      const response = await requestResponse('/api/email/received');
+      const result = await readJsonResponse(response, isReceivedEmailList);
       if (!isReceivedEmailList(result))
         throw new Error('The local service returned an invalid Resend inbox list.');
       setReceivedEmails(result);
@@ -368,11 +365,13 @@ export function MemoryPage({
     setBusy(true);
     setNotice('');
     try {
-      const response = await fetch(`/api/email/received/${encodeURIComponent(email.id)}/import`, {
-        method: 'POST',
-      });
-      const result = (await response.json()) as { error?: string; duplicate?: boolean };
-      if (!response.ok) throw new Error(result.error ?? 'Could not import received email.');
+      const response = await requestResponse(
+        `/api/email/received/${encodeURIComponent(email.id)}/import`,
+        {
+          method: 'POST',
+        },
+      );
+      const result = await readJsonResponse(response, isEmailImportResult);
       setReceivedEmails((all) =>
         all.map((item) => (item.id === email.id ? { ...item, imported: true } : item)),
       );
@@ -390,23 +389,23 @@ export function MemoryPage({
   }
 
   async function saveProfile(id: string) {
-    const fields = edits[id];
-    if (!fields) return;
-    const response = await fetch(`/api/memory/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        ...fields,
-        leagueIds: fields.includeAllLeagues ? null : fields.leagueIds,
-      }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      setNotice(result.error ?? 'Could not save profile.');
-      return;
+    try {
+      const fields = edits[id];
+      if (!fields) return;
+      const response = await requestResponse(`/api/memory/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          ...fields,
+          leagueIds: fields.includeAllLeagues ? null : fields.leagueIds,
+        }),
+      });
+      await readJsonResponse(response, isSavedMemory);
+      setNotice('Member profile saved locally.');
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'The local request failed.');
     }
-    setNotice('Member profile saved locally.');
-    await refresh();
   }
 
   function clearLearnedNotes(id: string) {
@@ -422,29 +421,39 @@ export function MemoryPage({
   }
 
   async function deleteProfile(id: string) {
-    const response = await fetch(`/api/memory/${encodeURIComponent(id)}`, { method: 'DELETE' });
-    if (!response.ok) {
-      setNotice('Could not delete profile.');
-      return;
+    try {
+      const response = await requestResponse(`/api/memory/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        setNotice('Could not delete profile.');
+        return;
+      }
+      setNotice('Imported source and member profile deleted.');
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'The local request failed.');
     }
-    setNotice('Imported source and member profile deleted.');
-    await refresh();
   }
 
   async function deleteAllProfiles() {
-    if (
-      !window.confirm(
-        'Delete every member profile and its imported source messages? This cannot be undone.',
+    try {
+      if (
+        !window.confirm(
+          'Delete every member profile and its imported source messages? This cannot be undone.',
+        )
       )
-    )
-      return;
-    const response = await fetch('/api/memory', { method: 'DELETE' });
-    if (!response.ok) {
-      setNotice('Could not delete member memory.');
-      return;
+        return;
+      const response = await requestResponse('/api/memory', { method: 'DELETE' });
+      if (!response.ok) {
+        setNotice('Could not delete member memory.');
+        return;
+      }
+      setNotice('All member profiles and imported source messages were deleted.');
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'The local request failed.');
     }
-    setNotice('All member profiles and imported source messages were deleted.');
-    await refresh();
   }
 
   return (
@@ -452,7 +461,7 @@ export function MemoryPage({
       <div className="page-title-block">
         <div>
           <p className="section-overline">LOCAL CONTEXT</p>
-          <h1>{mode === 'imports' ? 'Conversation imports' : 'Members & memory'}</h1>
+          <h1>{mode === 'imports' ? 'Conversation imports' : 'League members'}</h1>
           <p>Imported archives and editable profiles stay on this computer.</p>
         </div>
         {mode === 'members' && (
@@ -496,9 +505,12 @@ export function MemoryPage({
             CSV columns: <code>player</code>, <code>projectedPoints</code>, and optional{' '}
             <code>playerId</code>, <code>position</code>, <code>nflTeam</code>, <code>week</code>,
             and <code>adp</code> (average overall draft position). Leave <code>week</code> blank for
-            season totals; set it to 1–30 for a weekly estimate. Reports can cite the source URL you
-            provide. Weekly matchup totals require platform starter IDs and a projection for every
-            starter.
+            full-season totals; set it to 1–30 for a weekly estimate. For remaining-season trade
+            values, add <code>season</code>, <code>fromWeek</code>, and <code>throughWeek</code>,
+            leave <code>week</code> blank, and cover the current NFL week through the last week you
+            choose for trade value (at most week 18). Full-season points are never treated as future
+            trade value. Reports can cite the source URL you provide. Weekly matchup totals require
+            platform starter IDs and a projection for every starter.
           </p>
           <form onSubmit={importProjections}>
             <div className="settings-fields two">
@@ -584,6 +596,27 @@ export function MemoryPage({
                   {set.scoringMatched === true ? 'scoring confirmed' : 'scoring unconfirmed'}
                 </strong>
                 <span> Imported {new Date(set.importedAt).toLocaleString()}.</span>
+                {!!set.periods?.length && (
+                  <p>
+                    Projection periods:{' '}
+                    {set.periods
+                      .map(
+                        (period) =>
+                          `${period.season}, weeks ${period.fromWeek}–${period.throughWeek}`,
+                      )
+                      .join('; ')}
+                    {set.additionalPeriodCount
+                      ? `; ${set.additionalPeriodCount} more intervals`
+                      : ''}
+                    .
+                  </p>
+                )}
+                {!!set.undeclaredPeriodCount && (
+                  <p>
+                    {set.undeclaredPeriodCount} rows have no declared season/interval. Weekless
+                    legacy rows are full-season totals and cannot establish remaining trade value.
+                  </p>
+                )}
                 {set.sourceUrl && (
                   <a href={set.sourceUrl} target="_blank" rel="noreferrer">
                     {' '}
@@ -660,7 +693,8 @@ export function MemoryPage({
                 <div>
                   <h2>Sync the configured iMessage group</h2>
                   <p>
-                    Fetch up to 200 recent messages from the selected BlueBubbles chat. Sync runs
+                    Fetch up to 200 recent messages from the selected{' '}
+                    {imessageProvider === 'imsg' ? 'local Messages' : 'BlueBubbles'} chat. Sync runs
                     only when you click this button. Previously seen message IDs are skipped.
                   </p>
                 </div>

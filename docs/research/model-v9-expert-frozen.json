@@ -1,0 +1,48 @@
+{
+  "frozenAt": "2026-10-13T05:06:15.715Z",
+  "developmentSeasons": [2018, 2021],
+  "developmentSha256": "c3ee9beae92d7a3cb490d856fa99c5997e0dddc60881cc4e5e84b180aab26f5d",
+  "contextSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "parameters": {
+    "maxRows": 10000,
+    "slowTree": {
+      "depth": 2,
+      "halfLifeDays": 730,
+      "features": "market",
+      "rule": "direct"
+    },
+    "fastTree": {
+      "depth": 2,
+      "halfLifeDays": 120,
+      "features": "market",
+      "rule": "direct"
+    }
+  },
+  "candidateCount": 17,
+  "selection": {
+    "id": "hybrid-unadapted",
+    "spec": null,
+    "brier": 0.248752653739635
+  },
+  "bestAdaptive": {
+    "id": "experts-16-0.05-0.5-0.25",
+    "spec": {
+      "learningRate": 16,
+      "share": 0.05,
+      "bookPrior": 0.5,
+      "seasonCarry": 0.25
+    },
+    "brier": 0.2495291861337395
+  },
+  "warnings": [
+    "2026 diagnostics motivated the new family; all later audits are reused, not fresh holdouts.",
+    "Only 2018\u20132021 selects mixture settings. Moneyline and spread stay on production v3."
+  ],
+  "developmentArtifactSha256": "e52cfcd3a8ee095539aaae26936ed0f8b0e183c2ebbdb6a41a8c0141eb1a8788",
+  "codeHashes": {
+    "packages/core/src/expert-totals-model.ts": "9f82ae42abe981cb75758a3aa5f2828b2deb16d75a50cf57adb70cb8a970ca33",
+    "scripts/expert-totals-evaluation.mjs": "9cb9c7ad2c3ba77a2977625182096a03b4c4aed5c004448a61e6b83f4aa42392",
+    "scripts/develop-expert-totals.mjs": "24c2b1e43b2690945316005efb9af4a9aade431b06dd0640f100fefb43ba9cca",
+    "scripts/audit-expert-totals.mjs": "6c40fda8768ef75cc8e1475122d17c4e747b7ddd6957ed9b39a31b33086f2d02"
+  }
+}

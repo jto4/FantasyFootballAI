@@ -1,0 +1,141 @@
+{
+  "results": [
+    {
+      "procedure": "joint",
+      "penalty": 200,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21083110700858188,
+          "v3Brier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24914461911737149,
+          "v3Brier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24967575998436367,
+          "v3Brier": 0.2497186047632952,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "procedure": "joint",
+      "penalty": 1000,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.2108286240997465,
+          "v3Brier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.2492837941570617,
+          "v3Brier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24983216220956903,
+          "v3Brier": 0.2497186047632952,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "procedure": "offset",
+      "penalty": 200,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21091131132145807,
+          "v3Brier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.24914723115928838,
+          "v3Brier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24972034517005784,
+          "v3Brier": 0.2497186047632952,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    },
+    {
+      "procedure": "offset",
+      "penalty": 1000,
+      "markets": [
+        {
+          "kind": "moneyline",
+          "n": 1034,
+          "brier": 0.21084479259581645,
+          "v3Brier": 0.210826837347873,
+          "bookBrier": 0.21082834472930922
+        },
+        {
+          "kind": "spread",
+          "n": 1016,
+          "brier": 0.2490866876142106,
+          "v3Brier": 0.2490703366103935,
+          "bookBrier": 0.24946182670687445
+        },
+        {
+          "kind": "total",
+          "n": 1027,
+          "brier": 0.24972461001826204,
+          "v3Brier": 0.2497186047632952,
+          "bookBrier": 0.24993866188950456
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "moneyline": {
+      "procedure": "v3",
+      "penalty": 200,
+      "kind": "moneyline",
+      "n": 1034,
+      "brier": 0.210826837347873,
+      "v3Brier": 0.210826837347873,
+      "bookBrier": 0.21082834472930922
+    },
+    "spread": {
+      "procedure": "v3",
+      "penalty": 200,
+      "kind": "spread",
+      "n": 1016,
+      "brier": 0.2490703366103935,
+      "v3Brier": 0.2490703366103935,
+      "bookBrier": 0.24946182670687445
+    },
+    "total": {
+      "procedure": "joint",
+      "penalty": 200,
+      "kind": "total",
+      "n": 1027,
+      "brier": 0.24967575998436367,
+      "v3Brier": 0.2497186047632952,
+      "bookBrier": 0.24993866188950456
+    }
+  }
+}

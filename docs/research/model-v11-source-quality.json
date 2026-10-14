@@ -1,0 +1,4504 @@
+{
+  "checkedAt": "2026-10-13T19:18:37.448Z",
+  "games": 79,
+  "matchedTapes": 113,
+  "trades": 62463,
+  "completeTapes": 113,
+  "priceSupported": 74,
+  "flowSupported": 64,
+  "walletWeightedFeatureNonzero": 1,
+  "byProvider": [
+    {
+      "provider": "kalshi",
+      "tapes": 57,
+      "tradeRows": 58358
+    },
+    {
+      "provider": "polymarket",
+      "tapes": 56,
+      "tradeRows": 4105
+    }
+  ],
+  "coverage": [
+    {
+      "gameId": "2026_01_NE_SEA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-09T23:50:00.000Z",
+      "line": 44.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_NE_SEA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-09T23:50:00.000Z",
+      "line": 44.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_SF_LA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-11T00:05:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_SF_LA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-11T00:05:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_CHI_CAR",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_TB_CIN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 50.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_CHI_CAR",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 47.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 27,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_TB_CIN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 50.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 75,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_NO_DET",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 49.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_BUF_HOU",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 44.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_NO_DET",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 16,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_BUF_HOU",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 74,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_BAL_IND",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 48.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_BAL_IND",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 52,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_CLE_JAX",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 40.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_CLE_JAX",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 25,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_ATL_PIT",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 40.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_ATL_PIT",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 29,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_NYJ_TEN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 39.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_NYJ_TEN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T16:30:00.000Z",
+      "line": 39.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 46,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_ARI_LAC",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_ARI_LAC",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 47.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 16,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_MIA_LV",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 40.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_MIA_LV",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 38,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_GB_MIN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 46.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_GB_MIN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 15,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_WAS_PHI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 43.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_WAS_PHI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T19:55:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 10,
+      "complete": true
+    },
+    {
+      "gameId": "2026_01_DAL_NYG",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-13T23:50:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_DAL_NYG",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-13T23:50:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_DEN_KC",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-14T23:45:00.000Z",
+      "line": 42.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_01_DEN_KC",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-14T23:45:00.000Z",
+      "line": 42.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_02_CAR_ATL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 663,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_CAR_ATL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 101,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_NO_BAL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 749,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_NO_BAL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 116,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_MIN_CHI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 662,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_MIN_CHI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 165,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_DET_BUF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-17T23:45:00.000Z",
+      "line": 54.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 8601,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_DET_BUF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-17T23:45:00.000Z",
+      "line": 54.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_02_CIN_HOU",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 713,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_CIN_HOU",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 168,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_PIT_NE",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 635,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_PIT_NE",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 89,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_GB_NYJ",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 495,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_GB_NYJ",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 57,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_CLE_TB",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 253,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_CLE_TB",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 18,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_JAX_DEN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T19:35:00.000Z",
+      "line": 45.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_02_JAX_DEN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T19:35:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 51,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_PHI_TEN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 39.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 891,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_PHI_TEN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T16:30:00.000Z",
+      "line": 39.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 98,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_LV_LAC",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T19:35:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 432,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_LV_LAC",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T19:35:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 15,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_SEA_ARI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 53,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_SEA_ARI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 26,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_WAS_DAL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 51.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 75,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_WAS_DAL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 51.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 18,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_MIA_SF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 355,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_MIA_SF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T19:55:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 5,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_IND_KC",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-20T23:50:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 768,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_IND_KC",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-20T23:50:00.000Z",
+      "line": 46.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_02_NYG_LA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-21T23:45:00.000Z",
+      "line": 47.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 4975,
+      "complete": true
+    },
+    {
+      "gameId": "2026_02_NYG_LA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-21T23:45:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_ATL_GB",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-24T23:45:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 23,
+      "trades": 4686,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_ATL_GB",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-24T23:45:00.000Z",
+      "line": 43.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_LAC_BUF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 50.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 816,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_LAC_BUF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 50.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 166,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_CAR_CLE",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 418,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_CAR_CLE",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 100,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_HOU_IND",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 41.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_HOU_IND",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 7,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_NE_JAX",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 46.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_NE_JAX",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 139,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_NYJ_DET",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 170,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_NYJ_DET",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 20,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_KC_MIA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 384,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_KC_MIA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 96,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_TEN_NYG",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 37.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 799,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_TEN_NYG",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 37.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_CIN_PIT",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 683,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_CIN_PIT",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 66,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_SEA_WAS",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 427,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_SEA_WAS",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T16:30:00.000Z",
+      "line": 40.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 179,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_ARI_SF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T19:35:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 300,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_ARI_SF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T19:35:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 208,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_MIN_TB",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T19:35:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 341,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_MIN_TB",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T19:35:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 52,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_BAL_DAL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T19:55:00.000Z",
+      "line": 53.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 1167,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_BAL_DAL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T19:55:00.000Z",
+      "line": 53.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 137,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_LV_NO",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T19:55:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 756,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_LV_NO",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T19:55:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 58,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_LA_DEN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-27T23:50:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 141,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_LA_DEN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-27T23:50:00.000Z",
+      "line": 43.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_03_PHI_CHI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-09-28T23:45:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 2913,
+      "complete": true
+    },
+    {
+      "gameId": "2026_03_PHI_CHI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-09-28T23:45:00.000Z",
+      "line": 42.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_PIT_CLE",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-01T23:45:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 2630,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_PIT_CLE",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-01T23:45:00.000Z",
+      "line": 38.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_IND_WAS",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T13:00:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 25,
+      "trades": 1304,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_IND_WAS",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T13:00:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 298,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_TEN_BAL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 247,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_TEN_BAL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 42,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_NE_BUF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 409,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_NE_BUF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 152,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_JAX_CIN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 51.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_JAX_CIN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 51.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 65,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_NYJ_CHI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 450,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_NYJ_CHI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 43.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 117,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DAL_HOU",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 573,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_ARI_NYG",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 359,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DAL_HOU",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 65,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_ARI_NYG",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 159,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_GB_TB",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 38.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_GB_TB",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 54,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_LA_PHI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 605,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_LA_PHI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T16:30:00.000Z",
+      "line": 42.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_MIA_MIN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T19:35:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 605,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_MIA_MIN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T19:35:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 59,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_KC_LV",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 47.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 938,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_KC_LV",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_LAC_SEA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 312,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_LAC_SEA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 38,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DEN_SF",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 466,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DEN_SF",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T19:55:00.000Z",
+      "line": 48.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 66,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DET_CAR",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-04T23:50:00.000Z",
+      "line": 52.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 1063,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_DET_CAR",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-04T23:50:00.000Z",
+      "line": 52.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_TB_DAL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-08T23:45:00.000Z",
+      "line": 49.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 900,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_TB_DAL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-08T23:45:00.000Z",
+      "line": 49.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_PHI_JAX",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T13:00:00.000Z",
+      "line": 41.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_PHI_JAX",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T13:00:00.000Z",
+      "line": 41.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_04_ATL_NO",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-05T23:45:00.000Z",
+      "line": 47.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 5911,
+      "complete": true
+    },
+    {
+      "gameId": "2026_04_ATL_NO",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-05T23:45:00.000Z",
+      "line": 47.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_CHI_GB",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 602,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_CHI_GB",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 102,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_CIN_MIA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 273,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_CIN_MIA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 17,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_LV_NE",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 479,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_MIN_NO",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 600,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_LV_NE",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 45.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 110,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_MIN_NO",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 19,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_CLE_NYJ",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 225,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_CLE_NYJ",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 38.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 47,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_IND_PIT",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 200,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_IND_PIT",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_HOU_TEN",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 37.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 359,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_HOU_TEN",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 37.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_NYG_WAS",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 551,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_NYG_WAS",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T16:30:00.000Z",
+      "line": 41.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 35,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_DEN_LAC",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T19:35:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 334,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_DEN_LAC",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T19:35:00.000Z",
+      "line": 42.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 28,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_DET_ARI",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T19:55:00.000Z",
+      "line": 55.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 53,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_DET_ARI",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T19:55:00.000Z",
+      "line": 55.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_SF_SEA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T19:55:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 916,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_SF_SEA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T19:55:00.000Z",
+      "line": 46.5,
+      "status": "captured",
+      "prices": 288,
+      "trades": 54,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_BAL_ATL",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-11T23:50:00.000Z",
+      "line": 44.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 305,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_BAL_ATL",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-11T23:50:00.000Z",
+      "line": 44.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    },
+    {
+      "gameId": "2026_05_BUF_LA",
+      "provider": "kalshi",
+      "cutoffAt": "2026-10-12T23:45:00.000Z",
+      "line": 55.5,
+      "status": "captured",
+      "prices": 24,
+      "trades": 2368,
+      "complete": true
+    },
+    {
+      "gameId": "2026_05_BUF_LA",
+      "provider": "polymarket",
+      "cutoffAt": "2026-10-12T23:45:00.000Z",
+      "line": 55.5,
+      "status": "no exact pre-cutoff contract",
+      "prices": 0,
+      "trades": 0,
+      "complete": false
+    }
+  ],
+  "responses": [
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP09NESEA&limit=1000",
+      "capturedAt": "2026-10-13T19:10:43.741Z",
+      "sha256": "f754612ce7704986641a60567deaa6f8595126843e52cf5a009bfee8e1aa5d62",
+      "bytes": 43741,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ne-sea-2026-09-09",
+      "capturedAt": "2026-10-13T19:10:43.797Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP10SFLAR&limit=1000",
+      "capturedAt": "2026-10-13T19:10:43.962Z",
+      "sha256": "67c246fcfa4c0caa2a16cca1f4d0a3e22d1161dde43ffb70b0962c02cb70c825",
+      "bytes": 36415,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-sf-lar-2026-09-10",
+      "capturedAt": "2026-10-13T19:10:43.987Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13CHICAR&limit=1000",
+      "capturedAt": "2026-10-13T19:10:44.269Z",
+      "sha256": "854c63de4d86efa3cbee68ec7e95ce7eb8f49f93f4ff74a5d0713d80e85f2f97",
+      "bytes": 55040,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-chi-car-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:44.458Z",
+      "sha256": "ee2c692af24f7d6fe5fb55fff6c274b7ebc5f58de3f5049592feb3284b855689",
+      "bytes": 1225633,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=40632806985962007111310706438921343264459000475732318115296048182017300542653&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:44.521Z",
+      "sha256": "2c651dd52ee9fd52b1d636c053e5e33784c86330ba0bae9d9928e7ed10b20ba0",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13TBCIN&limit=1000",
+      "capturedAt": "2026-10-13T19:10:44.573Z",
+      "sha256": "6c97924454a3f3dd17f0ac57c195b1fd6e78f13df34f5598a1c127ded79aecf7",
+      "bytes": 36185,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x49afb322c89bfbb18eacbc99c89c93d5e0771bf25a615b94d3ffbeef1f65e3ac&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:44.574Z",
+      "sha256": "60a6f5eda3c3f83e9e45825dc2d15fbe58e218f304a5faa859fe33db8addc498",
+      "bytes": 43180,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-tb-cin-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:44.614Z",
+      "sha256": "8525248ee4af3cd0288dd61bc875c0ab980ae23ee38c19645abe47b1fca68aa2",
+      "bytes": 1212535,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=1512590621050882423280243164158392138803664283352252359294728465491593907157&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:44.647Z",
+      "sha256": "0c71781eb1006f094961f3e84bc7f138ec371a92e125afe183f665bc5e4326f1",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x21f39f62483277ec1dec9bcfe02a1fa81de2bc0baf3880a97b3af7189ef5c81d&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:44.694Z",
+      "sha256": "3e8038a7a42650600621a136cc459c4c5c69be24b457fcb49515842c2030ec54",
+      "bytes": 108336,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13NODET&limit=1000",
+      "capturedAt": "2026-10-13T19:10:44.916Z",
+      "sha256": "2dfe080cb1dae19bb55204e614c1141c00eda715f5e3ae4a90881e41941db3a7",
+      "bytes": 39959,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13BUFHOU&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.212Z",
+      "sha256": "033f22dbecebc284109ed601a30648c8d38b9745a22e80b67553aba5209c91d2",
+      "bytes": 43632,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-no-det-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:45.249Z",
+      "sha256": "9a80ca162e07ef0b84b61042ebe5c822bce3d42261d85cbfafcadb63e8800121",
+      "bytes": 1218738,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=11218281703971256170675803700067844753823248733066137865159490019818104251247&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.280Z",
+      "sha256": "007c56c9d0156513af158f83246ba7e57dcdba98d80f3b1bd23c6a8e729e21fe",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xc90e82d70158180df2e77317318115b5bda8a587325832d93abde9111ce11588&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:45.323Z",
+      "sha256": "09172342bf44f166103c4e88ca6be913651a399220e4eb9d2340436f18800ecb",
+      "bytes": 40490,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-buf-hou-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:45.360Z",
+      "sha256": "50f787896c9e72308076a1d50413ea9aeae4623640af581ccc9e4cb2cb23fcc0",
+      "bytes": 1192255,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=30766235858404901381951444771222545418679412165899849401112199550906577701438&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.394Z",
+      "sha256": "b72b7682af339de7e0af653a0d801328c27181ff7e3c2c08f84de7e249b4bc23",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x7ba9611047e3b624a2cdd434ad2bbdcbc985c0513c36f410362b80d95d440da2&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:45.434Z",
+      "sha256": "60dbad8021b36c3d0fe66d03c036fd7db1296c3f8f262071c9a4e44f3f137672",
+      "bytes": 144195,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13BALIND&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.663Z",
+      "sha256": "3568e7b708b24e76a0950e0b9338f3580e83fecbed193a9bf871706801588cc4",
+      "bytes": 43938,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-bal-ind-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:45.795Z",
+      "sha256": "c454485d8e2e6581f39019f723e2258850ed92938116cd90a61096e965be0daf",
+      "bytes": 1217063,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=91158008589350651788430778497049220831274543580832218512239791271379335938678&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.825Z",
+      "sha256": "6f8c05b0f8d44e55bbf19f4cb6e24c7e7b9e835329a0b20f5eefdbbe44e224c7",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x11f1c770db9218ae4562f29b849d6df818ac3d5c6f674f32d8abace68c66d8d4&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:45.867Z",
+      "sha256": "fc6489cc857e3155b163eb374b938344e964fc1f48b03f54c8816430c4e92dd1",
+      "bytes": 64283,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13CLEJAX&limit=1000",
+      "capturedAt": "2026-10-13T19:10:45.962Z",
+      "sha256": "50699ea1db13415ea46ec367dcfa58decd9660083271c5dc061561f38337fbac",
+      "bytes": 27,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cle-jax-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:45.999Z",
+      "sha256": "fb4774534bf79837a63f35a44400f815cb4a7fa6b4ff02af2c43870116d99195",
+      "bytes": 1171329,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=42868189873862203638019661384135193394899637134898534337473451945315827128441&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.027Z",
+      "sha256": "726e356e6db451ab284a82153a349b175bf6614f68d5289b00577f165c465ac9",
+      "bytes": 18576,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x96a8c7540bf790aacb5a1d40017dd0ffa2ebe381bf616ed444e48a4ec85cb91c&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:46.066Z",
+      "sha256": "7afaaa7a13a64b0cd1ebe6c4a464e6078743e9c12c7162e5a243838266d7f025",
+      "bytes": 55413,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13ATLPIT&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.263Z",
+      "sha256": "670dbc55fa00c5e07036ec8b40b3ff10aa03936dac0f2e0c9daac928133ea77e",
+      "bytes": 36163,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-atl-pit-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:46.405Z",
+      "sha256": "08df47c123794ab0e58677b286fc5641bf4b9b93ea0f1c1e926fd5a20ceb4186",
+      "bytes": 1206080,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=102351197211991894038347108298160835960161958167749557192555109920773114162362&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.438Z",
+      "sha256": "8c3c16ecd33a75825e3a00e994c249dec0579adc42bc5dfedb1bf7dc05441b04",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xc23c3146f226fc76615e50b1a78eb91065650bd7867f5ce36a966e39d045430a&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:46.491Z",
+      "sha256": "48ce012f39feb3d39832d396066101cfd5e25e483e92cc7df692b0798d063b07",
+      "bytes": 60793,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13NYJTEN&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.566Z",
+      "sha256": "ddd3c428bd96fec6fd952626d9ad2f182601752ca044faf05e61dacfeffa25f9",
+      "bytes": 36165,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-nyj-ten-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:46.603Z",
+      "sha256": "8de7015a17fddcb08789671396210c7f8a9464b91ef43f7acbc95bf91892b57e",
+      "bytes": 1188605,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=86381563835430069368869970919217413086755415723316667655845568837024255470712&start=1789230600&end=1789317000&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.631Z",
+      "sha256": "2608e90cc3d440022b2343ced73cc1ca3c8b2c2a68ef45812b2a4aff341b2bbf",
+      "bytes": 18492,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x71cee586afb8344fc1c45a9c0c0639ce41c294a354dc8f6ccf95fd5487d6ed54&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:46.665Z",
+      "sha256": "feab5dfbd0c486be4692e4703dbe07348f4e5babf3ff20fee394779f2bff95bc",
+      "bytes": 50003,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13ARILAC&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.865Z",
+      "sha256": "676816fdd5680d89460e4ef9a717fb31b18cbd29c2f54048d2eac4071e13a222",
+      "bytes": 36206,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ari-lac-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:46.898Z",
+      "sha256": "a7b27c17b4818702306c9f49d1bef76fa3f9211b593ed3677a542b45f786d592",
+      "bytes": 1221366,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=5864538308811840255702172486980419942356460705703028055077796255081915948439&start=1789242900&end=1789329300&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:46.927Z",
+      "sha256": "034c97234d88ae4af9e742cdebd7227fda5577cddbca336966ec57c7de7beee4",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x02d5dbb7acffdb7bb7a5109248d916d3b1adb10eb6b791df286e43fc4b2e6b37&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:46.960Z",
+      "sha256": "a9b1b1607eedca2269e1b51695dfc4a948687a756eb6f7263d29f4dc60fcea3b",
+      "bytes": 30345,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13MIALV&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.168Z",
+      "sha256": "a1258f01adb58ea9806353d9cf7790139f750d1ae752e628556db82bfd374f8a",
+      "bytes": 39793,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-mia-lv-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:47.206Z",
+      "sha256": "ae957bd6ac96f5721190c21429706e59e21b673bdd8d92f6690e49bad61aaaa1",
+      "bytes": 1205751,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=97733919089735190438770892072565453956903893541619976469345838892651295760218&start=1789242900&end=1789329300&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.239Z",
+      "sha256": "1b81e53497951bfa25f947bf7fb4427bc51578d6e366d4affe5c7f5cba307987",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x4b4464f800d96c1af46a9ce793c636ba915ece45c5faf21b3cd35a45526ea696&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:47.281Z",
+      "sha256": "556aac78e61a708620966d173566ccfea9095d1e27bdcbdf08babc8c9862ffaf",
+      "bytes": 87403,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13GBMIN&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.468Z",
+      "sha256": "d9e0a71cfe45d8cfd2257d50249fe3293dde130a8cefdd18b3361fc3fae83583",
+      "bytes": 36188,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-gb-min-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:47.648Z",
+      "sha256": "25e0987a8fd639ad8ea3886e98d2600185ced9350483ecf86b85561c0fe4547e",
+      "bytes": 1214766,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=2456610196305145041574559500811100531012631230716514477097548852672589281790&start=1789242900&end=1789329300&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.686Z",
+      "sha256": "dc587146047d1e9f4f44ed88553dd5f320cb838fa289325231c8199bc10bb18b",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x96ba1fd9aea77a8b2ae232a4cc25067e8f504eae535d48b016ca2a3de42bdc2d&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:47.722Z",
+      "sha256": "2f52f4320e3fe3fde4b03ceab9716c73596e44e7f66c745b7e2fa644f67ae7b3",
+      "bytes": 72341,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13WASPHI&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.772Z",
+      "sha256": "dee7511439c1d26900b6af8379af33509cc50da59e2870a2b6999843a6d07910",
+      "bytes": 36361,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-was-phi-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:47.815Z",
+      "sha256": "8455235df8b50ad60c79a3a584ff8ebc9508af155b590f95ea622a851d44cf0f",
+      "bytes": 1199628,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=39375740397667277637503354148321204262572708516049989536802572827004673527469&start=1789242900&end=1789329300&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:47.847Z",
+      "sha256": "d173df0a76d50eb6159869a20b95e03a4b2ef6208b753ff7bdd73add302a4e0c",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x63cfd012526cb352fc96f6f04920155a4c7377836cf9c40278f056bdffc78cf1&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:47.881Z",
+      "sha256": "0feb514f1eedde3eee5e04940e0e39986cc9c8dd0e57e4385bac6d60c9cd1a5d",
+      "bytes": 10718,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP13DALNYG&limit=1000",
+      "capturedAt": "2026-10-13T19:10:48.074Z",
+      "sha256": "95ab601c7b65eefc64570e21314163d4cd268dc2273da6aff14b77fea5307ba7",
+      "bytes": 36082,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-dal-nyg-2026-09-13",
+      "capturedAt": "2026-10-13T19:10:48.109Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP14DENKC&limit=1000",
+      "capturedAt": "2026-10-13T19:10:48.378Z",
+      "sha256": "241bd59f93eac1bc7fe641a315ae250c3a67a1cf3c9c72543cba795d2456de41",
+      "bytes": 36159,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-den-kc-2026-09-14",
+      "capturedAt": "2026-10-13T19:10:48.527Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP17DETBUF&limit=1000",
+      "capturedAt": "2026-10-13T19:10:48.679Z",
+      "sha256": "ddf0ba9daa9cdb1cc2ce3963ad662b4b0ee28d33be6b9d9cd59813d7b95a4a35",
+      "bytes": 39830,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20CARATL&limit=1000",
+      "capturedAt": "2026-10-13T19:10:48.974Z",
+      "sha256": "6309c51d403d5922357190d43277b290af90c558e79e72e128ca44c4269f0239",
+      "bytes": 36023,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP17DETBUF-55/candlesticks?start_ts=1789602300&end_ts=1789688700&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:49.277Z",
+      "sha256": "ba87244324f60489debb79cce0b6bd05601ac3f57fd4fa780e69ad4d0078cfd0",
+      "bytes": 10787,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20CARATL-44/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:49.584Z",
+      "sha256": "a33a2fc3b9ddec9cb00dc2d97977fea57b8a7c183bd16d8cd25b2c1372fa37c3",
+      "bytes": 10976,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700",
+      "capturedAt": "2026-10-13T19:10:49.920Z",
+      "sha256": "ae94c833c12b0bcecfc2a66af313b884fa904d60709a7e19b7fce8cefaf1caac",
+      "bytes": 304394,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20CARATL-44&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:50.194Z",
+      "sha256": "7e0e6e392df5e2286276fd2ece3d1bbdb142e1a9d82e1499f00d012d644fb195",
+      "bytes": 201996,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-car-atl-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:50.323Z",
+      "sha256": "b32fdf022ea17e1ff3d098952fbdf01f8ab84153b5757233a45e8156845e59a0",
+      "bytes": 991874,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=65678855266755188074464519941748169232832866417327658820270203993973203308761&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:50.364Z",
+      "sha256": "c7397381d5995cbd63ca390c5e59c1d11b192def46723a7af3a914a6af508680",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x6dfd9b0958c035f2e4ac544be17b1b877a083e0e64bac845de45b6d0fd62487e&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:50.405Z",
+      "sha256": "9609af60c1258a30f62c8d77f9b4b0b65cd37e90359735699618ee97b869e977",
+      "bytes": 166331,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcidgZBobBmCh7q2waprzsaDAir67HVBhCYyebJAw",
+      "capturedAt": "2026-10-13T19:10:50.497Z",
+      "sha256": "16ed72116281c418173620da8357997d9c7129a32ad186db045a41489888d56a",
+      "bytes": 304364,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20NOBAL&limit=1000",
+      "capturedAt": "2026-10-13T19:10:50.788Z",
+      "sha256": "3679a214e545db6c283a6f4bbc1d8d989ac630c321dafdaf2a105089ae348c6a",
+      "bytes": 39974,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcidgYRobRKRmxZcroA8ikaDAjB3bHVBhDApp7JAQ",
+      "capturedAt": "2026-10-13T19:10:51.099Z",
+      "sha256": "b3860ba4bbd2ac2509ffe8e3127d2be21ece4cff8b6316f939a6d95b57af073c",
+      "bytes": 304385,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20NOBAL-46/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:51.395Z",
+      "sha256": "82f2108744a8bc37f03351822e6cd0be6f38aa25dc53981458302094db9aad12",
+      "bytes": 10947,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcidfVpoaSaxsAokgYo9lUaDAiBy7HVBhCw__ylAQ",
+      "capturedAt": "2026-10-13T19:10:51.702Z",
+      "sha256": "9d7e46b5592fd3539b9dcb83bd66fdcb38813ae24b4685e80e3e2171da2fef05",
+      "bytes": 304355,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20NOBAL-46&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:52.001Z",
+      "sha256": "890ee600243f22615c954b5714c482a2a5a65c334473ab6277c78e672ba98de4",
+      "bytes": 227422,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-no-bal-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:52.046Z",
+      "sha256": "720d0154088165c478086af84e673926857c4fdeb75f39a78b93482d9e3bafb7",
+      "bytes": 1037209,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=15829661071402046542845430430842057766195364405966185565181999237395516423548&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:52.074Z",
+      "sha256": "4abb8859e22ee6993dda3ee7fc65535bbd5ecb6f434db54c4a84f31f32db2642",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x166cc36ea1d3ad6ac8b2dcb4ac9cdecc90f967def1eab7f3ee871905ab5f6e68&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:52.119Z",
+      "sha256": "e9ac5657e07e6f04c91ac278bcdb3642f5b50fc0aca037b26c50c4225c191c07",
+      "bytes": 205629,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcidLPcwa72tKpdDFx4rHUaDAiOs7HVBhDIpJKaAQ",
+      "capturedAt": "2026-10-13T19:10:52.301Z",
+      "sha256": "069916885693acd6da03d8552cea53df9f03b7a5fd7d06ce66148d5e06bc0d2b",
+      "bytes": 304256,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20MINCHI&limit=1000",
+      "capturedAt": "2026-10-13T19:10:52.596Z",
+      "sha256": "46a29befd31f6e447a226fdc2495bd7715559ea0898d6e77464e7cbf10d698b7",
+      "bytes": 47500,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcibK3iQZ7EytIB1Q73XjsaDAjPjrHVBhDw2KqUAQ",
+      "capturedAt": "2026-10-13T19:10:52.912Z",
+      "sha256": "1358c3d3d87156f0d69c97fd0d1481b040e7053f4c79d6dde9a81d89af5ed75d",
+      "bytes": 304222,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20MINCHI-47/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:53.193Z",
+      "sha256": "e7fdddd5c0d106666f3f7e4054d1b4769c7c287524f17dec9f94674d583462fb",
+      "bytes": 9575,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcibXP3OaW63oZy1vzEKh0aDAi13LDVBhDg_ufUAQ",
+      "capturedAt": "2026-10-13T19:10:53.508Z",
+      "sha256": "93f89e687703173d715470236c324a889f6c2b91bac28349e7436e34e4eb65b6",
+      "bytes": 304128,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20MINCHI-47&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:53.815Z",
+      "sha256": "32027aac6b5957b8afa82ce66bece4b4d1c1158150b68125b2e6bbffa8a3e628",
+      "bytes": 201587,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-min-chi-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:53.850Z",
+      "sha256": "f7d09938a42c9755f8aee516799c5b55bd3ab3dda49cf418b3515b88e7f1ff1a",
+      "bytes": 1033470,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=11867264843172484903577786551930925575867272746321132146401305124063446396557&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:53.894Z",
+      "sha256": "7ed955003cec52bae20383505d34c64c45116a08342830875ba3342a147698eb",
+      "bytes": 18567,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xace9dc85bd437945c13015b97699557217619c99f9ead171c5ec2258f352dbb4&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:53.937Z",
+      "sha256": "618dda01f305d7800690ee0fad334e108a1ac9929111eded8e970e4f07facfa9",
+      "bytes": 217721,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAcibhnYsbN46avwSiWHHl8aDAiDobDVBhDA7fyAAw",
+      "capturedAt": "2026-10-13T19:10:54.114Z",
+      "sha256": "711f40b2679f013e003790ec318ba0504061a7a930e066c78e0007b1a6df957e",
+      "bytes": 304235,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20CINHOU&limit=1000",
+      "capturedAt": "2026-10-13T19:10:54.399Z",
+      "sha256": "042fbf2f4d51850beeae504dc5d54a4ff77901560cc361c1e0fc0e485b59c0d0",
+      "bytes": 39901,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP17DETBUF-55&limit=1000&min_ts=1789602300&max_ts=1789688700&cursor=EhIKEAciGn91Iawu2sL-95hEySQaDAilg67VBhDg6P-JAQ",
+      "capturedAt": "2026-10-13T19:10:54.711Z",
+      "sha256": "612769bfc9de60bb7e3593e76a5c96434598923193328e00561a3d31684dcb66",
+      "bytes": 182960,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-det-buf-2026-09-17",
+      "capturedAt": "2026-10-13T19:10:54.849Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20CINHOU-46/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:55.009Z",
+      "sha256": "ceffd7fd08828961a3e1268329a018dfc8a61c28f1cc283e3813c9d4171e7cce",
+      "bytes": 10958,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20PITNE&limit=1000",
+      "capturedAt": "2026-10-13T19:10:55.302Z",
+      "sha256": "99c28d0d5588dc45e0803291f411fc5dfa472024f27283831c45dbd6a33ce280",
+      "bytes": 40025,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20CINHOU-46&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:55.614Z",
+      "sha256": "db29d6a2690a5b1824c5a467ec3d0d8fe25361284ac2bae7171e27c56cf38282",
+      "bytes": 216883,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cin-hou-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:55.646Z",
+      "sha256": "cde8b8cc93539967351d50ab25b44a30aaf6c84c90b03af4498e96a4cd21bc68",
+      "bytes": 1037595,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=97872357237026883469016481736078996914270299772743403717792581164334154745810&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:55.685Z",
+      "sha256": "40f03480bb2451c5dcab3cc2d9be789e780b32167c6abb8d28ae62289847ed2f",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xe805c89e4d9a4125b5e6790d9d754614001f3f117cef0dbf83c52f8fbc671e54&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:55.725Z",
+      "sha256": "0bf3d9f00f96e105306068889410e4848febe28bb1e0aa28468aa42b61814282",
+      "bytes": 179124,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20PITNE-42/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:55.908Z",
+      "sha256": "6f13ea2fac3ffd0b92c3f10675753939d42ab9b658dbd9f61ba950261f1571a2",
+      "bytes": 10960,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20GBNYJ&limit=1000",
+      "capturedAt": "2026-10-13T19:10:56.207Z",
+      "sha256": "fc888bae0312f8c7daabc0953470d629039288130a87cd493cbba081f14493ff",
+      "bytes": 39934,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20PITNE-42&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:56.519Z",
+      "sha256": "8108c556093b0d0fb9cc4a17b832d9f6a47aaf75cae96d78c5ccca6f29233bf3",
+      "bytes": 192169,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-pit-ne-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:56.560Z",
+      "sha256": "678f03b050ca488fe1728ec9473e633ee5cd11837ae6fe93532b8a299968f9ee",
+      "bytes": 989396,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=42021441155324117587138414817998528047580677756605768854516209114664932174757&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:56.590Z",
+      "sha256": "2e0b04729ddf50d07109a7b3489d056a9bf3ac98fceac45641bd8622be60dd1c",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xb3b81f3be547b43cc1b5437b5b5379198362451ce0d29f2eea0d7c4663b43b8f&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:56.632Z",
+      "sha256": "c57704209934e26821e3a29ee74c49412e00736b9045b059f41de34a46ce3d90",
+      "bytes": 149104,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20GBNYJ-45/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:56.809Z",
+      "sha256": "b815f7cefd5993da50a1d4561b636f643b5a889ee1aea8ff211f968adac0ba65",
+      "bytes": 10980,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20CLETB&limit=1000",
+      "capturedAt": "2026-10-13T19:10:57.110Z",
+      "sha256": "0d4507c556ae0976b7883100ab25c5e9bedb45388c53e483b50eacf6210863dd",
+      "bytes": 36103,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20GBNYJ-45&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:57.426Z",
+      "sha256": "77660b9a1cf2cf5911a1bf9165a1d626f02f143c565324190d21ba9968fa860e",
+      "bytes": 149937,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-gb-nyj-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:57.458Z",
+      "sha256": "72e10725a3a62a2df28576e3245e38578b98bc920f5010935b23ffb7d24e53db",
+      "bytes": 983252,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=12967330378147126783943584810958506775929569706924570590424844952517545883892&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:57.491Z",
+      "sha256": "ec893a00a526e91cf7ccb2a8ce55f3ac4ce79f02446a89bbcab004bdf53ecaab",
+      "bytes": 18576,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x88cbed871cd88814579225e316b4b01a45794dd610cdcab29f146bc14edfc616&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:57.519Z",
+      "sha256": "20fd63e756233468c5369afb570270161b6175cd5070aa7c3e08a22e402b8e55",
+      "bytes": 140574,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20CLETB-42/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:57.717Z",
+      "sha256": "b328c3482bb62aeabdcf33486ddad4e7842eebf398805139aaf0f8c55a0efc3d",
+      "bytes": 10585,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20PHITEN&limit=1000",
+      "capturedAt": "2026-10-13T19:10:58.026Z",
+      "sha256": "6676772552c31238946e70fd68543c9bfcd2c62416450c8d1178372dca9c59c1",
+      "bytes": 36252,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20CLETB-42&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:58.317Z",
+      "sha256": "af9f5f0f8b93467ec883f3b76b199c357183a512ded2ae091806343ad4c7da6b",
+      "bytes": 76756,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cle-tb-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:58.458Z",
+      "sha256": "cdb3d265a7dd0eb1c50680faeb93d5ba955e86df39ee8fde0ddfc7fb3714c1d1",
+      "bytes": 1038267,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=46412712922757321526949840237167204902226248578192703490089815411935434220231&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:58.502Z",
+      "sha256": "bce30082ed09a99c3a0d09fd5f2af933fa448f2b5ab4fd4818d23e81cce594e5",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xbccdcd07ee24ccec2dc55c3e40200e6f597c56b00c563f2a593a212c14426520&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:58.549Z",
+      "sha256": "ba49f5c5945a7594130ec9857dd20640483e217b6d73a9a694ee73caf5ef586e",
+      "bytes": 96040,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20PHITEN-40/candlesticks?start_ts=1789835400&end_ts=1789921800&period_interval=60",
+      "capturedAt": "2026-10-13T19:10:58.629Z",
+      "sha256": "b63d6852ee9efb43dd72cf9f944afabe10d4d7b526462359257e15af349429ae",
+      "bytes": 10971,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20JAXDEN&limit=1000",
+      "capturedAt": "2026-10-13T19:10:58.941Z",
+      "sha256": "50699ea1db13415ea46ec367dcfa58decd9660083271c5dc061561f38337fbac",
+      "bytes": 27,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-jax-den-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:59.100Z",
+      "sha256": "4e37b3524ec23e01d5adb55c71bfb3cacc68e9d00b4ae8d49a6a157bc35bd531",
+      "bytes": 1036090,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=107942799673796614799778679704327689600166599625951401686587264616807805415896&start=1789846500&end=1789932900&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:59.135Z",
+      "sha256": "e3a9af34cf8b7c26885f1330ae5c7e3b2ece2b11d7ebb58c3843ee5f70eef73a",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xb36c54be1821d65f0029b1c0b5d98dc448a15dbf39ec6619a932486d52b25368&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:59.179Z",
+      "sha256": "c54226590f39485b25b74b07069a30236c2635a340a2d6575e6f7648d7225245",
+      "bytes": 107442,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20PHITEN-40&limit=1000&min_ts=1789835400&max_ts=1789921800",
+      "capturedAt": "2026-10-13T19:10:59.241Z",
+      "sha256": "07a20e73208f97462bb4152dd73e4ea34824bc2a723cb7c860af386134b00f70",
+      "bytes": 270832,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-phi-ten-2026-09-20",
+      "capturedAt": "2026-10-13T19:10:59.320Z",
+      "sha256": "bb8da21e5ffa3ec331f7de16050585242dddc731a940d667fb85caf67005f405",
+      "bytes": 1033867,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=11950011779351729928738929748152267249737389536022922412565999600825202067627&start=1789835400&end=1789921800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:10:59.357Z",
+      "sha256": "1cc767a41a02ba14d286412784f3e53a48a724ea925c1fddbc9e276aab774eaf",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x23aeefb3ec0728f2b80f71583e9d0f459fda238ed252287e3bcd621da5a09122&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:10:59.470Z",
+      "sha256": "47fe83611e2554ab54c0838a2ad8d13f816ac4b6eb8adbd86a46610d8569342f",
+      "bytes": 234775,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20LVLAC&limit=1000",
+      "capturedAt": "2026-10-13T19:10:59.548Z",
+      "sha256": "0ef9adb012876424514ee1d0afa7078b13b9f1de0a34d11995224795a04097cf",
+      "bytes": 36252,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20SEAARI&limit=1000",
+      "capturedAt": "2026-10-13T19:10:59.828Z",
+      "sha256": "ba66d3ffefecca8cee26da18b88ad48941d9309c7ee3368393297dbab360e9a2",
+      "bytes": 35993,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20LVLAC-44/candlesticks?start_ts=1789846500&end_ts=1789932900&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:00.127Z",
+      "sha256": "ee33c56d2ecf284e197916c8fcb5ddfdc85bbb8a9b1b5418ae12670feab3c657",
+      "bytes": 10956,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20SEAARI-41/candlesticks?start_ts=1789847700&end_ts=1789934100&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:00.434Z",
+      "sha256": "6ab6beb7d06a9e86685518f1730b95f1ac37c6d0f9a323cc832bc540d222c6f1",
+      "bytes": 9966,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20LVLAC-44&limit=1000&min_ts=1789846500&max_ts=1789932900",
+      "capturedAt": "2026-10-13T19:11:00.734Z",
+      "sha256": "a0c908aa6d939a07d79d3a511b1b8f90789a4ae88d7964f4f33418708b13c335",
+      "bytes": 130952,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lv-lac-2026-09-20",
+      "capturedAt": "2026-10-13T19:11:00.760Z",
+      "sha256": "6bfe6ef37998bd80ed0ae7a4b86d166df978030ab538749717e808aa1c50e87f",
+      "bytes": 984995,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=81135401369585995503064752460013996735235030339350844060053168536475397867657&start=1789846500&end=1789932900&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:00.812Z",
+      "sha256": "4ead6f319be024d3b470b0df93e40fac249c834dde2203e1da6fc76f2583ef4c",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x83e65fb4e49151e35abb2985ac1edf0fb4b89f51d86430024aefee90d0356083&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:00.851Z",
+      "sha256": "be013a52877db964fcf3b99a0772db28383e624c12837ec1aad7223b62360bf1",
+      "bytes": 66125,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20SEAARI-41&limit=1000&min_ts=1789847700&max_ts=1789934100",
+      "capturedAt": "2026-10-13T19:11:01.033Z",
+      "sha256": "e7061c22312691c96d943755089bd3e2e3852806bb0a76dfa37f9c87da97d702",
+      "bytes": 16150,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-sea-ari-2026-09-20",
+      "capturedAt": "2026-10-13T19:11:01.083Z",
+      "sha256": "deea29e727c80fed770c35e420a4b4cce4d7a5e0c80e138d180d890d48cfb6f7",
+      "bytes": 987768,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=43430846661961249067216598537790563571715723295351094368987724452116899428979&start=1789847700&end=1789934100&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:01.127Z",
+      "sha256": "9a82a7f9b7970761e2439b8db35db54eeb2185759818405c9c1171a55f0f73c9",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x5d804b409ed790a6c6814e903195699dc2744cdd5cba80cf8a8d4dff469d1369&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:01.170Z",
+      "sha256": "9e6d4980b6c72e22ceb1ffb7a6ab8c241c2d9f15a5df99e02426306bf4e723af",
+      "bytes": 62676,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20WASDAL&limit=1000",
+      "capturedAt": "2026-10-13T19:11:01.326Z",
+      "sha256": "e317a15cefad9a6d3ce00b1af73e692167cf6702115f6a54e783271a75f0ef0a",
+      "bytes": 36084,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20MIASF&limit=1000",
+      "capturedAt": "2026-10-13T19:11:01.634Z",
+      "sha256": "e780b9a3fe80fc7004539ce6fa68c6fb88748d6b5cddea098ce156f508519dde",
+      "bytes": 36102,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20WASDAL-52/candlesticks?start_ts=1789847700&end_ts=1789934100&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:01.935Z",
+      "sha256": "e7f945c51daa4dbc776c102d4566cb1086d499c9187d10298aadce1e0bbb2960",
+      "bytes": 9830,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20MIASF-45/candlesticks?start_ts=1789847700&end_ts=1789934100&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:02.232Z",
+      "sha256": "4388889612070d194f78a0db9a867b2109de639a5f6e89c5b4fa264a6075a188",
+      "bytes": 10947,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20WASDAL-52&limit=1000&min_ts=1789847700&max_ts=1789934100",
+      "capturedAt": "2026-10-13T19:11:02.537Z",
+      "sha256": "48ec3511dd75ea1c21285323d44b4c719965acf0440f524d1a190d5c66cd2275",
+      "bytes": 22857,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-was-dal-2026-09-20",
+      "capturedAt": "2026-10-13T19:11:02.582Z",
+      "sha256": "22cdf8c42f4288abb55f8a7750c05562e28b3358694d83081737fb7ca538fdbc",
+      "bytes": 1000967,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=106775413919122094811906041868893434779985826033836795968853441739371340198785&start=1789847700&end=1789934100&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:02.608Z",
+      "sha256": "3d27f5c10bf8e32a11777e663ed2960111dbe9171aa8ad847825b578da1f503e",
+      "bytes": 18573,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xfb3a8d1c373f1729d0e994800d7e52659b0cb507605b6b31022b17fda4fbffc0&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:02.653Z",
+      "sha256": "4f3eb5858c8d72c24c415b5dd3d2e1f6331d813fb75e71c2e6aba9a37a273c5d",
+      "bytes": 331572,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20MIASF-45&limit=1000&min_ts=1789847700&max_ts=1789934100",
+      "capturedAt": "2026-10-13T19:11:02.838Z",
+      "sha256": "63301104fdd3012cbaed6e08ba84cd9cb7b68b0602a7c7fc685c82098f259de6",
+      "bytes": 107556,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-mia-sf-2026-09-20",
+      "capturedAt": "2026-10-13T19:11:02.873Z",
+      "sha256": "2894b36822d94cfbe45eca9bff7f88f66cdbf38708b4dbbc3f24197178438173",
+      "bytes": 1041469,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=57238017397296442806103534960563088854346126498683677753532189341079816675629&start=1789847700&end=1789934100&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:02.910Z",
+      "sha256": "2170e52c00d9a3e28738b27a85c939fd5261f7a2621b1cb95471e23ddb3a0ed0",
+      "bytes": 18573,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x42144e5f98a57a2e0cd6192fae7c9f8eb39402ac912b83c854c63d3a76b10d0a&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:02.945Z",
+      "sha256": "b25e5e2bcb5e36d33947414ac78c5450d5f517556bf73b0d465f82787d7e2357",
+      "bytes": 44493,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP20INDKC&limit=1000",
+      "capturedAt": "2026-10-13T19:11:03.138Z",
+      "sha256": "40b4213df8adaa00030ac32e7932ec510ff6d665e515cb0412e09db88aedacd0",
+      "bytes": 40131,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP21NYGLAR&limit=1000",
+      "capturedAt": "2026-10-13T19:11:03.434Z",
+      "sha256": "2f16ab3bd7704ec8926fbebb38410ba82a2813808581e0d9bad077e36cdf8fbf",
+      "bytes": 40146,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP20INDKC-47/candlesticks?start_ts=1789861800&end_ts=1789948200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:03.740Z",
+      "sha256": "ad6bb63361157c1f1e4aacd227fe0f93a4579f5f20c7f8281108bb3768dc38d1",
+      "bytes": 10950,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP21NYGLAR-48/candlesticks?start_ts=1789947900&end_ts=1790034300&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:04.040Z",
+      "sha256": "8c5a9de216a013419135fb94e88555d216a471b81ad5a2e1a4a8fa41c395b80a",
+      "bytes": 10991,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP20INDKC-47&limit=1000&min_ts=1789861800&max_ts=1789948200",
+      "capturedAt": "2026-10-13T19:11:04.351Z",
+      "sha256": "9daa6ed8d825a1f30241f173881fb88ad5f196dea6f0e3176086978d6d628036",
+      "bytes": 232581,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ind-kc-2026-09-20",
+      "capturedAt": "2026-10-13T19:11:04.382Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP21NYGLAR-48&limit=1000&min_ts=1789947900&max_ts=1790034300",
+      "capturedAt": "2026-10-13T19:11:04.654Z",
+      "sha256": "14b523fc176fcf79e5ff9dfa111a60f62686647ca61b2d80a1252e52eaf0051f",
+      "bytes": 304169,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP24ATLGB&limit=1000",
+      "capturedAt": "2026-10-13T19:11:04.938Z",
+      "sha256": "6e4fbdb81183741dc1e0862ab13383d773777ad84a008252c4eef8cf7be7bbe1",
+      "bytes": 36248,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP21NYGLAR-48&limit=1000&min_ts=1789947900&max_ts=1790034300&cursor=EhIKEAcjo9150bfL6HXNlOurk0QaDAjw7cbVBhDo4srzAQ",
+      "capturedAt": "2026-10-13T19:11:05.256Z",
+      "sha256": "41c5a34a12683d84ba8d319c5b5a96a908c05b1d14868d588a87d61c2b237fb8",
+      "bytes": 304160,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP24ATLGB-44/candlesticks?start_ts=1790207100&end_ts=1790293500&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:05.547Z",
+      "sha256": "ce0d9acf3edd3c1795e4759628fa472d7af9023af6c9fe231b168a081a25a2a1",
+      "bytes": 10425,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP21NYGLAR-48&limit=1000&min_ts=1789947900&max_ts=1790034300&cursor=EhIKEAcj05lZsY8zWI7byMTjmAQaDAiby8bVBhCA7YKMAQ",
+      "capturedAt": "2026-10-13T19:11:05.862Z",
+      "sha256": "ba2412eaf6e5d19e92cbbcfd8adc9d554e1018f6f71d2d95ffad2c7e9a23323e",
+      "bytes": 304175,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP24ATLGB-44&limit=1000&min_ts=1790207100&max_ts=1790293500",
+      "capturedAt": "2026-10-13T19:11:06.164Z",
+      "sha256": "5fbc3761a9e27a7f3cd0e63549748188cfab29d9b7730815fd80439b300a6345",
+      "bytes": 303008,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP21NYGLAR-48&limit=1000&min_ts=1789947900&max_ts=1790034300&cursor=EhIKEAcj1MDNiZPxnp1PWvAQmNwaDAizhMbVBhD4seqrAw",
+      "capturedAt": "2026-10-13T19:11:06.471Z",
+      "sha256": "18e4fba5fe0f0d683d720db0d6bd51250d531f676bfeceaa04d11d94a24eace7",
+      "bytes": 304103,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP24ATLGB-44&limit=1000&min_ts=1790207100&max_ts=1790293500&cursor=EhIKEAcjg6EsAY9WjU0u6drcW2waDAiN19bVBhDA35KXAw",
+      "capturedAt": "2026-10-13T19:11:06.779Z",
+      "sha256": "dc316183f07a92167ae08cacb9a00bd4ceae729e62b73e292337097617de2ef3",
+      "bytes": 302959,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP21NYGLAR-48&limit=1000&min_ts=1789947900&max_ts=1790034300&cursor=EhIKEAcj0Kv2KbntSbUOCon65rwaDAjCjsXVBhDYuf3KAw",
+      "capturedAt": "2026-10-13T19:11:07.066Z",
+      "sha256": "ff88393240e2ffa6a36ad61ebd1ecd3b56ea41374d878701c62f02dcbc3e96dd",
+      "bytes": 296500,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-nyg-lar-2026-09-21",
+      "capturedAt": "2026-10-13T19:11:07.096Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP24ATLGB-44&limit=1000&min_ts=1790207100&max_ts=1790293500&cursor=EhIKEAcjgKgQqbQkfHqQvMEB1jAaDAistdbVBhDY87fQAg",
+      "capturedAt": "2026-10-13T19:11:07.374Z",
+      "sha256": "22fb69909acc5d5dc13bba080a4f472acfe1cf2b6f3bcad60875430d45bb7748",
+      "bytes": 303080,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27LACBUF&limit=1000",
+      "capturedAt": "2026-10-13T19:11:07.653Z",
+      "sha256": "078f77503ecdc3ca288bfb839d1c31eb447aeabd38362f416aa8917ca419decb",
+      "bytes": 39869,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP24ATLGB-44&limit=1000&min_ts=1790207100&max_ts=1790293500&cursor=EhIKEAcjnWADEajCbGifbCEluq4aDAjc9NXVBhDgqqiZAw",
+      "capturedAt": "2026-10-13T19:11:07.969Z",
+      "sha256": "87075109ed7bc35cc3c0b93d60056d37c3e509b07888935f1af3530fc26ffbbd",
+      "bytes": 302879,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27LACBUF-51/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:08.264Z",
+      "sha256": "3827c248898879f0021cf595fce3ae7709538e396dbf64c5291280a98fd078a7",
+      "bytes": 10953,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP24ATLGB-44&limit=1000&min_ts=1790207100&max_ts=1790293500&cursor=EhIKEAcjgaxN8bFyuck0XkHwT2oaDAj36dTVBhCYr-7rAQ",
+      "capturedAt": "2026-10-13T19:11:08.578Z",
+      "sha256": "e16b9cd4c24a15e8cb461966a4bb781988d41f0bdeeaaea95f4b9163f8ab302f",
+      "bytes": 207807,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-atl-gb-2026-09-24",
+      "capturedAt": "2026-10-13T19:11:08.622Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27LACBUF-51&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:08.875Z",
+      "sha256": "2dfe65484ff1b510e5769e48f4e8249751bfcbbeeecf3b0b723274e378aa8c0f",
+      "bytes": 248288,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27CARCLE&limit=1000",
+      "capturedAt": "2026-10-13T19:11:09.161Z",
+      "sha256": "d9f790189c9be9ca4c0409310ed254565d2bddf5c5fa2b682de97606b64d6489",
+      "bytes": 36165,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lac-buf-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:09.389Z",
+      "sha256": "6c5a03392a6cb1207528f8b7dd60972f170e308db14c6ddcc0c093f11000f795",
+      "bytes": 1027796,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=90152789774724716187575903890866789443196206926276731334346187141684050796485&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:09.464Z",
+      "sha256": "9c9521ccb2cdb3a77f40f5db8c5ebde48dbed8f1427f5188b605aae0cc3d155b",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27CARCLE-42/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:09.493Z",
+      "sha256": "3ad23fcc166c079330bf870e0f50ec90782e804aa30d73eae7b4d6ef2596e209",
+      "bytes": 9734,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xef482aa304fda22eaf55e5c6fa0045c7a15f09572821b636fca699aecda487dd&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:09.506Z",
+      "sha256": "c6a3700e0f0f051655d77829c0a7865510afc6239aec8fd008beb6a64e2d1321",
+      "bytes": 275066,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27CARCLE-42&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:09.834Z",
+      "sha256": "23a130f0430aa0d3f7c0172f3610d89505240f587ead2d66ffb12dd9211883dd",
+      "bytes": 127278,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-car-cle-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:09.968Z",
+      "sha256": "198f8bf416e9ef307569dd4bca06e67ff51d0023c738149a48ffeddf57a24fab",
+      "bytes": 989859,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=45188199267848919120347783174261772966572900495851879362821794656413558302129&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:10.001Z",
+      "sha256": "844ff7896ab0a8115ac27f31dd3e386c050abda7bf1bec9df404e93ac8c769b0",
+      "bytes": 18562,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x63b19a2c25e106d0c272bf80c409e55da536eca12dfefb2df52b4517c24ca135&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:10.040Z",
+      "sha256": "f118e1423f063f98c3bcd565d3e295709dfb353b82d1eea0147ea5b5355474c3",
+      "bytes": 165204,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27NYJDET&limit=1000",
+      "capturedAt": "2026-10-13T19:11:10.130Z",
+      "sha256": "f22bf6a308b3555015cf780853a09de5de5363917557c1907228c3e393816f87",
+      "bytes": 39714,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27HOUIND&limit=1000",
+      "capturedAt": "2026-10-13T19:11:10.431Z",
+      "sha256": "a78b2a0b3bf9670f78d8fdccfbaccd8f915ac4f7a9a8c757e5678a57c958279c",
+      "bytes": 36039,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-hou-ind-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:10.463Z",
+      "sha256": "9f67e564f1c65e8393b0e42376c4452284e534b75d95f0aa9aa07a4cbb416e13",
+      "bytes": 976614,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=97429287918958236515635809274854692655555175377561527990479716822486116265196&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:10.497Z",
+      "sha256": "e4650f1959b722175cd245d8b214d59a110cf541b5a382b1bcf5bdb0b3ab3921",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x472a1fe034a0475e74f58aa9487f2cc3ecfcafe62a39ec33332937722984e329&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:10.539Z",
+      "sha256": "fc3ebb10becb3fe46d00c1246587998072fcdb940bec34188c49d163a3550f94",
+      "bytes": 32830,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27NYJDET-50/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:10.732Z",
+      "sha256": "d720475b5583985be5b78ca9fa0d2c30fc7a49d35a6a5c1bcdada73c4a7ab44b",
+      "bytes": 9576,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27NEJAX&limit=1000",
+      "capturedAt": "2026-10-13T19:11:11.032Z",
+      "sha256": "50699ea1db13415ea46ec367dcfa58decd9660083271c5dc061561f38337fbac",
+      "bytes": 27,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ne-jax-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:11.155Z",
+      "sha256": "5f00542a1aeb7c8f0c134066d49a5be0a616b628c99706a600ac8e60d8df6021",
+      "bytes": 1034017,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=115555641301857150702203091113457553312364122009983356493908967149947994989772&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:11.193Z",
+      "sha256": "d3c6a32d13390a919d66a47523113191a08a456ee5c1b8fb344474eb41d88b4b",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xd47da90134ebf98d08efa49684fc63e3c56172ad3728d2ae262482d91645a02d&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:11.271Z",
+      "sha256": "91605b042d5fa5132d4bbe70891ff0ee0b5713d1a0b43ce2983ed302c0d683c8",
+      "bytes": 211065,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27NYJDET-50&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:11.344Z",
+      "sha256": "d66d845c20b9c5605f2ab49ce993739f2b31d4d61e1165fb4a71c6f7108275a4",
+      "bytes": 51799,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-nyj-det-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:11.390Z",
+      "sha256": "8168398fc97af2a7fe20c21d1a6981839d66b6f14ccf30d32717c886796185e4",
+      "bytes": 1026212,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=19055077803430590121345693990308239164877010511184652098393024356843242207656&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:11.430Z",
+      "sha256": "21abb8d564f4d9973e0f2c89a49e6868705622c7ddd36d5f1c4ecee903e4af12",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xa51a473f76aa0e5735502beaa44ef9a2fe2918cdc2cc2d9d726293f3da9d1882&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:11.473Z",
+      "sha256": "326074036e9ef45667dbda0bb0fe134f4299204265891c4fa13972aa97c2faa6",
+      "bytes": 72195,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27KCMIA&limit=1000",
+      "capturedAt": "2026-10-13T19:11:11.643Z",
+      "sha256": "ab2192be1afc5c1a91eb294fc9b7b4152d9ceff3e59b30617f302c3d4fd4fb95",
+      "bytes": 36092,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27TENNYG&limit=1000",
+      "capturedAt": "2026-10-13T19:11:11.931Z",
+      "sha256": "e5765c0da664127cfd5e49d0fd35f63a024ca784e25111b8d96eef5fdc72bc26",
+      "bytes": 41702,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27KCMIA-46/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:12.238Z",
+      "sha256": "44af72fc400c4e8c236be2b04915d839f84c6c575f9ecef16fecab5b3d293cd5",
+      "bytes": 10816,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27TENNYG-38/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:12.540Z",
+      "sha256": "477455dbee6b819a77e63597622584d5993275cf7ac938703cf04443b7187512",
+      "bytes": 10995,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27KCMIA-46&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:12.839Z",
+      "sha256": "ad4f2418e8c5526df5e8aeaee916115183a0065367ac5095119d002eda908791",
+      "bytes": 116355,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-kc-mia-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:12.875Z",
+      "sha256": "44d24910190ae29ed8d092e8fa70be2c3e68a1b28f3949dd0e57649297202d2b",
+      "bytes": 978090,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=83685765929258717970067961059468047703371888160876916879121594379204690318115&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:12.901Z",
+      "sha256": "9c76701ef5ff62e05e5cf62b0a58e195c9a71d6c3d125c797a2cfa488e3557da",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x96e21bb623ef1c13b7bedb865338c72780fc73e110611217f7f7780454c6bafb&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:12.942Z",
+      "sha256": "c7a10275a2a6e6e66222573aedbe0772eb6146d331b5162ced751dfd73e37f05",
+      "bytes": 200521,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27TENNYG-38&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:13.150Z",
+      "sha256": "dcaf4730f7e2c0ea905cde5358a301f5a529cefff4ae350f3f68690512f02477",
+      "bytes": 242540,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ten-nyg-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:13.201Z",
+      "sha256": "32eac7ae1c0289760e5b7fd88c96b66d1439c5979261ee613a6cf466911e0f7f",
+      "bytes": 978544,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27CINPIT&limit=1000",
+      "capturedAt": "2026-10-13T19:11:13.442Z",
+      "sha256": "58a96baa3348155567010181a35f982da7ce225505213bdcd698d8ba09598f7b",
+      "bytes": 39993,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27SEAWAS&limit=1000",
+      "capturedAt": "2026-10-13T19:11:13.739Z",
+      "sha256": "cb36c479ee614acdd3dfebfe43357ebf8f1ac0bfaa47df9200449065ae2d353d",
+      "bytes": 40137,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27CINPIT-43/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:14.044Z",
+      "sha256": "6b18a28d7554606c1700dc685e5a6cc1300a9da25ce6a390e3c706ec69f06800",
+      "bytes": 10989,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27SEAWAS-41/candlesticks?start_ts=1790440200&end_ts=1790526600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:14.342Z",
+      "sha256": "2539e0868dc7bfd46af60e44c65e7ce9b34c664e474b170e31d7863971b196aa",
+      "bytes": 10607,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27CINPIT-43&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:14.653Z",
+      "sha256": "56bc203cb4e78ac5df0d65f62c81b8ea58c6e33299c0a01187de27c91c682b0a",
+      "bytes": 207270,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cin-pit-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:14.695Z",
+      "sha256": "12a626c360cc8940fa962a30a0aff318dcbfeb3b8e1308acee43201289db2846",
+      "bytes": 1036868,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=58469231700578613241214720969941349346071019516274508937355324794518872415688&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:14.727Z",
+      "sha256": "ded4ae22d912139df82c68d350bc530a0852df45c1e040bab4f432a4a277ba30",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xdbbe762bc34a6bccba5058e42d40641b89e4aacd5803ebcce7790fb8f41425bc&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:14.769Z",
+      "sha256": "abb5014773f276522c701a476bfd7edb6fa0df6abfb9d826c17d0b44d795a097",
+      "bytes": 155200,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27SEAWAS-41&limit=1000&min_ts=1790440200&max_ts=1790526600",
+      "capturedAt": "2026-10-13T19:11:14.955Z",
+      "sha256": "88881a08e2b124f95eac01f14572b3c8f88983a1c7d66ff64290deb08f014351",
+      "bytes": 129687,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-sea-was-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:15.147Z",
+      "sha256": "e7598d178983cfd2d90c9c499947e25f9340fb054d2630725cce395aecf9ad90",
+      "bytes": 1034302,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=39406332687676369992276595148923689922589761154400465128871482110124873900823&start=1790440200&end=1790526600&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:15.177Z",
+      "sha256": "472d68aab2949d04a7a8b0b4742d86378208d7644acc594cd45179af8544e295",
+      "bytes": 18574,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x9d232fb0b16979c4b3f281d3a53a0441ace232a0b79e1aa0f45fac51e7870be3&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:15.222Z",
+      "sha256": "a3826271bc89ba489fdccef8ec19729a6d0fde52a3c10741c35b84c927c2fed3",
+      "bytes": 249334,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27ARISF&limit=1000",
+      "capturedAt": "2026-10-13T19:11:15.242Z",
+      "sha256": "64181432e07b83a9e033cb3f52e61dee311f0b18d0e393f5859266c51646e8bd",
+      "bytes": 36104,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27MINTB&limit=1000",
+      "capturedAt": "2026-10-13T19:11:15.560Z",
+      "sha256": "eba054c8e88b3fa796e26ece4fba3ada157e250901c3ad374f1bc9a276039781",
+      "bytes": 36207,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27ARISF-49/candlesticks?start_ts=1790451300&end_ts=1790537700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:15.863Z",
+      "sha256": "1bb778037e62cc052d8468231e24981a0bc132b34b391eb7f6b59c7b5fcca279",
+      "bytes": 10455,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27MINTB-43/candlesticks?start_ts=1790451300&end_ts=1790537700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:16.162Z",
+      "sha256": "d538e111947c1d7cd6ec01ae341726bcb532a96ba4b1e4ab27f52f7f98e9e287",
+      "bytes": 10927,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27ARISF-49&limit=1000&min_ts=1790451300&max_ts=1790537700",
+      "capturedAt": "2026-10-13T19:11:16.471Z",
+      "sha256": "e8ce37aa38e0bc0fb08dcc56f83b59e491f27779f44e58b37d9fb9116289ed36",
+      "bytes": 90868,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ari-sf-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:16.634Z",
+      "sha256": "6c2a89b488c36fbaba079ec4117609e47dbe553e5b868ac05985c24778f35bb6",
+      "bytes": 1034693,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=42580567177042870585621175297447564317541736978540136272874339061643520561870&start=1790451300&end=1790537700&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:16.662Z",
+      "sha256": "40c6deb6bd99203839338e69e732c00a9c5a607fa911029933ca47f7dead7799",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x95a01ebbdfe1d934bd35026d9a8877399d76ecf87b93f408bccd9bbcddd568c8&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:16.703Z",
+      "sha256": "a4444c07ccd11aae12c16ff76fd52490fc75496f7b247339e6897d2144999f73",
+      "bytes": 343834,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27MINTB-43&limit=1000&min_ts=1790451300&max_ts=1790537700",
+      "capturedAt": "2026-10-13T19:11:16.772Z",
+      "sha256": "8c718091a7b4945372233e3b1e1889d6f3b8130192272821efbd6119d971026f",
+      "bytes": 103290,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-min-tb-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:17.002Z",
+      "sha256": "76b5bd9689dac4375dea198e1a8dea69a5d1e0eef4ed613ac47982c98974092d",
+      "bytes": 983474,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=102875267595266223084089019796048386413908971770210928028440420083140319107520&start=1790451300&end=1790537700&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:17.030Z",
+      "sha256": "40213d63907cda9a1a71ac7ab6787c5ed132a11fe10ef56a29e8e5dcd6e5f282",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27BALDAL&limit=1000",
+      "capturedAt": "2026-10-13T19:11:17.068Z",
+      "sha256": "d5ee6545a986f1384e15103ba7deab86a48c216c7dc76f93a7ce5a5090125fbf",
+      "bytes": 36152,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x9c21e5a977b362059cc37184e5bc31b306e001c3247779f1ee5bc44a6e63ee34&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:17.071Z",
+      "sha256": "cc2965570e9a62bed476904b295a230b5f427d95504dad602e2e6d62d7a683f4",
+      "bytes": 197152,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27BALDAL-54/candlesticks?start_ts=1790452500&end_ts=1790538900&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:17.411Z",
+      "sha256": "c7e600cd220590e0c5a683a1ebb90bbb0ac9cb587dc43e256fb27b960f7c4491",
+      "bytes": 10962,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27LVNO&limit=1000",
+      "capturedAt": "2026-10-13T19:11:17.708Z",
+      "sha256": "5fb52356e63abadddd94fdd3f2b09371963b3a20d81778fff65fb26e6bc64d8d",
+      "bytes": 43522,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27BALDAL-54&limit=1000&min_ts=1790452500&max_ts=1790538900",
+      "capturedAt": "2026-10-13T19:11:18.023Z",
+      "sha256": "dd97706449b33d2e598bf31c4e037af33d8d7900686fb72c03394984da4453bd",
+      "bytes": 304347,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27LVNO-44/candlesticks?start_ts=1790452500&end_ts=1790538900&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:18.307Z",
+      "sha256": "d3e96ef09c4e61e13a4c25295429be39541079a9c66d8321eac2866b076f0bdb",
+      "bytes": 10987,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27BALDAL-54&limit=1000&min_ts=1790452500&max_ts=1790538900&cursor=EhIKEAcjZKI16Z7MzXkqmi8FpisaDAiy5OLVBhCwzoGLAg",
+      "capturedAt": "2026-10-13T19:11:18.613Z",
+      "sha256": "f6523c71dbb44aec3aeec672720cab9e088e7bea26439be3cbbdaf48340eb3c8",
+      "bytes": 50785,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-bal-dal-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:18.778Z",
+      "sha256": "0cc52deae7c09cf1835f54bfccee5d0d5298f876ba4aa0a84b37446da1edafa5",
+      "bytes": 1031745,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=91183826090039292158195859352780254962064006515213846161600182294893949578548&start=1790452500&end=1790538900&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:18.820Z",
+      "sha256": "9cfa56715e7f025c3d9009ac4286bb5f99412bfe157df6e03302e6d73473800c",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xc8507157753e7df675b026af3caa8b6dbe7376b2a87280f577b56cfb3bf79cea&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:18.864Z",
+      "sha256": "4e96830c6fc83e350a1ba38fbe1db3218120b2d1c9222378db11244f4f5c616c",
+      "bytes": 217282,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27LVNO-44&limit=1000&min_ts=1790452500&max_ts=1790538900",
+      "capturedAt": "2026-10-13T19:11:18.920Z",
+      "sha256": "1aa76ebe5d219f5104e9ce83edee7a8b09b1730461fd0b0fd94a8c8a35d43cce",
+      "bytes": 228812,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lv-no-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:19.047Z",
+      "sha256": "902cd544e9091923a35e8b297f737cadd9403094490cd23c8271ac0ca050fb78",
+      "bytes": 1027636,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=12151927971287488726741464844212594725178625804808173691657103751931424265309&start=1790452500&end=1790538900&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:19.080Z",
+      "sha256": "79e5204f58615b269adda20a534851ebd56b6eed1f1bbfc20342b692dc11400b",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xc1f6fc9e30ec9757acfe6d6737d425aa0f8d5599d808d9f86f0cdaa26f554547&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:19.133Z",
+      "sha256": "356dc55576ad4a76003a4917a600ebbb152712191c157039a477eef88c1377ce",
+      "bytes": 158737,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP27LARDEN&limit=1000",
+      "capturedAt": "2026-10-13T19:11:19.209Z",
+      "sha256": "f3fb37480ea5f021adf0f428fdae4dc00d8a972fc430cfc7c8f09bb5d2105c08",
+      "bytes": 36046,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26SEP28PHICHI&limit=1000",
+      "capturedAt": "2026-10-13T19:11:19.512Z",
+      "sha256": "2ca550c587f5e1efc534ad64d21b7d885e8de1c863902129f211c8c82b89c4fe",
+      "bytes": 36083,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP27LARDEN-44/candlesticks?start_ts=1790466600&end_ts=1790553000&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:19.814Z",
+      "sha256": "31591efe1091d17e759cab5e22be1b2547edec8c6ce5c7598f529b604fa75ca2",
+      "bytes": 10065,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26SEP28PHICHI-43/candlesticks?start_ts=1790552700&end_ts=1790639100&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:20.119Z",
+      "sha256": "e8988060918617c1452751fb04987d0fa3764f54b1a91415a2492c92059e29f3",
+      "bytes": 10976,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP27LARDEN-44&limit=1000&min_ts=1790466600&max_ts=1790553000",
+      "capturedAt": "2026-10-13T19:11:20.418Z",
+      "sha256": "f6999a2e98d845993a3a8aeddb2ac36fe566fac5bd2de7a8051cfa8758514d23",
+      "bytes": 42971,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lar-den-2026-09-27",
+      "capturedAt": "2026-10-13T19:11:20.445Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP28PHICHI-43&limit=1000&min_ts=1790552700&max_ts=1790639100",
+      "capturedAt": "2026-10-13T19:11:20.729Z",
+      "sha256": "567a671d91e3166cc8d69086a28511d512367f5448c22ae122cb858444ac812a",
+      "bytes": 303821,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT01PITCLE&limit=1000",
+      "capturedAt": "2026-10-13T19:11:21.021Z",
+      "sha256": "9aabe94875a186e39b9fb7a743ab4b64c69c4d0199902da8f10cfc3115853379",
+      "bytes": 39973,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP28PHICHI-43&limit=1000&min_ts=1790552700&max_ts=1790639100&cursor=EhIKEAcjQPO7wbqLKfIijhGkv3MaDAj65evVBhDAxq34AQ",
+      "capturedAt": "2026-10-13T19:11:21.337Z",
+      "sha256": "2fccfa4e42cb263813e2ed31fe3406c96e7875dbbc9bb9d78f98cc3d7cbbb816",
+      "bytes": 303883,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT01PITCLE-39/candlesticks?start_ts=1790811900&end_ts=1790898300&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:21.623Z",
+      "sha256": "ef693440d715566dd0fa272d16788c6b7997d959a3464742bdbe985c29122e91",
+      "bytes": 10755,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26SEP28PHICHI-43&limit=1000&min_ts=1790552700&max_ts=1790639100&cursor=EhIKEAcjThcPobspv3zjRkD9DXMaDAjFwOvVBhDIv9GCAQ",
+      "capturedAt": "2026-10-13T19:11:21.939Z",
+      "sha256": "9b906fce89cfc38641e864f580dd9172a5a437cdf00c79fe4bcd3f28aa4be22d",
+      "bytes": 277217,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-phi-chi-2026-09-28",
+      "capturedAt": "2026-10-13T19:11:21.973Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT01PITCLE-39&limit=1000&min_ts=1790811900&max_ts=1790898300",
+      "capturedAt": "2026-10-13T19:11:22.236Z",
+      "sha256": "4d6c7023501a89927887b8eb0f0bc8d071192ce2abd0e87e993cb2237ead60be",
+      "bytes": 303423,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04INDWAS&limit=1000",
+      "capturedAt": "2026-10-13T19:11:22.527Z",
+      "sha256": "bc9e0f84a2c22c65400d1ab820e9f3d17399a45dc4043000ed915fc1aac0d8b8",
+      "bytes": 39870,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT01PITCLE-39&limit=1000&min_ts=1790811900&max_ts=1790898300&cursor=EhIKEAcjE3y34ajzNWVMhxegtzcaDAiDhPvVBhDgxobAAg",
+      "capturedAt": "2026-10-13T19:11:22.839Z",
+      "sha256": "f1568439dfd8ca84ba6b9df6daa6481b9e09be8fef42b1721b9d5754a3aa3c25",
+      "bytes": 303466,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04INDWAS-47/candlesticks?start_ts=1791032400&end_ts=1791118800&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:23.134Z",
+      "sha256": "21249e0be84e0103a5bd0d645dc60311faa8ee4b777723598d763947e947d023",
+      "bytes": 10845,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT01PITCLE-39&limit=1000&min_ts=1790811900&max_ts=1790898300&cursor=EhIKEAcjLMTH6b3BfNUElKv4LIUaDAjeyPnVBhCgsPqKAQ",
+      "capturedAt": "2026-10-13T19:11:23.442Z",
+      "sha256": "35adfe0d184b39ce34e3d916eb5a74d424888870b23e111fcb24229ffc5f5dd5",
+      "bytes": 191256,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-pit-cle-2026-10-01",
+      "capturedAt": "2026-10-13T19:11:23.481Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04INDWAS-47&limit=1000&min_ts=1791032400&max_ts=1791118800",
+      "capturedAt": "2026-10-13T19:11:23.745Z",
+      "sha256": "d2db315159923411b1ea39c7a293297c4aa876eabb3c88c9967dd6c8430b2d62",
+      "bytes": 304402,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04TENBAL&limit=1000",
+      "capturedAt": "2026-10-13T19:11:24.036Z",
+      "sha256": "d22de5beac78a3bce4044c5d68754fa40587c1e69f987cfa3b26fb514e754f4e",
+      "bytes": 35954,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04INDWAS-47&limit=1000&min_ts=1791032400&max_ts=1791118800&cursor=EhIKEAclEUWBCaHPSSfuUN2pOq8aDAjXt4fWBhDQjLaVAQ",
+      "capturedAt": "2026-10-13T19:11:24.341Z",
+      "sha256": "8e14b53bddd6b3289fc39b8545f707f0fa8158d0df82cd9da3bc76aee5c09c11",
+      "bytes": 92579,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ind-was-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:24.387Z",
+      "sha256": "5800afaa4cf5b852fa0faa97eb00b97943a051833b9c2f7f0392e33d8aa5736e",
+      "bytes": 1049324,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=82909686797588176251000697154724499219922227870981483319636445296282697666335&start=1791032400&end=1791118800&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:24.438Z",
+      "sha256": "01f08fed28285eddeebeacd7e31bae3a360a009e2003ce5f90ca77840a2c9ed6",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xed203f42ae15344ac944092c1e4574eeadb72f26a449d0a592516ac32c40ef26&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:24.475Z",
+      "sha256": "fa4b56a94590c75709d6f9bc2a5f761f7b400c201bea2d98d2c3d59afd830a81",
+      "bytes": 605129,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04TENBAL-43/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:24.637Z",
+      "sha256": "c976947f37b872b48778bc7fdf5278368f35b0ca59cc44afbe0891c8ce0b3aeb",
+      "bytes": 10335,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04NEBUF&limit=1000",
+      "capturedAt": "2026-10-13T19:11:24.936Z",
+      "sha256": "bf87243b675bab37fadb1e5b977a3b7e733bc8544a8407b418e4473c8d9dcb7f",
+      "bytes": 35925,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04TENBAL-43&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:25.246Z",
+      "sha256": "297aab2fb31c2978d0a575b55e698a8f2090281a1d9f001f0a2e9866db8c049e",
+      "bytes": 75098,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ten-bal-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:25.280Z",
+      "sha256": "3b5ede0b1e6173b07f854c6558e98e21323c3cb28a002ec55a9727d53874eb6c",
+      "bytes": 1035980,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=20431099331704182002583463206215809918723144087310276051393326717441944304055&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:25.321Z",
+      "sha256": "09fbf4da38ed3c74928c62c3f0744f3be61ad7637ce6b6c80a042b72276daf87",
+      "bytes": 18576,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xdbccac1b094f5ba29003408f638af673cde1420bc9490fb7d9ce1132c24bd4f4&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:25.361Z",
+      "sha256": "956ba3720befd49120c1005fb661bcd064cbfd9d6efad63ea369e20f5d57596f",
+      "bytes": 108934,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04NEBUF-50/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:25.541Z",
+      "sha256": "4c7b2ee816e5d39594d85244ab229bd34e4b9c4217bc25735df36b0402d7da47",
+      "bytes": 10467,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04NYJCHI&limit=1000",
+      "capturedAt": "2026-10-13T19:11:25.844Z",
+      "sha256": "bfbd38f0522e790ca2d8df1601b1a193650a6efbf12601fba78780cac72960ad",
+      "bytes": 35805,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04NEBUF-50&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:26.145Z",
+      "sha256": "481cbe57314d8d10b96ec3390b459fc3c16c40b7c0a7ec27aeaf9082683c8f89",
+      "bytes": 123953,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ne-buf-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:26.195Z",
+      "sha256": "5a63493f47008db885970567c034ea2116254f9f2391d917e401b705b8a7aa26",
+      "bytes": 1036036,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=22229707184927329858462809999907757214470907532512964735235569640949542740936&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:26.230Z",
+      "sha256": "a2a268a0ad9afa26cf7ff96b62526f74f072d512c455aeb7a721cdbe62c3275c",
+      "bytes": 18560,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x0be1751c4132dff67c14b87969eff92e6417a2bec5153cdd28802f28fd51dadf&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:26.265Z",
+      "sha256": "7b4c29bb28ea9b32354309a068775fe272c88bfef0ded344e587768f25ffaf4d",
+      "bytes": 233727,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04NYJCHI-44/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:26.446Z",
+      "sha256": "a31d0efd81f2de572bfd15aee33b001064e67c2d593da3efad7052f86d993a32",
+      "bytes": 10711,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04JAXCIN&limit=1000",
+      "capturedAt": "2026-10-13T19:11:26.742Z",
+      "sha256": "50699ea1db13415ea46ec367dcfa58decd9660083271c5dc061561f38337fbac",
+      "bytes": 27,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-jax-cin-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:26.869Z",
+      "sha256": "319cb71f6c563aa80fad86462dcee508f13cc3d0e74b28abe0cfdb5a470a8389",
+      "bytes": 994266,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=74118889380075822314748388409984820525439529450430613378751125922139416835112&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:26.904Z",
+      "sha256": "06d21fd4ad3b8c80f49fe8cc881be246ef1abf4a1a5c3572cabd73f58dbe6d03",
+      "bytes": 18575,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x0552f7229faf30f996e1c6dd12ab9bede0d093f5b305dfab7c0f5a8aba85edfa&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:26.935Z",
+      "sha256": "2b9a5fd57051030e979e0dd16ae15ccd63ad7a9321bf72729b230cd33a1e5a48",
+      "bytes": 105636,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04NYJCHI-44&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:27.053Z",
+      "sha256": "09c49de5a5eb026600a4489c9887a067bd1c1c109b54ba1b214c743a7132f937",
+      "bytes": 136822,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-nyj-chi-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:27.093Z",
+      "sha256": "7f57d3b435912e0b221d54ed2f68f9c2d99c887bf1e58d887f120018dfadbcbf",
+      "bytes": 981722,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=16753613102612797251138965101498992797648924093390718883665187019243202392630&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:27.122Z",
+      "sha256": "17ee8fe32dcdada1827f2e2c7ca728a71a2401ae50439814469f36a7044724a5",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x3098f87b363c8c2f002a93049ccbcd2578c8db582c1bd669e04b4a4a849ebc87&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:27.159Z",
+      "sha256": "5f5b093d02fea660b562ef66a0c4ac218665a56a910d0576c22f82e02b96e2ee",
+      "bytes": 171031,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04DALHOU&limit=1000",
+      "capturedAt": "2026-10-13T19:11:27.347Z",
+      "sha256": "05c361e35c82d8b3dd319d909010635c4fb9ed173f12796261596ad7c33d59f2",
+      "bytes": 39783,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04ARINYG&limit=1000",
+      "capturedAt": "2026-10-13T19:11:27.652Z",
+      "sha256": "abd8c18629d7b221b1f655552e65d273a2b7caf386b966c43c5ba91018936546",
+      "bytes": 39808,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04DALHOU-49/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:27.955Z",
+      "sha256": "e72f8aa33b52be50ab198da8c4c76818d7d2d56bfa341eb666ad2e741bccbcfe",
+      "bytes": 10989,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04ARINYG-45/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:28.260Z",
+      "sha256": "989a9a4c5c18f1d4aeacb03471d002b4596db632499b1488126ff1519697b108",
+      "bytes": 10714,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04DALHOU-49&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:28.572Z",
+      "sha256": "7d9e6c5e03c74b1bd9e7b0d3ae63d4b41066148a7bd53478293df698fa90d19c",
+      "bytes": 174391,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-dal-hou-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:28.731Z",
+      "sha256": "f11afaee43d46a5e20440ec6862c42747197937e3acddd9a0c441d182aa5c64a",
+      "bytes": 1036638,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=106459308981234179640696285156422654838333518202244631283683534883430657515432&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:28.809Z",
+      "sha256": "182d355e8ef8f329ff7b14166001565fdda9880c872dca318515ae9672213e5d",
+      "bytes": 18573,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04ARINYG-45&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:28.865Z",
+      "sha256": "e5e4f2d94bd0477044e1c1e8904c664313e46cd4b5f03eafd49de2a0daaf2731",
+      "bytes": 109103,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x2a80e8a34e4a752a18c0af9214d9744f1842b7d87893ee0f8f2a93156611d3dc&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:28.864Z",
+      "sha256": "95ab595de1619e4f2dccbfdf3354dcbea579011a0cf7d6ad993f23785a484ca2",
+      "bytes": 157718,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ari-nyg-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:28.945Z",
+      "sha256": "2a8bcdd568b29feb514bf9ba582834609b5a5918c5cb69a452af7f99c9404567",
+      "bytes": 986700,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=65998416724373331522940715104387008808049711009921407085656821585063397714469&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:28.984Z",
+      "sha256": "ba0c6bcdf8b13a69ccd130654b726e87084d16055b9f96dec72fbd7531f611c1",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x3c0e6f2d9ff25ccb69789d789b6fd564b2039b058896f62f800e5b16fa56d255&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:29.019Z",
+      "sha256": "21befa2d09aafc4839008c590656ebc1303c19ef93a72e930343e7716ca7e9e6",
+      "bytes": 201201,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04LARPHI&limit=1000",
+      "capturedAt": "2026-10-13T19:11:29.200Z",
+      "sha256": "c1a79e22cf56828cb6a8c6ecf875584bd67da5a18ec92bd1b7dc00f690514f3b",
+      "bytes": 35820,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04GBTB&limit=1000",
+      "capturedAt": "2026-10-13T19:11:29.505Z",
+      "sha256": "efadee98870c1b383fceb35dcfb4b90eaf6ae23e456126267e3a137fc97db627",
+      "bytes": 39768,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-gb-tb-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:29.539Z",
+      "sha256": "404a980826dacbab0908223ae6e7367559d149b692e64620fdaebd6fd058acbd",
+      "bytes": 1044083,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=98668079502648140777676357738779346486519762933841194760305727916282916443290&start=1791045000&end=1791131400&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:29.578Z",
+      "sha256": "f8343eb12a83d8ba145c28542a4e38c85680824a3642ce09cf52af66fecd7b8b",
+      "bytes": 18570,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x0e628c74b6a64bf8092a67028decafca6a4c1da521ccdf741f202b1099ad1bbc&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:29.621Z",
+      "sha256": "c348d5edfb6bb7d6c07b0ffb56c1f94ae1c88775ab06536f068799705a7ccb64",
+      "bytes": 102309,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04LARPHI-43/candlesticks?start_ts=1791045000&end_ts=1791131400&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:29.808Z",
+      "sha256": "3209dad021aaf2f1be03917bc088769b71c850cc3eb41036885f16443635645b",
+      "bytes": 10834,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04MIAMIN&limit=1000",
+      "capturedAt": "2026-10-13T19:11:30.106Z",
+      "sha256": "53aad69087ce40ae1366e8f94ba5c665ce9173b5db6b7a4f05ef58a817b67398",
+      "bytes": 39858,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04LARPHI-43&limit=1000&min_ts=1791045000&max_ts=1791131400",
+      "capturedAt": "2026-10-13T19:11:30.416Z",
+      "sha256": "a78cc75d32299e040ee2494bdf85bf9c85b6bdf2a46fd4320e8e9e24d335b3d4",
+      "bytes": 184081,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lar-phi-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:30.446Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04MIAMIN-39/candlesticks?start_ts=1791056100&end_ts=1791142500&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:30.713Z",
+      "sha256": "26ac473f72f8c439f6f0ff74b69a267eeda2d675af162eaa719d1fad802d7ede",
+      "bytes": 10841,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04KCLV&limit=1000",
+      "capturedAt": "2026-10-13T19:11:31.013Z",
+      "sha256": "d0554d0ab3a03fc6cfc7a95573b3ea39fc404572acb72cc9ca1591e04307ea96",
+      "bytes": 35861,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04MIAMIN-39&limit=1000&min_ts=1791056100&max_ts=1791142500",
+      "capturedAt": "2026-10-13T19:11:31.327Z",
+      "sha256": "da11b4b0f78db6dc03340623eb02c871909789842c456e4b5c50cf1b0288a717",
+      "bytes": 183682,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-mia-min-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:31.446Z",
+      "sha256": "6b353441bcd482613c4b315676eb13363a60973fee260e01de537814b1dfd201",
+      "bytes": 988407,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=90771109429318414047876102477305088859323335652986967611308729579270071050820&start=1791056100&end=1791142500&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:31.497Z",
+      "sha256": "6a466008ad6f87154d8bae941333795acacd3c813e68f0679db06232bbf45915",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x3755353cb459cc4ddf9ec96ea2a6073b1d87561730f52f1d11a51aeff21e1933&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:31.533Z",
+      "sha256": "35e05a270e9954424c07ca904d88d0c7cc2dd533e60ada2b087dd4ea92446a66",
+      "bytes": 124449,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04KCLV-48/candlesticks?start_ts=1791057300&end_ts=1791143700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:31.618Z",
+      "sha256": "ae39616364e79c2c5118626f30c20a8f95384caf7fdcf07c22138c71d8624ac5",
+      "bytes": 10965,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04LACSEA&limit=1000",
+      "capturedAt": "2026-10-13T19:11:31.914Z",
+      "sha256": "4afe5fb2d6d372e88b6dcc7cab9e69ec0d5ff6d9a817446dc54c29ca7e800376",
+      "bytes": 36075,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04KCLV-48&limit=1000&min_ts=1791057300&max_ts=1791143700",
+      "capturedAt": "2026-10-13T19:11:32.262Z",
+      "sha256": "6e0a3788f9667d60e35be5688fed2d4bd7f05047cabff5e0235b9560667a6ac3",
+      "bytes": 283350,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-kc-lv-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:32.311Z",
+      "sha256": "49de499d78cac63c193e0a697cc88ea6e0c7e012d1fd7cb7ef364b4b9e47f902",
+      "bytes": 989176,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04LACSEA-43/candlesticks?start_ts=1791057300&end_ts=1791143700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:32.518Z",
+      "sha256": "efc6af0da4efc32e19f1df703ed486689e3452dcd53ca5809403fd51ae459106",
+      "bytes": 10804,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04DENSF&limit=1000",
+      "capturedAt": "2026-10-13T19:11:32.820Z",
+      "sha256": "f98b6554ee7819b8483ed46b024be28e24d0fe81dafaace75b633b322b78bb84",
+      "bytes": 43409,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04LACSEA-43&limit=1000&min_ts=1791057300&max_ts=1791143700",
+      "capturedAt": "2026-10-13T19:11:33.132Z",
+      "sha256": "e606e25a7246e4af880e0ab1c662a0b08b282e6f7e7575b0fd329d12dacaf039",
+      "bytes": 94840,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lac-sea-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:33.176Z",
+      "sha256": "edf8657ee016f51581bf01128c5affebd551463b1dcd11a13631747fe8cc7827",
+      "bytes": 1039407,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=114544982839890442270386452115488622933350015651444159925268293161891182937866&start=1791057300&end=1791143700&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:33.205Z",
+      "sha256": "d479a1af90792082adf1adbfef7a6e9b1737f7fe9499e08ef711b97bfacc0777",
+      "bytes": 18574,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xcfdb6b2db0309cc41449ec5a8ccde1f62884f2c0afca70c4292aa16492e33fea&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:33.249Z",
+      "sha256": "75be807aa259c0e54ea0fce51b4ba63b65d99f47e8238a5f88f73340ee930b99",
+      "bytes": 110662,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04DENSF-49/candlesticks?start_ts=1791057300&end_ts=1791143700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:33.422Z",
+      "sha256": "29c9087e1865a18b393cce60d93e8c2cd2ba7faef207e500a303774ec176eea3",
+      "bytes": 10953,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT04DETCAR&limit=1000",
+      "capturedAt": "2026-10-13T19:11:33.719Z",
+      "sha256": "29c44f143de7e711878b696a654104ec81a3961abbdeb9e28631785e2b7d8698",
+      "bytes": 39796,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04DENSF-49&limit=1000&min_ts=1791057300&max_ts=1791143700",
+      "capturedAt": "2026-10-13T19:11:34.030Z",
+      "sha256": "8853d52ae48898e16c33c2318a31940c7907fc741bd041a818086ad122daed9f",
+      "bytes": 141179,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-den-sf-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:34.074Z",
+      "sha256": "4ce6d2ba868fbbb2c984f4dcc6cc27d6bfcece925bb5f731780f57bf68241f21",
+      "bytes": 1033397,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=61490878016305378056531851374930637056739126164149094627793779026486034582592&start=1791057300&end=1791143700&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:34.106Z",
+      "sha256": "d49ef2269c65ee3b338e79b02de703d378da22b0bdb1dcbac43e68a759df44ba",
+      "bytes": 18577,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x7508ee030896063a226a76ef6dbc44378e5b04a3a31babb565461d200f7342ab&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:34.143Z",
+      "sha256": "77fdbccba1be21ad1c27b60a0890c600ec9301f0732ae78495ab1c1539e563da",
+      "bytes": 127526,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT04DETCAR-53/candlesticks?start_ts=1791071400&end_ts=1791157800&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:34.323Z",
+      "sha256": "2c0ea45f335d4cb64bf57da12a8cf2405290ee118fd0a074066a8789e3b67bf8",
+      "bytes": 9729,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT05ATLNO&limit=1000",
+      "capturedAt": "2026-10-13T19:11:34.625Z",
+      "sha256": "d149b42f076edcc93f2617605062472284590d23140ab353bcaaa8442fae4a80",
+      "bytes": 39718,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04DETCAR-53&limit=1000&min_ts=1791071400&max_ts=1791157800",
+      "capturedAt": "2026-10-13T19:11:34.944Z",
+      "sha256": "8aafc79ff343e65868b4b1d6b43c0b6e262459d1258503de91d761c9abc32473",
+      "bytes": 304627,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT05ATLNO-48/candlesticks?start_ts=1791157500&end_ts=1791243900&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:35.250Z",
+      "sha256": "d340091363288883dab7ec0189c69efe7cbc406a3a773ad12d29bdaf248570ee",
+      "bytes": 10997,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT04DETCAR-53&limit=1000&min_ts=1791071400&max_ts=1791157800&cursor=EhIKEAclKzSkeazeOntlXr2M_1saDAiKkovWBhC44KmDAQ",
+      "capturedAt": "2026-10-13T19:11:35.541Z",
+      "sha256": "0cbe1d275a94c47a33c6a62228d544da147e032f4286faff4983db05f5881c4c",
+      "bytes": 19227,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-det-car-2026-10-04",
+      "capturedAt": "2026-10-13T19:11:35.592Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900",
+      "capturedAt": "2026-10-13T19:11:35.863Z",
+      "sha256": "7ed8720bce801d3d44f0720911fad5b238b5baac19e586d55851168686b612dd",
+      "bytes": 303537,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT08TBDAL&limit=1000",
+      "capturedAt": "2026-10-13T19:11:36.144Z",
+      "sha256": "3170897a9528fbf38f3eeb38a19b20c2fe591071a0a35928d958a4e4864f00ee",
+      "bytes": 36082,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900&cursor=EhIKEAclN3jECYy9KeIpUoGn2bQaDAiz3ZDWBhCI1O2nAQ",
+      "capturedAt": "2026-10-13T19:11:36.473Z",
+      "sha256": "6097e4558459e7105fe079fcc003161c05659f283b1ec0ecfb54d87642a66cb1",
+      "bytes": 303459,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT08TBDAL-50/candlesticks?start_ts=1791416700&end_ts=1791503100&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:36.751Z",
+      "sha256": "c07d7af4131f064262083736d7d0c9feaf16cd167b6321320c597731635055d6",
+      "bytes": 10448,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900&cursor=EhIKEAclOS-dcbZ1NDAoKSf6MyAaDAiLxZDWBhCwjtPYAg",
+      "capturedAt": "2026-10-13T19:11:37.076Z",
+      "sha256": "b60355f4c9e691449ae69a420eeb9a9e89d8308510fc6a3d82907cf31099ae6e",
+      "bytes": 303311,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT08TBDAL-50&limit=1000&min_ts=1791416700&max_ts=1791503100",
+      "capturedAt": "2026-10-13T19:11:37.437Z",
+      "sha256": "557676dd417875065d3dd207720c85b3b2b55d674db416bfbe1d984df019a467",
+      "bytes": 272577,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-tb-dal-2026-10-08",
+      "capturedAt": "2026-10-13T19:11:37.479Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900&cursor=EhIKEAclO-lcyYECqGAuUs8ZZRwaDAjyl5DWBhCA1tLgAg",
+      "capturedAt": "2026-10-13T19:11:37.675Z",
+      "sha256": "634f9f488062d77199381c86e4ea3976f07c3333cca3d613c7a19372be8bba51",
+      "bytes": 303273,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11PHIJAX&limit=1000",
+      "capturedAt": "2026-10-13T19:11:37.986Z",
+      "sha256": "50699ea1db13415ea46ec367dcfa58decd9660083271c5dc061561f38337fbac",
+      "bytes": 27,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-phi-jax-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:38.054Z",
+      "sha256": "541fe02f3a590772310f7de3a139e1ed6a8346af0475f5834a1593bab12ab693",
+      "bytes": 986436,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900&cursor=EhIKEAclMmt8mbNaPgC-to7YrdcaDAjEyI_WBhCA0o6IAg",
+      "capturedAt": "2026-10-13T19:11:38.310Z",
+      "sha256": "43468da3f1fd24c76a74de0794088629548f101c5b354a2078991fc7694e5e2b",
+      "bytes": 303328,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11CHIGB&limit=1000",
+      "capturedAt": "2026-10-13T19:11:38.585Z",
+      "sha256": "6e5b4168ea9f800a17653633f92ae3afad16601a4cffd30b52f9c2f93a8af4d3",
+      "bytes": 35867,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT05ATLNO-48&limit=1000&min_ts=1791157500&max_ts=1791243900&cursor=EhIKEAclPT7_GZmUhaCXEIgZ1XAaDAjKzY7WBhCAyO_HAw",
+      "capturedAt": "2026-10-13T19:11:38.874Z",
+      "sha256": "c0d30863fe1df1abc5af1f35c8ddbaa11315c60986b0cc3528d77fdf31e57b70",
+      "bytes": 276309,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-atl-no-2026-10-05",
+      "capturedAt": "2026-10-13T19:11:38.910Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11CHIGB-47/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:39.166Z",
+      "sha256": "adc68ba5523a3113fae3b0a9e780a103ffc441942e05e47dc012d4e69b191a54",
+      "bytes": 10836,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11CINMIA&limit=1000",
+      "capturedAt": "2026-10-13T19:11:39.468Z",
+      "sha256": "76925428026b7f54f8576bc5ca7ca441368e22e2a7b43d56b7912a374f3c95c6",
+      "bytes": 36082,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11CHIGB-47&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:39.814Z",
+      "sha256": "9b905f7294afd30a7dbe00ebac7f2b6ad4cede2b4f4977b658a0e65f5a78f2db",
+      "bytes": 182476,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-chi-gb-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:39.880Z",
+      "sha256": "e58fef0c0badb8051c0c3d2db236f191be50147f9e6668bba40401d8a76faff5",
+      "bytes": 983697,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=38515215844862500206714421895308523699803333445754682323047243315611640037969&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:40.062Z",
+      "sha256": "3a05425042210777b9079b4e1d54580a17a4e7e71a4cf51e22aca1448875ed69",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11CINMIA-45/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:40.114Z",
+      "sha256": "181530aeeed44c416948821f87f9e24f33b038da0472d5bf0b62da888efbca72",
+      "bytes": 10451,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xb9670c0f9acaad197eb9da0cfbf0b8d1e7f4e223ea02b7eaaba590ef60144020&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:40.154Z",
+      "sha256": "78acf8f2b9b0e40d56ee741991c59e79115e46a73e623e6f733652d7dd0aaddc",
+      "bytes": 258518,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11CINMIA-45&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:40.476Z",
+      "sha256": "ab10d5d0b1c3a0cee6f6a81fa16b5e4d2f8426bb30765170db52c1b5efa97719",
+      "bytes": 82990,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cin-mia-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:40.544Z",
+      "sha256": "a6e44c4b6728fab158f6465c9c03a86b331f7b33b8e48b8a684abe677802eb76",
+      "bytes": 988910,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=66062891085494712346926154433908954179806089181719044402935408315312738764190&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:40.587Z",
+      "sha256": "4e36eb756ccd345585c3395c4fcec48155a48a9e4367c34ad65410d7d1783aa1",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x58ad3a8ec0a07a5de445220bfbd820cc65db734434c1515c76fd17f19b9f5e30&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:40.628Z",
+      "sha256": "4cf6ebdffb7c954f08f6ef545ec2f726c7a00beb6100d9e227d33d18fb96a73c",
+      "bytes": 48035,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11LVNE&limit=1000",
+      "capturedAt": "2026-10-13T19:11:40.768Z",
+      "sha256": "d50d7628fe062907545bfe991a167381a023b260d92a569394c17f8c1d1a56b7",
+      "bytes": 43461,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11MINNO&limit=1000",
+      "capturedAt": "2026-10-13T19:11:41.059Z",
+      "sha256": "09c3ddc1510cd66fc406bfab6c3d2033cde4e96bac23cc5800c9a63b243b0f18",
+      "bytes": 35999,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11LVNE-46/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:41.363Z",
+      "sha256": "f6e68d1fcd0fdedeefc787d375a9c48cc48a223ac38358ef0c904a4c330ffe12",
+      "bytes": 10953,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11MINNO-42/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:41.668Z",
+      "sha256": "3e8665f9e1d926ec8b20ac2d570377ed5d55cf0e9e931a61d3fd0e55b72335bf",
+      "bytes": 10836,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11LVNE-46&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:41.965Z",
+      "sha256": "d68d4b41d4c9c6875be1ed9afb03447cb1f2a7069b35bd43b312dbf350c13dc1",
+      "bytes": 144719,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-lv-ne-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:41.995Z",
+      "sha256": "566fe85781cdde3b7978f62fe27f3951e8de78811f167ce5a566d55b14278bc5",
+      "bytes": 1045531,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11MINNO-42&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:42.274Z",
+      "sha256": "9412fd9d3e31a28a424148224ba6a84af8db383a4e6df588f6ee8aa6697a88df",
+      "bytes": 181769,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=53877825117790103878626383972734238626154551104138172172221016708650821668357&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:42.296Z",
+      "sha256": "283115091406ea139057e541c04fdcb612934f1f5fc7ddb8e1c00e794a1a7d8f",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-min-no-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:42.315Z",
+      "sha256": "f67b2469e97f6973e4093b276d92dd3a757f20c2bdf8d8e6d5f4b307bf92f1ce",
+      "bytes": 1045598,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=49726344730304664951754054987345199132773736568844093985199587494620402958283&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:42.384Z",
+      "sha256": "8ac380f0544323c54ab5724b30cdbb0e33f338b04572e9b0cb64ba6572dd281b",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xfc9cf4bdb3990773d31cec00e7ac0bd99dffded98015c2785fdc3d43b53d57f8&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:42.419Z",
+      "sha256": "59729151b561773c963c6d25aaa5be5aad77352391cc579a915bdb7cb59d5ed5",
+      "bytes": 199964,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xef426ab8b9754c0e264b7b3107d0445f3b6753987f908339439c76916e9abe81&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:42.425Z",
+      "sha256": "77f898829b5b5094b3171a0e2a29c01287ddc99d409f270f2b1a468d6e8c93ca",
+      "bytes": 100847,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11CLENYJ&limit=1000",
+      "capturedAt": "2026-10-13T19:11:42.754Z",
+      "sha256": "e0a61c4008474d8e1c31d42ec0aa7bf63308ff3cdb7a86a7a70bea1125a854b5",
+      "bytes": 39633,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11INDPIT&limit=1000",
+      "capturedAt": "2026-10-13T19:11:43.059Z",
+      "sha256": "93ec3d64621ce02a2566e8c1105b0990f3af2e02b0a3d4bf4fe9c4e43a54f4cc",
+      "bytes": 39796,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11CLENYJ-39/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:43.366Z",
+      "sha256": "cb1266ff34501a18bc19562e9e091d8353808c692f32573d1bc68140331de536",
+      "bytes": 8955,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11INDPIT-42/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:43.660Z",
+      "sha256": "ed0d28250fd5c588fbb50b19ab43d7db6292955213e3d8fb1b3f6bdd68a1ba88",
+      "bytes": 9099,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11CLENYJ-39&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:43.964Z",
+      "sha256": "6b8b475cd04ee5148e8b2187ac7e8beda5ef484608ea513f4e3be011a19b0574",
+      "bytes": 68312,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-cle-nyj-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:43.996Z",
+      "sha256": "8e164f2f110a28ea4be5262ff0f18301f19ce7165a2bbc4c8a859ee03b50ea7a",
+      "bytes": 990592,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=87448183946060536289471579455973017861805019942741413389081351378289809607886&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:44.027Z",
+      "sha256": "ce017f77e8c51298c2521d7ce1f2bc657281905c83b5feb4484649972c5085d5",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x063cf8ee5ac067cec8f8a5c7bddcdfc78c27e8e44e84bee1e27c359c5c6abb85&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:44.079Z",
+      "sha256": "a126a8bea0179de5ae2aa83ebe3ff96b966754b140c4d5e9775fd4b40b3914ed",
+      "bytes": 113582,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11INDPIT-42&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:44.270Z",
+      "sha256": "9d71a0c0d0e3351326a7465a1bd71e26917dc2b4161f42b20cdafab2ff068a78",
+      "bytes": 60863,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-ind-pit-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:44.300Z",
+      "sha256": "eb074d8cd5bbf5ecc4ebe7cef1f36d70dcd8f611d75943c2ce93013abb4d0fd2",
+      "bytes": 985984,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11HOUTEN&limit=1000",
+      "capturedAt": "2026-10-13T19:11:44.562Z",
+      "sha256": "a8d46bf7bc8a563668927d908a2eaaa6b15e4ce3633c2f04617d3bac3a6341c8",
+      "bytes": 35963,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11NYGWAS&limit=1000",
+      "capturedAt": "2026-10-13T19:11:44.865Z",
+      "sha256": "a789fd40a2b5ee395e83e062da9202db5ec701e4e74952e8e16462b676943919",
+      "bytes": 37982,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11HOUTEN-38/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:45.169Z",
+      "sha256": "6430ca0f8df55b267590d042cb15ad707ec4c33ba989d87368996cae3c845d33",
+      "bytes": 10353,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11NYGWAS-42/candlesticks?start_ts=1791649800&end_ts=1791736200&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:45.465Z",
+      "sha256": "aa6424754068b4da2adcb89ef77f1aecfdb2230af7153df688feecd188e6c115",
+      "bytes": 10958,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11HOUTEN-38&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:45.780Z",
+      "sha256": "48520526322949915c873fb7252adc283589a8e41d8f48894be2c8c296bd098f",
+      "bytes": 109201,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-hou-ten-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:45.827Z",
+      "sha256": "4ad2ee0ec701ee693b5c4d031c14264878f1116b3af4aeac8db70fcf21c86573",
+      "bytes": 981458,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11NYGWAS-42&limit=1000&min_ts=1791649800&max_ts=1791736200",
+      "capturedAt": "2026-10-13T19:11:46.078Z",
+      "sha256": "5582f81e8c4b3e6b6e68eedaa33740303f07c454e49e7fa0391c9eb053effc45",
+      "bytes": 167337,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-nyg-was-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:46.137Z",
+      "sha256": "ce06d59b8b9179d8ff5c36e4e9b21b7ffb10d1d3761eb9d1a23d8f0f77f917ce",
+      "bytes": 1050274,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=17567525181149790776506257609193742580181725919395008359931768263883245484152&start=1791649800&end=1791736200&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:46.183Z",
+      "sha256": "3564ac7235a267eceda404cc30cfa92ec1a1590456bb1dc04a1513857ad1c185",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xa92644a6e5364179978a1f2961d93724863e25e09e06885224d2cbea1f6ff14a&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:46.219Z",
+      "sha256": "7066d57756b1f3339c223a9bd379eb5a2653cd33b800cb2dab1ab310407498b3",
+      "bytes": 134431,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11DENLAC&limit=1000",
+      "capturedAt": "2026-10-13T19:11:46.369Z",
+      "sha256": "be09dd3ddda66d84fcd7fa9585a2d01c20aac2536f0eff298e1b4494d56f94a7",
+      "bytes": 36048,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11DETARI&limit=1000",
+      "capturedAt": "2026-10-13T19:11:46.672Z",
+      "sha256": "28014b2dee3f968ceef35070ff1a4328bf2f9d31826a0703c84b180c1bd4d2af",
+      "bytes": 36067,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11DENLAC-43/candlesticks?start_ts=1791660900&end_ts=1791747300&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:46.972Z",
+      "sha256": "27f8162ab9ed8edbde546b201e8de8ceda0461bf4e74acd57378282f6e00b730",
+      "bytes": 10203,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11DETARI-56/candlesticks?start_ts=1791662100&end_ts=1791748500&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:47.277Z",
+      "sha256": "298c7fc492288bb73d8c0f7f6ef4468cfffc2bdb4eb9da95d555d6d8403f1b0f",
+      "bytes": 9202,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11DENLAC-43&limit=1000&min_ts=1791660900&max_ts=1791747300",
+      "capturedAt": "2026-10-13T19:11:47.578Z",
+      "sha256": "86dfc6c6e06d4cbc7afb67770a11c246fba1fcf49b19ff9a6e78fac4252ac2f7",
+      "bytes": 101465,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-den-lac-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:47.611Z",
+      "sha256": "2daae13768e8541158dc70bc3022eab3ee4920d23ba3d95c81b58edae00f4cb9",
+      "bytes": 985389,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=67652154059036099639279966213728204539352956454727553963679324547773603933452&start=1791660900&end=1791747300&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:47.638Z",
+      "sha256": "9ccdd41ab95fa5033fd79ecd5914b7fa0c3da7b9e5993c5af99b26c9ca4c9996",
+      "bytes": 18639,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0x5efadb9f269d2e946f8e18874ae86d4b7e066869cfc5a428e24043347c3cadd0&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:47.669Z",
+      "sha256": "49d06d2fbd5d67c6177f7e8a534135faa444ca8abce5b73e6ae8c587947126be",
+      "bytes": 119479,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11DETARI-56&limit=1000&min_ts=1791662100&max_ts=1791748500",
+      "capturedAt": "2026-10-13T19:11:47.879Z",
+      "sha256": "159f841ea9b75bdc4f0f5e4ea4eb4773cce6d65bc597c00d2cf23f283a784a4c",
+      "bytes": 16150,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-det-ari-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:47.918Z",
+      "sha256": "11cbe34e19d9f5ed9e2030cd3ae8003c460ee01e1e5dfeba1d5bc919e12ee645",
+      "bytes": 990014,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11SFSEA&limit=1000",
+      "capturedAt": "2026-10-13T19:11:48.177Z",
+      "sha256": "69a5ee62359eb9e20dcf25283966f89dbbbeaa918be78f1a75f9307bd5cda6c2",
+      "bytes": 39726,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT11BALATL&limit=1000",
+      "capturedAt": "2026-10-13T19:11:48.484Z",
+      "sha256": "11eb0d58d18f6f68921cd2129f9c3a254f2cb5929527e1d9dc0cf43f2419aff3",
+      "bytes": 36032,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11SFSEA-47/candlesticks?start_ts=1791662100&end_ts=1791748500&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:48.781Z",
+      "sha256": "2513a20d6724fda4953057e1b88487b7ac5a45dec0915b82381f4b195e44dd39",
+      "bytes": 10992,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT11BALATL-45/candlesticks?start_ts=1791676200&end_ts=1791762600&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:49.084Z",
+      "sha256": "ec590166662bc2c5437aa5d6e1f7dc22434c68bd21accd23b951669dec48b2f5",
+      "bytes": 9608,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11SFSEA-47&limit=1000&min_ts=1791662100&max_ts=1791748500",
+      "capturedAt": "2026-10-13T19:11:49.402Z",
+      "sha256": "a5e7f7fb4abd01eea9309a034405022ae9e6cf0808a74616cd5f7d454b46fd4f",
+      "bytes": 277543,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-sf-sea-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:49.447Z",
+      "sha256": "89a1d5a7d373e767e438f79e3fa0d239193c4b967a77ed80ba4d05f3c0319250",
+      "bytes": 1046630,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/prices-history?token_id=85800080481868364304526122443374004162258069369667588466645082882763864925395&start=1791662100&end=1791748500&bucket_seconds=300&limit=1000",
+      "capturedAt": "2026-10-13T19:11:49.479Z",
+      "sha256": "81d2642dca10564098c96a0db6e95d53e4c3c26ba1ba398bd94dfcfadd8d0518",
+      "bytes": 18627,
+      "status": 200
+    },
+    {
+      "url": "https://data-api.polymarket.com/v2/trades?condition=0xfeabc0b6861d93f5ecdda3a80bcd8b19bdc7315a4c0ae8ad368a5e2970805811&limit=1000&taker_only=true",
+      "capturedAt": "2026-10-13T19:11:49.510Z",
+      "sha256": "71046d8ff02b0c664cb29597ab2904bdae1808619dbd62f5eb45f1d85765f561",
+      "bytes": 97826,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT11BALATL-45&limit=1000&min_ts=1791676200&max_ts=1791762600",
+      "capturedAt": "2026-10-13T19:11:49.693Z",
+      "sha256": "d29584ca58539774d828ae5e13658801ece570a978b0db98d6fbd8f8bdf964f7",
+      "bytes": 92850,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-bal-atl-2026-10-11",
+      "capturedAt": "2026-10-13T19:11:49.722Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?event_ticker=KXNFLTOTAL-26OCT12BUFLAR&limit=1000",
+      "capturedAt": "2026-10-13T19:11:49.987Z",
+      "sha256": "7ad2541cd49e78a40277e7fe3bc914743b21f4e86e78974da9836edc693eb5b8",
+      "bytes": 39725,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/KXNFLTOTAL/markets/KXNFLTOTAL-26OCT12BUFLAR-56/candlesticks?start_ts=1791762300&end_ts=1791848700&period_interval=60",
+      "capturedAt": "2026-10-13T19:11:50.323Z",
+      "sha256": "b940999a55682f86f7b76c71abfd5533d1a1fa3310c649cf0740e996e3c41123",
+      "bytes": 10585,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT12BUFLAR-56&limit=1000&min_ts=1791762300&max_ts=1791848700",
+      "capturedAt": "2026-10-13T19:11:50.673Z",
+      "sha256": "68de15730031bc8b03b5f7872927e0478eb5389675a34275a00746e0d9614bf4",
+      "bytes": 304209,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT12BUFLAR-56&limit=1000&min_ts=1791762300&max_ts=1791848700&cursor=EhIKEAcl-0tCoaNr9CS71h_Ue2QaCwjFzrXWBhDAvJNp",
+      "capturedAt": "2026-10-13T19:11:51.024Z",
+      "sha256": "4ecf213460fe0555700a2d158034179a33bd04abd54fdc2e96e0222a8dfbec34",
+      "bytes": 304092,
+      "status": 200
+    },
+    {
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/trades?ticker=KXNFLTOTAL-26OCT12BUFLAR-56&limit=1000&min_ts=1791762300&max_ts=1791848700&cursor=EhIKEAcl921_uayfo6YchYlClVwaDAiJ_bTWBhCYs4T9Ag",
+      "capturedAt": "2026-10-13T19:11:51.367Z",
+      "sha256": "3a795584a3bc6ef4c9878ec8f304f221bbcb58be65da02cdfef64f9010d981c8",
+      "bytes": 111753,
+      "status": 200
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/events?slug=nfl-buf-lar-2026-10-12",
+      "capturedAt": "2026-10-13T19:11:51.394Z",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3,
+      "status": 200
+    }
+  ]
+}

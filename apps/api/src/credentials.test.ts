@@ -2,8 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   CredentialStoreUnavailableError,
   createCredentialManager,
+  createRuntimeCredentialManager,
   type CredentialBackend,
 } from './credentials.js';
+import { resolve } from 'node:path';
 
 function fakeBackend(): CredentialBackend {
   const entries = new Map<string, string>();
@@ -17,6 +19,61 @@ function fakeBackend(): CredentialBackend {
 }
 
 describe('OS credential manager contract', () => {
+  it('never touches the native vault in a valid verification profile and discards credentials on restart', async () => {
+    const backend = fakeBackend();
+    const root = resolve('private-verification-fixture');
+    const first = createRuntimeCredentialManager(backend, root);
+    await expect(first.listCredentialProviders()).resolves.toEqual(
+      expect.arrayContaining([{ provider: 'backup-encryption', configured: false }]),
+    );
+    await first.saveCredential('backup-encryption', 'fictional-test-passphrase');
+    await expect(first.readCredential('backup-encryption')).resolves.toBe(
+      'fictional-test-passphrase',
+    );
+    await expect(first.listCredentialProviders()).resolves.toEqual(
+      expect.arrayContaining([{ provider: 'backup-encryption', configured: true }]),
+    );
+    const restarted = createRuntimeCredentialManager(undefined, root);
+    await expect(restarted.readCredential('backup-encryption')).resolves.toBeNull();
+    const other = createRuntimeCredentialManager(undefined, resolve('other-verification-fixture'));
+    await expect(other.readCredential('backup-encryption')).resolves.toBeNull();
+    await first.removeCredential('backup-encryption');
+    await expect(first.readCredential('backup-encryption')).resolves.toBeNull();
+    expect(backend.getPassword).not.toHaveBeenCalled();
+    expect(backend.setPassword).not.toHaveBeenCalled();
+    expect(backend.deletePassword).not.toHaveBeenCalled();
+  });
+
+  it('retains the normal OS namespace and fails closed for invalid test isolation or unavailable native storage', async () => {
+    const backend = fakeBackend();
+    const normal = createRuntimeCredentialManager(backend);
+    await normal.saveCredential('openai', 'fictional-normal-secret');
+    expect(backend.setPassword).toHaveBeenCalledWith(
+      'SundaySidekick',
+      'openai',
+      'fictional-normal-secret',
+    );
+    expect(() => createRuntimeCredentialManager(backend, '')).toThrow('absolute private profile');
+    expect(() => createRuntimeCredentialManager(backend, 'relative')).toThrow(
+      'absolute private profile',
+    );
+    expect(() =>
+      createRuntimeCredentialManager(backend, resolve('test-profile'), resolve('outside')),
+    ).toThrow('private profile');
+    expect(() => createRuntimeCredentialManager(undefined)).toThrow(
+      CredentialStoreUnavailableError,
+    );
+  });
+  it('preserves backup passphrase whitespace and enforces its recovery bounds', async () => {
+    const credentials = createCredentialManager(fakeBackend());
+    await credentials.saveCredential('backup-encryption', ' padded-backup-passphrase ');
+    expect(await credentials.readCredential('backup-encryption')).toBe(
+      ' padded-backup-passphrase ',
+    );
+    await expect(credentials.saveCredential('backup-encryption', 'short')).rejects.toThrow(
+      '12 and 200',
+    );
+  });
   it('trims and stores only allowlisted providers in the configured service namespace', async () => {
     const backend = fakeBackend();
     const credentials = createCredentialManager(backend, 'test-sidekick');

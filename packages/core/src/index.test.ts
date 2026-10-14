@@ -366,6 +366,28 @@ describe('league analysis', () => {
     ];
 
     const guidance = reportEvidenceGuidance(preseason, 'power-rankings', projections);
+    for (const period of [
+      { season: 2026, fromWeek: 5, throughWeek: 18 },
+      { season: 2025, fromWeek: 1, throughWeek: 18 },
+    ]) {
+      expect(
+        reportEvidenceGuidance(
+          { ...preseason, season: 2026 },
+          'power-rankings',
+          projections.map((row) => ({ ...row, period })),
+        ),
+      ).toContain('complete owner-confirmed roster projections are unavailable');
+    }
+    expect(
+      reportEvidenceGuidance(
+        { ...preseason, season: 2026 },
+        'power-rankings',
+        projections.map((row) => ({
+          ...row,
+          period: { season: 2026, fromWeek: 1, throughWeek: 18 },
+        })),
+      ),
+    ).toContain('clearly labeled AI preseason power ranking');
     expect(guidance).toContain('clearly labeled AI preseason power ranking');
     expect(guidance.indexOf('"Higher projection"')).toBeLessThan(
       guidance.indexOf('"Lower projection"'),
@@ -630,6 +652,18 @@ describe('league analysis', () => {
     ];
 
     const guidance = reportEvidenceGuidance(connected, 'matchup-preview', projections);
+    const weekly = projections.filter((row) => row.week !== undefined);
+    const withPeriod = (season: number) =>
+      weekly.map((row) => ({
+        ...row,
+        period: { season, fromWeek: row.week!, throughWeek: row.week! },
+      }));
+    expect(
+      reportEvidenceGuidance({ ...connected, season: 2026 }, 'matchup-preview', withPeriod(2026)),
+    ).toContain('week 4: "Alpha" 30.5 vs "Beta" 15.0');
+    expect(
+      reportEvidenceGuidance({ ...connected, season: 2026 }, 'matchup-preview', withPeriod(2025)),
+    ).toContain('No owner-imported week-specific projections');
     expect(guidance).toContain('week 4: "Alpha" 30.5 vs "Beta" 15.0');
     expect(guidance).toContain("model-independent sums of the owner's imported estimates");
     expect(guidance).toContain('Starter assignments came from the platform snapshot last synced');
@@ -648,7 +682,7 @@ describe('league analysis', () => {
       ],
     };
     expect(reportEvidenceGuidance(partialLineup, 'matchup-preview', projections)).toContain(
-      'no matchup has a complete starter-ID and projection match',
+      'no matchup has a complete starter-ID, projection and eligible-availability match',
     );
 
     const incomplete = {
@@ -656,7 +690,7 @@ describe('league analysis', () => {
       matchups: [{ week: 5, teams: connected.matchups![0]!.teams }],
     };
     expect(reportEvidenceGuidance(incomplete, 'matchup-preview', projections)).toContain(
-      'no matchup has a complete starter-ID and projection match',
+      'no matchup has a complete starter-ID, projection and eligible-availability match',
     );
   });
 
@@ -740,7 +774,7 @@ describe('league analysis', () => {
       projections,
     );
     expect(incompleteGuidance).toContain(
-      'no matchup has a complete starter-ID and projection match',
+      'no matchup has a complete starter-ID, projection and eligible-availability match',
     );
 
     const truncatedRoster: LeagueConnection = {
@@ -748,7 +782,7 @@ describe('league analysis', () => {
       teams: connected.teams.map((team) => (team.id === '1' ? { ...team, rosterSize: 3 } : team)),
     };
     expect(reportEvidenceGuidance(truncatedRoster, 'matchup-preview', projections)).toContain(
-      'no matchup has a complete starter-ID and projection match',
+      'no matchup has a complete starter-ID, projection and eligible-availability match',
     );
   });
 
@@ -836,6 +870,18 @@ describe('league analysis', () => {
     ];
 
     const guidance = reportEvidenceGuidance(draftLeague, 'draft-review', projections);
+    for (const period of [
+      { season: 2026, fromWeek: 5, throughWeek: 18 },
+      { season: 2025, fromWeek: 1, throughWeek: 18 },
+    ]) {
+      const limited = reportEvidenceGuidance(
+        { ...draftLeague, season: 2026 },
+        'draft-review',
+        projections.map((row) => ({ ...row, period })),
+      );
+      expect(limited).toContain('No matching full-season projections');
+      expect(limited).not.toContain('+80.0 projected points');
+    }
     expect(guidance).toContain('Owner-imported season projections');
     expect(guidance).toContain('Player One');
     expect(guidance).toContain('+80.0 projected points versus WR replacement (140.0)');

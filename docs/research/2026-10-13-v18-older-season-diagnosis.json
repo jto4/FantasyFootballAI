@@ -1,0 +1,3861 @@
+{
+  "generatedAt": "2026-10-13T22:44:12.091Z",
+  "parentPrimary": "feedback-2-0.5-reset",
+  "seasons": [
+    {
+      "season": 2023,
+      "n": 270,
+      "excessBrier": 0.00013242663872713146,
+      "rawExcessBrier": 0.0003118642194001253,
+      "alignmentGain": -0.00010986451374201341,
+      "varianceCost": 0.000022562124985115843,
+      "meanWeight": 0.12184524100408167,
+      "over": 148,
+      "under": 121,
+      "changed": 102
+    },
+    {
+      "season": 2024,
+      "n": 269,
+      "excessBrier": 0.00011317417469355182,
+      "rawExcessBrier": 0.00015567742451801612,
+      "alignmentGain": -0.00008242701193906161,
+      "varianceCost": 0.00003074716275448912,
+      "meanWeight": 0.13131600429612406,
+      "over": 224,
+      "under": 42,
+      "changed": 88
+    }
+  ],
+  "weekly": [
+    {
+      "season": 2023,
+      "week": 1,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0016276574584848623,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 10,
+      "under": 5,
+      "changed": 0,
+      "priorWeeks": [],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 10,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0020180528632260082,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 10,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 5,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0011723981406995432,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 5,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 2,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.003444094263963006,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 2,
+      "under": 14,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.009135681513237051,
+          "quadratic": 0.00014347899502198015,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [{ "week": 1, "linear": 0, "quadratic": 0, "weight": 0 }],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 2,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0023056049144158514,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 2,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 14,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.004265479860874271,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 14,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 3,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0018262159073370553,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 12,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.006459902348770499,
+          "quadratic": 0.00010145497033787305,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.019160834525080647,
+          "quadratic": 0.0006438094953417136,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.01916083452508065,
+          "quadratic": 0.0006438094953417135,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.006459902348770502,
+          "quadratic": 0.00010145497033787294,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 12,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0019977170069595657,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 12,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0013117126084695244,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 4,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.0015629494711281236,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 12,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.004567840756618526,
+          "quadratic": 0.00007173949751099007,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.013548756025877849,
+          "quadratic": 0.00045524205994841474,
+          "effectiveGames": 8
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.009960969726342011,
+          "quadratic": 0.0007393349791362127,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.023509725752219858,
+          "quadratic": 0.001194577039084627,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.014528810482960534,
+          "quadratic": 0.0008110744766472023,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.018116596782496372,
+          "quadratic": 0.0005269815574594044,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 12,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0017233847168953338,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 12,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0010816437338264928,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 5,
+      "n": 14,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0002443836770053811,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 7,
+      "under": 7,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.0032299511743852493,
+          "quadratic": 0.000050727485168936524,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.009580417262540324,
+          "quadratic": 0.0003219047476708568,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0070434692406903445,
+          "quadratic": 0.0005227887773156306,
+          "effectiveGames": 8
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.009299824290604757,
+          "quadratic": 0.0009168938662235083,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.007324062212625913,
+          "quadratic": 0.0017615873912099956,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.0009735961244708383,
+          "quadratic": 0.0014904101287080752,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.0035105441463208174,
+          "quadratic": 0.0012895260990633014,
+          "weight": 0
+        },
+        {
+          "week": 4,
+          "linear": -0.01985383767761592,
+          "quadratic": 0.0008954210101554238,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 7,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0046827378929074626,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 7,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 7,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.004193970538896701,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 7,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 6,
+      "n": 14,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.0019787855052425768,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 8,
+      "under": 6,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.002283920378309263,
+          "quadratic": 0.000035869748755495036,
+          "effectiveGames": 2.6516504294495538
+        },
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.006774378012938924,
+          "quadratic": 0.00022762102997420737,
+          "effectiveGames": 4
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0049804848631710055,
+          "quadratic": 0.00036966748956810633,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.006575968819729998,
+          "quadratic": 0.0006483418704349939,
+          "effectiveGames": 8
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.0002803488792685921,
+          "quadratic": 0.001858577214568051,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.005459242935648518,
+          "quadratic": 0.003104207604545358,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.0009687853010188563,
+          "quadratic": 0.0029124563233266457,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.0027626784507867753,
+          "quadratic": 0.002770409863732747,
+          "weight": 0
+        },
+        {
+          "week": 4,
+          "linear": -0.014319132133687778,
+          "quadratic": 0.0024917354828658594,
+          "weight": 0
+        },
+        {
+          "week": 5,
+          "linear": -0.007462814434689189,
+          "quadratic": 0.0012815001387328022,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 8,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.004938940286750293,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 8,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 6,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.011202419894566404,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 6,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 7,
+      "n": 13,
+      "excessBrier": -0.0002849778509371907,
+      "rawExcessBrier": -0.0010033894040670445,
+      "alignmentGain": 0.00030239039664806534,
+      "varianceCost": 0.0000174125457108745,
+      "meanWeight": 0.22384239223197686,
+      "over": 5,
+      "under": 8,
+      "changed": 13,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 15,
+          "linear": -0.0016149755871926246,
+          "quadratic": 0.000025363742584468262,
+          "effectiveGames": 1.875
+        },
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.004790208631270162,
+          "quadratic": 0.0001609523738354284,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0035217346203451723,
+          "quadratic": 0.0002613943886578153,
+          "effectiveGames": 4
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.004649912145302379,
+          "quadratic": 0.00045844693311175415,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.00019823659362886922,
+          "quadratic": 0.0013142125517798741,
+          "effectiveGames": 7
+        },
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.01097970940910492,
+          "quadratic": 0.0023704417284203293,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": 0.007119441709163098,
+          "quadratic": 0.004565447975805202,
+          "weight": 0.2898152606936018
+        },
+        {
+          "week": 2,
+          "linear": 0.010294674753240635,
+          "quadratic": 0.0044298593445542414,
+          "weight": 0.4213972175625916
+        },
+        {
+          "week": 3,
+          "linear": 0.009026200742315645,
+          "quadratic": 0.004329417329731855,
+          "weight": 0.37099946209090434
+        },
+        {
+          "week": 4,
+          "linear": 0.0008545539766680946,
+          "quadratic": 0.004132364785277916,
+          "weight": 0.035411116327456645
+        },
+        {
+          "week": 5,
+          "linear": 0.005702702715599342,
+          "quadratic": 0.003276599166609796,
+          "weight": 0.24499724701106038
+        },
+        {
+          "week": 6,
+          "linear": -0.005475243287134448,
+          "quadratic": 0.0022203699899693407,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 5,
+          "excessBrier": -0.00047221545899283067,
+          "rawExcessBrier": -0.0020271071974547862,
+          "alignmentGain": 0.00047754013455871827,
+          "varianceCost": 0.00000532467556588423,
+          "meanWeight": 0.22384239223197683,
+          "over": 5,
+          "under": 0,
+          "changed": 5
+        },
+        {
+          "direction": "under",
+          "n": 8,
+          "excessBrier": -0.00016795434590241576,
+          "rawExcessBrier": -0.0003635657831997062,
+          "alignmentGain": 0.00019292181045390736,
+          "varianceCost": 0.000024967464551493417,
+          "meanWeight": 0.2238423922319768,
+          "over": 0,
+          "under": 8,
+          "changed": 8
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 8,
+      "n": 16,
+      "excessBrier": -0.0020923984995662795,
+      "rawExcessBrier": -0.004740914505800232,
+      "alignmentGain": 0.0021480070833804817,
+      "varianceCost": 0.00005560858381420381,
+      "meanWeight": 0.4255130785600535,
+      "over": 6,
+      "under": 10,
+      "changed": 16,
+      "priorWeeks": [
+        {
+          "week": 2,
+          "games": 16,
+          "linear": -0.003387189006469462,
+          "quadratic": 0.00011381051498710368,
+          "effectiveGames": 2
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0024902424315855027,
+          "quadratic": 0.00018483374478405317,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.003287984409864999,
+          "quadratic": 0.00032417093521749696,
+          "effectiveGames": 4
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.00014017443963429605,
+          "quadratic": 0.0009292886072840255,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.00776382697863583,
+          "quadratic": 0.0016761554205735752,
+          "effectiveGames": 7
+        },
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.006209033670398848,
+          "quadratic": 0.003194522467572775,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0.140601476929983,
+      "omittedWeeks": [
+        {
+          "week": 2,
+          "linear": 0.01463042818767988,
+          "quadratic": 0.006308971175431924,
+          "weight": 0.5
+        },
+        {
+          "week": 3,
+          "linear": 0.01373348161279592,
+          "quadratic": 0.006237947945634975,
+          "weight": 0.5
+        },
+        {
+          "week": 4,
+          "linear": 0.007955254771345418,
+          "quadratic": 0.0060986107552015315,
+          "weight": 0.3048152580213455
+        },
+        {
+          "week": 5,
+          "linear": 0.011383413620844713,
+          "quadratic": 0.005493493083135003,
+          "weight": 0.4465223178213781
+        },
+        {
+          "week": 6,
+          "linear": 0.0034794122025745867,
+          "quadratic": 0.004746626269845453,
+          "weight": 0.140601476929983
+        },
+        {
+          "week": 7,
+          "linear": 0.005034205510811569,
+          "quadratic": 0.003228259222846253,
+          "weight": 0.21672762743495452
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 6,
+          "excessBrier": -0.0017513277761184026,
+          "rawExcessBrier": -0.004043922857207727,
+          "alignmentGain": 0.0017739821131535249,
+          "varianceCost": 0.000022654337035117263,
+          "meanWeight": 0.4255130785600536,
+          "over": 6,
+          "under": 0,
+          "changed": 6
+        },
+        {
+          "direction": "under",
+          "n": 10,
+          "excessBrier": -0.0022970409336350054,
+          "rawExcessBrier": -0.0051591094949557355,
+          "alignmentGain": 0.0023724220655166562,
+          "varianceCost": 0.00007538113188165573,
+          "meanWeight": 0.4255130785600536,
+          "over": 0,
+          "under": 10,
+          "changed": 10
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 9,
+      "n": 14,
+      "excessBrier": 0.0026159445021468907,
+      "rawExcessBrier": 0.0054159391591726775,
+      "alignmentGain": -0.0025239194247074284,
+      "varianceCost": 0.00009202507743944864,
+      "meanWeight": 0.5,
+      "over": 6,
+      "under": 8,
+      "changed": 14,
+      "priorWeeks": [
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0017608673101725861,
+          "quadratic": 0.00013069719432890766,
+          "effectiveGames": 2
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.0023249560726511893,
+          "quadratic": 0.00022922346655587707,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.00009911829681443461,
+          "quadratic": 0.0006571062758899371,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.00548985470455246,
+          "quadratic": 0.0011852208642101647,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.004390449812954622,
+          "quadratic": 0.0022588684994734928,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.02855602708776856,
+          "quadratic": 0.003474729438304969,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0.4229273454285238,
+      "omittedWeeks": [
+        {
+          "week": 3,
+          "linear": 0.040662169381112404,
+          "quadratic": 0.007805148544434438,
+          "weight": 0.5
+        },
+        {
+          "week": 4,
+          "linear": 0.03657634599828863,
+          "quadratic": 0.007706622272207469,
+          "weight": 0.5
+        },
+        {
+          "week": 5,
+          "linear": 0.03900042036775425,
+          "quadratic": 0.007278739462873409,
+          "weight": 0.5
+        },
+        {
+          "week": 6,
+          "linear": 0.033411447366387355,
+          "quadratic": 0.006750624874553182,
+          "weight": 0.5
+        },
+        {
+          "week": 7,
+          "linear": 0.03451085225798519,
+          "quadratic": 0.005676977239289853,
+          "weight": 0.5
+        },
+        {
+          "week": 8,
+          "linear": 0.010345274983171254,
+          "quadratic": 0.004461116300458377,
+          "weight": 0.4229273454285238
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 6,
+          "excessBrier": 0.007961526122542412,
+          "rawExcessBrier": 0.016169684310647484,
+          "alignmentGain": -0.007838210089761087,
+          "varianceCost": 0.00012331603278131236,
+          "meanWeight": 0.5,
+          "over": 6,
+          "under": 0,
+          "changed": 6
+        },
+        {
+          "direction": "under",
+          "n": 8,
+          "excessBrier": -0.001393241713149751,
+          "rawExcessBrier": -0.002649369704433427,
+          "alignmentGain": 0.0014617985740828158,
+          "varianceCost": 0.00006855686093305088,
+          "meanWeight": 0.5,
+          "over": 0,
+          "under": 8,
+          "changed": 8
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 10,
+      "n": 14,
+      "excessBrier": -0.0002808206128631601,
+      "rawExcessBrier": -0.0018297683918515923,
+      "alignmentGain": 0.00028741694929567866,
+      "varianceCost": 0.000006596336432495863,
+      "meanWeight": 0.12916907480946113,
+      "over": 6,
+      "under": 8,
+      "changed": 14,
+      "priorWeeks": [
+        {
+          "week": 4,
+          "games": 16,
+          "linear": 0.0016439922049324995,
+          "quadratic": 0.00016208546760874848,
+          "effectiveGames": 2
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.00007008721981714803,
+          "quadratic": 0.00046464430364201274,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.003881913489317915,
+          "quadratic": 0.0008380777102867876,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.003104516835199424,
+          "quadratic": 0.0015972612337863876,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.02019216039750789,
+          "quadratic": 0.002457004748613966,
+          "effectiveGames": 8
+        },
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.02498552756530703,
+          "quadratic": 0.003644007152612469,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 4,
+          "linear": 0.002122975936901042,
+          "quadratic": 0.009000995148941626,
+          "weight": 0.07320355477451672
+        },
+        {
+          "week": 5,
+          "linear": 0.0038370553616506892,
+          "quadratic": 0.008698436312908361,
+          "weight": 0.1337025934031398
+        },
+        {
+          "week": 6,
+          "linear": -0.00011494534748437372,
+          "quadratic": 0.008325002906263586,
+          "weight": 0
+        },
+        {
+          "week": 7,
+          "linear": 0.0006624513066341175,
+          "quadratic": 0.007565819382763986,
+          "weight": 0.02403162037143459
+        },
+        {
+          "week": 8,
+          "linear": -0.016425192255674348,
+          "quadratic": 0.006706075867936407,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.02875249570714057,
+          "quadratic": 0.005519073463937905,
+          "weight": 0.5
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 6,
+          "excessBrier": -0.0000503057440980198,
+          "rawExcessBrier": -0.00004846970905358905,
+          "alignmentGain": 0.00005683886795992979,
+          "varianceCost": 0.0000065331238619126266,
+          "meanWeight": 0.12916907480946113,
+          "over": 6,
+          "under": 0,
+          "changed": 6
+        },
+        {
+          "direction": "under",
+          "n": 8,
+          "excessBrier": -0.0004537067644370153,
+          "rawExcessBrier": -0.0031657424039500948,
+          "alignmentGain": 0.00046035051029749024,
+          "varianceCost": 0.00000664374586043329,
+          "meanWeight": 0.12916907480946113,
+          "over": 0,
+          "under": 8,
+          "changed": 8
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 11,
+      "n": 13,
+      "excessBrier": 0.000682002710712209,
+      "rawExcessBrier": 0.0018209750491509657,
+      "alignmentGain": -0.0006322213237736652,
+      "varianceCost": 0.000049781386938534135,
+      "meanWeight": 0.41332882471265836,
+      "over": 7,
+      "under": 6,
+      "changed": 13,
+      "priorWeeks": [
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.000049559148407217306,
+          "quadratic": 0.00032855313794496853,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.00274492735227623,
+          "quadratic": 0.0005926104321050823,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.002195224906477311,
+          "quadratic": 0.0011294342497367464,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.01427801354388428,
+          "quadratic": 0.0017373647191524844,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.017667435972952013,
+          "quadratic": 0.0025767021683045593,
+          "effectiveGames": 7
+        },
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.011013791956186268,
+          "quadratic": 0.003913800982065675,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 5,
+          "linear": 0.012564521785872074,
+          "quadratic": 0.009949912551364544,
+          "weight": 0.4195178120912284
+        },
+        {
+          "week": 6,
+          "linear": 0.009770035285188626,
+          "quadratic": 0.00968585525720443,
+          "weight": 0.32911415893323626
+        },
+        {
+          "week": 7,
+          "linear": 0.010319737730987546,
+          "quadratic": 0.009149031439572766,
+          "weight": 0.35403364095924833
+        },
+        {
+          "week": 8,
+          "linear": -0.0017630509064194243,
+          "quadratic": 0.008541100970157029,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.03018239861041687,
+          "quadratic": 0.007701763521004953,
+          "weight": 0.5
+        },
+        {
+          "week": 10,
+          "linear": 0.0015011706812785887,
+          "quadratic": 0.006364664707243838,
+          "weight": 0.056938735915960034
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 7,
+          "excessBrier": 0.002647991902941032,
+          "rawExcessBrier": 0.006566269619261378,
+          "alignmentGain": -0.0026014669805481763,
+          "varianceCost": 0.00004652492239285153,
+          "meanWeight": 0.41332882471265847,
+          "over": 7,
+          "under": 0,
+          "changed": 7
+        },
+        {
+          "direction": "under",
+          "n": 6,
+          "excessBrier": -0.001611651346888084,
+          "rawExcessBrier": -0.0037152019493111818,
+          "alignmentGain": 0.0016652319424632633,
+          "varianceCost": 0.00005358059557516383,
+          "meanWeight": 0.41332882471265847,
+          "over": 0,
+          "under": 6,
+          "changed": 6
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 12,
+      "n": 16,
+      "excessBrier": 0.00002596722351083311,
+      "rawExcessBrier": 0.0006156303679290837,
+      "alignmentGain": -0.00002513872097060993,
+      "varianceCost": 8.285025402206493e-7,
+      "meanWeight": 0.062400809158030375,
+      "over": 8,
+      "under": 8,
+      "changed": 16,
+      "priorWeeks": [
+        {
+          "week": 6,
+          "games": 14,
+          "linear": 0.0019409567446589575,
+          "quadratic": 0.0004190388551433938,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.001552258417599712,
+          "quadratic": 0.0007986306168931938,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.010096080198753944,
+          "quadratic": 0.001228502374306983,
+          "effectiveGames": 4
+        },
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.012492763782653515,
+          "quadratic": 0.0018220035763062345,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.007787926978797162,
+          "quadratic": 0.002767475214633208,
+          "effectiveGames": 7
+        },
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.007030266776463467,
+          "quadratic": 0.0026785759202130107,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 6,
+          "linear": -0.0000867649639661695,
+          "quadratic": 0.00929518770235263,
+          "weight": 0
+        },
+        {
+          "week": 7,
+          "linear": 0.0003019333630930761,
+          "quadratic": 0.00891559594060283,
+          "weight": 0.010441886230299199
+        },
+        {
+          "week": 8,
+          "linear": -0.008241888418061156,
+          "quadratic": 0.008485724183189042,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.014346955563346303,
+          "quadratic": 0.00789222298118979,
+          "weight": 0.5
+        },
+        {
+          "week": 10,
+          "linear": -0.005933735198104374,
+          "quadratic": 0.006946751342862816,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": 0.008884458557156255,
+          "quadratic": 0.007035650637283014,
+          "weight": 0.32862011261916174
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 8,
+          "excessBrier": -0.00013393014262312597,
+          "rawExcessBrier": -0.0019908905411890263,
+          "alignmentGain": 0.0001345755124947549,
+          "varianceCost": 6.453698716221518e-7,
+          "meanWeight": 0.06240080915803038,
+          "over": 8,
+          "under": 0,
+          "changed": 8
+        },
+        {
+          "direction": "under",
+          "n": 8,
+          "excessBrier": 0.0001858645896447922,
+          "rawExcessBrier": 0.0032221512770471937,
+          "alignmentGain": -0.00018485295443597475,
+          "varianceCost": 0.0000010116352088191467,
+          "meanWeight": 0.06240080915803038,
+          "over": 0,
+          "under": 8,
+          "changed": 8
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 13,
+      "n": 13,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.004111013355506653,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 4,
+      "under": 9,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 7,
+          "games": 13,
+          "linear": 0.0010976124532386556,
+          "quadratic": 0.0005647171248683732,
+          "effectiveGames": 1.625
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.00713900677194214,
+          "quadratic": 0.0008686823595762422,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.008833717986476006,
+          "quadratic": 0.0012883510841522796,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.005506895978093134,
+          "quadratic": 0.0019569004910328374,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.004971149311187809,
+          "quadratic": 0.0018940391971056167,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0022789140472396566,
+          "quadratic": 0.0024072344313931797,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 7,
+          "linear": -0.003437878594868201,
+          "quadratic": 0.008415207563260155,
+          "weight": 0
+        },
+        {
+          "week": 8,
+          "linear": -0.009479272913571686,
+          "quadratic": 0.008111242328552285,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.006493451844846461,
+          "quadratic": 0.0076915736039762485,
+          "weight": 0.2344919771519977
+        },
+        {
+          "week": 10,
+          "linear": -0.00784716211972268,
+          "quadratic": 0.0070230241970956914,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": 0.002630883169558264,
+          "quadratic": 0.007085885491022912,
+          "weight": 0.09713114863570617
+        },
+        {
+          "week": 12,
+          "linear": -0.0000613520943898889,
+          "quadratic": 0.006572690256735349,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.003592433217100968,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 4,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 9,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.007534767387776707,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 9,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 14,
+      "n": 15,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.0028278164268188428,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 6,
+      "under": 9,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.005048040099376972,
+          "quadratic": 0.0006142511871534915,
+          "effectiveGames": 2
+        },
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.006246381891326758,
+          "quadratic": 0.0009110017881531172,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.003893963489398581,
+          "quadratic": 0.001383737607316604,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.0035151333882317334,
+          "quadratic": 0.0013392879601065054,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0016114355765444411,
+          "quadratic": 0.0017021717903438606,
+          "effectiveGames": 8
+        },
+        {
+          "week": 13,
+          "games": 13,
+          "linear": -0.01807458231354265,
+          "quadratic": 0.0016408658488684452,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 8,
+          "linear": -0.025553569680247003,
+          "quadratic": 0.006977064994788533,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": -0.014259147689543273,
+          "quadratic": 0.0066803143937889066,
+          "weight": 0
+        },
+        {
+          "week": 10,
+          "linear": -0.02439949307026861,
+          "quadratic": 0.00620757857462542,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": -0.0169903961926383,
+          "quadratic": 0.0062520282218355185,
+          "weight": 0
+        },
+        {
+          "week": 12,
+          "linear": -0.01889409400432559,
+          "quadratic": 0.005889144391598163,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": -0.0024309472673273817,
+          "quadratic": 0.005950450333073579,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 6,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.006279911078364883,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 6,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 9,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.000526419992454816,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 9,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 15,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0017660967796679292,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 12,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 9,
+          "games": 14,
+          "linear": -0.004416858993238003,
+          "quadratic": 0.0006441755420761398,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.002753447989046567,
+          "quadratic": 0.0009784502455164187,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.0024855746555939046,
+          "quadratic": 0.0009470195985528083,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0011394570236198283,
+          "quadratic": 0.0012036172156965899,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 13,
+          "games": 13,
+          "linear": -0.012780659721020445,
+          "quadratic": 0.0011602673687522984,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 14,
+          "games": 15,
+          "linear": 0.015596344722878075,
+          "quadratic": 0.0011991668754413366,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 9,
+          "linear": 0.0019441013116904666,
+          "quadratic": 0.005488521303959451,
+          "weight": 0.07627360130100858
+        },
+        {
+          "week": 10,
+          "linear": -0.005226205670594104,
+          "quadratic": 0.005154246600519172,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": 0.000012816974046367998,
+          "quadratic": 0.005185677247482782,
+          "weight": 0.0005088993208490754
+        },
+        {
+          "week": 12,
+          "linear": -0.0013333006579277083,
+          "quadratic": 0.004929079630339001,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": 0.010307902039472908,
+          "quadratic": 0.004972429477283292,
+          "weight": 0.41277129439287086
+        },
+        {
+          "week": 14,
+          "linear": -0.01806910240442561,
+          "quadratic": 0.004933529970594254,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 12,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.001390990833183119,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 12,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0028914146191223594,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 16,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.00013044674015270236,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 12,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 10,
+          "games": 14,
+          "linear": 0.0019469817446992905,
+          "quadratic": 0.000691868803658302,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.0017575666941158667,
+          "quadratic": 0.0006696439800532527,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0008057177882722206,
+          "quadratic": 0.0008510858951719303,
+          "effectiveGames": 4
+        },
+        {
+          "week": 13,
+          "games": 13,
+          "linear": -0.009037291156771324,
+          "quadratic": 0.0008204329244342226,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 14,
+          "games": 15,
+          "linear": 0.011028281115270112,
+          "quadratic": 0.000847939029398853,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.00966890844219594,
+          "quadratic": 0.0006432872617667436,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 10,
+          "linear": -0.010241202966085244,
+          "quadratic": 0.0038323890908250006,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": -0.006536654527270087,
+          "quadratic": 0.00385461391443005,
+          "weight": 0
+        },
+        {
+          "week": 12,
+          "linear": -0.007488503433113733,
+          "quadratic": 0.0036731719993113726,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": 0.0007430699353853706,
+          "quadratic": 0.00370382497004908,
+          "weight": 0.031348102524561966
+        },
+        {
+          "week": 14,
+          "linear": -0.019322502336656066,
+          "quadratic": 0.00367631886508445,
+          "weight": 0
+        },
+        {
+          "week": 15,
+          "linear": 0.001374687220809986,
+          "quadratic": 0.0038809706327165593,
+          "weight": 0.05756412676655135
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 12,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.001964251048055969,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 12,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.005370966183557098,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 17,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.004793831303937627,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 14,
+      "under": 2,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 11,
+          "games": 13,
+          "linear": -0.0012427873277969523,
+          "quadratic": 0.00047350979927640417,
+          "effectiveGames": 1.625
+        },
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0005697285118099141,
+          "quadratic": 0.0006018086078482949,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 13,
+          "games": 13,
+          "linear": -0.006390329860510222,
+          "quadratic": 0.0005801336843761492,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 14,
+          "games": 15,
+          "linear": 0.0077981723614390375,
+          "quadratic": 0.0005995834377206683,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.006836950726148608,
+          "quadratic": 0.0004548727850461901,
+          "effectiveGames": 8
+        },
+        {
+          "week": 16,
+          "games": 16,
+          "linear": 0.001312208640213754,
+          "quadratic": 0.001148580887697026,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 11,
+          "linear": -0.004686628096815955,
+          "quadratic": 0.003384979402688328,
+          "weight": 0
+        },
+        {
+          "week": 12,
+          "linear": -0.005359686912802994,
+          "quadratic": 0.0032566805941164375,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": 0.00046091443589731454,
+          "quadratic": 0.0032783555175885833,
+          "weight": 0.01980012873113216
+        },
+        {
+          "week": 14,
+          "linear": -0.013727587786051945,
+          "quadratic": 0.003258905764244064,
+          "weight": 0
+        },
+        {
+          "week": 15,
+          "linear": 0.0009075353015357002,
+          "quadratic": 0.003403616416918542,
+          "weight": 0.038777566909686666
+        },
+        {
+          "week": 16,
+          "linear": -0.007241624064826662,
+          "quadratic": 0.002709908314267706,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 14,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.005424171306299371,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 14,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 2,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0003814512874054238,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 2,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "week": 18,
+      "n": 16,
+      "excessBrier": 0.0019353147028853233,
+      "rawExcessBrier": 0.0042374493364782835,
+      "alignmentGain": -0.0017519047375315162,
+      "varianceCost": 0.0001834099653538094,
+      "meanWeight": 0.5,
+      "over": 11,
+      "under": 5,
+      "changed": 16,
+      "priorWeeks": [
+        {
+          "week": 12,
+          "games": 16,
+          "linear": -0.0004028588941361103,
+          "quadratic": 0.00042554294758596515,
+          "effectiveGames": 2
+        },
+        {
+          "week": 13,
+          "games": 13,
+          "linear": -0.004518645578385662,
+          "quadratic": 0.0004102164622171113,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 14,
+          "games": 15,
+          "linear": 0.005514140557635056,
+          "quadratic": 0.0004239695146994265,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.00483445422109797,
+          "quadratic": 0.0003216436308833718,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 16,
+          "games": 16,
+          "linear": 0.0009278716278267253,
+          "quadratic": 0.0008121693344318317,
+          "effectiveGames": 8
+        },
+        {
+          "week": 17,
+          "games": 16,
+          "linear": 0.02899976749633083,
+          "quadratic": 0.0037635250266033786,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 12,
+          "linear": 0.02608867988230897,
+          "quadratic": 0.00573152396883512,
+          "weight": 0.5
+        },
+        {
+          "week": 13,
+          "linear": 0.03020446656655852,
+          "quadratic": 0.005746850454203974,
+          "weight": 0.5
+        },
+        {
+          "week": 14,
+          "linear": 0.0201716804305378,
+          "quadratic": 0.005733097401721659,
+          "weight": 0.5
+        },
+        {
+          "week": 15,
+          "linear": 0.03052027520927083,
+          "quadratic": 0.005835423285537714,
+          "weight": 0.5
+        },
+        {
+          "week": 16,
+          "linear": 0.024757949360346133,
+          "quadratic": 0.005344897581989254,
+          "weight": 0.5
+        },
+        {
+          "week": 17,
+          "linear": -0.003313946508157972,
+          "quadratic": 0.0023935418898177073,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 11,
+          "excessBrier": 0.0037158604189761165,
+          "rawExcessBrier": 0.007929696137155136,
+          "alignmentGain": -0.003466872769374685,
+          "varianceCost": 0.00024898764960143557,
+          "meanWeight": 0.5,
+          "over": 11,
+          "under": 0,
+          "changed": 11
+        },
+        {
+          "direction": "under",
+          "n": 5,
+          "excessBrier": -0.001981885872514422,
+          "rawExcessBrier": -0.0038854936250107943,
+          "alignmentGain": 0.002021024932523455,
+          "varianceCost": 0.00003913906000903187,
+          "meanWeight": 0.5,
+          "over": 0,
+          "under": 5,
+          "changed": 5
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 1,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.00006462420572270894,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 10,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 10,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.001359934517494843,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 10,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0031413394708462716,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 2,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0036943677773855436,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 11,
+      "under": 4,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.0011522024677802717,
+          "quadratic": 0.001573265510035354,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [{ "week": 1, "linear": 0, "quadratic": 0, "weight": 0 }],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 11,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.005816004795413796,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 11,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 4,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0012165420778457656,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 4,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 3,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0037133314976297398,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 7,
+      "under": 9,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.000814730178267305,
+          "quadratic": 0.0011124667107529113,
+          "effectiveGames": 7
+        },
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.020034756053494245,
+          "quadratic": 0.0017274880143938486,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.020034756053494245,
+          "quadratic": 0.0017274880143938478,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": 0.0008147301782673033,
+          "quadratic": 0.0011124667107529104,
+          "weight": 0.03859000416338601
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 7,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.009687282674314528,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 7,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 9,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.0009330749731250957,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 9,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 4,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0018355447803153728,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 6,
+      "under": 10,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.0005761012338901359,
+          "quadratic": 0.000786632755017677,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.014166711864844011,
+          "quadratic": 0.0012215184893963748,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.020038669174790722,
+          "quadratic": 0.0019342117746997324,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.03420538103963473,
+          "quadratic": 0.003155730264096107,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.019462567940900583,
+          "quadratic": 0.0027208445297174097,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.013590610630953872,
+          "quadratic": 0.002008151244414052,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 6,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0005944282486876571,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 6,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 10,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0025802146992920023,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 10,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 5,
+      "n": 14,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0024791333836588947,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 9,
+      "under": 5,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.0004073650891336525,
+          "quadratic": 0.0005562333553764556,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.010017378026747122,
+          "quadratic": 0.0008637440071969243,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.014169478859448359,
+          "quadratic": 0.0013676942621410476,
+          "effectiveGames": 8
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.009779355403291258,
+          "quadratic": 0.0012081077747385662,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.03396621228948674,
+          "quadratic": 0.0034395460440765366,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.02354146917360597,
+          "quadratic": 0.003132035392256068,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.019389368340904732,
+          "quadratic": 0.0026280851373119444,
+          "weight": 0
+        },
+        {
+          "week": 4,
+          "linear": -0.023779491797061833,
+          "quadratic": 0.002787671624714426,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 9,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0023356645897526385,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 9,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 5,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0027373772126901563,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 5,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 6,
+      "n": 13,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.004534204995987704,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 11,
+      "under": 2,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.00028805061694506793,
+          "quadratic": 0.0003933163775088385,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.0070833559324220054,
+          "quadratic": 0.0006107592446981874,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.010019334587395361,
+          "quadratic": 0.0009671058873498662,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.006915048521300551,
+          "quadratic": 0.0008542611999218303,
+          "effectiveGames": 8
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.011792105224880679,
+          "quadratic": 0.0009579579289547298,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.035809844265998605,
+          "quadratic": 0.0033900842609246138,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": -0.02843843771663153,
+          "quadratic": 0.003172641393735265,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.025502459061658177,
+          "quadratic": 0.002816294751083586,
+          "weight": 0
+        },
+        {
+          "week": 4,
+          "linear": -0.028606745127752985,
+          "quadratic": 0.002929139438511622,
+          "weight": 0
+        },
+        {
+          "week": 5,
+          "linear": -0.023729688424172855,
+          "quadratic": 0.0028254427094787224,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 11,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.006991981266636426,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 11,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 2,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.008983564492580268,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 2,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 7,
+      "n": 15,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.002545059611901407,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 15,
+      "under": 0,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 1,
+          "games": 14,
+          "linear": 0.00020368254456682626,
+          "quadratic": 0.0002781166776882278,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.005008689013373561,
+          "quadratic": 0.00043187200359846216,
+          "effectiveGames": 2.6516504294495538
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0070847394297241795,
+          "quadratic": 0.0006838471310705238,
+          "effectiveGames": 4
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.004889677701645629,
+          "quadratic": 0.0006040538873692831,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.008338277568978446,
+          "quadratic": 0.0006773785476553104,
+          "effectiveGames": 7
+        },
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.02183144440465428,
+          "quadratic": 0.001982716509921746,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 1,
+          "linear": -0.0034899393090675386,
+          "quadratic": 0.004379868079615323,
+          "weight": 0
+        },
+        {
+          "week": 2,
+          "linear": 0.0017224322488728488,
+          "quadratic": 0.0042261127537050885,
+          "weight": 0.0710981685912208
+        },
+        {
+          "week": 3,
+          "linear": 0.003798482665223467,
+          "quadratic": 0.003974137626233027,
+          "weight": 0.158440846734236
+        },
+        {
+          "week": 4,
+          "linear": 0.0016034209371449167,
+          "quadratic": 0.004053930869934268,
+          "weight": 0.06665941403985162
+        },
+        {
+          "week": 5,
+          "linear": 0.0050520208044777335,
+          "quadratic": 0.003980606209648241,
+          "weight": 0.2106711048215757
+        },
+        {
+          "week": 6,
+          "linear": -0.025117701169154995,
+          "quadratic": 0.002675268247381805,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 15,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.002545059611901407,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 15,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 8,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.012218560689641809,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 14,
+      "under": 2,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 2,
+          "games": 15,
+          "linear": -0.0035416779662110027,
+          "quadratic": 0.0003053796223490937,
+          "effectiveGames": 1.875
+        },
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0050096672936976805,
+          "quadratic": 0.0004835529436749331,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.0034575242606502757,
+          "quadratic": 0.00042713059996091516,
+          "effectiveGames": 4
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.0058960526124403395,
+          "quadratic": 0.0004789789644773649,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.015437162381628155,
+          "quadratic": 0.0014019922893361914,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.011487805341123355,
+          "quadratic": 0.004018822969245618,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 2,
+          "linear": -0.010413887126283501,
+          "quadratic": 0.006810477766695023,
+          "weight": 0
+        },
+        {
+          "week": 3,
+          "linear": -0.008945897798796825,
+          "quadratic": 0.006632304445369184,
+          "weight": 0
+        },
+        {
+          "week": 4,
+          "linear": -0.010498040831844229,
+          "quadratic": 0.006688726789083201,
+          "weight": 0
+        },
+        {
+          "week": 5,
+          "linear": -0.008059512480054164,
+          "quadratic": 0.006636878424566752,
+          "weight": 0
+        },
+        {
+          "week": 6,
+          "linear": -0.029392727474122658,
+          "quadratic": 0.005713865099707925,
+          "weight": 0
+        },
+        {
+          "week": 7,
+          "linear": -0.0024677597513711493,
+          "quadratic": 0.003097034419798499,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 14,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.012412479199086694,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 14,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 2,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.010861131123527615,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 2,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 9,
+      "n": 15,
+      "excessBrier": 0.0011394679124215176,
+      "rawExcessBrier": 0.002549316275947394,
+      "alignmentGain": -0.0010042776868693392,
+      "varianceCost": 0.00013519022555217856,
+      "meanWeight": 0.5,
+      "over": 15,
+      "under": 0,
+      "changed": 15,
+      "priorWeeks": [
+        {
+          "week": 3,
+          "games": 16,
+          "linear": -0.0035423697148620897,
+          "quadratic": 0.0003419235655352619,
+          "effectiveGames": 2
+        },
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.0024448388508228145,
+          "quadratic": 0.00030202694368464155,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.004169138784489223,
+          "quadratic": 0.0003386892738276552,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.01091572220232714,
+          "quadratic": 0.000991358254960873,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.008123105057659362,
+          "quadratic": 0.0028417369739418322,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.07150375250817302,
+          "quadratic": 0.0047702710965843755,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 3,
+          "linear": 0.06768239201752876,
+          "quadratic": 0.009244082542999377,
+          "weight": 0.5
+        },
+        {
+          "week": 4,
+          "linear": 0.0665848611534895,
+          "quadratic": 0.009283979164849998,
+          "weight": 0.5
+        },
+        {
+          "week": 5,
+          "linear": 0.0683091610871559,
+          "quadratic": 0.009247316834706984,
+          "weight": 0.5
+        },
+        {
+          "week": 6,
+          "linear": 0.05322430010033953,
+          "quadratic": 0.008594647853573766,
+          "weight": 0.5
+        },
+        {
+          "week": 7,
+          "linear": 0.07226312736032603,
+          "quadratic": 0.006744269134592806,
+          "weight": 0.5
+        },
+        {
+          "week": 8,
+          "linear": -0.007363730205506347,
+          "quadratic": 0.0048157350119502635,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 15,
+          "excessBrier": 0.0011394679124215176,
+          "rawExcessBrier": 0.002549316275947394,
+          "alignmentGain": -0.0010042776868693392,
+          "varianceCost": 0.00013519022555217856,
+          "meanWeight": 0.5,
+          "over": 15,
+          "under": 0,
+          "changed": 15
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 10,
+      "n": 13,
+      "excessBrier": 0.004620412165508796,
+      "rawExcessBrier": 0.009446987868995223,
+      "alignmentGain": -0.00451733039651994,
+      "varianceCost": 0.00010308176898885043,
+      "meanWeight": 0.5,
+      "over": 13,
+      "under": 0,
+      "changed": 13,
+      "priorWeeks": [
+        {
+          "week": 4,
+          "games": 16,
+          "linear": -0.0017287621303251378,
+          "quadratic": 0.00021356529998045758,
+          "effectiveGames": 2
+        },
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.0029480263062201697,
+          "quadratic": 0.00023948948223868246,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.007718581190814078,
+          "quadratic": 0.0007009961446680957,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.005743902670561678,
+          "quadratic": 0.002009411484622809,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.05056078827881375,
+          "quadratic": 0.0033730910404930004,
+          "effectiveGames": 8
+        },
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.010651973438694746,
+          "quadratic": 0.005735635514285067,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 4,
+          "linear": 0.03893546705415124,
+          "quadratic": 0.012058623666307654,
+          "weight": 0.5
+        },
+        {
+          "week": 5,
+          "linear": 0.04015473123004627,
+          "quadratic": 0.01203269948404943,
+          "weight": 0.5
+        },
+        {
+          "week": 6,
+          "linear": 0.029488123733012028,
+          "quadratic": 0.011571192821620016,
+          "weight": 0.5
+        },
+        {
+          "week": 7,
+          "linear": 0.042950607594387784,
+          "quadratic": 0.010262777481665302,
+          "weight": 0.5
+        },
+        {
+          "week": 8,
+          "linear": -0.013354083354987646,
+          "quadratic": 0.008899097925795112,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.04785867836252085,
+          "quadratic": 0.006536553452003045,
+          "weight": 0.5
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 13,
+          "excessBrier": 0.004620412165508796,
+          "rawExcessBrier": 0.009446987868995223,
+          "alignmentGain": -0.00451733039651994,
+          "varianceCost": 0.00010308176898885043,
+          "meanWeight": 0.5,
+          "over": 13,
+          "under": 0,
+          "changed": 13
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 11,
+      "n": 14,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0038486741648123012,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 11,
+      "under": 3,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 5,
+          "games": 14,
+          "linear": -0.0020845693922446114,
+          "quadratic": 0.0001693446369138276,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.00545786110116357,
+          "quadratic": 0.0004956791274804365,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.004061552528829681,
+          "quadratic": 0.0014208684869709161,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.03575187625408651,
+          "quadratic": 0.0023851355482921877,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.0075320826515200435,
+          "quadratic": 0.004055706766565362,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.041525054431111444,
+          "quadratic": 0.003790270529173501,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 5,
+          "linear": -0.011908952256211093,
+          "quadratic": 0.012147660458482404,
+          "weight": 0
+        },
+        {
+          "week": 6,
+          "linear": -0.019451382749619273,
+          "quadratic": 0.011821325967915795,
+          "weight": 0
+        },
+        {
+          "week": 7,
+          "linear": -0.009931969119626023,
+          "quadratic": 0.010896136608425316,
+          "weight": 0
+        },
+        {
+          "week": 8,
+          "linear": -0.04974539790254222,
+          "quadratic": 0.009931869547104044,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": -0.006461438996935661,
+          "quadratic": 0.008261298328830869,
+          "weight": 0
+        },
+        {
+          "week": 10,
+          "linear": 0.02753153278265574,
+          "quadratic": 0.00852673456622273,
+          "weight": 0.5
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 11,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0036788249244873905,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 11,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 3,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.004471454712670307,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 3,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 12,
+      "n": 13,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.006261207455241376,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 13,
+      "under": 0,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 6,
+          "games": 13,
+          "linear": 0.003859290595407039,
+          "quadratic": 0.00035049807233404785,
+          "effectiveGames": 1.625
+        },
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.002871951335280839,
+          "quadratic": 0.0010047057423114045,
+          "effectiveGames": 2.6516504294495538
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.025280394139406876,
+          "quadratic": 0.0016865455202465002,
+          "effectiveGames": 4
+        },
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.005325986719347373,
+          "quadratic": 0.0028678177571425335,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.0293626475773794,
+          "quadratic": 0.0026801259937101066,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.01806214942119043,
+          "quadratic": 0.001975631564846638,
+          "effectiveGames": 9.899494936611667
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 6,
+          "linear": -0.030342340913791153,
+          "quadratic": 0.010214826578257187,
+          "weight": 0
+        },
+        {
+          "week": 7,
+          "linear": -0.023611098983103276,
+          "quadratic": 0.00956061890827983,
+          "weight": 0
+        },
+        {
+          "week": 8,
+          "linear": -0.05176344445779099,
+          "quadratic": 0.008878779130344735,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": -0.02115706359903674,
+          "quadratic": 0.007697506893448701,
+          "weight": 0
+        },
+        {
+          "week": 10,
+          "linear": 0.0028795972589952847,
+          "quadratic": 0.007885198656881129,
+          "weight": 0.1032661554406641
+        },
+        {
+          "week": 11,
+          "linear": -0.008420900897193686,
+          "quadratic": 0.008589693085744596,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 13,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.006261207455241376,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 13,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 13,
+      "n": 15,
+      "excessBrier": 0.0003134728106666096,
+      "rawExcessBrier": 0.001337959451556625,
+      "alignmentGain": -0.00028386852668467433,
+      "varianceCost": 0.00002960428398193021,
+      "meanWeight": 0.28878449167306275,
+      "over": 15,
+      "under": 0,
+      "changed": 15,
+      "priorWeeks": [
+        {
+          "week": 7,
+          "games": 15,
+          "linear": -0.0020307762644148405,
+          "quadratic": 0.0007104342434854581,
+          "effectiveGames": 1.875
+        },
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.017875938127043255,
+          "quadratic": 0.0011925677741460939,
+          "effectiveGames": 2.8284271247461907
+        },
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.0037660413257600217,
+          "quadratic": 0.002027853383282681,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.020762527215555722,
+          "quadratic": 0.0018951352645867506,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.012771868338528426,
+          "quadratic": 0.0013969824766292486,
+          "effectiveGames": 7
+        },
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.030053963422761856,
+          "quadratic": 0.002552477595303412,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 7,
+          "linear": 0.010629464669960936,
+          "quadratic": 0.009065016493948185,
+          "weight": 0.36571335413396944
+        },
+        {
+          "week": 8,
+          "linear": -0.00927724972149716,
+          "quadratic": 0.00858288296328755,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.012364729731306118,
+          "quadratic": 0.007747597354150962,
+          "weight": 0.44561442828693737
+        },
+        {
+          "week": 10,
+          "linear": 0.02936121562110182,
+          "quadratic": 0.007880315472846892,
+          "weight": 0.5
+        },
+        {
+          "week": 11,
+          "linear": 0.021370556744074523,
+          "quadratic": 0.008378468260804395,
+          "weight": 0.5
+        },
+        {
+          "week": 12,
+          "linear": -0.02145527501721576,
+          "quadratic": 0.007222973142130232,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 15,
+          "excessBrier": 0.0003134728106666096,
+          "rawExcessBrier": 0.001337959451556625,
+          "alignmentGain": -0.00028386852668467433,
+          "varianceCost": 0.00002960428398193021,
+          "meanWeight": 0.28878449167306275,
+          "over": 15,
+          "under": 0,
+          "changed": 15
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 14,
+      "n": 13,
+      "excessBrier": 0.0005776605561843456,
+      "rawExcessBrier": 0.008096675030962269,
+      "alignmentGain": -0.0005743282862250407,
+      "varianceCost": 0.000003332269959296577,
+      "meanWeight": 0.07632598312010933,
+      "over": 12,
+      "under": 1,
+      "changed": 13,
+      "priorWeeks": [
+        {
+          "week": 8,
+          "games": 16,
+          "linear": 0.012640197069703438,
+          "quadratic": 0.0008432727601232501,
+          "effectiveGames": 2
+        },
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.0026629933596736865,
+          "quadratic": 0.0014339088785712668,
+          "effectiveGames": 2.6516504294495538
+        },
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.0146813237886897,
+          "quadratic": 0.0013400629968550533,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.009031074710595215,
+          "quadratic": 0.000987815782423319,
+          "effectiveGames": 4.949747468305834
+        },
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.02125136133776737,
+          "quadratic": 0.0018048742164657743,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 13,
+          "games": 15,
+          "linear": -0.005213023014704219,
+          "quadratic": 0.003765156987816383,
+          "effectiveGames": 10.606601717798215
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 8,
+          "linear": -0.010337053535895447,
+          "quadratic": 0.009331818862131799,
+          "weight": 0
+        },
+        {
+          "week": 9,
+          "linear": 0.004966136893481678,
+          "quadratic": 0.008741182743683781,
+          "weight": 0.17278818821654254
+        },
+        {
+          "week": 10,
+          "linear": 0.01698446732249769,
+          "quadratic": 0.008835028625399996,
+          "weight": 0.5
+        },
+        {
+          "week": 11,
+          "linear": 0.011334218244403206,
+          "quadratic": 0.00918727583983173,
+          "weight": 0.3883273761690173
+        },
+        {
+          "week": 12,
+          "linear": -0.018948217803959378,
+          "quadratic": 0.008370217405789275,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": 0.007516166548512211,
+          "quadratic": 0.006409934634438666,
+          "weight": 0.28459618141996834
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 12,
+          "excessBrier": 0.000570694865937707,
+          "rawExcessBrier": 0.008043570311496067,
+          "alignmentGain": -0.0005671219338611316,
+          "varianceCost": 0.000003572932076566758,
+          "meanWeight": 0.07632598312010933,
+          "over": 12,
+          "under": 0,
+          "changed": 12
+        },
+        {
+          "direction": "under",
+          "n": 1,
+          "excessBrier": 0.0006612488391440074,
+          "rawExcessBrier": 0.008733931664556688,
+          "alignmentGain": -0.0006608045145919502,
+          "varianceCost": 4.4432455205440614e-7,
+          "meanWeight": 0.07632598312010934,
+          "over": 0,
+          "under": 1,
+          "changed": 1
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 15,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": 0.0016084875526417887,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 16,
+      "under": 0,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 9,
+          "games": 15,
+          "linear": -0.0018830206628800109,
+          "quadratic": 0.0010139266916413404,
+          "effectiveGames": 1.875
+        },
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.010381263607777861,
+          "quadratic": 0.0009475676322933753,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.006385934169264213,
+          "quadratic": 0.0006984912383146243,
+          "effectiveGames": 3.5
+        },
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.015026981711380928,
+          "quadratic": 0.001276238797651706,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 13,
+          "games": 15,
+          "linear": -0.003686163924178896,
+          "quadratic": 0.0026623680383168796,
+          "effectiveGames": 7.5
+        },
+        {
+          "week": 14,
+          "games": 13,
+          "linear": -0.034584870838235617,
+          "quadratic": 0.005258037976472609,
+          "effectiveGames": 9.19238815542512
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 9,
+          "linear": -0.04001125082807566,
+          "quadratic": 0.010842703683049192,
+          "weight": 0
+        },
+        {
+          "week": 10,
+          "linear": -0.03151300788317782,
+          "quadratic": 0.010909062742397157,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": -0.035508337321691466,
+          "quadratic": 0.011158139136375908,
+          "weight": 0
+        },
+        {
+          "week": 12,
+          "linear": -0.056921253202336604,
+          "quadratic": 0.010580391577038826,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": -0.03820810756677678,
+          "quadratic": 0.009194262336373653,
+          "weight": 0
+        },
+        {
+          "week": 14,
+          "linear": -0.007309400652720059,
+          "quadratic": 0.006598592398217923,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 16,
+          "excessBrier": 0,
+          "rawExcessBrier": 0.0016084875526417887,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 16,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 16,
+      "n": 16,
+      "excessBrier": 0,
+      "rawExcessBrier": -0.006187629912577085,
+      "alignmentGain": 0,
+      "varianceCost": 0,
+      "meanWeight": 0,
+      "over": 16,
+      "under": 0,
+      "changed": 0,
+      "priorWeeks": [
+        {
+          "week": 10,
+          "games": 13,
+          "linear": -0.00734066189434485,
+          "quadratic": 0.0006700314984275267,
+          "effectiveGames": 1.625
+        },
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.004515537355297607,
+          "quadratic": 0.0004939078912116595,
+          "effectiveGames": 2.474873734152917
+        },
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.010625680668883685,
+          "quadratic": 0.0009024371082328871,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 13,
+          "games": 15,
+          "linear": -0.0026065115073521097,
+          "quadratic": 0.0018825784939081915,
+          "effectiveGames": 5.3033008588991075
+        },
+        {
+          "week": 14,
+          "games": 13,
+          "linear": -0.024455196696177284,
+          "quadratic": 0.0037179943089001733,
+          "effectiveGames": 6.5
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.006336705955089922,
+          "quadratic": 0.005524547384654665,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 10,
+          "linear": -0.02728827084503323,
+          "quadratic": 0.012521465186907572,
+          "weight": 0
+        },
+        {
+          "week": 11,
+          "linear": -0.030113395384080473,
+          "quadratic": 0.012697588794123438,
+          "weight": 0
+        },
+        {
+          "week": 12,
+          "linear": -0.045254613408261764,
+          "quadratic": 0.012289059577102211,
+          "weight": 0
+        },
+        {
+          "week": 13,
+          "linear": -0.03202242123202597,
+          "quadratic": 0.011308918191426907,
+          "weight": 0
+        },
+        {
+          "week": 14,
+          "linear": -0.010173736043200796,
+          "quadratic": 0.009473502376434925,
+          "weight": 0
+        },
+        {
+          "week": 15,
+          "linear": -0.02829222678428816,
+          "quadratic": 0.007666949300680433,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 16,
+          "excessBrier": 0,
+          "rawExcessBrier": -0.006187629912577085,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 16,
+          "under": 0,
+          "changed": 0
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 17,
+      "n": 16,
+      "excessBrier": -0.00015164706124865326,
+      "rawExcessBrier": -0.000013754766011146377,
+      "alignmentGain": 0.0002964167394917366,
+      "varianceCost": 0.00014476967824308563,
+      "meanWeight": 0.5,
+      "over": 14,
+      "under": 2,
+      "changed": 16,
+      "priorWeeks": [
+        {
+          "week": 11,
+          "games": 14,
+          "linear": -0.0031929670846321066,
+          "quadratic": 0.00034924561915731215,
+          "effectiveGames": 1.75
+        },
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.007513490855690464,
+          "quadratic": 0.000638119398825853,
+          "effectiveGames": 2.29809703885628
+        },
+        {
+          "week": 13,
+          "games": 15,
+          "linear": -0.001843081962089448,
+          "quadratic": 0.0013311840191584398,
+          "effectiveGames": 3.75
+        },
+        {
+          "week": 14,
+          "games": 13,
+          "linear": -0.017292435419117808,
+          "quadratic": 0.0026290189882363043,
+          "effectiveGames": 4.59619407771256
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.004480727751229267,
+          "quadratic": 0.00390644491867572,
+          "effectiveGames": 8
+        },
+        {
+          "week": 16,
+          "games": 16,
+          "linear": 0.0372707034921379,
+          "quadratic": 0.004536365853780077,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 11,
+          "linear": 0.02116794921539184,
+          "quadratic": 0.013041133178676391,
+          "weight": 0.5
+        },
+        {
+          "week": 12,
+          "linear": 0.010461491275069273,
+          "quadratic": 0.01275225939900785,
+          "weight": 0.31941281203293653
+        },
+        {
+          "week": 13,
+          "linear": 0.019818064092849183,
+          "quadratic": 0.012059194778675264,
+          "weight": 0.5
+        },
+        {
+          "week": 14,
+          "linear": 0.03526741754987754,
+          "quadratic": 0.0107613598095974,
+          "weight": 0.5
+        },
+        {
+          "week": 15,
+          "linear": 0.022455709881989003,
+          "quadratic": 0.009483933879157982,
+          "weight": 0.5
+        },
+        {
+          "week": 16,
+          "linear": -0.019295721361378165,
+          "quadratic": 0.008854012944053627,
+          "weight": 0
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 14,
+          "excessBrier": -0.0004538447087202223,
+          "rawExcessBrier": -0.0005787886231772307,
+          "alignmentGain": 0.0006182951058518296,
+          "varianceCost": 0.00016445039713161022,
+          "meanWeight": 0.5,
+          "over": 14,
+          "under": 0,
+          "changed": 14
+        },
+        {
+          "direction": "under",
+          "n": 2,
+          "excessBrier": 0.0019637364710523297,
+          "rawExcessBrier": 0.003941482234151444,
+          "alignmentGain": -0.0019567318250289147,
+          "varianceCost": 0.000007004646023413499,
+          "meanWeight": 0.5,
+          "over": 0,
+          "under": 2,
+          "changed": 2
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "week": 18,
+      "n": 16,
+      "excessBrier": -0.0035311781409868032,
+      "rawExcessBrier": -0.006799934809507269,
+      "alignmentGain": 0.0036623888772199754,
+      "varianceCost": 0.00013121073623316624,
+      "meanWeight": 0.5,
+      "over": 16,
+      "under": 0,
+      "changed": 16,
+      "priorWeeks": [
+        {
+          "week": 12,
+          "games": 13,
+          "linear": 0.005312840334441842,
+          "quadratic": 0.00045121855411644357,
+          "effectiveGames": 1.625
+        },
+        {
+          "week": 13,
+          "games": 15,
+          "linear": -0.0013032557536760549,
+          "quadratic": 0.0009412892469540957,
+          "effectiveGames": 2.6516504294495538
+        },
+        {
+          "week": 14,
+          "games": 13,
+          "linear": -0.012227598348088642,
+          "quadratic": 0.0018589971544500867,
+          "effectiveGames": 3.25
+        },
+        {
+          "week": 15,
+          "games": 16,
+          "linear": -0.003168352977544961,
+          "quadratic": 0.0027622736923273326,
+          "effectiveGames": 5.6568542494923815
+        },
+        {
+          "week": 16,
+          "games": 16,
+          "linear": 0.02635436717888385,
+          "quadratic": 0.003207695057150995,
+          "effectiveGames": 8
+        },
+        {
+          "week": 17,
+          "games": 16,
+          "linear": 0.003353572584829051,
+          "quadratic": 0.006551527756536329,
+          "effectiveGames": 11.313708498984763
+        }
+      ],
+      "weightWithoutStrongestWeek": 0,
+      "omittedWeeks": [
+        {
+          "week": 12,
+          "linear": 0.013008732684403237,
+          "quadratic": 0.01532178290741884,
+          "weight": 0.3682920740014779
+        },
+        {
+          "week": 13,
+          "linear": 0.019624828772521134,
+          "quadratic": 0.014831712214581188,
+          "weight": 0.5
+        },
+        {
+          "week": 14,
+          "linear": 0.03054917136693372,
+          "quadratic": 0.013914004307085198,
+          "weight": 0.5
+        },
+        {
+          "week": 15,
+          "linear": 0.02148992599639004,
+          "quadratic": 0.01301072776920795,
+          "weight": 0.5
+        },
+        {
+          "week": 16,
+          "linear": -0.00803279416003877,
+          "quadratic": 0.012565306404384288,
+          "weight": 0
+        },
+        {
+          "week": 17,
+          "linear": 0.014968000434016028,
+          "quadratic": 0.009221473704998956,
+          "weight": 0.5
+        }
+      ],
+      "directions": [
+        {
+          "direction": "over",
+          "n": 16,
+          "excessBrier": -0.0035311781409868032,
+          "rawExcessBrier": -0.006799934809507269,
+          "alignmentGain": 0.0036623888772199754,
+          "varianceCost": 0.00013121073623316624,
+          "meanWeight": 0.5,
+          "over": 16,
+          "under": 0,
+          "changed": 16
+        },
+        {
+          "direction": "under",
+          "n": 0,
+          "excessBrier": 0,
+          "rawExcessBrier": 0,
+          "alignmentGain": 0,
+          "varianceCost": 0,
+          "meanWeight": 0,
+          "over": 0,
+          "under": 0,
+          "changed": 0
+        }
+      ]
+    }
+  ],
+  "interpretation": "Exact parent reproduction and descriptive weak-season decomposition. Leave-week diagnostics are counterfactuals with fixed raw forecasts, not independent validation. Feedback candidates are diagnosis-informed; new selection uses only earlier 2021-2022, but inherited source settings and revised inputs keep the full pipeline retrospective."
+}

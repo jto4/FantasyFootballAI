@@ -1,0 +1,71 @@
+{
+  "frozenAt": "2026-10-13T15:33:43.230Z",
+  "developmentCompletedAt": "2026-10-13T15:32:58.349Z",
+  "developmentArtifactSha256": "9e0079d9f35ca6f699e2401eab873492eb8f886ef8c34c072e7216f72abc6a92",
+  "contextSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "signalsSha256": "7992bfcea9b82609957c950e54e984f0f080b9f50194cf77a0abde38ae6d143f",
+  "selection": {
+    "id": "plain",
+    "spec": "plain",
+    "brier": 0.248752653739635
+  },
+  "bestSignals": {
+    "id": "matchup-365-true-tree-static-0.5",
+    "spec": {
+      "halfLifeDays": 365,
+      "signals": true,
+      "method": "tree",
+      "anchor": "static",
+      "strength": 0.5
+    },
+    "brier": 0.24927195691420145
+  },
+  "parameters": {
+    "signals": {
+      "fitSeasons": 1,
+      "teamPenaltyGames": 4,
+      "iterations": 16,
+      "publicationLagHours": 48,
+      "maxRows": 12000
+    },
+    "matchup": {
+      "depth": 2,
+      "labelHalfLifeDays": 730,
+      "labelSeasons": 4,
+      "linearPenalty": 200,
+      "linearLabelWeights": "uniform",
+      "signalScales": [0.1, 0.2, 0.2, 0.2, 0.05, 0.1, 0.2, 0.1, 0.2, 0.2, 1, 1],
+      "maxLinearLogitCorrection": 0.5
+    },
+    "tree": {
+      "rounds": 20,
+      "learningRate": 0.05,
+      "leafPenalty": 20,
+      "minLeaf": 60,
+      "minTrain": 200,
+      "fitSeasons": 4,
+      "maxLogitCorrection": 0.5,
+      "blendSeasons": 2,
+      "blendPenalty": 1
+    },
+    "fixedWeights": [0.5, 0.16666666666666666, 0.16666666666666666, 0.16666666666666666]
+  },
+  "codeHashes": {
+    "packages/core/src/team-total-signals.ts": "21183c30101d8742fe8ea7967feacdd1b7f60658869a365151001d9ff72d0651",
+    "packages/core/src/matchup-totals-model.ts": "85013e61805cb1c85eac4aae6053e43272f118e9de08c668c8b961bedff1ff7f",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/boosted-market-model.ts": "437af284529e7bbca8cafb7010c67404a9a44a4f04451e77c4ae77f96c95dc2b",
+    "packages/core/src/market-context.ts": "f2b1a3be210252acc8875cd2fa13b04fe32586a16405dfabcc3dea5727c43bc8",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/core/src/expert-totals-model.ts": "9f82ae42abe981cb75758a3aa5f2828b2deb16d75a50cf57adb70cb8a970ca33",
+    "packages/integrations/src/team-total-signals.ts": "3d85ed9ee0b2272ae0b6428ece7f741f9beef06501dceb18e984de6284518987",
+    "packages/integrations/src/football-csv.ts": "ebd08425c69e1c253af305ad2ee5addbba2d1fed3fef39f339814520859bce51",
+    "scripts/capture-team-total-signals.mjs": "e0d017b169c4f331d50192693a3da713571daa2eed7d46aa784549299bfc7619",
+    "scripts/matchup-totals-evaluation.mjs": "94840b4c5dcad9eb76b4c381e0e8de09d75f24c92cb015e57eeffbf7e396e4c5",
+    "scripts/develop-matchup-totals.mjs": "9fa56ba3edf6a369b78209d347e4dae0d6b10d78ec62985e232f1a7c3561f66d",
+    "scripts/audit-matchup-totals.mjs": "ada8aea19417c147da3213550ec4c67b6f3cc0c31525032ce8854dfe41aedb78",
+    "scripts/game-context-snapshot.mjs": "fd9a6e0b61a4a341e73505244f7a79c7ffdbe1e5edf64435c11bef79aaa52173",
+    "scripts/rich-personnel-evaluation.mjs": "0fa18d0c2dce12a5a660bdebacd79caa7d2ff3922352f1e343f9e07798df7123",
+    "scripts/seasonal-hybrid-evaluation.mjs": "31260c94302d19fcd04a4819fd0a9cbd079c2b35b161cf9602656327e7e1d5df"
+  }
+}

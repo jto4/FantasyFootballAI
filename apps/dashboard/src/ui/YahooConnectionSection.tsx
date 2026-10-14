@@ -51,7 +51,7 @@ export function YahooConnectionSection({
     <section className="settings-card">
       <div className="settings-card-title">
         <div>
-          <h2 ref={headingRef} tabIndex={-1}>
+          <h2 ref={headingRef} tabIndex={-1} data-search-target="yahoo-access">
             Yahoo Fantasy connection
           </h2>
           <p>Connect through Yahoo’s owner-authorized OAuth flow.</p>

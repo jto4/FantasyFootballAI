@@ -1,0 +1,32 @@
+{
+  "scoredAt": "2026-10-13T15:40:04.441Z",
+  "auditSha256": "5b0b0d399ede56b36d3e9eb432f3f965d1a1eddb340f7ecc0339671d6c7ec58f",
+  "n": 77,
+  "components": [
+    {
+      "expert": "slow",
+      "weight": 0.16666666666666666,
+      "meanCorrection": -0.0016378558394451095,
+      "variance": 0.000021089619200703048,
+      "alignment": -0.000333387548493439
+    },
+    {
+      "expert": "fast",
+      "weight": 0.16666666666666666,
+      "meanCorrection": 0.00013993203509376443,
+      "variance": 0.000016205595405490717,
+      "alignment": 0.000010592447042136363
+    },
+    {
+      "expert": "production",
+      "weight": 0.16666666666666666,
+      "meanCorrection": -0.0028401028887972348,
+      "variance": 0.000010383429057831712,
+      "alignment": 0.0000445459175635943
+    }
+  ],
+  "crossVariance": 0.00001794018855492466,
+  "totalVariance": 0.00006561883221895013,
+  "totalAlignment": -0.0002782491838877084,
+  "warning": "Post-hoc additive explanation of saved fixed-mixture probabilities. Fast expert reconstructed from fixed=book/2+(slow+fast+production)/6. No settings or predictions changed."
+}

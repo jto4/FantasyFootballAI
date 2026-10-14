@@ -2,6 +2,7 @@ import type { RefObject } from 'react';
 import { Download, ShieldCheck, Trash2 } from 'lucide-react';
 import { credentialStatusLabel } from './credential-status.js';
 import { EmptyStatus, LoadError, LoadingStatus } from './LoadFeedback.js';
+import { ConnectionFields } from './ConnectionFields';
 
 export type SecretState = { provider: string; configured: boolean }[];
 export type LocalImage = { id: string; createdAt: string; size: number; mimeType: string };
@@ -22,22 +23,22 @@ const secrets: SecretDefinition[] = [
   {
     id: 'espn',
     name: 'ESPN session cookie',
-    help: 'Owner-authorized ESPN session cookie for private league access.',
+    help: 'Access to your own private ESPN league. Public leagues do not need this.',
   },
   {
     id: 'resend',
     name: 'Resend delivery settings',
-    help: 'JSON with apiKey and from fields. A test email can verify the key and sender.',
+    help: 'Connect Resend to send reports by email. A test email can check your connection.',
   },
   {
     id: 'twilio',
     name: 'Twilio delivery settings',
-    help: 'JSON with accountSid and authToken; direct SMS also needs a from number.',
+    help: 'Connect Twilio to send text messages. Direct texts need a sending phone number.',
   },
   {
     id: 'bluebubbles',
     name: 'BlueBubbles iMessage bridge',
-    help: 'JSON with serverUrl and serverPassword. The BlueBubbles server must run on a Mac.',
+    help: 'Connect your BlueBubbles server to use iMessage. The server must run on a Mac.',
   },
 ];
 
@@ -114,7 +115,10 @@ export function CredentialsSection({
             Credentials
           </h2>
           <p>
-            Secret values are stored in the OS credential manager and never returned to the browser.
+            {typeof window !== 'undefined' &&
+            window.sidekickDesktop?.isVerificationMode?.() === true
+              ? 'Test credentials stay in memory for this session and are discarded on restart.'
+              : 'Secret values are stored in the OS credential manager and never returned to the browser.'}
           </p>
         </div>
         <ShieldCheck size={18} />
@@ -132,26 +136,75 @@ export function CredentialsSection({
           .map((secret) => {
             const configured = secretState.find((item) => item.provider === secret.id)?.configured;
             return (
-              <div className="credential-row" key={secret.id}>
+              <details
+                className="credential-row"
+                key={secret.id}
+                data-search-target={`credential-${secret.id}`}
+              >
+                <summary>
+                  {secret.name} · {credentialStatusLabel(credentialStoreAvailable, configured)}
+                </summary>
                 <div>
                   <strong>{secret.name}</strong>
                   <p>{secret.help}</p>
+                  {secret.id === 'espn' && (
+                    <details>
+                      <summary>How to find ESPN access details</summary>
+                      <ol>
+                        <li>
+                          Sign in to your own ESPN account in a web browser and open your league.
+                        </li>
+                        <li>
+                          Open the browser’s developer tools and find Cookies under Application or
+                          Storage for espn.com.
+                        </li>
+                        <li>
+                          Copy the values named espn_s2 and SWID. Paste them below as{' '}
+                          <code>espn_s2=your value; SWID=your value</code>.
+                        </li>
+                      </ol>
+                      <p>
+                        These grant access to your account. Keep them private. If you prefer, you
+                        can connect a public league without them.
+                      </p>
+                    </details>
+                  )}
                   <span className={configured ? 'credential-status ready' : 'credential-status'}>
                     {credentialStatusLabel(credentialStoreAvailable, configured)}
                   </span>
                 </div>
                 <div className="credential-edit">
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    value={secretValues[secret.id] ?? ''}
-                    onChange={(event) => onSecretValueChange(secret.id, event.target.value)}
-                    placeholder={configured ? 'Enter to replace' : 'Paste value locally'}
-                    aria-label={secret.name}
-                  />
+                  {['resend', 'twilio', 'bluebubbles'].includes(secret.id) && (
+                    <ConnectionFields
+                      provider={secret.id}
+                      value={secretValues[secret.id] ?? ''}
+                      onChange={(value) => onSecretValueChange(secret.id, value)}
+                    />
+                  )}
+                  <details
+                    className="credential-advanced"
+                    open={
+                      ['resend', 'twilio', 'bluebubbles'].includes(secret.id) ? undefined : true
+                    }
+                  >
+                    <summary>
+                      {['resend', 'twilio', 'bluebubbles'].includes(secret.id)
+                        ? 'Advanced: edit connection JSON'
+                        : 'Access key or cookie'}
+                    </summary>
+                    <input
+                      type="password"
+                      autoComplete="new-password"
+                      value={secretValues[secret.id] ?? ''}
+                      onChange={(event) => onSecretValueChange(secret.id, event.target.value)}
+                      placeholder={configured ? 'Enter to replace' : 'Paste value locally'}
+                      aria-label={secret.name}
+                    />
+                  </details>
                   <button
                     type="button"
                     className="small-button"
+                    disabled={!secretValues[secret.id]?.trim() || credentialStoreAvailable !== true}
                     onClick={() => onSaveSecret(secret.id)}
                   >
                     Save
@@ -180,7 +233,14 @@ export function CredentialsSection({
                     <button
                       type="button"
                       className="small-button danger"
-                      onClick={() => onRemoveSecret(secret.id)}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Remove ${secret.name}? This connection will stop working until you add access details again.`,
+                          )
+                        )
+                          onRemoveSecret(secret.id);
+                      }}
                     >
                       Remove
                     </button>
@@ -206,7 +266,7 @@ export function CredentialsSection({
                     </button>
                   </div>
                 )}
-              </div>
+              </details>
             );
           })}
       </div>

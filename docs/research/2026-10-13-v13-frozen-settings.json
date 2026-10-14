@@ -1,0 +1,518 @@
+{
+  "version": 1,
+  "frozenAt": "2026-10-13T21:06:16.164Z",
+  "parameters": {
+    "penalty": 400,
+    "minimumTrainingGames": 20,
+    "minimumFeedbackGames": 20,
+    "feedbackRidge": 0.01,
+    "maxAddedLogit": 0.15,
+    "featureCount": 18,
+    "fitSeasons": 2
+  },
+  "selected": {
+    "features": "all",
+    "halfLifeWeeks": 4,
+    "priorSeasonWeight": 0
+  },
+  "selection": "Best enabled candidate on 2024 and 2025 Weeks 1–8, stable lexical tie-break. Book-only control reported separately.",
+  "audit": "2025 Weeks 9–18 and 2026 Weeks 1–5, already examined and diagnosis-informed reused research.",
+  "results": [
+    {
+      "spec": {
+        "features": "all",
+        "halfLifeWeeks": 4,
+        "priorSeasonWeight": 0
+      },
+      "id": "all-4-0",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999060590262084,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931288390383666,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-3.720976832130443e-7, 0.0000011387833561612863],
+        "previousImprovementInterval": [-0.0013784250260537785, 0.0039328241853480075],
+        "simultaneousBookInterval": [-7.210264089644682e-7, 0.00000148771208191271]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.24999369436532468,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931350755590014,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00010613392538635622, 0.00010072368565164067],
+        "previousImprovementInterval": [-0.0013840619789658457, 0.003932284212852411],
+        "simultaneousBookInterval": [-0.00015390642418041197, 0.00014849618444569642]
+      },
+      "active": {
+        "n": 11,
+        "brier": 0.2451507868510195,
+        "previousBrier": 0.251081199030609,
+        "bookBrier": 0.24516437809703673,
+        "logLoss": 0.6834458277025793,
+        "previousLogLoss": 0.6953110295494227,
+        "bookLogLoss": 0.6834731304626414,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "changed": 11,
+      "exactBookFallback": 379,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.0018277239673587405,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "all",
+        "halfLifeWeeks": 8,
+        "priorSeasonWeight": 0
+      },
+      "id": "all-8-0",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999098924545732,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296091162142,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [0, 0],
+        "previousImprovementInterval": [-0.0013787094877310327, 0.003932341961352314],
+        "simultaneousBookInterval": [0, 0]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2500078225154935,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.693163359101335,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00012812300733910535, 0.00009445646726668637],
+        "previousImprovementInterval": [-0.0013911692321150887, 0.003911135165663951],
+        "simultaneousBookInterval": [-0.00017952637426783577, 0.0001458598341954168]
+      },
+      "active": {
+        "n": 0
+      },
+      "changed": 0,
+      "exactBookFallback": 390,
+      "coverage": 122,
+      "meanReliabilityWeight": 0,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "all",
+        "halfLifeWeeks": 8,
+        "priorSeasonWeight": 0.25
+      },
+      "id": "all-8-0.25",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999098924545732,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931296091162142,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [0, 0],
+        "previousImprovementInterval": [-0.0013787094877310327, 0.003932341961352314],
+        "simultaneousBookInterval": [0, 0]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2500222312191132,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931921645895536,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00014494438267402678, 0.00008246043536224016],
+        "previousImprovementInterval": [-0.0013992781649989363, 0.003890426691308431],
+        "simultaneousBookInterval": [-0.0001974621331251065, 0.00013497818581331987]
+      },
+      "active": {
+        "n": 0
+      },
+      "changed": 0,
+      "exactBookFallback": 390,
+      "coverage": 122,
+      "meanReliabilityWeight": 0,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "all",
+        "halfLifeWeeks": 4,
+        "priorSeasonWeight": 0.25
+      },
+      "id": "all-4-0.25",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999124210253856,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931301156566552,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-7.471947506495533e-7, 2.414805881586532e-7],
+        "previousImprovementInterval": [-0.0013788698050329214, 0.003931996564491712],
+        "simultaneousBookInterval": [-9.755232670329894e-7, 4.6980910454208926e-7]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2500049694679268,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931576122353926,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00011940368735091072, 0.00009144324241199813],
+        "previousImprovementInterval": [-0.0013908959736941336, 0.003916568002376502],
+        "simultaneousBookInterval": [-0.00016809749488008456, 0.00014013704994117197]
+      },
+      "active": {
+        "n": 14,
+        "brier": 0.251716748013917,
+        "previousBrier": 0.26005054984681225,
+        "bookBrier": 0.25170970413807875,
+        "logLoss": 0.6965818986126386,
+        "previousLogLoss": 0.7132972263983636,
+        "bookLogLoss": 0.6965677878432112,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "changed": 14,
+      "exactBookFallback": 376,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.00022697741964216393,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "directional",
+        "halfLifeWeeks": 4,
+        "priorSeasonWeight": 0
+      },
+      "id": "directional-4-0",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999180424494882,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.69313123587464,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.0000022715708470174597, 6.41571864007043e-7],
+        "previousImprovementInterval": [-0.0013793597165958692, 0.00393136219123414],
+        "simultaneousBookInterval": [-0.00000294434332056095, 0.0000013143443375505334]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2499805448542728,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931087262181064,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.000035749087142850755, 0.00005663786951190587],
+        "previousImprovementInterval": [-0.0013730710154622422, 0.003947592271452579],
+        "simultaneousBookInterval": [-0.00005708528914783831, 0.00007797407151689342]
+      },
+      "active": {
+        "n": 26,
+        "brier": 0.2501550056263244,
+        "previousBrier": 0.25011861076976605,
+        "bookBrier": 0.25014278063394935,
+        "logLoss": 0.6934593804124367,
+        "previousLogLoss": 0.6933897661598816,
+        "bookLogLoss": 0.6934349790360506,
+        "bookImprovementInterval": [-0.000035330422349798895, 0.000010880437599646637],
+        "previousImprovementInterval": [-0.00986619416501491, 0.00979340445189816],
+        "simultaneousBookInterval": [-0.000046002537531490996, 0.000021552552781338742]
+      },
+      "changed": 26,
+      "exactBookFallback": 364,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.007777437768029974,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "directional",
+        "halfLifeWeeks": 4,
+        "priorSeasonWeight": 0.25
+      },
+      "id": "directional-4-0.25",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999187056371266,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931313684933605,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.0000023586473824224466, 5.960108717286974e-7],
+        "previousImprovementInterval": [-0.0013794184997856442, 0.003931288336896231],
+        "simultaneousBookInterval": [-0.00000304100761647424, 0.000001278371105780491]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.24998008395183446,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931077996187891,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00003528087999373482, 0.00005709146723944232],
+        "previousImprovementInterval": [-0.0013727888946712197, 0.003948231955538208],
+        "simultaneousBookInterval": [-0.00005661370804225401, 0.00007842429528796152]
+      },
+      "active": {
+        "n": 40,
+        "brier": 0.25069979671338494,
+        "previousBrier": 0.25359478944673225,
+        "bookBrier": 0.2506912038603947,
+        "logLoss": 0.6945486160457333,
+        "previousLogLoss": 0.70035737724335,
+        "bookLogLoss": 0.694531462118557,
+        "bookImprovementInterval": [-0.000023079892075338773, 0.00000589418609481184],
+        "previousImprovementInterval": [-0.0053370333113840675, 0.011127018778078692],
+        "simultaneousBookInterval": [-0.00002977127803641973, 0.000012585572055892798]
+      },
+      "changed": 40,
+      "exactBookFallback": 350,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.008188303339743255,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "directional",
+        "halfLifeWeeks": 8,
+        "priorSeasonWeight": 0
+      },
+      "id": "directional-8-0",
+      "totals": {
+        "n": 390,
+        "brier": 0.2499919934294782,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931316137502612,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.000002983094872077583, 9.747268303160618e-7],
+        "previousImprovementInterval": [-0.0013794556495196376, 0.003931079755099157],
+        "simultaneousBookInterval": [-0.000003897129562683952, 0.0000018887615209224305]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.2499806207865597,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931088815541796,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00004307329430105043, 0.00006381021209630032],
+        "previousImprovementInterval": [-0.001373125976631421, 0.003947495368047952],
+        "simultaneousBookInterval": [-0.0000677573857147039, 0.00008849430350995379]
+      },
+      "active": {
+        "n": 11,
+        "brier": 0.24519998098505244,
+        "previousBrier": 0.251081199030609,
+        "bookBrier": 0.24516437809703673,
+        "logLoss": 0.6835442038515626,
+        "previousLogLoss": 0.6953110295494227,
+        "bookLogLoss": 0.6834731304626414,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "changed": 11,
+      "exactBookFallback": 379,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.007999673988309334,
+      "nonTotalMaximumProductionDifference": 0
+    },
+    {
+      "spec": {
+        "features": "directional",
+        "halfLifeWeeks": 8,
+        "priorSeasonWeight": 0.25
+      },
+      "id": "directional-8-0.25",
+      "totals": {
+        "n": 390,
+        "brier": 0.24999209154876245,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6931318101506718,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.000003122522318166276, 9.179157078986084e-7],
+        "previousImprovementInterval": [-0.0013795201407567148, 0.003930948007767728],
+        "simultaneousBookInterval": [-0.000004055636742910291, 0.0000018510301326426238]
+      },
+      "v12": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "ungated": {
+        "n": 390,
+        "brier": 0.24998011930629338,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.693107873398657,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00004256522132946212, 0.00006430509965733761],
+        "previousImprovementInterval": [-0.001372818196759858, 0.003948190548709015],
+        "simultaneousBookInterval": [-0.00006724626765327584, 0.00008898614598115134]
+      },
+      "active": {
+        "n": 25,
+        "brier": 0.24884695661158115,
+        "previousBrier": 0.2561040354876828,
+        "bookBrier": 0.24882976068002027,
+        "logLoss": 0.6908404747332965,
+        "previousLogLoss": 0.7053832997848296,
+        "bookLogLoss": 0.6908061385957605,
+        "bookImprovementInterval": [-0.00005022436819526028, 0.000015832505073497044],
+        "previousImprovementInterval": [0.004882713997436284, 0.009631443754766988],
+        "simultaneousBookInterval": [-0.00006547979864684344, 0.00003108793552508021]
+      },
+      "changed": 25,
+      "exactBookFallback": 365,
+      "coverage": 122,
+      "meanReliabilityWeight": 0.008432275453146952,
+      "nonTotalMaximumProductionDifference": 0
+    }
+  ],
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "priorSettingsPath": "docs/research/2026-10-13-v12-r2-frozen-settings.json",
+  "priorSettingsSha256": "bbaa963d05a4174a485190e6ee0a512b58b164708d150bdf7283bf6146d24227",
+  "diagnosisSha256": "6ccd431e27c0acb0895a6103f585f895b1186d66280497cf21464cbbf87b9af5",
+  "codeHashes": {
+    "packages/core/src/expanded-total-tape.ts": "fb900b10431555d259561477ad0eaccf3634b17637d61df02bbab7e13121e1f8",
+    "packages/core/src/expanded-external-totals-model.ts": "4f3007fc0d35ddc3bffaa39e0c138c50cc17e9054c8a88ce68dd8403f78133d8",
+    "packages/core/src/external-total-signals.ts": "ef4949d804eb07efe837faf7172e64e417543f9402dbac7b20dc4bb930718c7b",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/core/src/market-context.ts": "f2b1a3be210252acc8875cd2fa13b04fe32586a16405dfabcc3dea5727c43bc8",
+    "packages/integrations/src/historical-prediction-market-data.ts": "43bfe9f4105997a63bf1f93e13ceae7e1bf9e58e121cfc2856520865f1700ac2",
+    "packages/integrations/src/prediction-market-data.ts": "0dc0db14ebdeb8e1bd67f01e9cb71b685ad8205b933acc068f00257154d24580",
+    "scripts/expanded-total-evaluation.mjs": "c97af8c355bff7b32e21037b86f88680da183130db4bfd7a46e46d80f2d0f7a4",
+    "packages/integrations/src/historical-total-catalog.ts": "4be8c6c186c1e34d0cdc295fbabf0072fdf6e356a9d1efc0d3d6b37f197bb1e6",
+    "scripts/retry-historical-external-totals.mjs": "339742849ac869621eeec5d3c1b063d0fa72e594d94b44fe9ffdb89808822588",
+    "scripts/prepare-expanded-total-snapshot.mjs": "444efad851fbb2b9bd6cc74f01e959180923f6f8343129bf796490f9e0e32be1",
+    "scripts/freeze-expanded-total-revision.mjs": "6df0e851f602b0130eb4d1b852abd1888b73869f7250d76ee658b779e66395ea",
+    "scripts/audit-expanded-totals.mjs": "78f79ed3124565e9f11a694c88f94de00d9fdfd8de0ca80f8e5bbf6933ca86e0",
+    "scripts/develop-expanded-totals.mjs": "210ecc4ad7194bd3fe57d97097cd4ff142bf54483ba481456482a1da9d915dda",
+    "packages/core/src/seasonal-external-totals-model.ts": "3f8a9bd39744b5a64153da6dddff14c08a9e004751d7559cc738e9e09b8e2b22",
+    "scripts/seasonal-external-evaluation.mjs": "6f609557f7c970b653baca10f16b53c35407be3dc2e1a2f7ba77b986a2868c19",
+    "scripts/develop-seasonal-external-totals.mjs": "8379460f72278cb75d59224e97622f2a8625fd992bda91265909309013961142",
+    "scripts/audit-seasonal-external-totals.mjs": "408aae51e17f7b2881eba7d059d5133cfb907043aa152dc446653f1e785f3e49"
+  }
+}

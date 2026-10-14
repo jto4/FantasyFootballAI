@@ -8,9 +8,19 @@ export function groupChatSyncBlockReason(
   channel: GroupChatSyncChannel,
   target: string,
   isBackgroundPoll: boolean,
+  expectedSettings?: AppSettings,
 ): string | undefined {
   if (!settings.memoryEnabled) return 'Member memory was disabled while retrieving chat history.';
 
+  if (
+    channel === 'imessage' &&
+    expectedSettings &&
+    ((settings.imessageProvider ?? 'bluebubbles') !==
+      (expectedSettings.imessageProvider ?? 'bluebubbles') ||
+      settings.imsgExecutablePath !== expectedSettings.imsgExecutablePath ||
+      settings.imsgChatId !== expectedSettings.imsgChatId)
+  )
+    return 'The iMessage provider or local chat configuration changed during sync. Try again.';
   const currentTarget =
     channel === 'imessage' ? settings.imessageChatGuid?.trim() : settings.smsRecipient?.trim();
   if (currentTarget !== target)

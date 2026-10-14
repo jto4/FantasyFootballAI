@@ -1,0 +1,671 @@
+[
+  {
+    "game": {
+      "id": "2024_02_LA_ARI",
+      "espnId": "401671754",
+      "season": 2024,
+      "week": 2,
+      "seasonType": "REG",
+      "date": "2024-09-15",
+      "home": "ARI",
+      "away": "LA",
+      "homeScore": 41,
+      "awayScore": 10
+    },
+    "summary": {
+      "header": {
+        "id": "401671754",
+        "season": {
+          "year": 2024,
+          "current": false,
+          "type": 2
+        },
+        "week": 2,
+        "league": {
+          "slug": "nfl"
+        },
+        "competitions": [
+          {
+            "id": "401671754",
+            "date": "2024-09-15T20:05Z",
+            "status": {
+              "type": {
+                "id": "3",
+                "name": "STATUS_FINAL",
+                "state": "post",
+                "completed": true,
+                "description": "Final",
+                "detail": "Final",
+                "shortDetail": "Final"
+              },
+              "isTBDFlex": false
+            },
+            "competitors": [
+              {
+                "id": "22",
+                "homeAway": "home",
+                "score": "41",
+                "team": {
+                  "id": "22",
+                  "abbreviation": "ARI"
+                }
+              },
+              {
+                "id": "14",
+                "homeAway": "away",
+                "score": "10",
+                "team": {
+                  "id": "14",
+                  "abbreviation": "LAR"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "scoringPlays": [
+        {
+          "id": "4016717543223",
+          "type": {
+            "id": "9",
+            "text": "Fumble Recovery (Own)"
+          },
+          "homeScore": 41,
+          "awayScore": 10,
+          "scoringType": {
+            "name": "touchdown",
+            "displayName": "Touchdown",
+            "abbreviation": "TD"
+          },
+          "team": {
+            "id": "22",
+            "abbreviation": "ARI"
+          }
+        }
+      ],
+      "drives": {
+        "previous": [
+          {
+            "plays": [
+              {
+                "id": "4016717543223",
+                "type": {
+                  "id": "9",
+                  "text": "Fumble Recovery (Own)"
+                },
+                "text": "(Shotgun) J.Conner left end to LA 5 for 2 yards (J.Verse). FUMBLES (J.Verse), recovered by ARZ-T.McBride at LA -2. TOUCHDOWN.M.Prater extra point is GOOD, Center-A.Brewer, Holder-B.Gillikin.",
+                "homeScore": 41,
+                "awayScore": 10,
+                "scoringPlay": true,
+                "isTurnover": false,
+                "scoringType": {
+                  "name": "touchdown",
+                  "displayName": "Touchdown",
+                  "abbreviation": "TD"
+                },
+                "start": {
+                  "down": 2,
+                  "team": {
+                    "id": "22"
+                  }
+                },
+                "end": {
+                  "team": {
+                    "id": "22"
+                  }
+                },
+                "teamParticipants": [
+                  {
+                    "id": "22",
+                    "type": "offense"
+                  },
+                  {
+                    "id": "14",
+                    "type": "defense"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "team": "ARI"
+  },
+  {
+    "game": {
+      "id": "2024_04_BUF_BAL",
+      "espnId": "401671783",
+      "season": 2024,
+      "week": 4,
+      "seasonType": "REG",
+      "date": "2024-09-29",
+      "home": "BAL",
+      "away": "BUF",
+      "homeScore": 35,
+      "awayScore": 10
+    },
+    "summary": {
+      "header": {
+        "id": "401671783",
+        "season": {
+          "year": 2024,
+          "current": false,
+          "type": 2
+        },
+        "week": 4,
+        "league": {
+          "slug": "nfl"
+        },
+        "competitions": [
+          {
+            "id": "401671783",
+            "date": "2024-09-30T00:20Z",
+            "status": {
+              "type": {
+                "id": "3",
+                "name": "STATUS_FINAL",
+                "state": "post",
+                "completed": true,
+                "description": "Final",
+                "detail": "Final",
+                "shortDetail": "Final"
+              },
+              "isTBDFlex": false
+            },
+            "competitors": [
+              {
+                "id": "33",
+                "homeAway": "home",
+                "score": "35",
+                "team": {
+                  "id": "33",
+                  "abbreviation": "BAL"
+                }
+              },
+              {
+                "id": "2",
+                "homeAway": "away",
+                "score": "10",
+                "team": {
+                  "id": "2",
+                  "abbreviation": "BUF"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "scoringPlays": [
+        {
+          "id": "4016717833163",
+          "type": {
+            "id": "9",
+            "text": "Fumble Recovery (Own)"
+          },
+          "homeScore": 35,
+          "awayScore": 10,
+          "scoringType": {
+            "name": "touchdown",
+            "displayName": "Touchdown",
+            "abbreviation": "TD"
+          },
+          "team": {
+            "id": "33",
+            "abbreviation": "BAL"
+          }
+        }
+      ],
+      "drives": {
+        "previous": [
+          {
+            "plays": [
+              {
+                "id": "4016717833163",
+                "type": {
+                  "id": "9",
+                  "text": "Fumble Recovery (Own)"
+                },
+                "text": "D.Henry right tackle to BUF 2 for -1 yards (R.Douglas). FUMBLES (R.Douglas), recovered by BLT-P.Ricard at BUF -3. TOUCHDOWN.J.Tucker extra point is GOOD, Center-N.Moore, Holder-J.Stout.",
+                "homeScore": 35,
+                "awayScore": 10,
+                "scoringPlay": true,
+                "isTurnover": false,
+                "scoringType": {
+                  "name": "touchdown",
+                  "displayName": "Touchdown",
+                  "abbreviation": "TD"
+                },
+                "start": {
+                  "down": 2,
+                  "team": {
+                    "id": "33"
+                  }
+                },
+                "end": {
+                  "team": {
+                    "id": "33"
+                  }
+                },
+                "teamParticipants": [
+                  {
+                    "id": "33",
+                    "type": "offense"
+                  },
+                  {
+                    "id": "2",
+                    "type": "defense"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "team": "BAL"
+  },
+  {
+    "game": {
+      "id": "2024_15_NE_ARI",
+      "espnId": "401671677",
+      "season": 2024,
+      "week": 15,
+      "seasonType": "REG",
+      "date": "2024-12-15",
+      "home": "ARI",
+      "away": "NE",
+      "homeScore": 30,
+      "awayScore": 17
+    },
+    "summary": {
+      "header": {
+        "id": "401671677",
+        "season": {
+          "year": 2024,
+          "current": false,
+          "type": 2
+        },
+        "week": 15,
+        "league": {
+          "slug": "nfl"
+        },
+        "competitions": [
+          {
+            "id": "401671677",
+            "date": "2024-12-15T21:25Z",
+            "status": {
+              "type": {
+                "id": "3",
+                "name": "STATUS_FINAL",
+                "state": "post",
+                "completed": true,
+                "description": "Final",
+                "detail": "Final",
+                "shortDetail": "Final"
+              },
+              "isTBDFlex": false
+            },
+            "competitors": [
+              {
+                "id": "22",
+                "homeAway": "home",
+                "score": "30",
+                "team": {
+                  "id": "22",
+                  "abbreviation": "ARI"
+                }
+              },
+              {
+                "id": "17",
+                "homeAway": "away",
+                "score": "17",
+                "team": {
+                  "id": "17",
+                  "abbreviation": "NE"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "scoringPlays": [
+        {
+          "id": "401671677767",
+          "type": {
+            "id": "9",
+            "text": "Fumble Recovery (Own)"
+          },
+          "homeScore": 10,
+          "awayScore": 0,
+          "scoringType": {
+            "name": "touchdown",
+            "displayName": "Touchdown",
+            "abbreviation": "TD"
+          },
+          "team": {
+            "id": "22",
+            "abbreviation": "ARI"
+          }
+        }
+      ],
+      "drives": {
+        "previous": [
+          {
+            "plays": [
+              {
+                "id": "401671677767",
+                "type": {
+                  "id": "9",
+                  "text": "Fumble Recovery (Own)"
+                },
+                "text": "G.Dortch left end to NE 2 for 6 yards (A.Jennings; J.Peppers). FUMBLES (A.Jennings), recovered by ARZ-J.Williams at NE -9. TOUCHDOWN. C.Ryland extra point is GOOD, Center-A.Brewer, Holder-M.Palardy.",
+                "homeScore": 10,
+                "awayScore": 0,
+                "scoringPlay": true,
+                "isTurnover": false,
+                "scoringType": {
+                  "name": "touchdown",
+                  "displayName": "Touchdown",
+                  "abbreviation": "TD"
+                },
+                "start": {
+                  "down": 2,
+                  "team": {
+                    "id": "22"
+                  }
+                },
+                "end": {
+                  "team": {
+                    "id": "22"
+                  }
+                },
+                "teamParticipants": [
+                  {
+                    "id": "22",
+                    "type": "offense"
+                  },
+                  {
+                    "id": "17",
+                    "type": "defense"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "team": "ARI"
+  },
+  {
+    "game": {
+      "id": "2025_05_TEN_ARI",
+      "espnId": "401772747",
+      "season": 2025,
+      "week": 5,
+      "seasonType": "REG",
+      "date": "2025-10-05",
+      "home": "ARI",
+      "away": "TEN",
+      "homeScore": 21,
+      "awayScore": 22
+    },
+    "summary": {
+      "header": {
+        "id": "401772747",
+        "season": {
+          "year": 2025,
+          "current": false,
+          "type": 2
+        },
+        "week": 5,
+        "league": {
+          "slug": "nfl"
+        },
+        "competitions": [
+          {
+            "id": "401772747",
+            "date": "2025-10-05T20:05Z",
+            "status": {
+              "type": {
+                "id": "3",
+                "name": "STATUS_FINAL",
+                "state": "post",
+                "completed": true,
+                "description": "Final",
+                "detail": "Final",
+                "shortDetail": "Final"
+              },
+              "isTBDFlex": false
+            },
+            "competitors": [
+              {
+                "id": "22",
+                "homeAway": "home",
+                "score": "21",
+                "team": {
+                  "id": "22",
+                  "abbreviation": "ARI"
+                }
+              },
+              {
+                "id": "10",
+                "homeAway": "away",
+                "score": "22",
+                "team": {
+                  "id": "10",
+                  "abbreviation": "TEN"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "scoringPlays": [
+        {
+          "id": "4017727474224",
+          "type": {
+            "id": "39",
+            "text": "Fumble Return Touchdown",
+            "abbreviation": "TD"
+          },
+          "homeScore": 21,
+          "awayScore": 19,
+          "scoringType": {
+            "name": "touchdown",
+            "displayName": "Touchdown",
+            "abbreviation": "TD"
+          },
+          "team": {
+            "id": "10",
+            "abbreviation": "TEN"
+          }
+        }
+      ],
+      "drives": {
+        "previous": [
+          {
+            "plays": [
+              {
+                "id": "4017727474224",
+                "type": {
+                  "id": "39",
+                  "text": "Fumble Return Touchdown",
+                  "abbreviation": "TD"
+                },
+                "text": "Tyler Lockett 0 Yd Fumble Recovery (Joey Slye Kick)",
+                "homeScore": 21,
+                "awayScore": 19,
+                "scoringPlay": true,
+                "isTurnover": false,
+                "scoringType": {
+                  "name": "touchdown",
+                  "displayName": "Touchdown",
+                  "abbreviation": "TD"
+                },
+                "start": {
+                  "down": 3,
+                  "team": {
+                    "id": "10"
+                  }
+                },
+                "end": {
+                  "team": {
+                    "id": "10"
+                  }
+                },
+                "teamParticipants": [
+                  {
+                    "id": "10",
+                    "type": "offense"
+                  },
+                  {
+                    "id": "22",
+                    "type": "defense"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "team": "TEN"
+  },
+  {
+    "game": {
+      "id": "2025_15_ARI_HOU",
+      "espnId": "401772903",
+      "season": 2025,
+      "week": 15,
+      "seasonType": "REG",
+      "date": "2025-12-14",
+      "home": "HOU",
+      "away": "ARI",
+      "homeScore": 40,
+      "awayScore": 20
+    },
+    "summary": {
+      "header": {
+        "id": "401772903",
+        "season": {
+          "year": 2025,
+          "current": false,
+          "type": 2
+        },
+        "week": 15,
+        "league": {
+          "slug": "nfl"
+        },
+        "competitions": [
+          {
+            "id": "401772903",
+            "date": "2025-12-14T18:00Z",
+            "status": {
+              "type": {
+                "id": "3",
+                "name": "STATUS_FINAL",
+                "state": "post",
+                "completed": true,
+                "description": "Final",
+                "detail": "Final",
+                "shortDetail": "Final"
+              },
+              "isTBDFlex": false
+            },
+            "competitors": [
+              {
+                "id": "34",
+                "homeAway": "home",
+                "score": "40",
+                "team": {
+                  "id": "34",
+                  "abbreviation": "HOU"
+                }
+              },
+              {
+                "id": "22",
+                "homeAway": "away",
+                "score": "20",
+                "team": {
+                  "id": "22",
+                  "abbreviation": "ARI"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "scoringPlays": [
+        {
+          "id": "401772903653",
+          "type": {
+            "id": "39",
+            "text": "Fumble Return Touchdown",
+            "abbreviation": "TD"
+          },
+          "homeScore": 17,
+          "awayScore": 0,
+          "scoringType": {
+            "name": "touchdown",
+            "displayName": "Touchdown",
+            "abbreviation": "TD"
+          },
+          "team": {
+            "id": "34",
+            "abbreviation": "HOU"
+          }
+        }
+      ],
+      "drives": {
+        "previous": [
+          {
+            "plays": [
+              {
+                "id": "401772903653",
+                "type": {
+                  "id": "39",
+                  "text": "Fumble Return Touchdown",
+                  "abbreviation": "TD"
+                },
+                "text": "B.Fisher reported in as eligible.  C.Stroud FUMBLES (Aborted) at ARZ 2, recovered by HST-W.Marks at ARZ 7. W.Marks for 7 yards, TOUCHDOWN. K.Fairbairn extra point is GOOD, Center-A.Brinkman, Holder-T.Townsend.",
+                "homeScore": 17,
+                "awayScore": 0,
+                "scoringPlay": true,
+                "isTurnover": false,
+                "scoringType": {
+                  "name": "touchdown",
+                  "displayName": "Touchdown",
+                  "abbreviation": "TD"
+                },
+                "start": {
+                  "down": 3,
+                  "team": {
+                    "id": "34"
+                  }
+                },
+                "end": {
+                  "team": {
+                    "id": "34"
+                  }
+                },
+                "teamParticipants": [
+                  {
+                    "id": "34",
+                    "type": "offense"
+                  },
+                  {
+                    "id": "22",
+                    "type": "defense"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "team": "HOU"
+  }
+]

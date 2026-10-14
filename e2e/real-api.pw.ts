@@ -10,7 +10,9 @@ test('generation survives browser reload and saves one editable draft in SQLite'
   try {
     workspace.block();
     await page.goto(workspace.url);
+    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
+    await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByText('Generation running', { exact: true })).toBeVisible();
     const request = workspace.store.snapshot().generationJobs![0]!;
     await page.reload();
@@ -74,16 +76,20 @@ test('uncertain email retry retains original envelope after Settings destination
   const workspace = await apiWorkspace();
   try {
     await page.goto(workspace.url);
+    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
+    await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     workspace.failNextDelivery();
     await page.getByRole('button', { name: 'Send saved report', exact: true }).click();
+    await page.getByRole('button', { name: /^Send email to / }).click();
     await expect(page.getByRole('button', { name: 'Check and retry delivery' })).toBeVisible();
     await workspace.store.update((state) => {
       state.settings.emailRecipient = 'changed@example.test';
     });
     page.on('dialog', (dialog) => void dialog.accept());
     await page.getByRole('button', { name: 'Check and retry delivery' }).click();
+    await page.getByRole('button', { name: /^Send email to / }).click();
     await expect(page.getByRole('dialog')).toContainText('Sent');
     expect(workspace.sends).toHaveLength(2);
     expect(workspace.sends[1]).toEqual(workspace.sends[0]);
@@ -110,13 +116,19 @@ test('guided onboarding connects, tests AI, and reviews a draft through producti
       .getByRole('button', { name: 'Connect league', exact: false })
       .click();
     await expect(page.getByText('Connected Real API League', { exact: false })).toBeVisible();
-    await page.getByRole('button', { name: 'Continue setup', exact: true }).click();
     await page
-      .getByRole('dialog', { name: 'Choose and test an AI runtime' })
-      .getByRole('button', { name: 'Set up AI', exact: false })
+      .getByRole('dialog')
+      .getByRole('combobox', { name: 'Your team', exact: true })
+      .selectOption('1');
+    await page
+      .getByRole('dialog', { name: 'Connect your AI writer' })
+      .getByRole('button', { name: 'Test connection', exact: true })
       .click();
-    await page.getByRole('button', { name: 'Save and test runtime', exact: false }).click();
-    await page.getByRole('button', { name: 'Generate first draft', exact: true }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Create first report', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByRole('dialog')).toContainText('controlled provider response');
     expect(workspace.store.snapshot().leagues[0]!.id).toBe('123456');
     expect(workspace.store.snapshot().reports).toHaveLength(1);

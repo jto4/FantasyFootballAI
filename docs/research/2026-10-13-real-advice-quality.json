@@ -1,0 +1,3782 @@
+{
+  "completedAt": "2026-10-14T02:26:32.309Z",
+  "scope": "Real public football data, synthetic PPR roster scenarios, analysis/review/evidence consistency; not measured future outcomes.",
+  "snapshotSha256": "7d9e840d3877a431645205f9b27745b75567ee5227b00043076388c067e4cf29",
+  "dataAsOf": "2026-10-14T01:54:53.769Z",
+  "season": 2026,
+  "week": 6,
+  "profile": {
+    "playerGameRows": 45108,
+    "catalogPlayers": 12229,
+    "forecastRows": 6035,
+    "forecastPlayers": 426,
+    "availableSources": 61,
+    "injuryRows": 1413,
+    "currentWeekInjuryRows": 0,
+    "datedInjuryRows": 0,
+    "duplicatePlayerGameKeys": 0,
+    "duplicateForecastKeys": 0
+  },
+  "analyses": 20,
+  "modelCalls": 40,
+  "invalidPasses": 0,
+  "auditFailures": 0,
+  "numericalChecks": 190,
+  "byMode": {
+    "betting": {
+      "analyses": 6,
+      "modelCalls": 12
+    },
+    "draft-plan": {
+      "analyses": 2,
+      "modelCalls": 4
+    },
+    "draft-review": {
+      "analyses": 2,
+      "modelCalls": 4
+    },
+    "lineup": {
+      "analyses": 4,
+      "modelCalls": 8
+    },
+    "trade": {
+      "analyses": 3,
+      "modelCalls": 6
+    },
+    "waivers": {
+      "analyses": 3,
+      "modelCalls": 6
+    }
+  },
+  "records": [
+    {
+      "phase": "initial",
+      "case": "betting-moneyline",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "moneyline",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "home",
+          "americanOdds": 124,
+          "oppositeAmericanOdds": -148,
+          "quoteId": "b6f48af349789443710829e77e97df4278f8cb286baab6d558cda37fc4007e6d"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:06:48.585Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on Denver: no supported betting edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "Denver\u2019s conditional non-push win estimate is {{bet-model-probability}}, below the quoted price\u2019s break-even rate of {{odds-break-even}} and essentially equal to the sportsbook no-vig baseline of {{odds-no-vig}}. Model-implied hypothetical return is {{bet-model-return}}, not measured profit.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["entered-odds", "games"]
+          },
+          {
+            "text": "Across chronologically evaluated games totaling {{bet-model-evaluation}}, model Brier error is {{bet-model-brier}} versus matched sportsbook baseline error of {{bet-model-baseline-brier}}; lower is better. The paired improvement lower bound is {{bet-model-improvement-lower}}, withholding actionable model support. Fitting used earlier weeks, but sportsbook prices are model inputs, not independent confirmation of an edge.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The apparent countercase is the historical hit rate of {{bet-hit-rate}} and retrospective return of {{bet-historical-roi}}, from {{bet-sample}}. These entered-price scenarios are neither calibrated forecasts nor evidence of executable historical profit.",
+            "metricIds": ["bet-hit-rate", "bet-historical-roi", "bet-sample"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band runs from {{bet-model-lower}} to {{bet-model-upper}}. It describes earlier comparable estimates, not an individual-game certainty interval. The DraftKings price displayed by ESPN is a retrieved snapshot, not a guaranteed executable offer; historical sportsbook identities and publication times are unknown.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["entered-odds", "games"]
+          },
+          {
+            "text": "Seattle\u2019s captured quarterback chart differs from its last recorded starter, but does not confirm game-day participation. Injury-role matching is incomplete, current official injury coverage is unavailable, and absent Out reports do not prove health. Personnel research does not adjust this moneyline forecast, and no supported weather adjustment is supplied.",
+            "metricIds": [],
+            "sourceIds": [
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-official-current-injuries",
+              "game-context-current-personnel"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Remain unbet rather than automatically taking Seattle. Reconsider with refreshed executable prices, verified participation and independently supported conservative edge; an uncalibrated AI opinion cannot supply the missing advantage.",
+          "metricIds": [],
+          "sourceIds": ["entered-odds"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity evidence are supplied. Public sentiment is unknown and provides no demonstrated betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Compare the evidence before placing a bet",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 44.64285714285714,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 42.79403644395361,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 42.784809925312885,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 42.79403644395361,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.2117035964068629,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.21169352985944997,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -8.358047772160038e-5,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "b6f48af349789443710829e77e97df4278f8cb286baab6d558cda37fc4007e6d",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "moneyline",
+        "side": "home",
+        "americanOdds": 124,
+        "oppositeAmericanOdds": -148,
+        "observedAt": "2026-10-14T02:06:15.524Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "31f9b0bde9028a7e13c338718632e48bb4ea782f7895fe8083ef54d73bed581b",
+      "contextSha256": "e3ccebbf5f778a7f480541148b41594291083cee58aea2ddf450383965054a37"
+    },
+    {
+      "phase": "initial",
+      "case": "betting-spread",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "spread",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "home",
+          "line": 2.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "quoteId": "71dd67b760443cbf01764d09de27596abee1dbc3c3a7784e1651e442b9588c9b"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:07:54.212Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on Denver's spread: no supported betting edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "Denver's modeled cover probability is {{bet-model-probability}}, below the fetched price's break-even rate of {{odds-break-even}} and near the no-vig market baseline of {{odds-no-vig}}. The model-implied hypothetical return is {{bet-model-return}}, not measured profit. Sportsbook prices enter the model, so this is not independent market confirmation.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Chronological evaluation covers {{bet-model-evaluation}}, using earlier-week fitting and each historical game's archived handicap and paired prices. Model Brier error is {{bet-model-brier}}, slightly worse than the matched sportsbook baseline of {{bet-model-baseline-brier}}. The improvement lower bound is {{bet-model-improvement-lower}}, withholding actionable model support.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The apparent countercase is a historical hit rate of {{bet-hit-rate}} and retrospective return of {{bet-historical-roi}} over {{bet-sample}}. This small retrospective scenario is not a calibrated forecast; applying the entered odds does not establish historically executable prices or future profitability.",
+            "metricIds": ["bet-hit-rate", "bet-historical-roi", "bet-sample"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band spans {{bet-model-lower}} to {{bet-model-upper}}. It describes earlier comparable estimates, not guaranteed game-level uncertainty. DraftKings' price displayed by ESPN is a retrieval snapshot, not a guaranteed executable quote.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Seattle's captured quarterback chart differs from its last recorded starter but does not confirm participation. Injury-role matching is incomplete, injured-reserve coverage is omitted, and current official game-status coverage is unavailable. Personnel research does not adjust this spread probability; no supported weather effect was supplied.",
+            "metricIds": [],
+            "sourceIds": [
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-current-personnel",
+              "game-context-official-current-injuries",
+              "game-context-weather"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Abstain rather than automatically switching to Seattle. Reconsider with a refreshed executable quote, confirmed personnel and forecast evidence demonstrating a conservative advantage at that price plus supported improvement over the matched market baseline.",
+          "metricIds": [],
+          "sourceIds": ["games", "entered-odds"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity evidence were supplied. Public sentiment remains unknown and provides no demonstrated betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Compare the evidence before placing a bet",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 51.21951219512195,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 48.91657638136511,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 48.85900470733115,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 48.91657638136511,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.24982878120549154,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.24970218623774312,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -0.0008179859785966435,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "71dd67b760443cbf01764d09de27596abee1dbc3c3a7784e1651e442b9588c9b",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "spread",
+        "side": "home",
+        "line": 2.5,
+        "americanOdds": -105,
+        "oppositeAmericanOdds": -115,
+        "observedAt": "2026-10-14T02:07:52.945Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "35be17302ff3cfb6a4bf03e99a4a9938dcc089732959dac9806c076ba32dadce",
+      "contextSha256": "a0c3827d362097b7903a0ef37225c6765bdcd3589a6e5b58d6314a61ca62819a"
+    },
+    {
+      "phase": "initial",
+      "case": "betting-total",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "total",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "over",
+          "line": 40.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "quoteId": "cc88d8fc8e22a6dbdefc82f3b87d2d2837f6f1ebfa1b49d5d2394656128c52f9"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:08:56.272Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on the over: no supported betting edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The over's market-aware win estimate is {{bet-model-probability}}, below the break-even requirement of {{odds-break-even}} and the sportsbook no-vig baseline of {{odds-no-vig}}. Model-implied hypothetical return is {{bet-model-return}}, not measured profit.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Chronological evaluation covers {{bet-model-evaluation}}, with earlier-week fits and each historical game's own archived threshold and paired prices. Model Brier error is {{bet-model-brier}}, versus matched sportsbook error of {{bet-model-baseline-brier}}. Although lower error is better, the improvement lower bound is {{bet-model-improvement-lower}}, so a reliable advantage is not established. Sportsbook prices also enter the model; this is not an independent market forecast.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The strongest over countercase is the opponent-adjusted total estimate of {{bet-model-estimate}}, above the quoted threshold. However, this score estimate excludes personnel and weather adjustments, and an above-line mean does not establish a profitable betting probability.",
+            "metricIds": ["bet-model-estimate"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band extends from {{bet-model-lower}} to {{bet-model-upper}}. It describes historical comparable estimates, not guaranteed game-level uncertainty; market drift and future personnel uncertainty remain outside it.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Seattle's captured quarterback chart differs from its last recorded starter but does not confirm participation. Injury-role matching is incomplete, current official injury coverage is unavailable, and usable weather input is unavailable or unsupported. Descriptive quarterback efficiency and snap roles do not justify manual probability adjustments. The DraftKings price displayed by ESPN is a retrieval snapshot, not a guaranteed executable quote or publisher update time.",
+            "metricIds": [],
+            "sourceIds": [
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-official-current-injuries",
+              "game-context-current-personnel",
+              "game-context-weather",
+              "entered-odds"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Remain unbet rather than automatically switching to the under; rejecting the over does not establish an opposite-side edge after sportsbook margin. Reassess only with refreshed pricing, confirmed participation and adequately validated forecast support.",
+          "metricIds": [],
+          "sourceIds": [
+            "entered-odds",
+            "games",
+            "game-context-quarterbacks",
+            "game-context-live-injuries"
+          ]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity were supplied. Public sentiment is unknown; neither sentiment nor an uncalibrated AI opinion establishes a betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Compare the evidence before placing a bet",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 52.83018867924528,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 50.43297540699689,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 50.24837492291843,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 50.432975406996896,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.24980256845399426,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.25012765120282,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -0.0008771519805187752,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "cc88d8fc8e22a6dbdefc82f3b87d2d2837f6f1ebfa1b49d5d2394656128c52f9",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "total",
+        "side": "over",
+        "line": 40.5,
+        "americanOdds": -112,
+        "oppositeAmericanOdds": -108,
+        "observedAt": "2026-10-14T02:08:54.890Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "123f82e4ac1cd739e6a36dc321f2963f0ab02dafbc306fb0dd39d94ebd4ad442",
+      "contextSha256": "cac7867b79f863dc4df792e80c84dc3784ba34ecf2f8e02f638d6557d6719471"
+    },
+    {
+      "phase": "initial",
+      "case": "draft-plan",
+      "mode": "draft-plan",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "draft-plan",
+        "candidateIds": ["8676", "11620", "7594", "12507"],
+        "question": "Give a conditional draft-planning comparison of these real players for this test roster. It is in-season and the saved pick log is synthetic: do not present this as a current executable draft or a historically valid draft-time comparison. Explain what the available season/remaining evidence and roster needs support."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T01:59:11.193Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "Conditional outlook is useful, but selection remains unsupported",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "This is an in-season conditional planning comparison using a completed saved draft and synthetic pick log\u2014not an executable draft or a defensible retrospective draft grade. Candidate forecasts are supplied; missing future-pick timing does not prevent comparing them. Full-season totals include earned production and are not remaining-season value.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games"]
+          },
+          {
+            "text": "The supplied remaining forecasts are Chuba Hubbard {{7594:forecast-future}}, Rome Odunze {{11620:forecast-future}}, Omarion Hampton {{12507:forecast-future}}, and Rashid Shaheed {{8676:forecast-future}}. These are public expected-statistics forecasts scored for this league, not recorded results or prospectively validated predictions.",
+            "metricIds": [
+              "7594:forecast-future",
+              "11620:forecast-future",
+              "12507:forecast-future",
+              "8676:forecast-future"
+            ],
+            "sourceIds": ["espn-forecasts-2026-0", "espn-forecasts-2026-100", "games", "stats-2026"]
+          },
+          {
+            "text": "Running-back depth addresses a clearer roster vulnerability because Saquon Barkley is recorded Out. However, Hubbard does not establish a clear starting upgrade: Jonathan Taylor's remaining forecast is {{6813:forecast-future}}, while James Cook's future baseline is {{8138:forecast-baseline}}. Cook uses a historical baseline rather than the same public forecast method. Receiver depth is substantial, and Garrett Wilson's remaining forecast of {{8146:forecast-future}} exceeds the candidate receivers' estimates. CeeDee Lamb remains recorded Questionable.",
+            "metricIds": ["6813:forecast-future", "8138:forecast-baseline", "8146:forecast-future"],
+            "sourceIds": [
+              "league-snapshot",
+              "espn-forecasts-2026-0",
+              "games",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026"
+            ]
+          },
+          {
+            "text": "Recent workload supports Hubbard's stronger supplied outlook: his carries average {{7594:recent-carries}}, with a change of {{7594:change-carries}}. Hampton's corresponding figures are {{12507:recent-carries}} and {{12507:change-carries}}. These describe prior appearances, not guaranteed future roles; incomplete team totals prevent reliable workload-share comparisons.",
+            "metricIds": [
+              "7594:recent-carries",
+              "7594:change-carries",
+              "12507:recent-carries",
+              "12507:change-carries"
+            ],
+            "sourceIds": ["stats-2026", "stats-2025", "games"]
+          },
+          {
+            "text": "Hubbard's season value above positional replacement is {{7594:replacement}}, but that league-wide baseline is not this team's marginal starting gain. Barkley, Puka Nacua and Brock Bowers have supplied historical evidence but lack comparable season forecasts, leaving the full roster comparison incomplete. Usable fantasy ADP and an acquisition-cost or roster-space plan are also missing. The supplied decision policy therefore prevents selecting a player.",
+            "metricIds": ["7594:replacement"],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Hubbard's forecast covers {{7594:forecast-games}}, versus Hampton's {{12507:forecast-games}}, so aggregate totals do not isolate weekly superiority. Public forecasts lack prospective validation here; Cook's historical baseline also assumes continued participation without quantifying future injury or role changes. Retrieval dates are not publisher-update dates, and unmatched injury reports cannot confirm health.",
+            "metricIds": ["7594:forecast-games", "12507:forecast-games"],
+            "sourceIds": [
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026",
+              "injuries"
+            ]
+          },
+          {
+            "text": "The saved roster fills its configured capacity, so a real acquisition needs a legal roster-space plan and separate platform checks. Candidate exclusions establish only recorded availability against saved rosters and picks, not live or later-pick availability. Opponent-position totals describe aggregate historical production, not individual projections or grounds for inventing forecast adjustments.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games", "stats-2026", "stats-2025"]
+          }
+        ],
+        "alternative": {
+          "text": "Hampton challenges Hubbard's apparent advantage through a higher historical scoring average: {{12507:points-mean}} versus {{7594:points-mean}}, despite his weaker public forecast and declining recent workload. Odunze has recent targets of {{11620:recent-targets}}, versus Shaheed's {{8676:recent-targets}}, but either receiver faces substantial competition for this roster's starting spots. Comparable missing roster forecasts, fantasy ADP and acquisition costs would clarify the conditional value comparison.",
+          "metricIds": [
+            "12507:points-mean",
+            "7594:points-mean",
+            "11620:recent-targets",
+            "8676:recent-targets"
+          ],
+          "sourceIds": ["stats-2026", "stats-2025", "games", "league-snapshot"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "The current ESPN headlines concern other team offenses, not these candidates individually. Odunze's matched Sleeper add activity indicates platform attention only; it does not establish representative public opinion, player quality or a predictive edge.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1", "market-add"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:8144",
+          "publisher-ppr:7594",
+          "publisher-ppr:8676",
+          "publisher-ppr:11620",
+          "publisher-ppr:12507"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "25a217e165aa64ce343ebe9ab67de5f786954ee51d566d2d8ebb12e326cc49b6",
+      "contextSha256": "95a13c9af06491ca55bdeb8e1d453a09befcee139612a478b175dafe3b28b2df"
+    },
+    {
+      "phase": "initial",
+      "case": "draft-review",
+      "mode": "draft-review",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "draft-review",
+        "question": "Review the current outlook of this synthetic roster and pick log using real football data. Withhold a historical draft grade without draft-time estimates, ADP and actual alternatives. Identify supported strengths, weaknesses and practical next steps."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:00:41.220Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "Supported roster strengths, but incomplete forecasts and no defensible draft grade",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The completed saved draft and recorded roster are supplied. A retrospective process grade still requires draft-time forecasts, fantasy ADP and actually available alternatives. Current outcomes and NFL draft capital cannot establish those facts. Missing scoring-matched season estimates for Saquon Barkley, Puka Nacua and Brock Bowers also prevent a complete current scoring comparison.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "nfl-draft-picks"]
+          },
+          {
+            "text": "Quarterback has supported scoring strength: Josh Allen's public future estimate is {{4984:forecast-future}}, compared with Patrick Mahomes at {{4046:forecast-future}}. Their scheduled coverage differs. The dedicated quarterback slot and non-quarterback FLEX limit simultaneous starting value; Mahomes supplies insurance rather than additive lineup scoring. This does not establish whether drafting him was good value.",
+            "metricIds": ["4984:forecast-future", "4046:forecast-future"],
+            "sourceIds": ["league-snapshot", "espn-forecasts-2026-0", "games"]
+          },
+          {
+            "text": "Receiver depth is a structural strength. Public future estimates are Ja'Marr Chase {{7564:forecast-future}}, CeeDee Lamb {{6786:forecast-future}}, Chris Olave {{8144:forecast-future}} and Garrett Wilson {{8146:forecast-future}}. Puka Nacua adds historical evidence: prior scoring average {{9493:points-mean}} and recent targets {{9493:recent-targets}}. That history supports the depth assessment but cannot substitute for his missing forecast. These totals do not establish weekly starters or additive lineup value.",
+            "metricIds": [
+              "7564:forecast-future",
+              "6786:forecast-future",
+              "8144:forecast-future",
+              "8146:forecast-future",
+              "9493:points-mean",
+              "9493:recent-targets"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025",
+              "games"
+            ]
+          },
+          {
+            "text": "Running-back depth is the principal vulnerability while Barkley remains recorded Out. Jonathan Taylor's public future estimate is {{6813:forecast-future}}; James Cook's automatic future baseline is {{8138:forecast-baseline}}. Cook's recent carries are {{8138:recent-carries}}, versus Taylor's {{6813:recent-carries}}. These recorded workloads support established usage, not guaranteed future roles. Cook's baseline excludes adjustments because earlier tests did not establish reliable gains.",
+            "metricIds": [
+              "6813:forecast-future",
+              "8138:forecast-baseline",
+              "8138:recent-carries",
+              "6813:recent-carries"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "espn-forecasts-2026-0",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026",
+              "games"
+            ]
+          },
+          {
+            "text": "Tight end is not a demonstrated weakness. Brock Bowers' prior scoring average is {{11604:points-mean}}, versus Travis Kelce at {{1466:points-mean}}; recent targets are Bowers {{11604:recent-targets}} and Kelce {{1466:recent-targets}}. Bowers' production challenges any comparison that favors Kelce merely because his public future estimate, {{1466:forecast-future}}, is available. Historical production and publisher forecasts are different evidence types, so their future scoring gap remains unknown.",
+            "metricIds": [
+              "11604:points-mean",
+              "1466:points-mean",
+              "11604:recent-targets",
+              "1466:recent-targets",
+              "1466:forecast-future"
+            ],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "No uniquely matched injury report verifies current availability. Preserve Barkley's Out and Lamb's Questionable flags; Active catalog status does not establish health. Chase lacks a uniquely matched upcoming unplayed game. Retrieval timestamps are not publisher or injury-report update times.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "injuries", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Public forecasts have no prospective accuracy evaluation here. Cook's baseline assumes continued participation; historical residual bands and earlier weekly errors do not quantify future injury risk or calibrated season uncertainty. Full-season estimates include earned scoring and are neither remaining-season value nor draft-time knowledge.",
+            "metricIds": [],
+            "sourceIds": [
+              "espn-forecasts-2026-0",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026",
+              "games"
+            ]
+          },
+          {
+            "text": "Recorded opponent context is more restrictive for Taylor against Tennessee than for Cook against Las Vegas, but positional aggregates are not individual projections. Recent workload changes are descriptive, and incomplete team totals prevent reliable workload-share conclusions. Positional replacement values are not this roster's marginal starting gains.",
+            "metricIds": [],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "league-snapshot"]
+          }
+        ],
+        "alternative": {
+          "text": "Obtain scoring-matched forecasts for the uncovered players, verified game availability and Chase's upcoming schedule before optimizing weekly starters. Then evaluate actual running-back-depth offers against the starting value and insurance surrendered. Keeping quarterback and tight-end depth is a credible countercase, especially with availability uncertainty. No actual trade offer or verified waiver pool is supplied, so no transaction is established.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "games", "injuries"]
+        },
+        "perception": {
+          "tone": "mixed",
+          "text": "Current ESPN headlines praise Buffalo and Los Angeles offense while questioning New Orleans offense. These are limited team-level narratives, not player-specific assessments or representative public opinion. No matched activity metrics establish a perception-based predictive edge.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:8144"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "7b2a55351a8dc8ca9abb87e90a5d9630f4998de2a65926b64dd99406cd239419",
+      "contextSha256": "63320713ec422337e558fa0636ce944fbfd48df8b787ab9e0707fd528a2d5dae"
+    },
+    {
+      "phase": "initial",
+      "case": "lineup",
+      "mode": "lineup",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "lineup",
+        "question": "Set a complete legal PPR lineup from this scenario roster. Compare the recorded starters with the proposed starters; explicitly address the bye-week and recorded Out player, questionable availability and any change. This is a test scenario, not my actual roster."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T01:56:47.648Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "Withhold selection; the supplied proposal remains conditional",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The supplied decision policy prohibits selecting starters. Recorded ownership and a complete proposed assignment are present; the missing detail is the recorded starter-by-slot mapping, so exact substitutions cannot be verified.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "For comparison only, the supplied proposal assigns Josh Allen at quarterback, James Cook and Jonathan Taylor at running back, Puka Nacua and CeeDee Lamb at receiver, Brock Bowers at tight end, and Chris Olave at flex. This fills the configured starting slots without duplicating an owned player, but Lamb's participation remains uncertain.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "That proposal's supplied estimate is {{lineup-optimized}}, versus the recorded-starter aggregate of {{lineup-current}}, with a reported change of {{lineup-gain}}. These are starting-lineup estimates, not bench-point sums or guaranteed gains. The aggregate alone cannot identify which recorded starters changed.",
+            "metricIds": ["lineup-optimized", "lineup-current", "lineup-gain"],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+          },
+          {
+            "text": "The proposal correctly excludes Saquon Barkley's recorded Out status and Ja'Marr Chase's unscheduled bye week. Barkley's publisher forecast and Chase's played-game baseline cannot override those exclusions. Whether either was a recorded starter is not shown.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games"]
+          },
+          {
+            "text": "The supplied quarterback estimates favor Allen at {{4984:projected}} over Patrick Mahomes at {{4046:projected}}; the tight-end comparison favors Bowers at {{11604:projected}} over Travis Kelce at {{1466:projected}}. Lamb's estimate is {{6786:projected}}, compared with Olave at {{8144:projected}} and Garrett Wilson at {{8146:projected}}. Lamb's Questionable status challenges the highest-estimate assignment.",
+            "metricIds": [
+              "4984:projected",
+              "4046:projected",
+              "11604:projected",
+              "1466:projected",
+              "6786:projected",
+              "8144:projected",
+              "8146:projected"
+            ],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Cook's comparison value is a historical baseline of {{8138:baseline}}, not a complete public weekly forecast. His recent carries are {{8138:recent-carries}}, supporting recorded workload rather than guaranteeing future usage. Taylor's public weekly estimate is {{6813:projected}}. Opponent-position totals are descriptive context, not individual projections or justified point adjustments.",
+            "metricIds": ["8138:baseline", "8138:recent-carries", "6813:projected"],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "No uniquely matched current injury report establishes availability for these players. Preserve the recorded Out and Questionable flags; Active catalog status does not prove readiness. Retrieval dates are not publisher or injury-report update times. Public forecasts lack prospective validation here, while Cook's baseline assumes his prior role continues and excludes missed appearances.",
+            "metricIds": [],
+            "sourceIds": [
+              "league-snapshot",
+              "injuries",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Provide the recorded starter-by-slot mapping and verified game designations, especially for Lamb, then reassess under a policy permitting selection. Wilson is the relevant unused receiver comparison if Lamb cannot play; Olave already occupies the supplied proposal's flex slot and cannot simultaneously fill another slot. A changed assignment would need its own total.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "injuries"]
+        },
+        "perception": {
+          "tone": "mixed",
+          "text": "The selected current ESPN headlines praise Buffalo and Los Angeles offense while questioning New Orleans offense. This is limited team-level headline tone, not player-specific evidence, representative public opinion, or a predictive lineup edge.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [
+        {
+          "id": "lineup-optimized",
+          "label": "Best supported starting-lineup estimate",
+          "value": 137.99718018500002,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"],
+          "description": "A legal assignment using supplied estimates. Not a win forecast."
+        },
+        {
+          "id": "lineup-current",
+          "label": "Current starters estimate",
+          "value": 121.09841113200001,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        },
+        {
+          "id": "lineup-gain",
+          "label": "Estimated change from current starters",
+          "value": 16.89876905300001,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "lineup-optimized",
+          "lineup-current",
+          "lineup-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "038bc84bebf6bd2d37529a067c323207d128536573bd7a1882fca6086a1813f3",
+      "contextSha256": "d3909c11f6691723dc249492bc61acb522621e4a444401c297d7bf28da7de3be"
+    },
+    {
+      "phase": "initial",
+      "case": "start-sit",
+      "mode": "lineup",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "lineup",
+        "candidateIds": ["9493", "8146"],
+        "question": "Compare these players for one WR spot, show the estimates for both, and explain the practical reasons to reconsider before kickoff."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T01:58:17.904Z",
+      "verdict": "lean",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "lean",
+        "headline": "Lean Puka Nacua for the shared receiver spot",
+        "recommendedPlayerIds": ["9493"],
+        "reasons": [
+          {
+            "text": "Nacua's weekly estimate is {{9493:projected}}, versus {{8146:projected}} for Garrett Wilson; the supplied gap is {{start-sit-gap}}. These are ESPN expected statistics scored under your league rules for the scheduled unplayed matchup, not validated outcome probabilities.",
+            "metricIds": ["9493:projected", "8146:projected", "start-sit-gap"],
+            "sourceIds": ["espn-forecasts-2026-0", "games"]
+          },
+          {
+            "text": "Both players are owned in the saved roster and eligible for this shared receiver spot. Select Nacua conditionally on availability, keep him out of other starting slots, and check the rest of the lineup separately.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "Recorded recent targets favor Nacua at {{9493:recent-targets}}, compared with Wilson at {{8146:recent-targets}}. Arizona's combined receiver scoring allowed is {{9493:opponent-position-points}}, versus New England's {{8146:opponent-position-points}}. These support the comparison descriptively, but neither prior workload nor opponent-position totals establish an individual future outcome. Incomplete team target totals prevent a reliable workload-share comparison.",
+            "metricIds": [
+              "9493:recent-targets",
+              "8146:recent-targets",
+              "9493:opponent-position-points",
+              "8146:opponent-position-points"
+            ],
+            "sourceIds": ["stats-2026", "stats-2025", "games"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Neither player has a uniquely matched current injury report here. Active catalog status does not establish game availability. Reconsider before kickoff if final designations, inactive lists, workload restrictions or quarterback news change the outlook. Source retrieval times are not report update times.",
+            "metricIds": [],
+            "sourceIds": ["injuries", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Nacua's recent workload should not be extrapolated unchanged: his publisher forecast targets are {{9493:forecast-targets}}, versus Wilson's {{8146:forecast-targets}}. Nacua's historical scoring variability is {{9493:points-sd}}, compared with Wilson's {{8146:points-sd}}, so the higher estimate does not guarantee a safer result. These historical measures are not forecast intervals, and the public forecasts lack prospective validation here.",
+            "metricIds": [
+              "9493:forecast-targets",
+              "8146:forecast-targets",
+              "9493:points-sd",
+              "8146:points-sd"
+            ],
+            "sourceIds": ["espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+          }
+        ],
+        "alternative": {
+          "text": "Wilson is the credible fallback if fresh reports establish a Nacua absence or meaningful restriction and confirm Wilson's availability. His lower historical variability alone is not enough to overturn the supplied estimate advantage.",
+          "metricIds": [],
+          "sourceIds": ["injuries", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "The current ESPN headline is favorable toward the Rams' offense, but it is team-level coverage rather than player-specific evidence for Nacua. It does not establish representative public opinion or a predictive edge; no matched platform activity is supplied.",
+          "metricIds": [],
+          "sourceIds": ["news-0"]
+        }
+      },
+      "savedHeadline": "Lean Puka Nacua for the shared receiver spot",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["publisher-ppr:9493", "publisher-ppr:8146"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "bf6a54cc48b69037708a29926cdee8263a42e27096b75a5dbd6c4200886aa19b",
+      "contextSha256": "58b244fd06a04a77a98a326a2739e1e73f9da974bd78ba60b0ff32af9d6b51d8"
+    },
+    {
+      "phase": "initial",
+      "case": "trade-loss",
+      "mode": "trade",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "trade",
+        "giveIds": ["9493"],
+        "receiveIds": ["11631"],
+        "tradeTeamId": "other",
+        "throughWeek": 18,
+        "question": "Evaluate the proposed exchange on remaining-season starting value and roster consequences; do not accept a weak offer just because both players are good NFL players."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:03:35.304Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "Thomas cannot yet be valued against Nacua",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "Brian Thomas lacks a scoring-matched remaining-season estimate and uniquely matched performance history; his matched sample is {{11631:sample}}. This is missing evidence, not proof that he is a weaker player.",
+            "metricIds": ["11631:sample"],
+            "sourceIds": []
+          },
+          {
+            "text": "The supported starting-roster comparison falls from {{trade-before}} to {{trade-after}}, a change of {{trade-gain}}. Thomas is omitted because his estimate is unavailable, so this measures the fallback roster after removing Nacua\u2014not an established loss from the complete exchange.",
+            "metricIds": ["trade-before", "trade-after", "trade-gain"],
+            "sourceIds": [
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026"
+            ]
+          },
+          {
+            "text": "The saved snapshot records Nacua on your roster and Thomas on the comparison roster. The fallback legally moves Chase to receiver and Olave into FLEX. Nacua's remaining estimate is {{9493:projected}}, compared with Olave's {{8144:projected}}. Receiver depth cushions the departure, but the exchange does not address another positional need or establish improved starting value.",
+            "metricIds": ["9493:projected", "8144:projected"],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Lamb is recorded as Questionable and Barkley as Out; Barkley is excluded from these starting comparisons. No uniquely matched injury report establishes current availability for Nacua or Thomas. The snapshot also does not guarantee live ownership or transaction eligibility.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "injuries"]
+          },
+          {
+            "text": "The public forecasts sum verified unplayed weeks, not already-earned production, and lack prospective validation here. Cook's automatic estimate uses a historical scoring baseline with continued participation assumed. Retrieval times are not publisher update times, and aggregate slot comparisons do not resolve weekly bye coverage or future injuries.",
+            "metricIds": [],
+            "sourceIds": [
+              "espn-forecasts-2026-0",
+              "games",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Thomas could outperform the fallback and restore or improve starting value, so the reported decline cannot justify treating him as worthless. Obtain a uniquely matched, scoring-confirmed remaining-season forecast, workload evidence and current availability, then compare weekly legal lineups. Houston's opposing-receiver totals cannot substitute for his individual forecast.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "games", "injuries"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN's upbeat Rams headline is team-level context, not a player-specific assessment of Nacua. Thomas's matched Sleeper drop activity reflects limited platform behavior, not representative public opinion, player quality or a predictive trade edge.",
+          "metricIds": ["11631:market-drops"],
+          "sourceIds": ["news-1", "market-drop"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [
+        {
+          "id": "trade-before",
+          "label": "Starting roster remaining estimate before trade",
+          "value": 1631.3291843639001,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        },
+        {
+          "id": "trade-after",
+          "label": "Starting roster remaining estimate after trade",
+          "value": 1569.3441700973,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        },
+        {
+          "id": "trade-gain",
+          "label": "Remaining starting-slot estimate change",
+          "value": -61.98501426660005,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "trade-before",
+          "trade-after",
+          "trade-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "af9b2b39c30fd83282e0887d5f14151f226f944dd15233981dfffdc7885d88e2",
+      "contextSha256": "6df3a7640136fc6a6d20ba01c7a2ddce2743b9c631d25d7bc1b1623ed9b57a08"
+    },
+    {
+      "phase": "initial",
+      "case": "trade",
+      "mode": "trade",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "trade",
+        "giveIds": ["4866"],
+        "receiveIds": ["9509"],
+        "tradeTeamId": "other",
+        "throughWeek": 18,
+        "question": "Evaluate this conditional player-for-player exchange for this scenario team using remaining-season starting value. Address injury and depth risks. The other manager\u2019s willingness and platform eligibility are unknown."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:02:26.728Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "Conditional comparison available; selection withheld",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The saved snapshot confirms Barkley belongs to your roster and Robinson to the comparison roster. Complete conditional lineup comparisons are supplied, but the decision policy requires withholding selection. Live ownership, platform eligibility and the other manager\u2019s willingness remain unverified.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "The supplied remaining-season starting estimate increases from {{trade-before}} to {{trade-after}}, a change of {{trade-gain}}. Robinson\u2019s estimate of {{9509:projected}} replaces Cook\u2019s {{8138:projected}} in the starting comparison, with Taylor retained. This is starting-slot value, not accumulated bench value.",
+            "metricIds": [
+              "trade-before",
+              "trade-after",
+              "trade-gain",
+              "9509:projected",
+              "8138:projected"
+            ],
+            "sourceIds": [
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2024",
+              "stats-2025",
+              "stats-2026"
+            ]
+          },
+          {
+            "text": "Robinson\u2019s recorded recent carries are {{9509:recent-carries}} and recent targets are {{9509:recent-targets}}, supporting prior involvement rather than guaranteeing future workload. His estimate uses publisher expectations; Cook\u2019s uses a historical scoring baseline. Their comparison is conditional, not prospectively validated remaining-season accuracy.",
+            "metricIds": ["9509:recent-carries", "9509:recent-targets"],
+            "sourceIds": ["stats-2026", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Barkley is recorded Out and excluded from the supplied active-lineup comparison, but that does not establish season-long unavailability. His future forecast is {{4866:forecast-future}}; neither that forecast nor the unmatched injury coverage establishes his return timetable. The calculated gain therefore does not fully resolve injury-aware remaining-season value.",
+            "metricIds": ["4866:forecast-future"],
+            "sourceIds": ["league-snapshot", "injuries", "espn-forecasts-2026-0", "games"]
+          },
+          {
+            "text": "The exchange preserves nominal running-back depth and leaves Cook as cover, but the static season-total comparison does not establish weekly bye or injury coverage. Receiver depth cannot fill mandatory running-back slots. Robinson\u2019s Active status is not verified clearance, and Lamb remains Questionable.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games", "injuries"]
+          }
+        ],
+        "alternative": {
+          "text": "The countercase is retaining Barkley\u2019s recovery upside while Cook and Taylor provide running-back coverage. A verified injury outlook and week-by-week legal lineup comparison would better distinguish that opportunity cost from the supplied static estimate. Live trade permission and willingness require separate confirmation.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "injuries", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "The supplied ESPN headlines concern other teams, not Barkley or Robinson. They do not establish sentiment about this exchange, and no matched activity metrics support a public-opinion claim.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [
+        {
+          "id": "trade-before",
+          "label": "Starting roster remaining estimate before trade",
+          "value": 1631.3291843639001,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        },
+        {
+          "id": "trade-after",
+          "label": "Starting roster remaining estimate after trade",
+          "value": 1711.2124827529,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        },
+        {
+          "id": "trade-gain",
+          "label": "Remaining starting-slot estimate change",
+          "value": 79.88329838899995,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2024", "stats-2025", "stats-2026"]
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "publisher-ppr:9509",
+          "trade-before",
+          "trade-after",
+          "trade-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "ccbdef5416a5ead03d67f9a6dfc76095e30363f686f27aa9bbd9d77a18747f5d",
+      "contextSha256": "296e1bcc64476bf3b286bcd831a868462977db94a2b70517440ec3a3d232778c"
+    },
+    {
+      "phase": "initial",
+      "case": "waivers",
+      "mode": "waivers",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "waivers",
+        "candidateIds": ["8676", "11620", "7594", "12507"],
+        "dropPlayerId": "8144",
+        "question": "Compare adding each candidate and dropping Chris Olave after re-optimizing all starting slots. These players are unrostered only in the test scenario; actual league availability, locks, priority and FAAB are unknown. Distinguish immediate weekly gain from unquantified stash value."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:04:47.304Z",
+      "verdict": "insufficient",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "insufficient",
+        "headline": "No actionable waiver selection; modeled moves reduce weekly value",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The decision policy prevents a selection. The saved scenario nevertheless supports a conditional comparison: the current optimized starting-lineup estimate is {{waiver-before}}, including Chris Olave's estimate of {{waiver-drop}}. Actual waiver availability and transaction eligibility remain unknown.",
+            "metricIds": ["waiver-before", "waiver-drop"],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          },
+          {
+            "text": "After removing Olave and re-optimizing all starting slots, Chuba Hubbard yields {{7594:waiver-after}}, with a change of {{7594:waiver-gain}}; Rashid Shaheed yields {{8676:waiver-after}}, with a change of {{8676:waiver-gain}}; Rome Odunze yields {{11620:waiver-after}}, with a change of {{11620:waiver-gain}}; Omarion Hampton yields {{12507:waiver-after}}, with a change of {{12507:waiver-gain}}. Every proposed move lowers the supplied weekly starting-lineup estimate.",
+            "metricIds": [
+              "7594:waiver-after",
+              "7594:waiver-gain",
+              "8676:waiver-after",
+              "8676:waiver-gain",
+              "11620:waiver-after",
+              "11620:waiver-gain",
+              "12507:waiver-after",
+              "12507:waiver-gain"
+            ],
+            "sourceIds": [
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100",
+              "stats-2026",
+              "stats-2025"
+            ]
+          },
+          {
+            "text": "Hubbard's weekly estimate is {{7594:projected}}, barely above Garrett Wilson's {{8146:projected}}, so Hubbard fills FLEX after Olave leaves. Wilson fills FLEX in the other comparisons, leaving the acquisitions benched. Shaheed's weekly estimate is {{8676:projected}}, Odunze's is {{11620:projected}}, and Hampton's is {{12507:projected}}. Bench estimates are not starting-lineup gains, and Hubbard's tiny modeled advantage does not establish reliable superiority.",
+            "metricIds": [
+              "7594:projected",
+              "8146:projected",
+              "8676:projected",
+              "11620:projected",
+              "12507:projected"
+            ],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "espn-forecasts-2026-100"]
+          },
+          {
+            "text": "The countercase is depth and changing workload: Hubbard's recent carries are {{7594:recent-carries}}, with a change of {{7594:change-carries}}; Odunze's recent targets are {{11620:recent-targets}}, with a change of {{11620:change-targets}}. These increases support investigating future opportunity, but describe recorded appearances rather than guaranteed roles. They do not quantify stash value or offset losing Olave in this weekly comparison.",
+            "metricIds": [
+              "7594:recent-carries",
+              "7594:change-carries",
+              "11620:recent-targets",
+              "11620:change-targets"
+            ],
+            "sourceIds": ["stats-2026", "stats-2025", "games"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The optimization assumes questionable CeeDee Lamb participates, excludes Saquon Barkley because his recorded status is Out, and excludes Ja'Marr Chase because no game is scheduled. Availability changes require fresh optimization. No uniquely matched injury reports establish current availability for the other players.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "injuries", "games"]
+          },
+          {
+            "text": "The public weekly estimates score publisher expectations for the verified upcoming interval; they are not recorded performance or prospectively validated forecasts. James Cook instead contributes a historical baseline of {{8138:baseline}}, which assumes role continuity and excludes missed appearances. Retrieval times do not establish publisher update times.",
+            "metricIds": ["8138:baseline"],
+            "sourceIds": [
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100",
+              "stats-2026",
+              "stats-2025"
+            ]
+          },
+          {
+            "text": "Opponent-position allowances are historical totals across opposing players, not individual projections. They cannot justify inventing an adjustment that reverses the supplied comparison. Test-scenario ownership also does not establish live availability, locks, waiver priority or FAAB requirements.",
+            "metricIds": [],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "league-snapshot"]
+          }
+        ],
+        "alternative": {
+          "text": "A different legal drop would require a separate full-lineup comparison. An actionable decision also needs verified live availability, transaction rules and current game status. Future role and schedule evidence would be needed to evaluate stash value beyond this weekly calculation.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "injuries", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN's Saints headline supplies negative team-level context, not player-specific evidence against Olave. Odunze's Sleeper add activity is {{11620:market-adds}}; it indicates platform attention, not representative public opinion, league availability or a predictive edge.",
+          "metricIds": ["11620:market-adds"],
+          "sourceIds": ["news-0", "market-add"]
+        }
+      },
+      "savedHeadline": "More evidence is needed before choosing",
+      "decisionMetrics": [
+        {
+          "id": "waiver-before",
+          "label": "Current best starting-lineup estimate",
+          "value": 137.99718018500002,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        },
+        {
+          "id": "waiver-drop",
+          "label": "Chris Olave: estimate removed by the proposed drop",
+          "value": 17.374864351000003,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "7594:waiver-gain",
+          "label": "Chuba Hubbard: starting-lineup estimate change",
+          "value": -2.741734796000003,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "8676:waiver-gain",
+          "label": "Rashid Shaheed: starting-lineup estimate change",
+          "value": -2.745529423000022,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "11620:waiver-gain",
+          "label": "Rome Odunze: starting-lineup estimate change",
+          "value": -2.745529423000022,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "12507:waiver-gain",
+          "label": "Omarion Hampton: starting-lineup estimate change",
+          "value": -2.745529423000022,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "publisher-ppr:7594",
+          "publisher-ppr:8676",
+          "publisher-ppr:11620",
+          "publisher-ppr:12507",
+          "waiver-before",
+          "8676:waiver-after",
+          "8676:waiver-gain",
+          "11620:waiver-after",
+          "11620:waiver-gain",
+          "7594:waiver-after",
+          "7594:waiver-gain",
+          "12507:waiver-after",
+          "12507:waiver-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "06e2870dd30e475f1a9e66e5004aea68d3dda0cac5f6eae1ad8013cbc65e39cf",
+      "contextSha256": "fa25abf178ba2a1ce1ff6b008e306ce8eea0d582b0fb96c664bb7b3ec2c5735f"
+    },
+    {
+      "phase": "corrected",
+      "case": "draft-plan-complete",
+      "mode": "draft-plan",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "draft-plan",
+        "candidateIds": ["8676", "11620", "7594", "12507"],
+        "question": "Give a conditional draft-planning comparison of these real players for this test roster. It is in-season and the saved pick log is synthetic: do not present this as a current executable draft or a historically valid draft-time comparison. Explain what the available season/remaining evidence and roster needs support."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:07:07.401Z",
+      "verdict": "lean",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "lean",
+        "headline": "Conditionally favor Chuba Hubbard for running-back depth",
+        "recommendedPlayerIds": ["7594"],
+        "reasons": [
+          {
+            "text": "This is a conditional in-season planning comparison for the requested test roster. The saved draft is complete; neither its synthetic planning log nor current estimates supports an executable draft recommendation or a retrospective draft-time grade.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "Hubbard leads the supplied full-season estimates at {{7594:projected}}, compared with Hampton at {{12507:projected}}, Odunze at {{11620:projected}} and Shaheed at {{8676:projected}}. These totals include recorded scoring, so they are not remaining-season value.",
+            "metricIds": ["7594:projected", "12507:projected", "11620:projected", "8676:projected"],
+            "sourceIds": ["espn-forecasts-2026-0", "espn-forecasts-2026-100", "stats-2026", "games"]
+          },
+          {
+            "text": "The future-only comparison also favors Hubbard at {{7594:forecast-future}}, followed by Odunze at {{11620:forecast-future}}, Hampton at {{12507:forecast-future}} and Shaheed at {{8676:forecast-future}}. Hubbard's scheduled future appearances are {{7594:forecast-games}}; the corresponding counts are Hampton {{12507:forecast-games}}, Odunze {{11620:forecast-games}} and Shaheed {{8676:forecast-games}}. These are publisher expectations scored over exact verified unplayed weeks, not prospectively validated predictions.",
+            "metricIds": [
+              "7594:forecast-future",
+              "11620:forecast-future",
+              "12507:forecast-future",
+              "8676:forecast-future",
+              "7594:forecast-games",
+              "12507:forecast-games",
+              "11620:forecast-games",
+              "8676:forecast-games"
+            ],
+            "sourceIds": ["espn-forecasts-2026-0", "espn-forecasts-2026-100", "stats-2026", "games"]
+          },
+          {
+            "text": "The saved roster has thinner running-back depth than receiver depth. However, Hubbard trails Cook's future estimate of {{8138:forecast-future}} and Taylor's {{6813:forecast-future}}. For receiver and FLEX competition, Chase is estimated at {{7564:forecast-future}}, Lamb at {{6786:forecast-future}} and Olave at {{8144:forecast-future}}. Hubbard therefore offers depth rather than an established immediate starting upgrade. Bench scoring is not lineup gain, and none of these candidates supplies tight-end depth behind Kelce.",
+            "metricIds": [
+              "8138:forecast-future",
+              "6813:forecast-future",
+              "7564:forecast-future",
+              "6786:forecast-future",
+              "8144:forecast-future"
+            ],
+            "sourceIds": ["league-snapshot", "espn-forecasts-2026-0", "stats-2026", "games"]
+          },
+          {
+            "text": "Hubbard's recent carries are {{7594:recent-carries}}, with a recorded change of {{7594:change-carries}}; Hampton's are {{12507:recent-carries}}, with a change of {{12507:change-carries}}. The publisher's future carry expectations are Hubbard {{7594:forecast-carries}} and Hampton {{12507:forecast-carries}}. Recorded workload supports the tentative preference, but recent changes are not role forecasts and incomplete team totals prevent reliable workload-share comparisons.",
+            "metricIds": [
+              "7594:recent-carries",
+              "7594:change-carries",
+              "12507:recent-carries",
+              "12507:change-carries",
+              "7594:forecast-carries",
+              "12507:forecast-carries"
+            ],
+            "sourceIds": [
+              "stats-2026",
+              "stats-2025",
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100"
+            ]
+          },
+          {
+            "text": "Hubbard's full-season value above positional replacement is {{7594:replacement}}, not this team's marginal starting gain. Actual candidate ADP and a future pick location are not supplied, despite the generic candidate rationale mentioning imported ADP. The evidence supports a conditional roster-fit preference, not a draft-cost advantage or selection timing.",
+            "metricIds": ["7594:replacement"],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100",
+              "espn-forecasts-2026-200",
+              "espn-forecasts-2026-300",
+              "stats-2026",
+              "stats-2025",
+              "stats-2024"
+            ]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Challenge Hubbard's apparent advantage: his prior scoring average is {{7594:points-mean}}, below Hampton's {{12507:points-mean}}. Hubbard's favorable forecast depends on production stronger than that historical baseline. Historical baseline test errors do not validate these public forecasts.",
+            "metricIds": ["7594:points-mean", "12507:points-mean"],
+            "sourceIds": ["stats-2026", "stats-2025"]
+          },
+          {
+            "text": "No uniquely matched current injury report establishes candidate availability. Active catalog status is not confirmed health, and Lamb remains Questionable. Retrieval dates are not publisher update times. Chase also lacks matched upcoming opponent context. Missed games, changing roles or stale expectations could alter the comparison.",
+            "metricIds": [],
+            "sourceIds": ["injuries", "espn-forecasts-2026-0", "espn-forecasts-2026-100", "games"]
+          },
+          {
+            "text": "Saved ownership and pick-log checks establish only recorded unowned and unpicked status, not live or later availability. This comparison does not authorize a transaction or establish platform eligibility to execute it.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          }
+        ],
+        "alternative": {
+          "text": "Hampton is a credible running-back alternative if verified role or actual draft cost becomes more favorable. Odunze has the stronger supplied future estimate than Hampton, and recent targets of {{11620:recent-targets}} versus Shaheed's {{8676:recent-targets}}, but receiver depth limits his roster fit. Atlanta's recorded receiver yardage difference is {{11620:opponent-vs-average}}, versus Denver's {{8676:opponent-vs-average}}; these are descriptive positional aggregates, not individual projections or season-long adjustments.",
+          "metricIds": [
+            "11620:recent-targets",
+            "8676:recent-targets",
+            "11620:opponent-vs-average",
+            "8676:opponent-vs-average"
+          ],
+          "sourceIds": ["league-snapshot", "stats-2026", "stats-2025", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "The current ESPN headlines concern the Saints and Bills, not these candidates individually. Odunze's matched Sleeper adds are {{11620:market-adds}}, indicating platform activity only\u2014not representative public opinion, player quality or a predictive edge.",
+          "metricIds": ["11620:market-adds"],
+          "sourceIds": ["news-0", "news-1", "market-add"]
+        }
+      },
+      "savedHeadline": "Conditionally favor Chuba Hubbard for running-back depth",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:8144",
+          "publisher-ppr:7594",
+          "publisher-ppr:8676",
+          "publisher-ppr:11620",
+          "publisher-ppr:12507"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "fe612bd2bd2d86584e462e103a519667eb4e014b1567bfb9e18167c356379bf9",
+      "contextSha256": "49b8d214c7c75baa0d305f8d195638898341f6419db825a46dfac60cd6134d5a"
+    },
+    {
+      "phase": "corrected",
+      "case": "draft-review-complete",
+      "mode": "draft-review",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "draft-review",
+        "question": "Review the current outlook of this synthetic roster and pick log using real football data. Withhold a historical draft grade without draft-time estimates, ADP and actual alternatives. Identify supported strengths, weaknesses and practical next steps."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:09:09.270Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Withhold the draft grade; scoring depth masks roster fragility",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The completed saved draft and complete roster support a current outlook review. Missing draft-time estimates, fantasy ADP and historically available alternatives prevent a defensible retrospective grade. Current positional replacement values are not this team's marginal starting gains.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "Josh Allen's full-season estimate is {{4984:projected}}, comprising recorded scoring of {{4984:forecast-recorded}} and future scoring of {{4984:forecast-future}} across {{4984:forecast-games}}. The publisher's issued week is {{4984:forecast-issued-week}}. These are league-scored ESPN weekly expectations, not prospectively validated predictions or evidence of draft-day value.",
+            "metricIds": [
+              "4984:projected",
+              "4984:forecast-recorded",
+              "4984:forecast-future",
+              "4984:forecast-games",
+              "4984:forecast-issued-week"
+            ],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026"]
+          },
+          {
+            "text": "Quarterback insurance is useful, but Patrick Mahomes's future estimate of {{4046:forecast-future}} across {{4046:forecast-games}} cannot be added to Allen's as starting-lineup value: the league has no additional quarterback-eligible starting spot. That makes quarterback depth a possible trade resource, not proof that trading it would improve the roster.",
+            "metricIds": ["4046:forecast-future", "4046:forecast-games"],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0", "stats-2026"]
+          },
+          {
+            "text": "James Cook and Jonathan Taylor provide supported running-back scoring, with future estimates of {{8138:forecast-future}} and {{6813:forecast-future}}, respectively. Cook's recent carry change is {{8138:change-carries}}, while Taylor's is {{6813:change-carries}}. These are descriptive workload changes, not guaranteed roles. The required running-back slots exhaust the saved roster's running-back depth.",
+            "metricIds": [
+              "8138:forecast-future",
+              "6813:forecast-future",
+              "8138:change-carries",
+              "6813:change-carries"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          },
+          {
+            "text": "Receiver depth is the clearest scoring strength. Future estimates are {{7564:forecast-future}} for Ja'Marr Chase, {{6786:forecast-future}} for CeeDee Lamb, {{8144:forecast-future}} for Chris Olave and {{8146:forecast-future}} for Garrett Wilson. Chase's recent targets of {{7564:recent-targets}} challenge an overly confident forecast-led assessment. Receiver surplus offers flexibility, but bench totals are not starting-lineup gains.",
+            "metricIds": [
+              "7564:forecast-future",
+              "6786:forecast-future",
+              "8144:forecast-future",
+              "8146:forecast-future",
+              "7564:recent-targets"
+            ],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0", "stats-2026"]
+          },
+          {
+            "text": "Travis Kelce's future estimate is {{1466:forecast-future}} across {{1466:forecast-games}}, but recent targets are {{1466:recent-targets}}, with a change of {{1466:change-targets}}. His declining recorded workload deserves monitoring. The absence of an owned tight-end backup is a coverage weakness, not evidence that an available replacement would outperform him.",
+            "metricIds": [
+              "1466:forecast-future",
+              "1466:forecast-games",
+              "1466:recent-targets",
+              "1466:change-targets"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Lamb retains his recorded Questionable status. No roster player has a uniquely matched regular-season injury report here; Active catalog labels therefore do not establish game availability. Source retrieval dates do not establish injury-report or publisher-update freshness.",
+            "metricIds": [],
+            "sourceIds": ["injuries", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "The saved starter identities are position-compatible with the league's starting requirements, but platform slot assignments are unverified. Chase lacks a uniquely matched upcoming game, which establishes neither a bye nor inactivity. His future aggregate cannot justify an immediate lineup change without weekly estimates and confirmed availability.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games"]
+          },
+          {
+            "text": "Incomplete recorded team workload totals prevent reliable carry-share and target-share claims. Public expected volumes do not quantify future injuries, missed games or role changes. Opponent-position aggregates are descriptive context, not individual forecasts or justified point adjustments.",
+            "metricIds": [],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "alternative": {
+          "text": "Keeping quarterback and receiver insurance is a credible countercase to pursuing depth trades, especially while Lamb's availability is uncertain. Verify game designations and slot assignments, then inspect running-back and tight-end availability and actual offers. Compare any acquisition against the resulting legal lineup, acquisition cost and depth lost. No specific transaction is supported without those checks.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot", "injuries", "games"]
+        },
+        "perception": {
+          "tone": "mixed",
+          "text": "Current ESPN headlines frame Buffalo's offense positively and the Saints' offense negatively. These are team-level narratives, not player-specific role or availability evidence, representative public opinion, or a predictive edge. No matched platform activity is supplied.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1"]
+        }
+      },
+      "savedHeadline": "Withhold the draft grade; scoring depth masks roster fragility",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:8144"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "8e3307a6fa95a56e36deabd0c71fea2ad23db41c7918c1877e651615dea263e0",
+      "contextSha256": "244754f162c0dd9a1e86b64bed9d66af2fc87ec9d065c907350f47ac950a1136"
+    },
+    {
+      "phase": "corrected",
+      "case": "lineup",
+      "mode": "lineup",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "lineup",
+        "question": "Set a complete legal PPR lineup from this scenario roster. Compare the recorded starters with the proposed starters; explicitly address the bye-week and recorded Out player, questionable availability and any change. This is a test scenario, not my actual roster."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:05:39.208Z",
+      "verdict": "lean",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "lean",
+        "headline": "Start Nacua and Bowers; keep Lamb conditional on availability",
+        "recommendedPlayerIds": ["4984", "8138", "6813", "9493", "6786", "11604", "8144"],
+        "reasons": [
+          {
+            "text": "Complete legal scenario lineup: QB Josh Allen; RB James Cook and Jonathan Taylor; WR Puka Nacua and CeeDee Lamb; TE Brock Bowers; FLEX Chris Olave. Each is owned in the saved snapshot and used without duplication. Conditional on Lamb playing, this matches the highest supplied-estimate lineup at {{lineup-optimized}}, versus recorded starters at {{lineup-current}}, an estimated gain of {{lineup-gain}}.",
+            "metricIds": ["lineup-optimized", "lineup-current", "lineup-gain"],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Replace Garrett Wilson with Nacua: weekly estimates are Nacua {{9493:projected}} and Wilson {{8146:projected}}. Replace Travis Kelce with Bowers: weekly estimates are Bowers {{11604:projected}} and Kelce {{1466:projected}}. Bowers' recorded recent targets increased while Kelce's declined, supporting\u2014but not guaranteeing\u2014the projected preference. Other recorded starter identities remain selected; saved platform slot assignments were not verified.",
+            "metricIds": [
+              "9493:projected",
+              "8146:projected",
+              "11604:projected",
+              "1466:projected",
+              "11604:change-targets",
+              "1466:change-targets"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "stats-2026",
+              "stats-2025"
+            ]
+          },
+          {
+            "text": "Allen's weekly estimate is {{4984:projected}}, ahead of Patrick Mahomes at {{4046:projected}}. Cook and Taylor have weekly estimates of {{8138:projected}} and {{6813:projected}}. Tennessee's below-average recorded rushing allowance to opposing running backs challenges Taylor's outlook, but it is an aggregate matchup description, not an individual projection adjustment or evidence of a better available replacement.",
+            "metricIds": [
+              "4984:projected",
+              "4046:projected",
+              "8138:projected",
+              "6813:projected",
+              "6813:opponent-vs-average"
+            ],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+          },
+          {
+            "text": "Bench Ja'Marr Chase because the supplied schedule records a bye; his historical baseline is not a playable weekly forecast. Bench Saquon Barkley because his recorded status is Out; the underlying publisher estimate does not override that exclusion. Neither was a recorded starter, so these exclusions do not create additional starter changes.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Lamb remains Questionable, not confirmed available. No uniquely matched injury report establishes current availability for these players, and Active catalog status does not establish health. Confirm game designations and platform locks before using this conditional lineup.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "injuries"]
+          },
+          {
+            "text": "The ESPN estimates score expected statistics for the exact scheduled unplayed interval, without credited past points. They lack prospective validation here. Retrieval dates are not publisher update times; historical workload and opponent totals do not guarantee future roles. Incomplete team totals also prevent verified workload-share comparisons.",
+            "metricIds": [],
+            "sourceIds": ["espn-forecasts-2026-0", "games", "stats-2026", "stats-2025"]
+          }
+        ],
+        "alternative": {
+          "text": "If Lamb is unavailable, move Olave to WR and Wilson into FLEX. Their weekly estimates are Lamb {{6786:projected}}, Olave {{8144:projected}} and Wilson {{8146:projected}}. Credible evidence of a restricted Lamb role could also favor this fallback, but no injury-adjusted estimate is supplied. The optimized total does not belong to that alternate lineup.",
+          "metricIds": ["6786:projected", "8144:projected", "8146:projected"],
+          "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+        },
+        "perception": {
+          "tone": "mixed",
+          "text": "Current ESPN headlines praise Buffalo and the Rams' offense while questioning the Saints' offense. These are team-level stories, not player-specific availability evidence, representative public opinion or a predictive lineup edge.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1"]
+        }
+      },
+      "savedHeadline": "Start Nacua and Bowers; keep Lamb conditional on availability",
+      "decisionMetrics": [
+        {
+          "id": "lineup-optimized",
+          "label": "Best supported starting-lineup estimate",
+          "value": 141.586319188,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"],
+          "description": "A legal assignment using supplied estimates. Not a win forecast."
+        },
+        {
+          "id": "lineup-current",
+          "label": "Current starters estimate",
+          "value": 124.687550135,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "lineup-gain",
+          "label": "Estimated change from current starters",
+          "value": 16.89876905300001,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "lineup-optimized",
+          "lineup-current",
+          "lineup-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "c87726a38f0837a18728140a733fb19a4fd4447a6b087e7410ff89171751d8db",
+      "contextSha256": "0581e53de8229b67a13c257e23299d4cdff18841d0d91e3f251c7024941cbc91"
+    },
+    {
+      "phase": "corrected",
+      "case": "reserve-waivers",
+      "mode": "waivers",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "waivers",
+        "candidateIds": ["9753", "12469", "12507"],
+        "dropPlayerId": "8144",
+        "question": "Compare adding each candidate and dropping Chris Olave after re-optimizing all starting slots. These players are unrostered only in the test scenario; actual league availability, locks, priority and FAAB are unknown. Distinguish immediate weekly gain from unquantified stash value."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:12:16.411Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Hold off on dropping Chris Olave",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "After removing Olave and re-optimizing every starting slot, adding Omarion Hampton lowers the starting-lineup estimate from {{waiver-before}} to {{12507:waiver-after}}. The weekly change is {{12507:waiver-gain}}; Olave's removed individual estimate is {{waiver-drop}}. This is not an immediate upgrade.",
+            "metricIds": [
+              "waiver-before",
+              "12507:waiver-after",
+              "12507:waiver-gain",
+              "waiver-drop"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100"
+            ]
+          },
+          {
+            "text": "Garrett Wilson replaces Olave at FLEX with a weekly estimate of {{8146:projected}}, versus Olave's {{8144:projected}}. Hampton's estimate is {{12507:projected}}, leaving him outside the optimized starters. Josh Allen, James Cook, Jonathan Taylor, Puka Nacua, CeeDee Lamb and Brock Bowers retain their respective starting positions. Hampton's bench estimate does not offset the starting loss.",
+            "metricIds": ["8146:projected", "8144:projected", "12507:projected"],
+            "sourceIds": ["league-snapshot", "espn-forecasts-2026-0", "espn-forecasts-2026-100"]
+          },
+          {
+            "text": "Zach Charbonnet is recorded as PUP and Dylan Sampson as IR, so neither is eligible for the active-lineup calculation. Their historical baselines are {{9753:baseline}} and {{12469:baseline}}, respectively\u2014not current weekly forecasts or quantified stash values. Removing Olave for either leaves the same remaining starter options as the Hampton scenario, but candidate-specific after-move metrics were not supplied.",
+            "metricIds": ["9753:baseline", "12469:baseline"],
+            "sourceIds": ["league-snapshot", "stats-2025", "stats-2026"]
+          },
+          {
+            "text": "Hampton's recent carries are {{12507:recent-carries}}, with a change versus preceding appearances of {{12507:change-carries}}; publisher-expected carries are {{12507:forecast-carries}}. Kansas City's recorded rushing allowance to opposing running backs is {{12507:opponent-rushing_yards}}. These describe past workload and opponent-position totals, not a guaranteed future role or an additional projection adjustment.",
+            "metricIds": [
+              "12507:recent-carries",
+              "12507:change-carries",
+              "12507:forecast-carries",
+              "12507:opponent-rushing_yards"
+            ],
+            "sourceIds": ["stats-2026", "stats-2025", "games", "espn-forecasts-2026-100"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The comparison assumes CeeDee Lamb plays despite his Questionable status. Saquon Barkley is recorded Out and Ja'Marr Chase has a bye. Availability changes require re-optimization; no uniquely matched injury report establishes current availability, and an Active catalog designation does not prove health.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games", "injuries"]
+          },
+          {
+            "text": "The ESPN estimates score expected statistics for the verified unplayed weekly interval without crediting past points. They have no prospective accuracy evaluation here. Retrieval dates are not publisher update times, and playing-time or injury changes could invalidate the comparison.",
+            "metricIds": [],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "espn-forecasts-2026-100"]
+          }
+        ],
+        "alternative": {
+          "text": "The countercase is running-back depth while Barkley is Out, but this weekly loss does not quantify future stash value. Revisit with longer-term role evidence, return timelines and a less costly legal drop. Scenario availability does not establish live waiver availability, roster locks, transaction permission, priority or an appropriate FAAB bid.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN's Saints headline expresses concern about the team offense, not Olave specifically. The other supplied headlines are also team-level context. No matched candidate activity metrics are supplied; these limited headlines do not establish player-specific public opinion or a predictive edge.",
+          "metricIds": [],
+          "sourceIds": ["news-0", "news-1", "news-2"]
+        }
+      },
+      "savedHeadline": "Keep your current lineup for now",
+      "decisionMetrics": [
+        {
+          "id": "waiver-before",
+          "label": "Current best starting-lineup estimate",
+          "value": 141.586319188,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        },
+        {
+          "id": "waiver-drop",
+          "label": "Chris Olave: estimate removed by the proposed drop",
+          "value": 17.374864351000003,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "12507:waiver-gain",
+          "label": "Omarion Hampton: starting-lineup estimate change",
+          "value": -2.7455294229999936,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "publisher-ppr:12507",
+          "waiver-before",
+          "12507:waiver-after",
+          "12507:waiver-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "345c4e3d1fce32e2dd0eb29a2da65e1a366776c48574ce3d4b6688c5c1762f22",
+      "contextSha256": "a592bcb7a2b3f9ed2d46ad5a90d89186101a594d8fd0c3972ae91c66e50bf4dc"
+    },
+    {
+      "phase": "corrected",
+      "case": "trade-complete",
+      "mode": "trade",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "trade",
+        "giveIds": ["8138"],
+        "receiveIds": ["9509"],
+        "tradeTeamId": "other",
+        "throughWeek": 18,
+        "question": "Evaluate this conditional player-for-player exchange for this scenario team using remaining-season starting value. Address injury and depth risks. The other manager\u2019s willingness and platform eligibility are unknown."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:10:55.119Z",
+      "verdict": "lean",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "lean",
+        "headline": "Tentatively favor exchanging James Cook for Bijan Robinson",
+        "recommendedPlayerIds": ["9509"],
+        "reasons": [
+          {
+            "text": "The supplied legal starting-slot comparison increases from {{trade-before}} to {{trade-after}}, a gain of {{trade-gain}}. Robinson replaces Cook alongside Jonathan Taylor while other comparison starters remain unchanged. This is an aggregate remaining-season slot comparison, not bench-point value or a week-by-week availability optimization.",
+            "metricIds": ["trade-before", "trade-after", "trade-gain"],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Robinson's remaining estimate is {{9509:projected}}, versus Cook's {{8138:projected}}. These league-scored public weekly expectations sum verified unplayed scheduled weeks and exclude already-earned scoring. They support the exchange conditionally, but lack prospective accuracy evaluation here.",
+            "metricIds": ["9509:projected", "8138:projected"],
+            "sourceIds": ["games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Receiving opportunity supports Robinson's advantage under reception scoring: projected receptions are {{9509:forecast-receptions}}, versus Cook's {{8138:forecast-receptions}}. Historical targets also favor Robinson at {{9509:targets}}, versus Cook's {{8138:targets}}. Expected volumes are forecasts; historical usage is descriptive, and incomplete team totals prevent workload-share comparisons.",
+            "metricIds": [
+              "9509:forecast-receptions",
+              "8138:forecast-receptions",
+              "9509:targets",
+              "8138:targets"
+            ],
+            "sourceIds": ["espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Cook, Robinson and Taylor lack uniquely matched current injury reports; Active catalog status does not establish health. CeeDee Lamb remains Questionable. Confirm current availability without inventing missed-game deductions.",
+            "metricIds": [],
+            "sourceIds": ["injuries", "league-snapshot"]
+          },
+          {
+            "text": "The exchange preserves the existing lack of reserve running backs. Receiver and tight-end depth cannot fill required running-back slots during injury or bye absences. The aggregate gain therefore does not guarantee realizable weekly scoring.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "games"]
+          },
+          {
+            "text": "The saved snapshot records Cook on your roster and Robinson on the comparison roster, not your current team. Live ownership, manager willingness and platform eligibility remain unverified. Forecast retrieval dates also do not establish publisher update freshness.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "espn-forecasts-2026-0"]
+          }
+        ],
+        "alternative": {
+          "text": "Keeping Cook has a credible countercase: his recent carries change is {{8138:change-carries}}, versus Robinson's {{9509:change-carries}}. His upcoming opponent's recorded running-back rushing allowance is {{8138:opponent-rushing_yards}}, versus {{9509:opponent-rushing_yards}} for Robinson's opponent. These descriptive trends challenge the choice but do not establish future workload or a remaining-schedule advantage.",
+          "metricIds": [
+            "8138:change-carries",
+            "9509:change-carries",
+            "8138:opponent-rushing_yards",
+            "9509:opponent-rushing_yards"
+          ],
+          "sourceIds": ["stats-2026", "stats-2025", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN's current Buffalo headline provides favorable team-level context, not Cook-specific evidence. No supplied Robinson-specific headline or matched platform activity establishes player sentiment. This limited coverage is not representative public opinion or a predictive edge.",
+          "metricIds": [],
+          "sourceIds": ["news-1"]
+        }
+      },
+      "savedHeadline": "Tentatively favor exchanging James Cook for Bijan Robinson",
+      "decisionMetrics": [
+        {
+          "id": "trade-before",
+          "label": "Starting roster remaining estimate before trade",
+          "value": 1657.4240185259,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "trade-after",
+          "label": "Starting roster remaining estimate after trade",
+          "value": 1711.2124827529,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "trade-gain",
+          "label": "Remaining starting-slot estimate change",
+          "value": 53.78846422700008,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:7564",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "publisher-ppr:9509",
+          "trade-before",
+          "trade-after",
+          "trade-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "b43d19b8b2f98be771d951e48c89cd4d1c9c797d5d03edd4ed9348a05c0ad4ea",
+      "contextSha256": "6f77f19e973cbf57d005b2f27058953191d2001d6684d67816e8cbb52b93f5df"
+    },
+    {
+      "phase": "corrected-more",
+      "case": "betting-moneyline",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "moneyline",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "home",
+          "americanOdds": 124,
+          "oppositeAmericanOdds": -148,
+          "quoteId": "326baab3ad612432ed651c9c38bae344c7c7fc78bb65fa93953c1926c66c5afc"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:16:30.310Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on Denver\u2019s moneyline: no supported edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "Denver\u2019s conditional win estimate is {{bet-model-probability}}, below the required break-even rate of {{odds-break-even}} and essentially unchanged from the sportsbook no-vig baseline of {{odds-no-vig}}. The model-implied hypothetical return is {{bet-model-return}}, not measured profit. Because sportsbook prices enter the forecast, it is not independent evidence of value.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Across {{bet-model-evaluation}} evaluated chronologically at each historical game\u2019s archived prices, model Brier error is {{bet-model-brier}}, slightly worse than the matched sportsbook baseline of {{bet-model-baseline-brier}}; lower is better. The paired improvement lower bound is negative at {{bet-model-improvement-lower}}, so actionable model support is withheld. This evaluation does not establish executable historical prices or betting profitability.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The apparent countercase is the historical hit rate of {{bet-hit-rate}} and retrospective return of {{bet-historical-roi}} across {{bet-sample}}. These outcomes are not calibrated forecasts. Applying the entered price retrospectively cannot demonstrate an edge at historically available prices.",
+            "metricIds": ["bet-hit-rate", "bet-historical-roi", "bet-sample"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band extends from {{bet-model-lower}} to {{bet-model-upper}}. It describes earlier comparable estimates, not an individual-game prediction interval; its favorable upper end does not establish a conservative edge.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["games"]
+          },
+          {
+            "text": "The DraftKings price displayed by ESPN is a fetched pregame snapshot, not a guaranteed executable quote or publisher update time. Seattle\u2019s captured quarterback chart differs from the recorded starter, but participation is unconfirmed. Injury coverage and prior-role matching are incomplete, and absent Out reports do not establish health. Personnel context is descriptive for this moneyline forecast; no supported weather adjustment is available.",
+            "metricIds": [],
+            "sourceIds": [
+              "entered-odds",
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-current-personnel",
+              "game-context-weather"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Abstain rather than automatically switching to Seattle. Evidence against Denver\u2019s price does not establish value on the opposite side. Reconsider with refreshed paired quotes, verified availability and a conservatively positive edge supported by credible evaluation.",
+          "metricIds": [],
+          "sourceIds": ["entered-odds", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity evidence were supplied. Public sentiment remains unknown; missing coverage is not neutral or negative sentiment and supplies no demonstrated betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Pass on Denver\u2019s moneyline: no supported edge",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 44.64285714285714,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 42.79403644395361,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 42.784809925312885,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 42.79403644395361,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.2117035964068629,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.21169352985944997,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1162,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -8.358047772160038e-5,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "326baab3ad612432ed651c9c38bae344c7c7fc78bb65fa93953c1926c66c5afc",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "moneyline",
+        "side": "home",
+        "americanOdds": 124,
+        "oppositeAmericanOdds": -148,
+        "observedAt": "2026-10-14T02:16:07.638Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "f5cd816573f9c2f4d2d354356d12441a0165e82d7021c6c471ae6356d77ed765",
+      "contextSha256": "8bed94c7477dfeb1e6f41b9135cdf93c121bf42fcda502d3b4a3d2c29adffd21"
+    },
+    {
+      "phase": "corrected-more",
+      "case": "betting-spread",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "spread",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "home",
+          "line": 2.5,
+          "americanOdds": -105,
+          "oppositeAmericanOdds": -115,
+          "quoteId": "4ea55b6f64a474a871123c22d1c83496a144d1b5c94f53e72c6bb27aeb2fb6c4"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:17:34.055Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on Denver's spread: no supported betting edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "Denver's model cover estimate is {{bet-model-probability}}, below the break-even requirement of {{odds-break-even}} and close to the sportsbook no-vig baseline of {{odds-no-vig}}. Model-implied return is {{bet-model-return}}, not measured profit. The forecast incorporates sportsbook prices rather than providing independent market evidence.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Chronological evaluation covers {{bet-model-evaluation}}, using earlier-week fitting and each historical game's own archived handicap and paired prices. Model Brier error is {{bet-model-brier}}, worse than the matched sportsbook baseline of {{bet-model-baseline-brier}}; lower is better. The paired improvement lower bound is {{bet-model-improvement-lower}}, so actionable model support is withheld.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The appealing countercase is the historical hit rate of {{bet-hit-rate}} and retrospective return at the entered odds of {{bet-historical-roi}} across {{bet-sample}}. This retrospective scenario is neither a calibrated cover forecast nor evidence of executable historical betting profit, and it does not overcome the unsupported market edge.",
+            "metricIds": ["bet-hit-rate", "bet-historical-roi", "bet-sample"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band extends from {{bet-model-lower}} to {{bet-model-upper}}. It summarizes earlier empirical evidence, not a guaranteed game-specific uncertainty interval; market drift, source timing and future personnel uncertainty remain outside it.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The DraftKings price displayed by ESPN is a fetched pregame snapshot, not a guaranteed executable price or publisher update time. Seattle's captured quarterback chart differs from its last recorded starter, but participation is unconfirmed. Injury and prior-role coverage are incomplete; personnel and weather context do not quantitatively adjust this spread forecast.",
+            "metricIds": [],
+            "sourceIds": [
+              "entered-odds",
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-current-personnel"
+            ]
+          }
+        ],
+        "alternative": {
+          "text": "Abstain rather than automatically switching to Seattle: lack of value on Denver does not establish value on the opposite side. Reconsider with a refreshed executable quote and independently supported, conservatively positive edge backed by matched chronological validation.",
+          "metricIds": [],
+          "sourceIds": ["entered-odds", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity evidence were supplied. Public sentiment remains unknown; neither sentiment nor an uncalibrated AI opinion establishes a betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Pass on Denver's spread: no supported betting edge",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 51.21951219512195,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 48.91657638136511,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 48.85900470733115,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 48.91657638136511,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.24982878120549154,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.24970218623774312,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1131,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -0.0008179859785966435,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "4ea55b6f64a474a871123c22d1c83496a144d1b5c94f53e72c6bb27aeb2fb6c4",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "spread",
+        "side": "home",
+        "line": 2.5,
+        "americanOdds": -105,
+        "oppositeAmericanOdds": -115,
+        "observedAt": "2026-10-14T02:17:32.986Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "01d0a5bc9fd12e3075a01bb051eedbf8984a2fedc72b7404386edd3868075e69",
+      "contextSha256": "ba2dda117f9e832fcc9c89ebd5d617986b7ba9882845d753520e22f212c2a440"
+    },
+    {
+      "phase": "corrected-more",
+      "case": "betting-total",
+      "mode": "betting",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "betting",
+        "bet": {
+          "kind": "total",
+          "gameId": "2026_06_SEA_DEN",
+          "side": "over",
+          "line": 40.5,
+          "americanOdds": -112,
+          "oppositeAmericanOdds": -108,
+          "quoteId": "e0fc23bdae86aa27d3d25a5a08f32247ab530a789fee4f2344798f2467fc98ac"
+        },
+        "question": "Evaluate this real fetched pregame price against the chronological statistical forecast and matched sportsbook baseline. Abstain without independently supported edge; do not call an AI opinion or sentiment a proven betting advantage."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:18:30.824Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Pass on the over; no supported betting edge",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The market-aware over probability is {{bet-model-probability}}, below the price's break-even rate of {{odds-break-even}} and the sportsbook no-vig baseline of {{odds-no-vig}}. Model-implied return is {{bet-model-return}}; this is hypothetical, not measured profit.",
+            "metricIds": [
+              "bet-model-probability",
+              "odds-break-even",
+              "odds-no-vig",
+              "bet-model-return"
+            ],
+            "sourceIds": ["entered-odds", "games"]
+          },
+          {
+            "text": "Chronological evaluation covers {{bet-model-evaluation}} at each historical game's own paired prices and threshold. Model Brier error is {{bet-model-brier}}, versus matched sportsbook error of {{bet-model-baseline-brier}}. Although average error is slightly lower, the paired improvement lower bound is negative at {{bet-model-improvement-lower}}, withholding actionable support. Sportsbook prices are model inputs, so this is not independent market prediction.",
+            "metricIds": [
+              "bet-model-evaluation",
+              "bet-model-brier",
+              "bet-model-baseline-brier",
+              "bet-model-improvement-lower"
+            ],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "The countercase is the opponent-adjusted total estimate of {{bet-model-estimate}}, above the fetched total. But that score estimate excludes personnel and weather adjustments and is not the final market-aware probability. An elevated scoring estimate alone does not establish value at the quoted price.",
+            "metricIds": ["bet-model-estimate"],
+            "sourceIds": ["games", "entered-odds"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The similar-estimate calibration band extends from {{bet-model-lower}} to {{bet-model-upper}}. It describes earlier comparable estimates, not an individual-game certainty interval; future personnel changes, market drift and source-timing uncertainty remain outside it.",
+            "metricIds": ["bet-model-lower", "bet-model-upper"],
+            "sourceIds": ["games", "entered-odds"]
+          },
+          {
+            "text": "Seattle's captured quarterback chart differs from its last recorded starter, but participation is unconfirmed. Injury and prior-role coverage are incomplete, current official game-status coverage is unavailable, and weather input is unavailable or unsupported here. Descriptive quarterback efficiency and snap roles do not modify production probabilities.",
+            "metricIds": [],
+            "sourceIds": [
+              "game-context-quarterbacks",
+              "game-context-live-injuries",
+              "game-context-current-personnel",
+              "game-context-official-current-injuries",
+              "game-context-weather"
+            ]
+          },
+          {
+            "text": "The DraftKings price displayed by ESPN is a fetched snapshot, not a guaranteed executable quote or publisher update time. Historical sportsbook identity and price-publication times are unknown, limiting claims about executable historical performance.",
+            "metricIds": [],
+            "sourceIds": ["entered-odds", "games"]
+          }
+        ],
+        "alternative": {
+          "text": "Abstain rather than automatically switch to the under. Reassess with confirmed participation and a refreshed paired quote, but require a conservative price advantage and supported improvement over the matched sportsbook baseline.",
+          "metricIds": [],
+          "sourceIds": ["entered-odds", "games"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "No relevant current headlines or matched activity evidence were supplied. Public sentiment remains unknown; neither sentiment nor an uncalibrated AI opinion establishes a betting advantage.",
+          "metricIds": [],
+          "sourceIds": []
+        }
+      },
+      "savedHeadline": "Pass on the over; no supported betting edge",
+      "decisionMetrics": [
+        {
+          "id": "odds-break-even",
+          "label": "Break-even rate at your odds",
+          "value": 52.83018867924528,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Required win rate among non-push bets, before any fees."
+        },
+        {
+          "id": "odds-no-vig",
+          "label": "Two-sided no-vig market baseline",
+          "value": 50.43297540699689,
+          "unit": "%",
+          "sourceIds": ["entered-odds"],
+          "description": "Normalizes the implied probabilities of both entered sides; not a forecast."
+        },
+        {
+          "id": "bet-model-probability",
+          "label": "Market-aware conditional win estimate",
+          "value": 50.24837492291843,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "Sportsbook no-vig probability plus a penalized earlier-week correction using score ratings, schedule rest, season phase, market line and prior team performance against the line. Moneyline corrections shrink using earlier out-of-week probability losses. This uses the book as an input and is not an independent betting edge."
+        },
+        {
+          "id": "bet-model-market-baseline",
+          "label": "Sportsbook no-vig probability",
+          "value": 50.432975406996896,
+          "unit": "%",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "description": "Normalizes both entered/fetched prices to remove the paired implied margin. A probability baseline, not an executable price."
+        },
+        {
+          "id": "bet-model-brier",
+          "label": "Market-aware probability Brier score",
+          "value": 0.24980256845399426,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "Mean squared probability error on matched historical priced games, excluding pushes; lower is better."
+        },
+        {
+          "id": "bet-model-baseline-brier",
+          "label": "Sportsbook baseline Brier score",
+          "value": 0.25012765120282,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 1158,
+          "description": "No-vig paired sportsbook probabilities on exactly the same historical games, not a generic frequency baseline."
+        },
+        {
+          "id": "bet-model-improvement-lower",
+          "label": "Weekly market-baseline improvement lower bound",
+          "value": -0.0008771519805187752,
+          "unit": "score",
+          "sourceIds": [
+            "games",
+            "entered-odds",
+            "injuries",
+            "game-context-injuries-2026",
+            "game-context-injuries-2025",
+            "game-context-injuries-2024",
+            "game-context-injuries-2023",
+            "game-context-injuries-2022",
+            "game-context-injuries-2021",
+            "game-context-injuries-2020",
+            "game-context-injuries-2019",
+            "game-context-injuries-2018",
+            "game-context-injuries-2017",
+            "game-context-injuries-2016",
+            "game-context-official-injuries-2025",
+            "game-context-official-injuries-2026",
+            "game-context-quarterbacks-2026",
+            "game-context-quarterbacks-2025",
+            "game-context-weather",
+            "game-context-quarterbacks",
+            "game-context-live-injuries",
+            "game-context-current-personnel"
+          ],
+          "sampleSize": 77,
+          "description": "Normal approximation for paired book-minus-model losses clustered by NFL week. Positive lower-bound improvement and adequate calibration are required for tentative support."
+        }
+      ],
+      "quote": {
+        "id": "e0fc23bdae86aa27d3d25a5a08f32247ab530a789fee4f2344798f2467fc98ac",
+        "gameId": "2026_06_SEA_DEN",
+        "espnId": "401872995",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "total",
+        "side": "over",
+        "line": 40.5,
+        "americanOdds": -112,
+        "oppositeAmericanOdds": -108,
+        "observedAt": "2026-10-14T02:17:32.986Z",
+        "kickoffAt": "2026-10-16T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872995"
+      },
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["odds-break-even", "odds-no-vig", "bet-model-market-baseline"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "1c3e909f5f373e6be22a3f85c7e5765c5f2e902e8473b12f474b02407202a6ae",
+      "contextSha256": "d2dfaa57d5a488f0fa588ffb9eb023527f67ea6390d83b9fe8756b4234b41fdf"
+    },
+    {
+      "phase": "corrected-more",
+      "case": "start-sit",
+      "mode": "lineup",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "lineup",
+        "candidateIds": ["9493", "8146"],
+        "question": "Compare these players for one WR spot, show the estimates for both, and explain the practical reasons to reconsider before kickoff."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:13:29.909Z",
+      "verdict": "lean",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "lean",
+        "headline": "Lean Puka Nacua over Garrett Wilson",
+        "recommendedPlayerIds": ["9493"],
+        "reasons": [
+          {
+            "text": "Nacua\u2019s weekly estimate is {{9493:projected}}, versus Wilson\u2019s {{8146:projected}}; the estimate gap is {{start-sit-gap}}. These are ESPN expectations scored under your league rules for the scheduled upcoming game, with no recorded points included\u2014not prospectively validated predictions.",
+            "metricIds": ["9493:projected", "8146:projected", "start-sit-gap"],
+            "sourceIds": ["espn-forecasts-2026-0", "games"]
+          },
+          {
+            "text": "Both players are owned in the saved roster and eligible for the shared WR spot. Choose Nacua only if he is not used in another starting slot; this comparison does not validate or change the rest of the lineup.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot"]
+          },
+          {
+            "text": "Nacua\u2019s recent recorded target average is {{9493:recent-targets}}, versus Wilson\u2019s {{8146:recent-targets}}. The publisher expects targets of {{9493:forecast-targets}} for Nacua and {{8146:forecast-targets}} for Wilson, supporting Nacua without assuming his recent workload spike persists. Incomplete team totals prevent a reliable target-share comparison.",
+            "metricIds": [
+              "9493:recent-targets",
+              "8146:recent-targets",
+              "9493:forecast-targets",
+              "8146:forecast-targets"
+            ],
+            "sourceIds": ["stats-2026", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Nacua hosts Arizona; Wilson visits New England. Arizona\u2019s recorded opposing WR scoring average is {{9493:opponent-position-points}}, versus New England\u2019s {{8146:opponent-position-points}}. This supports Nacua descriptively, but these position-wide totals are not individual projections or schedule-adjusted defensive ratings.",
+            "metricIds": ["9493:opponent-position-points", "8146:opponent-position-points"],
+            "sourceIds": ["stats-2026", "stats-2025", "games"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "Both retain Active catalog status, but neither has a uniquely matched regular-season injury report. Before kickoff, verify official game designations, inactive lists, workload restrictions and quarterback availability. Retrieval dates do not establish when reports or forecasts were updated.",
+            "metricIds": [],
+            "sourceIds": ["injuries", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "The countercase is that Nacua\u2019s forecast includes expected receiving touchdowns of {{9493:forecast-receiving_tds}}, versus Wilson\u2019s {{8146:forecast-receiving_tds}}. Those fractional expectations are not guaranteed scores. Reduced usage or touchdown variance could overturn the estimate ordering; no prospective forecast accuracy or injury-adjusted uncertainty interval is supplied.",
+            "metricIds": ["9493:forecast-receiving_tds", "8146:forecast-receiving_tds"],
+            "sourceIds": ["espn-forecasts-2026-0"]
+          }
+        ],
+        "alternative": {
+          "text": "Wilson remains a credible fallback if verified reports limit Nacua while confirming Wilson\u2019s availability. Wilson\u2019s expected receptions are {{8146:forecast-receptions}}, providing a reception-driven scoring path despite his lower estimate. Confirm platform eligibility and lineup locks before acting.",
+          "metricIds": ["8146:forecast-receptions"],
+          "sourceIds": ["espn-forecasts-2026-0", "league-snapshot"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN\u2019s current headline describes a strong Rams offensive showing, but it is team-level coverage rather than player-specific evidence about Nacua. It does not establish representative public opinion or a predictive edge; no matched player activity metrics are supplied.",
+          "metricIds": [],
+          "sourceIds": ["news-0"]
+        }
+      },
+      "savedHeadline": "Lean Puka Nacua over Garrett Wilson",
+      "decisionMetrics": [],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": ["publisher-ppr:9493", "publisher-ppr:8146"],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "4f75916eface6beff5536ec1a2962d6f94cbfbdf22a95554f65e24621fbf9bab",
+      "contextSha256": "5386a8fa662f7d6ef76746cbb8f158d805337e6063e27aaa6580c49e6e29cb55"
+    },
+    {
+      "phase": "corrected-more",
+      "case": "waivers",
+      "mode": "waivers",
+      "request": {
+        "leagueId": "real-data-scenario",
+        "teamId": "mine",
+        "season": 2026,
+        "week": 6,
+        "connection": "codex-cli",
+        "model": "gpt-6.1-sol",
+        "mode": "waivers",
+        "candidateIds": ["8676", "11620", "7594", "12507"],
+        "dropPlayerId": "8144",
+        "question": "Compare adding each candidate and dropping Chris Olave after re-optimizing all starting slots. These players are unrostered only in the test scenario; actual league availability, locks, priority and FAAB are unknown. Distinguish immediate weekly gain from unquantified stash value."
+      },
+      "model": "Codex GPT-6.1-Sol \u00b7 signed-in CLI",
+      "createdAt": "2026-10-14T02:14:38.433Z",
+      "verdict": "hold",
+      "confidence": "Low",
+      "modelPasses": 2,
+      "invalidPasses": 0,
+      "reviewedAssessment": {
+        "verdict": "hold",
+        "headline": "Keep Olave; these swaps do not improve the weekly estimate",
+        "recommendedPlayerIds": [],
+        "reasons": [
+          {
+            "text": "The optimized starting-lineup estimate is {{waiver-before}}, including Olave's contribution of {{waiver-drop}} at FLEX. Each comparison removes Olave before reassigning all starting slots; these are starting-lineup values, not bench-point sums.",
+            "metricIds": ["waiver-before", "waiver-drop"],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Hubbard's weekly forecast is {{7594:projected}}. Adding him after dropping Olave produces a lineup estimate of {{7594:waiver-after}} and a change of {{7594:waiver-gain}}. Hubbard narrowly takes FLEX over the Wilson fallback, whose forecast is {{8146:projected}}. That negligible advantage does not offset losing Olave.",
+            "metricIds": [
+              "7594:projected",
+              "7594:waiver-after",
+              "7594:waiver-gain",
+              "8146:projected"
+            ],
+            "sourceIds": ["league-snapshot", "games", "espn-forecasts-2026-0"]
+          },
+          {
+            "text": "Shaheed's weekly forecast is {{8676:projected}}; his swap produces {{8676:waiver-after}}, with change {{8676:waiver-gain}}. Odunze's forecast is {{11620:projected}}; his swap produces {{11620:waiver-after}}, with change {{11620:waiver-gain}}. Hampton's forecast is {{12507:projected}}; his swap produces {{12507:waiver-after}}, with change {{12507:waiver-gain}}. These additions remain outside the optimized starting lineup while Wilson replaces Olave at FLEX.",
+            "metricIds": [
+              "8676:projected",
+              "8676:waiver-after",
+              "8676:waiver-gain",
+              "11620:projected",
+              "11620:waiver-after",
+              "11620:waiver-gain",
+              "12507:projected",
+              "12507:waiver-after",
+              "12507:waiver-gain"
+            ],
+            "sourceIds": [
+              "league-snapshot",
+              "games",
+              "espn-forecasts-2026-0",
+              "espn-forecasts-2026-100"
+            ]
+          },
+          {
+            "text": "The countercase is running-back depth with Barkley recorded Out. Hubbard's recent carry change is {{7594:change-carries}}, compared with Hampton's {{12507:change-carries}}. That supports investigating insurance value, but recorded workload changes are not future-role guarantees, and this weekly comparison does not quantify stash value.",
+            "metricIds": ["7594:change-carries", "12507:change-carries"],
+            "sourceIds": ["league-snapshot", "stats-2026", "stats-2025", "games"]
+          }
+        ],
+        "risks": [
+          {
+            "text": "The comparison assumes questionable Lamb plays, excludes Barkley as Out, and excludes Chase on bye. No uniquely matched injury report establishes current health for Olave or the candidates. Updated availability could change the optimization.",
+            "metricIds": [],
+            "sourceIds": ["league-snapshot", "injuries", "games"]
+          },
+          {
+            "text": "The ESPN forecasts are publisher expectations scored under the supplied league rules for verified unplayed games, not recorded performance or prospectively validated predictions. Retrieval times do not establish publisher update times; playing time and roles can change, and recorded team workload shares are unavailable.",
+            "metricIds": [],
+            "sourceIds": ["games", "espn-forecasts-2026-0", "espn-forecasts-2026-100"]
+          }
+        ],
+        "alternative": {
+          "text": "Withhold these Olave-drop moves. A credible stash comparison needs longer-horizon role evidence and a separately evaluated drop with lower starting opportunity cost. The candidates are unrostered only in the test scenario; actual availability, locks, waiver priority and FAAB remain unknown.",
+          "metricIds": [],
+          "sourceIds": ["league-snapshot"]
+        },
+        "perception": {
+          "tone": "unknown",
+          "text": "ESPN's Saints headline supplies negative team-level context, not Olave-specific evidence. Odunze's matched Sleeper add activity is {{11620:market-adds}}, but platform behavior establishes neither representative public opinion nor a predictive edge.",
+          "metricIds": ["11620:market-adds"],
+          "sourceIds": ["news-0", "market-add"]
+        }
+      },
+      "savedHeadline": "Keep your current lineup for now",
+      "decisionMetrics": [
+        {
+          "id": "waiver-before",
+          "label": "Current best starting-lineup estimate",
+          "value": 141.586319188,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"]
+        },
+        {
+          "id": "waiver-drop",
+          "label": "Chris Olave: estimate removed by the proposed drop",
+          "value": 17.374864351000003,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0"]
+        },
+        {
+          "id": "7594:waiver-gain",
+          "label": "Chuba Hubbard: starting-lineup estimate change",
+          "value": -2.741734796000003,
+          "unit": "points",
+          "sourceIds": ["games", "espn-forecasts-2026-0", "stats-2026", "stats-2025"],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "8676:waiver-gain",
+          "label": "Rashid Shaheed: starting-lineup estimate change",
+          "value": -2.7455294229999936,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "11620:waiver-gain",
+          "label": "Rome Odunze: starting-lineup estimate change",
+          "value": -2.7455294229999936,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        },
+        {
+          "id": "12507:waiver-gain",
+          "label": "Omarion Hampton: starting-lineup estimate change",
+          "value": -2.7455294229999936,
+          "unit": "points",
+          "sourceIds": [
+            "games",
+            "espn-forecasts-2026-0",
+            "stats-2026",
+            "stats-2025",
+            "espn-forecasts-2026-100"
+          ],
+          "description": "Includes the proposed drop and reassigns all supported starting slots. Platform locks and transaction rules still need confirmation."
+        }
+      ],
+      "audit": {
+        "passed": true,
+        "errors": [],
+        "checks": [
+          "publisher-ppr:4984",
+          "publisher-ppr:4046",
+          "publisher-ppr:8138",
+          "publisher-ppr:6813",
+          "publisher-ppr:9493",
+          "publisher-ppr:8146",
+          "publisher-ppr:6786",
+          "publisher-ppr:1466",
+          "publisher-ppr:11604",
+          "publisher-ppr:8144",
+          "publisher-ppr:7594",
+          "publisher-ppr:8676",
+          "publisher-ppr:11620",
+          "publisher-ppr:12507",
+          "waiver-before",
+          "8676:waiver-after",
+          "8676:waiver-gain",
+          "11620:waiver-after",
+          "11620:waiver-gain",
+          "7594:waiver-after",
+          "7594:waiver-gain",
+          "12507:waiver-after",
+          "12507:waiver-gain"
+        ],
+        "scope": "Evidence arithmetic, legal roster consequences and reviewed recommendation gates; not future football outcomes."
+      },
+      "resultSha256": "8a59f9c9a1ba59b85fdff239c916dfaf749336745a4f6bbc645674a9e1cc70a1",
+      "contextSha256": "9bfa95f45118bfa0923f7887e1f8bd1b59f82625f562558b72a9bb56b7a10b91"
+    }
+  ],
+  "nativeVersion": "codex-cli 0.162.0-alpha.17.2",
+  "sourceHashes": {
+    "apps/api/src/advice-service.ts": "a248f9554628e2c7dc0685134f7d1ce7b7a38282e752ed8e8a258b17a73bb7a8",
+    "packages/core/src/player-evidence.ts": "672a8a0cc8fdbc6aa981452a1ac1fe9e5399dcd68b8592d4b17a586995077e3f",
+    "packages/core/src/player-availability.ts": "8ef60433df4e3c4b5071b9661f91985271f495a5295b0399fd64943ff82a0f79",
+    "packages/core/src/public-player-forecast.ts": "f4837637916bb07a27bde992f7de0670e504ecdce4837f67b468f8a40dc02424",
+    "packages/core/src/fantasy-advice.ts": "0d0eb87aec244cbe34be72e58780f3006fa572ad7310f7c006625f2c0dfb04b3",
+    "packages/core/src/advice-policy.ts": "7c3bb3277f1a1140bb338321b2e229bade1a9d500372265efcdce338a35ef752",
+    "apps/dashboard/src/ui/AdviceResultView.tsx": "bd3b996a5eb988b099b4d3929235b9dddec03e48e88b87150affaa0f61a206cf",
+    "scripts/real-advice-audit.mjs": "7dd5ab1238b93b22dd7734a4c88d300102adc5c9d9e92a5a47f86d8cc081a92e",
+    "scripts/evaluate-real-advice.mjs": "44ff4ee1b107c6b05af88441b450e2b984a119d0dac6b9a2f87b8d74093a2a4b",
+    "scripts/capture-real-football-data.mjs": "37598e86cd0e3a061f7d8cbc7e2169d567eca073dbd988066f56fab779646633"
+  },
+  "limitations": [
+    "Current public football data and explicitly synthetic offensive PPR roster/pick scenarios; no real owner league or transaction.",
+    "No measured future NFL outcome accuracy or betting profit; all fetched betting markets abstained.",
+    "Zero dated/current-week injury rows; absent/undated reports do not establish health.",
+    "K/DST/IDP, dynasty/keeper, player props and actual platform transaction eligibility are outside this live sweep.",
+    "Initial and corrected phases preserved; snapshot retained locally, not a certified historical publication-vintage archive."
+  ]
+}

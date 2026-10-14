@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import type { AppSettings, AIProvider, SavedReport } from '@sidekick/core';
 import {
   fetchBlueBubblesMessages,
+  ImsgClient,
+  resolveImsgExecutable,
   fetchTwilioConversationMessages,
   isBlueBubblesConfigured,
   type BlueBubblesMessage,
@@ -39,6 +41,7 @@ export interface ChatSyncDependencies {
   twilioConversationAutoSyncToken: string;
   blueBubblesAutoSyncStatus: SyncStatus;
   twilioConversationAutoSyncStatus: SyncStatus;
+  imsgHistory?: (settings: AppSettings, guid: string) => Promise<BlueBubblesMessage[]>;
   claims: { imessage: boolean; twilio: boolean };
 }
 export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
@@ -72,18 +75,34 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
     const chatGuid = state.settings.imessageChatGuid?.trim();
     if (!chatGuid)
       return res.status(409).json({ error: 'Set an iMessage group chat ID in Settings.' });
-    const config = parseSecret(await readCredential('bluebubbles'));
-    if (!isBlueBubblesConfigured(config))
-      return res.status(409).json({ error: 'Configure a valid BlueBubbles server in Settings.' });
-
+    const localImsg = state.settings.imessageProvider === 'imsg';
+    const identity = localImsg ? `imsg:${chatGuid}` : chatGuid;
+    const sourceName = localImsg ? 'imsg group chat' : blueBubblesMemorySource;
     let history: BlueBubblesMessage[];
     try {
-      history = await fetchBlueBubblesMessages(
-        config.serverUrl as string,
-        config.serverPassword as string,
-        chatGuid,
-        200,
-      );
+      if (localImsg) {
+        if (!state.settings.imsgChatId)
+          return res
+            .status(409)
+            .json({ error: 'Choose the local Messages chat ID before syncing.' });
+        history = dependencies.imsgHistory
+          ? await dependencies.imsgHistory(state.settings, chatGuid)
+          : await new ImsgClient(
+              await resolveImsgExecutable(state.settings.imsgExecutablePath),
+            ).history(chatGuid, state.settings.imsgChatId);
+      } else {
+        const config = parseSecret(await readCredential('bluebubbles'));
+        if (!isBlueBubblesConfigured(config))
+          return res
+            .status(409)
+            .json({ error: 'Configure a valid BlueBubbles server in Settings.' });
+        history = await fetchBlueBubblesMessages(
+          config.serverUrl as string,
+          config.serverPassword as string,
+          chatGuid,
+          200,
+        );
+      }
     } catch (error) {
       return res.status(502).json({
         error: error instanceof Error ? error.message : 'Could not retrieve iMessage history.',
@@ -96,11 +115,12 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
       'imessage',
       chatGuid,
       isBackgroundPoll,
+      state.settings,
     );
     if (blockedAfterFetch) return res.status(409).json({ error: blockedAfterFetch });
 
     const cursor =
-      state.settings.imessageSyncCursor?.chatGuid === chatGuid
+      state.settings.imessageSyncCursor?.chatGuid === identity
         ? state.settings.imessageSyncCursor
         : undefined;
     const newMessages = unseenBlueBubblesMessages(history, cursor);
@@ -112,7 +132,7 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
     for (const message of newMessages) {
       const participant = message.isFromMe ? 'owner' : message.author;
       if (!participant) continue;
-      const authorId = `${chatGuid}\u0000${participant}`;
+      const authorId = `${identity}\u0000${participant}`;
       const name = message.isFromMe ? ownerName : participant;
       const group = memberGroups.get(authorId) ?? { authorId, name, messages: [] };
       group.messages.push(message);
@@ -125,11 +145,24 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
       'imessage',
       chatGuid,
       isBackgroundPoll,
+      state.settings,
     );
     if (blockedBeforeAnalysis) return res.status(409).json({ error: blockedBeforeAnalysis });
     const groupAnalysis = await analyzeGroupChatMembers({
       initialSettings: analysisState.settings,
-      currentSettings: () => store.settingsSnapshot(),
+      currentSettings: () => {
+        const settings = store.settingsSnapshot();
+        const blocked = groupChatSyncBlockReason(
+          settings,
+          'imessage',
+          chatGuid,
+          isBackgroundPoll,
+          state.settings,
+        );
+        return blocked
+          ? { ...settings, memoryEnabled: false, analyzeImportsWithAI: false }
+          : settings;
+      },
       participants: [...memberGroups.values()].map((group) => {
         const previous = analysisState.memories.find(
           (memory) => memory.sourceAuthorId === group.authorId,
@@ -144,7 +177,7 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
     });
     const { notes, failures: analysisFailures, wasOptedIn: analysisWasOptedIn } = groupAnalysis;
 
-    const nextCursor = blueBubblesCursorAfterHistory(chatGuid, history, cursor);
+    const nextCursor = blueBubblesCursorAfterHistory(identity, history, cursor);
     let chatReplyDrafts: SavedReport[];
     try {
       const replyState = store.snapshot();
@@ -153,13 +186,14 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
         'imessage',
         chatGuid,
         isBackgroundPoll,
+        state.settings,
       );
       if (blockedBeforeReply) return res.status(409).json({ error: blockedBeforeReply });
       chatReplyDrafts = await buildMentionReplyDrafts(
         replyState,
         cursor
           ? newMessages.map((message) => ({
-              id: `bluebubbles:${message.guid}`,
+              id: `${localImsg ? 'imsg' : 'bluebubbles'}:${message.guid}`,
               text: message.text,
               author: message.author ?? 'League member',
               fromMe: message.isFromMe,
@@ -176,6 +210,7 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
               channel: 'imessage',
               target: chatGuid,
               isBackgroundPoll,
+              expectedSettings: state.settings,
             });
           },
           afterGenerate: ({ memberContext }) => {
@@ -186,6 +221,7 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
               channel: 'imessage',
               target: chatGuid,
               isBackgroundPoll,
+              expectedSettings: state.settings,
             });
           },
         },
@@ -202,6 +238,14 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
         throw new Error('Enable member memory in Settings before syncing.');
       if (isBackgroundPoll && !current.settings.imessageAutoSyncEnabled)
         throw new Error('Automatic iMessage sync was disabled while syncing.');
+      const blocked = groupChatSyncBlockReason(
+        current.settings,
+        'imessage',
+        chatGuid,
+        isBackgroundPoll,
+        state.settings,
+      );
+      if (blocked) throw new Error(blocked);
       if (current.settings.imessageChatGuid !== chatGuid)
         throw new Error('The iMessage group changed during sync. Try again.');
       if (chatReplyDrafts.length && !current.settings.chatRepliesEnabled)
@@ -224,7 +268,7 @@ export function createChatSyncRouter(dependencies: ChatSyncDependencies) {
           current.memories.unshift({
             id: randomUUID(),
             name: group.name,
-            sourceName: blueBubblesMemorySource,
+            sourceName,
             sourceAuthorId: group.authorId,
             importedAt: new Date().toISOString(),
             sourceText: merged.sourceText,

@@ -1,4 +1,4 @@
-import keytar from 'keytar';
+import { resolveVerificationProfile } from '@sidekick/integrations';
 
 const service = 'SundaySidekick';
 const knownProviders = [
@@ -12,6 +12,7 @@ const knownProviders = [
   'twilio',
   'bluebubbles',
   'bluebubbles-webhook-token',
+  'backup-encryption',
 ] as const;
 export type CredentialProvider = (typeof knownProviders)[number];
 
@@ -64,9 +65,19 @@ export function createCredentialManager(backend: CredentialBackend, serviceName 
 
     async saveCredential(provider: string, value: string): Promise<void> {
       validateProvider(provider);
+      if (provider === 'backup-encryption' && (value.length < 12 || value.length > 200))
+        throw new CredentialValidationError(
+          'Backup passphrase must be between 12 and 200 characters.',
+        );
       if (!value.trim() || value.length > 8_000)
         throw new CredentialValidationError('Credential must be between 1 and 8,000 characters.');
-      await accessStore(() => backend.setPassword(serviceName, provider, value.trim()));
+      await accessStore(() =>
+        backend.setPassword(
+          serviceName,
+          provider,
+          provider === 'backup-encryption' ? value : value.trim(),
+        ),
+      );
     },
 
     async readCredential(provider: CredentialProvider): Promise<string | null> {
@@ -81,7 +92,53 @@ export function createCredentialManager(backend: CredentialBackend, serviceName 
   };
 }
 
-const manager = createCredentialManager(keytar);
+const verificationProfile = resolveVerificationProfile(
+  process.env.SIDEKICK_VERIFICATION_ROOT,
+  process.env.SIDEKICK_USER_DATA_DIR,
+);
+if (verificationProfile) process.env.SIDEKICK_USER_DATA_DIR = verificationProfile.dataDirectory;
+
+/** Test profiles never open the native vault or retain credentials across API restarts. */
+export function createRuntimeCredentialManager(
+  nativeBackend: CredentialBackend | undefined,
+  verificationRoot?: string,
+  dataDirectory?: string,
+) {
+  const profile = resolveVerificationProfile(verificationRoot, dataDirectory);
+  if (!profile) {
+    if (!nativeBackend) throw new CredentialStoreUnavailableError();
+    return createCredentialManager(nativeBackend);
+  }
+  const entries = new Map<string, string>();
+  const checkService = (name: string) => {
+    if (name !== profile.credentialService) throw new CredentialStoreUnavailableError();
+  };
+  return createCredentialManager(
+    {
+      async getPassword(name, account) {
+        checkService(name);
+        return entries.get(account) ?? null;
+      },
+      async setPassword(name, account, password) {
+        checkService(name);
+        entries.set(account, password);
+      },
+      async deletePassword(name, account) {
+        checkService(name);
+        return entries.delete(account);
+      },
+    },
+    profile.credentialService,
+  );
+}
+
+// Do not even load the native vault binding during isolated desktop verification.
+const nativeBackend = verificationProfile ? undefined : (await import('keytar')).default;
+const manager = createRuntimeCredentialManager(
+  nativeBackend,
+  process.env.SIDEKICK_VERIFICATION_ROOT,
+  process.env.SIDEKICK_USER_DATA_DIR,
+);
 export const listCredentialProviders = manager.listCredentialProviders;
 export const saveCredential = manager.saveCredential;
 export const readCredential = manager.readCredential;

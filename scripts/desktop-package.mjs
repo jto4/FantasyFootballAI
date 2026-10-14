@@ -20,6 +20,14 @@ const forgeArgs = process.argv.slice(2).filter((argument) => argument !== '--upd
 async function copyProjectFiles() {
   await mkdir(staging, { recursive: true });
   await cp(join(root, 'apps/desktop/main.mjs'), join(staging, 'main.mjs'));
+  await cp(
+    join(root, 'apps/desktop/team-selection-preference.mjs'),
+    join(staging, 'team-selection-preference.mjs'),
+  );
+  await cp(
+    join(root, 'apps/desktop/appearance-preference.mjs'),
+    join(staging, 'appearance-preference.mjs'),
+  );
   await cp(join(root, 'apps/desktop/update-check.mjs'), join(staging, 'update-check.mjs'));
   await cp(join(root, 'apps/desktop/native-updater.mjs'), join(staging, 'native-updater.mjs'));
   await cp(join(root, 'apps/desktop/background-tray.mjs'), join(staging, 'background-tray.mjs'));
@@ -184,8 +192,7 @@ async function smokeCheckPackage(packageRoot) {
     env: {
       ...process.env,
       SIDEKICK_USER_DATA_DIR: smokeData,
-      HOME: smokeData,
-      USERPROFILE: smokeData,
+      SIDEKICK_VERIFICATION_ROOT: smokeData,
     },
     timeout: 60_000,
     stdio: 'inherit',

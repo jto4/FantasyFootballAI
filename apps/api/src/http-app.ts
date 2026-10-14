@@ -2,10 +2,27 @@ import express from 'express';
 import { apiErrorCodes } from './api-errors.js';
 import { applySecurityHeaders } from './security-headers.js';
 import { isAllowedOrigin } from './origin.js';
+import { randomUUID } from 'node:crypto';
+import { logEvent } from './logger.js';
 /** Production and integration fixtures share the same loopback and browser-origin boundary. */
 export function createLocalHttpApp(port: () => number, development = false) {
   const app = express();
   app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    const requestId = randomUUID();
+    const started = performance.now();
+    res.setHeader('x-sidekick-request-id', requestId);
+    res.once('finish', () => {
+      if (res.statusCode >= 400)
+        logEvent('warn', 'http.request_failed', {
+          component: 'http',
+          requestId,
+          status: res.statusCode,
+          durationMs: Math.round(performance.now() - started),
+        });
+    });
+    next();
+  });
   app.use(apiErrorCodes);
   app.use((_req, res, next) => {
     applySecurityHeaders(res);

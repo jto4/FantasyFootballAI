@@ -1,0 +1,183 @@
+{
+  "capturedAt": "2026-10-13T22:15:47.269Z",
+  "sources": [
+    {
+      "season": 2019,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2019.csv.gz",
+      "capturedAt": "2026-10-13T22:13:14.802Z",
+      "compressedSha256": "b764668137052be23745953cbc33fa17e537a70c81e9b73785a19a15e7288216",
+      "compressedBytes": 17992849,
+      "teamRows": 502,
+      "plays": 45339,
+      "drives": 5528,
+      "unavailableGames": [
+        "2019_01_PIT_NE",
+        "2019_01_SF_TB",
+        "2019_04_TB_LA",
+        "2019_10_SEA_SF",
+        "2019_13_TB_JAX"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2019-selected.csv.gz",
+      "selectedSha256": "396dd06bcac226c6b660c9837e33fcd0d02310f0f786e1d0a70b980a971106d7",
+      "selectedCompressedSha256": "43e11ffaa4d7019f666b396a610ff66a3c034e1c7cc46cd26ce0ef147550d9a0",
+      "selectedBytes": 5465150,
+      "selectedCompressedBytes": 1031462
+    },
+    {
+      "season": 2020,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2020.csv.gz",
+      "capturedAt": "2026-10-13T22:14:55.657Z",
+      "compressedSha256": "bc954b5780e325df4faa255fac092585c981a4de5d2f553a8a4e0a3c8b3a3cf2",
+      "compressedBytes": 18143553,
+      "teamRows": 508,
+      "plays": 45406,
+      "drives": 5369,
+      "unavailableGames": [
+        "2020_04_DEN_NYJ",
+        "2020_08_DAL_PHI"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2020-selected.csv.gz",
+      "selectedSha256": "76413467ac84fbbc553d88eebb6cc1bce4e0aa70841f7b3a26fed987f21ee50b",
+      "selectedCompressedSha256": "39a4e041a3c612a1941270225112f0bc9e86033dc39a33e08064ad2025aa8a0d",
+      "selectedBytes": 5517617,
+      "selectedCompressedBytes": 1039980
+    },
+    {
+      "season": 2021,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2021.csv.gz",
+      "capturedAt": "2026-10-13T22:15:15.753Z",
+      "compressedSha256": "e8743a568f99667a8bdcd29ba12224ee1782ad2b7916bee78ee335c099383739",
+      "compressedBytes": 19022201,
+      "teamRows": 524,
+      "plays": 47651,
+      "drives": 5641,
+      "unavailableGames": [
+        "2021_02_DEN_JAX",
+        "2021_06_DAL_NE",
+        "2021_08_NE_LAC",
+        "2021_10_ATL_DAL",
+        "2021_10_BAL_MIA",
+        "2021_12_LA_GB",
+        "2021_12_LV_DAL",
+        "2021_12_MIN_SF",
+        "2021_18_KC_DEN",
+        "2021_18_WAS_NYG"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2021-selected.csv.gz",
+      "selectedSha256": "cd87b14171d5cb9dc75a06866e6a1ae35587ce681b7c92499856766838e5f5d0",
+      "selectedCompressedSha256": "29f84ad4caf9e7c557e650d4c6f2e0449c8743e960ea6b03e73f3e1b0099c817",
+      "selectedBytes": 5772921,
+      "selectedCompressedBytes": 1089615
+    },
+    {
+      "season": 2022,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2022.csv.gz",
+      "capturedAt": "2026-10-13T22:15:39.538Z",
+      "compressedSha256": "0c69a71eb39498956c7b1d5c1ca52ce7fe679934a95d1af249facb5ea9829ea4",
+      "compressedBytes": 19093961,
+      "teamRows": 534,
+      "plays": 47157,
+      "drives": 5664,
+      "unavailableGames": [
+        "2022_02_ATL_LA",
+        "2022_05_DAL_LA",
+        "2022_07_NO_ARI",
+        "2022_13_IND_DAL"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2022-selected.csv.gz",
+      "selectedSha256": "26b2325f00109e2ac6532f0a72480b20bc727318f47882f298ce4af969baac5b",
+      "selectedCompressedSha256": "3e8d4e3426ca9594d8a01603168a900c147b150ffa95eb7e4d29c4c859b90788",
+      "selectedBytes": 5714524,
+      "selectedCompressedBytes": 1078000
+    },
+    {
+      "season": 2023,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2023.csv.gz",
+      "capturedAt": "2026-10-13T22:15:41.454Z",
+      "compressedSha256": "4649804ee0f0a40b41e51ec75a1ce921949d7fab5459213488656b92f78560e8",
+      "compressedBytes": 19169807,
+      "teamRows": 532,
+      "plays": 47399,
+      "drives": 5796,
+      "unavailableGames": [
+        "2023_04_NE_DAL",
+        "2023_13_IND_TEN",
+        "2023_14_IND_CIN",
+        "2023_16_LV_KC",
+        "2023_16_NYG_PHI",
+        "2023_17_LA_NYG"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2023-selected.csv.gz",
+      "selectedSha256": "dddc96d7ce598c8ed31f4db8f1fd495239aae291aaed1a66e9e6843d7b2df1bb",
+      "selectedCompressedSha256": "ef67c5c897fd84e17aa8e0037187ec9da6bd1bc0b886216e0f673ed82faf11ce",
+      "selectedBytes": 5734886,
+      "selectedCompressedBytes": 1076453
+    },
+    {
+      "season": 2024,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2024.csv.gz",
+      "capturedAt": "2026-10-13T22:15:43.275Z",
+      "compressedSha256": "23370d5d10f8104d80d46a1fc5e61f4f6f5a3263fe96fe2dd629913cfcb08c06",
+      "compressedBytes": 19362351,
+      "teamRows": 526,
+      "plays": 47274,
+      "drives": 5595,
+      "unavailableGames": [
+        "2024_01_ARI_BUF",
+        "2024_01_TEN_CHI",
+        "2024_02_CIN_KC",
+        "2024_05_NYG_SEA",
+        "2024_07_DET_MIN",
+        "2024_07_NE_JAX",
+        "2024_09_JAX_PHI",
+        "2024_12_NE_MIA",
+        "2024_13_LAC_ATL"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2024-selected.csv.gz",
+      "selectedSha256": "a4ab39c3781822de8797a03bcd24c57e617eae7ba2e98a961cbc2961bb9d15cc",
+      "selectedCompressedSha256": "5999ce4a1384a67c40e6936ebb1991d5fc0f2c24183da342b1a9427e714451b1",
+      "selectedBytes": 5755783,
+      "selectedCompressedBytes": 1095329
+    },
+    {
+      "season": 2025,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2025.csv.gz",
+      "capturedAt": "2026-10-13T22:15:45.072Z",
+      "compressedSha256": "2f135887790a013fd004e609e37096bb4816d5cc80b9f19122e1bad478961978",
+      "compressedBytes": 19105296,
+      "teamRows": 538,
+      "plays": 46452,
+      "drives": 5487,
+      "unavailableGames": [
+        "2025_04_JAX_SF",
+        "2025_07_HOU_SEA",
+        "2025_16_LA_SEA"
+      ],
+      "selectedPath": "docs/research/model-v16-pbp-2025-selected.csv.gz",
+      "selectedSha256": "b15c7569a61d024043cb3b9371dc1c0e7fb8e3aec8f0198e7fd7e8b25b251b53",
+      "selectedCompressedSha256": "36b91acfb5c48238a8bf4c9be5793ee5dc7f5563c57c06594b3bc745a161bce2",
+      "selectedBytes": 5672103,
+      "selectedCompressedBytes": 1077619
+    },
+    {
+      "season": 2026,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2026.csv.gz",
+      "capturedAt": "2026-10-13T22:09:00.708Z",
+      "compressedSha256": "af5d1d443d93b6db94fc3e0c1b9e3155f298bd95b07ad1d9cb6fd3399aff481a",
+      "compressedBytes": 5434264,
+      "teamRows": 158,
+      "plays": 13842,
+      "drives": 1650,
+      "unavailableGames": [],
+      "selectedPath": "docs/research/model-v16-pbp-2026-selected.csv.gz",
+      "selectedSha256": "2933d6cdc9636a99e8644ee8ac847781a35822feea8c19c052a6b3772846b7f8",
+      "selectedCompressedSha256": "b5c6f17b98296f3fe1acb43d82650c40c4f4d3955a270a2e77d70e7038c92fb5",
+      "selectedBytes": 1601261,
+      "selectedCompressedBytes": 306086
+    }
+  ],
+  "rows": 3822,
+  "snapshotSha256": "eb69a73e18dd90926dd6ddf43ae85802423de376a2f377cfabeb37d598fbbba3",
+  "warning": "Latest revised PBP. Prior completed weeks with a 48-hour lag only; not certified contemporaneous historical publications. No weather or injury vintage added.",
+  "selectedRetention": "Raw source fields needed for every feature retained, no inferred values. Aggregation reproduces the original normalized snapshot exactly."
+}

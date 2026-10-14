@@ -82,13 +82,65 @@ export {
   type SettingsSection,
 } from './settings-sections.js';
 
-export { parseLeagueInput } from './league-input.js';
+export { parseLeagueInput, detectLeagueLink } from './league-input.js';
 
 export { localDateTimeInstants } from './calendar-time.js';
+export { nextSchedule, type SchedulePlan } from './next-schedule.js';
 
 export * from './workflow-contracts.js';
+export { reportVisuals } from './report-visuals.js';
 
 export * from './domain-types.js';
+export * from './projection-period.js';
 export * from './league-status.js';
 export * from './schedules.js';
 export * from './analysis.js';
+
+export { deliveryText } from './message-text.js';
+export * from './advice-types.js';
+export * from './advice-readiness.js';
+export * from './advice-journal.js';
+export * from './advice-contracts.js';
+export * from './advice-math.js';
+export * from './advice-policy.js';
+export * from './advice-perception.js';
+export * from './bet-forecast.js';
+export { prepareFantasyForecast, type FantasyForecast } from './fantasy-forecast.js';
+export { buildFootballContext } from './football-context.js';
+export {
+  buildFantasyAdvicePlan,
+  evaluateLineupSelection,
+  validateLineupAssessment,
+  validateStartSitAssessment,
+  StartSitSelectionError,
+} from './fantasy-advice.js';
+export {
+  buildPlayerEvidence,
+  buildPlayerMarketEvidence,
+  mean,
+  median,
+  standardDeviation,
+  type PlayerEvidenceInput,
+} from './player-evidence.js';
+export * from './sportsbook-types.js';
+export { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
+export {
+  validateExternalTotalTape,
+  type ExternalTotalTape,
+  type ExternalTotalTrade,
+} from './external-total-signals.js';
+export {
+  validateTeamTotalStats,
+  totalSignalTeamKey,
+  type TeamTotalStats,
+} from './team-total-signals.js';
+export * from './prediction-records.js';
+export { evaluateArchivedMarkets, type MarketBacktest } from './market-backtest.js';
+export {
+  usablePregameContext,
+  availabilityFeatures,
+  usablePersonnel,
+  personnelFeatures,
+} from './game-availability.js';
+
+export { validateDriveTotalStats, type DriveTotalStats } from './drive-total-signals.js';

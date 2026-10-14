@@ -7,6 +7,7 @@ import {
 } from '@sidekick/core';
 import { postDraftEventDraft } from './post-draft-event.js';
 import { Trash2 } from 'lucide-react';
+import { timezoneLabel } from './timezone-label';
 
 type LeagueCalendarSettingsProps = {
   leagues: LeagueConnection[];
@@ -143,7 +144,9 @@ export function LeagueCalendarSettings({
 
   return (
     <div className="news-source-settings">
-      <h3>LEAGUE SEASON CALENDAR</h3>
+      <h3 data-search-target="league-calendar" tabIndex={-1}>
+        LEAGUE SEASON CALENDAR
+      </h3>
       <p className="schedule-explainer">
         Add a draft day, season milestone, or other league date. At that time, Sidekick refreshes
         that league and saves the selected report as a draft. Calendar events never send messages.
@@ -216,9 +219,11 @@ export function LeagueCalendarSettings({
                 }
               />
             </label>
-            <label>
-              TIMEZONE
+            <label className="schedule-timezone">
+              <span>TIMEZONE</span>
               <select
+                aria-label="TIMEZONE"
+                aria-describedby="calendar-timezone-id"
                 value={draft.timezone}
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, timezone: event.target.value }))
@@ -226,10 +231,13 @@ export function LeagueCalendarSettings({
               >
                 {[...new Set([draft.timezone, ...timezonesForCalendar])].map((timezone) => (
                   <option key={timezone} value={timezone}>
-                    {timezone}
+                    {timezoneLabel(timezone)}
                   </option>
                 ))}
               </select>
+              <small className="timezone-id" id="calendar-timezone-id">
+                Timezone ID: {draft.timezone}
+              </small>
             </label>
           </div>
           <button type="button" className="small-button" onClick={addEvent}>
@@ -238,7 +246,7 @@ export function LeagueCalendarSettings({
           {hasUpcomingDraft && draftHype && draftTimeSource && (
             <p className="schedule-explainer">
               {draftTimeSource} reports a draft at {draftHype.date} at {draftHype.time} (
-              {draft.timezone}).{' '}
+              {timezoneLabel(draft.timezone)}).{' '}
               <button type="button" className="text-button" onClick={usePlatformDraftTime}>
                 Use platform draft time
               </button>
@@ -276,7 +284,8 @@ export function LeagueCalendarSettings({
                 <small>
                   {leagues.find((league) => league.id === event.leagueId)?.displayName ??
                     'Disconnected league'}{' '}
-                  · {actionNames[event.kind]} · {event.date} {event.time} {event.timezone}
+                  · {actionNames[event.kind]} · {event.date} {event.time}{' '}
+                  {timezoneLabel(event.timezone)}
                   {event.completedAt ? ' · complete' : ''}
                 </small>
               </div>

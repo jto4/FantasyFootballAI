@@ -1,0 +1,844 @@
+{
+  "generatedAt": "2026-10-13T22:29:37.091Z",
+  "parentPrimary": "drive-residual-100-football-only",
+  "late2025": {
+    "n": 151,
+    "finalExcessBrier": 0.0005783089969897047,
+    "rawExcessBrier": 0.0003072301727357675,
+    "finalVarianceCost": 0.00022083994990162737,
+    "finalAlignmentGain": -0.0003574690470880824,
+    "rawVarianceCost": 0.0009693992535208894,
+    "rawAlignmentGain": 0.0006621690807851151,
+    "meanFeedbackWeight": 0.350861293276439,
+    "overCorrections": 150,
+    "underCorrections": 1,
+    "bookFallback": 46,
+    "outcomeRate": 0.5099337748344371
+  },
+  "losingWeeks": [
+    {
+      "season": 2025,
+      "week": 11,
+      "n": 15,
+      "finalExcessBrier": 0.006886956088701446,
+      "rawExcessBrier": 0.009161061288512984,
+      "finalVarianceCost": 0.0005375173766047016,
+      "finalAlignmentGain": -0.006349438712096743,
+      "rawVarianceCost": 0.0009081133297790982,
+      "rawAlignmentGain": -0.00825294795873389,
+      "meanFeedbackWeight": 0.7693540228103947,
+      "overCorrections": 15,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.4,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 145,
+          "effectiveGames": 92.39779766475048,
+          "linear": 0.09902891316953309,
+          "quadratic": 0.08743726381645232
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 115.63530763621742,
+          "linear": 0.011979852943927654,
+          "quadratic": 0.03685101287046709
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 12,
+      "n": 14,
+      "finalExcessBrier": 0.003618512592893784,
+      "rawExcessBrier": 0.012301862324636596,
+      "finalVarianceCost": 0.00007431624665011445,
+      "finalAlignmentGain": -0.003544196346243684,
+      "rawVarianceCost": 0.0007847565215535825,
+      "rawAlignmentGain": -0.011517105803083027,
+      "meanFeedbackWeight": 0.3077332453866094,
+      "overCorrections": 14,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.2857142857142857,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 160,
+          "effectiveGames": 98.48421468985342,
+          "linear": 0.03405001392175079,
+          "quadratic": 0.09267147837287264
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 112.59325730099319,
+          "linear": 0.011664695606528074,
+          "quadratic": 0.03588156298230126
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 17,
+      "n": 16,
+      "finalExcessBrier": 0.0027987553176374025,
+      "rawExcessBrier": 0.005506875916007155,
+      "finalVarianceCost": 0.0004859599909120242,
+      "finalAlignmentGain": -0.0023127953267253892,
+      "rawVarianceCost": 0.0014760757562302244,
+      "rawAlignmentGain": -0.004030800159776944,
+      "meanFeedbackWeight": 0.5737806973921948,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.4375,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 236,
+          "effectiveGames": 123.17258105400353,
+          "linear": 0.0802177573232012,
+          "quadratic": 0.10619439870405842
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 98.5421423025716,
+          "linear": 0.010208995830912304,
+          "quadratic": 0.03140371075674911
+        }
+      ]
+    }
+  ],
+  "losingWeekShareOfLateNetLoss": 2.2759161733200792,
+  "weekly": [
+    {
+      "season": 2025,
+      "week": 1,
+      "n": 16,
+      "finalExcessBrier": 0.002270543240907294,
+      "rawExcessBrier": 0.0102413525440502,
+      "finalVarianceCost": 0.00002419141899095702,
+      "finalAlignmentGain": -0.0022463518219163403,
+      "rawVarianceCost": 0.0004587872130123326,
+      "rawAlignmentGain": -0.009782565331037864,
+      "meanFeedbackWeight": 0.22962809303089224,
+      "overCorrections": 12,
+      "underCorrections": 0,
+      "bookFallback": 4,
+      "outcomeRate": 0.25,
+      "feedbackContributions": [
+        { "type": "current", "games": 0, "effectiveGames": 0, "linear": 0, "quadratic": 0 },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 150.96324678735462,
+          "linear": 0.015639838155140834,
+          "quadratic": 0.048109428374849515
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 2,
+      "n": 16,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": -0.004848580945865648,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.00037313037869903464,
+      "rawAlignmentGain": 0.005221711324564673,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 16,
+      "outcomeRate": 0.625,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 12,
+          "effectiveGames": 11.004048518456052,
+          "linear": -0.0717652156918045,
+          "quadratic": 0.006731355668846586
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 146.99181448969736,
+          "linear": 0.01522839656454663,
+          "quadratic": 0.04684380020550556
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 3,
+      "n": 16,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": -0.00022658471630040283,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.0007455585222246921,
+      "rawAlignmentGain": 0.0009721432385250837,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 16,
+      "outcomeRate": 0.5,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 28,
+          "effectiveGames": 24.762821674319305,
+          "linear": -0.027502349774252657,
+          "quadratic": 0.01164727341913308
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 143.12485977072578,
+          "linear": 0.014827778882792915,
+          "quadratic": 0.04561146726990575
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 4,
+      "n": 16,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": -0.008408470918157187,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.0008055513565369931,
+      "rawAlignmentGain": 0.009214022274694164,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 16,
+      "outcomeRate": 0.625,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 44,
+          "effectiveGames": 37.3796722877818,
+          "linear": -0.018088091698206084,
+          "quadratic": 0.021619479686867213
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 139.35963410959675,
+          "linear": 0.014437700362286537,
+          "quadratic": 0.04441155366103645
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 5,
+      "n": 14,
+      "finalExcessBrier": -0.0029217245514924594,
+      "rawExcessBrier": -0.003968948062743495,
+      "finalVarianceCost": 0.00043673334705869306,
+      "finalAlignmentGain": 0.00335845789855115,
+      "rawVarianceCost": 0.0009288248541176039,
+      "rawAlignmentGain": 0.0048977729168611,
+      "meanFeedbackWeight": 0.6857112315251073,
+      "overCorrections": 14,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.6428571428571429,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 60,
+          "effectiveGames": 48.94937531283625,
+          "linear": 0.05100751221946776,
+          "quadratic": 0.03164425190009337
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 135.6934612915723,
+          "linear": 0.01405788374636912,
+          "quadratic": 0.0432432065146147
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 6,
+      "n": 15,
+      "finalExcessBrier": 0.008906985081366729,
+      "rawExcessBrier": 0.01014007286770257,
+      "finalVarianceCost": 0.0011231991118876904,
+      "finalAlignmentGain": -0.00778378596947905,
+      "rawVarianceCost": 0.001412189181005286,
+      "rawAlignmentGain": -0.008727883686697297,
+      "meanFeedbackWeight": 0.8918297091129669,
+      "overCorrections": 15,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.4,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 74,
+          "effectiveGames": 57.7248316790792,
+          "linear": 0.07821303791128334,
+          "quadratic": 0.04094221298974036
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 132.1237355058432,
+          "linear": 0.013688059072250389,
+          "quadratic": 0.042105595402896184
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 7,
+      "n": 15,
+      "finalExcessBrier": -0.0008509902533501072,
+      "rawExcessBrier": -0.003312274534892636,
+      "finalVarianceCost": 0.00003994977040126725,
+      "finalAlignmentGain": 0.000890940023751363,
+      "rawVarianceCost": 0.0008878573855999646,
+      "rawAlignmentGain": 0.0042001319204925894,
+      "meanFeedbackWeight": 0.21212191441045872,
+      "overCorrections": 15,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.6,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 89,
+          "effectiveGames": 66.68896469109472,
+          "linear": 0.011695387276055721,
+          "quadratic": 0.05696892268061482
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 128.64791949339258,
+          "linear": 0.013327963479126676,
+          "quadratic": 0.04099791174443137
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 8,
+      "n": 13,
+      "finalExcessBrier": -0.0016100361879100578,
+      "rawExcessBrier": -0.003195263003544011,
+      "finalVarianceCost": 0.00018972749762381132,
+      "finalAlignmentGain": 0.0017997636855338617,
+      "rawVarianceCost": 0.0010611989957635122,
+      "rawAlignmentGain": 0.004256461999307511,
+      "meanFeedbackWeight": 0.422830906472714,
+      "overCorrections": 13,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.6923076923076923,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 104,
+          "effectiveGames": 74.90911090693747,
+          "linear": 0.039611252067122876,
+          "quadratic": 0.06445326462090255
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 125.26354274358594,
+          "linear": 0.012977341021346872,
+          "quadratic": 0.039919368229348655
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 9,
+      "n": 14,
+      "finalExcessBrier": -0.00204068649911037,
+      "rawExcessBrier": -0.0031524520047549365,
+      "finalVarianceCost": 0.00032588945398489,
+      "finalAlignmentGain": 0.0023665759530952513,
+      "rawVarianceCost": 0.0010064256693084284,
+      "rawAlignmentGain": 0.004158877674063362,
+      "meanFeedbackWeight": 0.5690419720335368,
+      "overCorrections": 14,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.5,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 117,
+          "effectiveGames": 80.61301013618952,
+          "linear": 0.06169443191217925,
+          "quadratic": 0.07175451326198663
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 121.96819973820152,
+          "linear": 0.012635942486493685,
+          "quadratic": 0.03886919825975723
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 10,
+      "n": 14,
+      "finalExcessBrier": -0.0018897709257281539,
+      "rawExcessBrier": -0.0023437366648273905,
+      "finalVarianceCost": 0.0005818155209858232,
+      "finalAlignmentGain": 0.002471586446713976,
+      "rawVarianceCost": 0.0011879488445955186,
+      "rawAlignmentGain": 0.0035316855094229124,
+      "meanFeedbackWeight": 0.6998319754461518,
+      "overCorrections": 14,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.5,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 131,
+          "effectiveGames": 86.76051283465031,
+          "linear": 0.08326999700285186,
+          "quadratic": 0.07871972849059607
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 118.75954824165738,
+          "linear": 0.01230352521825033,
+          "quadratic": 0.03784665540487097
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 11,
+      "n": 15,
+      "finalExcessBrier": 0.006886956088701446,
+      "rawExcessBrier": 0.009161061288512984,
+      "finalVarianceCost": 0.0005375173766047016,
+      "finalAlignmentGain": -0.006349438712096743,
+      "rawVarianceCost": 0.0009081133297790982,
+      "rawAlignmentGain": -0.00825294795873389,
+      "meanFeedbackWeight": 0.7693540228103947,
+      "overCorrections": 15,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.4,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 145,
+          "effectiveGames": 92.39779766475048,
+          "linear": 0.09902891316953309,
+          "quadratic": 0.08743726381645232
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 115.63530763621742,
+          "linear": 0.011979852943927654,
+          "quadratic": 0.03685101287046709
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 12,
+      "n": 14,
+      "finalExcessBrier": 0.003618512592893784,
+      "rawExcessBrier": 0.012301862324636596,
+      "finalVarianceCost": 0.00007431624665011445,
+      "finalAlignmentGain": -0.003544196346243684,
+      "rawVarianceCost": 0.0007847565215535825,
+      "rawAlignmentGain": -0.011517105803083027,
+      "meanFeedbackWeight": 0.3077332453866094,
+      "overCorrections": 14,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.2857142857142857,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 160,
+          "effectiveGames": 98.48421468985342,
+          "linear": 0.03405001392175079,
+          "quadratic": 0.09267147837287264
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 112.59325730099319,
+          "linear": 0.011664695606528074,
+          "quadratic": 0.03588156298230126
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 13,
+      "n": 16,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": 0.004578574602432144,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.0005920365634672514,
+      "rawAlignmentGain": -0.003986538038964895,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 16,
+      "outcomeRate": 0.4375,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 174,
+          "effectiveGames": 103.14847966729789,
+          "linear": -0.04270462767468094,
+          "quadratic": 0.09505486900242056
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 109.63123503359019,
+          "linear": 0.011357829201227746,
+          "quadratic": 0.03493761668311321
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 14,
+      "n": 14,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": -0.00703635375628095,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.000667033878757317,
+      "rawAlignmentGain": 0.007703387635038264,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 13,
+      "underCorrections": 1,
+      "bookFallback": 14,
+      "outcomeRate": 0.7857142857142857,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 190,
+          "effectiveGames": 109.2596375966018,
+          "linear": -0.06840568824219284,
+          "quadratic": 0.0958520979603015
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 106.74713551327632,
+          "linear": 0.011059035616160194,
+          "quadratic": 0.03401850304286458
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 15,
+      "n": 16,
+      "finalExcessBrier": 0,
+      "rawExcessBrier": -0.006083082385633255,
+      "finalVarianceCost": 0,
+      "finalAlignmentGain": 0,
+      "rawVarianceCost": 0.0007190907104124802,
+      "rawAlignmentGain": 0.00680217309604573,
+      "meanFeedbackWeight": 0,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 16,
+      "outcomeRate": 0.625,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 204,
+          "effectiveGames": 113.02958604002633,
+          "linear": -0.01328002944236835,
+          "quadratic": 0.09646018007209611
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 103.93890880457965,
+          "linear": 0.010768102477388838,
+          "quadratic": 0.03312356878186077
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 16,
+      "n": 16,
+      "finalExcessBrier": -0.001875544165839153,
+      "rawExcessBrier": -0.005169314662410909,
+      "finalVarianceCost": 0.00010666404773896371,
+      "finalAlignmentGain": 0.0019822082135781,
+      "rawVarianceCost": 0.0010500557747552266,
+      "rawAlignmentGain": 0.0062193704371661315,
+      "meanFeedbackWeight": 0.31871525158442005,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.625,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 220,
+          "effectiveGames": 118.32065209172912,
+          "linear": 0.03772312116068697,
+          "quadratic": 0.09900492055642934
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 101.20455890025357,
+          "linear": 0.010484822997957543,
+          "quadratic": 0.03225217780641861
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 17,
+      "n": 16,
+      "finalExcessBrier": 0.0027987553176374025,
+      "rawExcessBrier": 0.005506875916007155,
+      "finalVarianceCost": 0.0004859599909120242,
+      "finalAlignmentGain": -0.0023127953267253892,
+      "rawVarianceCost": 0.0014760757562302244,
+      "rawAlignmentGain": -0.004030800159776944,
+      "meanFeedbackWeight": 0.5737806973921948,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.4375,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 236,
+          "effectiveGames": 123.17258105400353,
+          "linear": 0.0802177573232012,
+          "quadratic": 0.10619439870405842
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 98.5421423025716,
+          "linear": 0.010208995830912304,
+          "quadratic": 0.03140371075674911
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "week": 18,
+      "n": 16,
+      "finalExcessBrier": -0.0016489895979138695,
+      "rawExcessBrier": -0.0043202185846089,
+      "finalVarianceCost": 0.00012836187906048962,
+      "finalAlignmentGain": 0.0017773514769743545,
+      "rawVarianceCost": 0.0012696961036323157,
+      "rawAlignmentGain": 0.005589914688241203,
+      "meanFeedbackWeight": 0.31795681617702315,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.5,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 252,
+          "effectiveGames": 127.62181952975104,
+          "linear": 0.04398992745126271,
+          "quadratic": 0.11903777196194254
+        },
+        {
+          "type": "prior",
+          "games": 797,
+          "effectiveGames": 95.94976664194469,
+          "linear": 0.009940424926189746,
+          "quadratic": 0.03057756456673434
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "week": 1,
+      "n": 16,
+      "finalExcessBrier": -0.003456472264589623,
+      "rawExcessBrier": -0.007452662662206792,
+      "finalVarianceCost": 0.00010461913563676902,
+      "finalAlignmentGain": 0.003561091400226383,
+      "rawVarianceCost": 0.0005250513973218487,
+      "rawAlignmentGain": 0.007977714059528634,
+      "meanFeedbackWeight": 0.4463799245816517,
+      "overCorrections": 13,
+      "underCorrections": 0,
+      "bookFallback": 3,
+      "outcomeRate": 0.5625,
+      "feedbackContributions": [
+        { "type": "current", "games": 0, "effectiveGames": 0, "linear": 0, "quadratic": 0 },
+        {
+          "type": "prior",
+          "games": 803,
+          "effectiveGames": 151.85494261240297,
+          "linear": 0.06044881401420971,
+          "quadratic": 0.11542009997618613
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "week": 2,
+      "n": 16,
+      "finalExcessBrier": 0.003584524345331219,
+      "rawExcessBrier": 0.004459115092763732,
+      "finalVarianceCost": 0.000785357005183104,
+      "finalAlignmentGain": -0.002799167340148125,
+      "rawVarianceCost": 0.0011185405479817827,
+      "rawAlignmentGain": -0.0033405745447819576,
+      "meanFeedbackWeight": 0.8379299137390851,
+      "overCorrections": 16,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.375,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 13,
+          "effectiveGames": 11.921052561660723,
+          "linear": 0.05852476838494808,
+          "quadratic": 0.007703588067750362
+        },
+        {
+          "type": "prior",
+          "games": 803,
+          "effectiveGames": 147.86005222362323,
+          "linear": 0.05885857018042897,
+          "quadratic": 0.11238371116898258
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "week": 3,
+      "n": 16,
+      "finalExcessBrier": -0.0010537219536833169,
+      "rawExcessBrier": -0.0015110084145440027,
+      "finalVarianceCost": 0.0002592916025971656,
+      "finalAlignmentGain": 0.0013130135562804813,
+      "rawVarianceCost": 0.0008107322425303372,
+      "rawAlignmentGain": 0.0023217406570743343,
+      "meanFeedbackWeight": 0.5655298115574328,
+      "overCorrections": 12,
+      "underCorrections": 4,
+      "bookFallback": 0,
+      "outcomeRate": 0.5,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 29,
+          "effectiveGames": 25.603718089573018,
+          "linear": 0.029160886323081038,
+          "quadratic": 0.02347552068511296
+        },
+        {
+          "type": "prior",
+          "games": 803,
+          "effectiveGames": 143.97025653208428,
+          "linear": 0.05731016133534282,
+          "quadratic": 0.10942720149020117
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "week": 4,
+      "n": 16,
+      "finalExcessBrier": -0.003108318330723189,
+      "rawExcessBrier": -0.004649020315596863,
+      "finalVarianceCost": 0.0003536292098734003,
+      "finalAlignmentGain": 0.0034619475405965774,
+      "rawVarianceCost": 0.0009126918849230618,
+      "rawAlignmentGain": 0.005561712200519906,
+      "meanFeedbackWeight": 0.6224607487372237,
+      "overCorrections": 14,
+      "underCorrections": 2,
+      "bookFallback": 0,
+      "outcomeRate": 0.5625,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 45,
+          "effectiveGames": 38.15077770048577,
+          "linear": 0.043773015220175765,
+          "quadratic": 0.03342226329429082
+        },
+        {
+          "type": "prior",
+          "games": 803,
+          "effectiveGames": 140.18279078223267,
+          "linear": 0.05580248691421884,
+          "quadratic": 0.10654846953730036
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "week": 5,
+      "n": 15,
+      "finalExcessBrier": -0.003971020560469932,
+      "rawExcessBrier": -0.004750783651480669,
+      "finalVarianceCost": 0.0005856097660470451,
+      "finalAlignmentGain": 0.004556630326516968,
+      "rawVarianceCost": 0.0009008994530714351,
+      "rawAlignmentGain": 0.005651683104552098,
+      "meanFeedbackWeight": 0.8062430681661663,
+      "overCorrections": 15,
+      "underCorrections": 0,
+      "bookFallback": 0,
+      "outcomeRate": 0.5333333333333333,
+      "feedbackContributions": [
+        {
+          "type": "current",
+          "games": 61,
+          "effectiveGames": 49.6564820940228,
+          "linear": 0.08094093254030085,
+          "quadratic": 0.0440394249527084
+        },
+        {
+          "type": "prior",
+          "games": 803,
+          "effectiveGames": 136.49496295171147,
+          "linear": 0.05433447530518873,
+          "quadratic": 0.10374546918992156
+        }
+      ]
+    }
+  ],
+  "interpretation": "Exact parent reproduction. Descriptive allocation and timing, not causal identification. New adaptation variants are diagnosis-informed reused research; source probabilities remain frozen."
+}

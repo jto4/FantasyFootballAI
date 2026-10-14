@@ -77,3 +77,58 @@ describe('delivery channel settings section', () => {
     expect(markup).toContain('disabled=""');
   });
 });
+
+const settings: AppSettings = {
+  writingStyle: '',
+  reportLength: 'standard',
+  allowProfanity: false,
+  excludedTopics: '',
+  actions: [],
+  memoryEnabled: true,
+  analyzeImportsWithAI: false,
+  includeMemberContextInReports: false,
+  imessageAutoSyncEnabled: false,
+  imessageSyncIntervalMinutes: 15,
+};
+function render(overrides: Partial<AppSettings> = {}) {
+  return renderToStaticMarkup(
+    createElement(DeliveryChannelsSection, {
+      settings: { ...settings, ...overrides },
+      setSettings: vi.fn(),
+      leagues: [],
+      twilioConfigured: false,
+      twilioAutoSyncStatus: null,
+      blueBubblesConfigured: false,
+      imessageAutoSyncStatus: null,
+      blueBubblesWebhookConfigured: false,
+      blueBubblesWebhookLoading: false,
+      blueBubblesWebhookError: '',
+      blueBubblesWebhookUrl: '',
+      onCreateWebhook: vi.fn(),
+      onRevokeWebhook: vi.fn(),
+      onRetryWebhookStatus: vi.fn(),
+      onNotice: vi.fn(),
+    }),
+  );
+}
+describe('iMessage provider settings', () => {
+  it('preserves the legacy BlueBubbles setup and exposes an explicit local alternative', () => {
+    const markup = render();
+    expect(markup).toContain('BlueBubbles server');
+    expect(markup).toContain('Local Messages via imsg (macOS)');
+    expect(markup).toContain('Live message webhook');
+    expect(markup).not.toContain('Check imsg installation');
+  });
+  it('shows installation, chat selection and permission guidance for local imsg without an irrelevant webhook', () => {
+    const markup = render({
+      imessageProvider: 'imsg',
+      imessageChatGuid: 'iMessage;+;fixture',
+      imsgChatId: 42,
+    });
+    expect(markup).toContain('Check imsg installation');
+    expect(markup).toContain('Find iMessage chats');
+    expect(markup).toContain('Full Disk Access');
+    expect(markup).toContain('LOCAL MESSAGES CHAT ID');
+    expect(markup).not.toContain('Live message webhook');
+  });
+});

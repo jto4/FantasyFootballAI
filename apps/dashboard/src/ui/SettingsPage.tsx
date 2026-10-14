@@ -1,7 +1,11 @@
+import { RoutineBackupSection } from './RoutineBackupSection';
+import { AppearanceSettings } from './Appearance';
+import { settingTarget } from './search-catalog';
+import { DiagnosticsSection } from './DiagnosticsSection';
 import { useImageLibrary } from './hooks/useImageLibrary';
 import { useYahooConnection } from './hooks/useYahooConnection';
 import { useSettingsForm } from './hooks/useSettingsForm';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { preferredScrollBehavior } from './motion.js';
 import { parseCredentialStatuses } from './credential-status.js';
 import { YahooConnectionSection } from './YahooConnectionSection.js';
@@ -15,6 +19,7 @@ import { CredentialsSection, type SecretState } from './CredentialsSection.js';
 import { AutomaticActionsSection } from './AutomaticActionsSection.js';
 import { DeliveryChannelsSection } from './DeliveryChannelsSection.js';
 import { writeImageProviderPreference } from './image-provider.js';
+import { FriendlyError } from './FriendlyError';
 import { RefreshCw, Save } from 'lucide-react';
 import {
   applyScheduleRecommendations,
@@ -47,12 +52,16 @@ type SettingsPageProps = {
   settings: AppSettings;
   leagues: LeagueConnection[];
   onSaved: (settings: AppSettings) => void;
-  onCredentialsChanged: () => void;
+  onCredentialsChanged: (provider?: string) => void;
   onRuntimeTested: (runtime: NonNullable<AppSettings['aiRuntime']>) => void;
   focusTarget: 'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null;
   onFocusTargetHandled: () => void;
   onRestored: () => Promise<void>;
   onDirtyChange?: (dirty: boolean) => void;
+  searchSettingId?: string;
+  searchFocusRevision?: number;
+  onSearchSettingClear?: () => void;
+  onGuidedSetup?: () => void;
 };
 const sectionLabels: Record<SettingsSection, string> = {
   ai: 'AI',
@@ -80,29 +89,40 @@ export function SettingsPage({
   onFocusTargetHandled,
   onRestored,
   onDirtyChange,
+  searchSettingId = '',
+  searchFocusRevision = 0,
+  onSearchSettingClear,
+  onGuidedSetup,
 }: SettingsPageProps) {
   const aiHeadingRef = useRef<HTMLHeadingElement>(null);
   const voiceHeadingRef = useRef<HTMLHeadingElement>(null);
   const yahooHeadingRef = useRef<HTMLHeadingElement>(null);
   const credentialsHeadingRef = useRef<HTMLHeadingElement>(null);
   const dataDirectoryHeadingRef = useRef<HTMLHeadingElement>(null);
+  const pageRef = useRef<HTMLFormElement>(null);
+  const [highlightedSetting, setHighlightedSetting] = useState('');
   const [dataDirectory, setDataDirectory] = useState<string | null>(null);
   const { form, setForm, dirtySections, persistSettings, reloadSection, conflict, reset } =
     useSettingsForm(settings, leagues, onSaved);
   const [section, setSection] = useState<SettingsSection>('ai');
   const [saving, setSaving] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [runtimeError, setRuntimeError] = useState('');
   const [message, setMessage] = useState('');
   const [secretState, setSecretState] = useState<SecretState>([]);
   const [credentialStoreAvailable, setCredentialStoreAvailable] = useState<boolean | null>(null);
   const [secretValues, setSecretValues] = useState<Record<string, string>>({});
+  const [backupDirty, setBackupDirty] = useState(false);
   const dirty =
-    dirtySections.length > 0 || Object.values(secretValues).some((value) => Boolean(value.trim()));
-  useEffect(() => {
+    backupDirty ||
+    dirtySections.length > 0 ||
+    Object.values(secretValues).some((value) => Boolean(value.trim()));
+  useLayoutEffect(() => {
     onDirtyChange?.(dirty);
     return () => onDirtyChange?.(false);
   }, [dirty, onDirtyChange]);
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty || window.sidekickDesktop?.isVerificationMode?.() === true) return;
     const warn = (event: BeforeUnloadEvent) => {
       event.preventDefault();
     };
@@ -298,6 +318,7 @@ export function SettingsPage({
               ? credentialsHeadingRef.current
               : dataDirectoryHeadingRef.current;
     if (!target) return;
+    revealSetting(target);
     target.scrollIntoView({
       behavior: preferredScrollBehavior(
         window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -308,14 +329,56 @@ export function SettingsPage({
     onFocusTargetHandled();
   }, [dataDirectory, focusTarget, onFocusTargetHandled, section]);
 
+  useEffect(() => {
+    const destination = settingTarget(searchSettingId);
+    if (!destination) {
+      setHighlightedSetting('');
+      return;
+    }
+    if (section !== destination.section) {
+      setSection(destination.section);
+      return;
+    }
+    const requested = pageRef.current?.querySelector<HTMLElement>(
+      `[data-search-target="${destination.id}"]`,
+    );
+    const target = requested ?? (destination.section === 'ai' ? aiHeadingRef.current : undefined);
+    if (!target) return;
+    for (const details of pageRef.current?.querySelectorAll<HTMLDetailsElement>('details') ?? []) {
+      if (details.contains(target)) details.open = true;
+    }
+    // Disabled controls still need a visible, focusable destination with their explanation.
+    const anchor = target.closest<HTMLElement>('label') ?? target;
+    anchor.classList.add('search-setting-highlight');
+    if (!anchor.hasAttribute('tabindex')) anchor.tabIndex = -1;
+    anchor.scrollIntoView({
+      block: 'center',
+      behavior: preferredScrollBehavior(
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      ),
+    });
+    (target.matches(
+      'input:not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled)',
+    )
+      ? target
+      : anchor
+    ).focus({ preventScroll: true });
+    setHighlightedSetting(
+      requested ? destination.title : `${destination.title} (available in API mode)`,
+    );
+    return () => anchor.classList.remove('search-setting-highlight');
+  }, [searchSettingId, searchFocusRevision, section, dataDirectory]);
+
   async function saveSettings(event: React.FormEvent) {
     event.preventDefault();
     setMessage('');
     setSaving(true);
+    setSaveFailed(false);
     try {
       await persistSettings(section);
       setMessage(`${sectionLabels[section]} saved locally. Other sections were not saved.`);
     } catch (error) {
+      setSaveFailed(true);
       setMessage(error instanceof Error ? error.message : 'Could not save settings.');
     } finally {
       setSaving(false);
@@ -324,16 +387,18 @@ export function SettingsPage({
 
   async function testRuntime() {
     setRuntimeBusy(true);
-    setMessage('Saving only AI settings and testing the runtime…');
+    setRuntimeError('');
+    setMessage('Saving AI settings and checking the connection…');
     try {
       const savedSettings = await persistSettings('ai');
       const response = await fetch('/api/ai/test', { method: 'POST' });
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error ?? 'AI runtime test failed.');
       if (savedSettings.aiRuntime) onRuntimeTested(savedSettings.aiRuntime);
-      setMessage('AI runtime responded. The test sent no league data.');
+      setMessage('Your AI connection works. The test sent no league data.');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'AI runtime test failed.');
+      setMessage('');
+      setRuntimeError(error instanceof Error ? error.message : 'AI connection test failed.');
     } finally {
       setRuntimeBusy(false);
     }
@@ -387,8 +452,12 @@ export function SettingsPage({
       ...current.filter((item) => item.provider !== provider),
       { provider, configured: true },
     ]);
-    onCredentialsChanged();
-    setMessage('Credential saved to the operating system credential store.');
+    onCredentialsChanged(provider);
+    setMessage(
+      window.sidekickDesktop?.isVerificationMode?.() === true
+        ? 'Test credential saved for this session only.'
+        : 'Credential saved to the operating system credential store.',
+    );
   }
 
   async function removeSecret(provider: string) {
@@ -410,7 +479,7 @@ export function SettingsPage({
       setBlueBubblesWebhookLoading(false);
       setBlueBubblesWebhookUrl('');
     }
-    onCredentialsChanged();
+    onCredentialsChanged(provider);
     setMessage('Credential removed.');
   }
 
@@ -569,20 +638,36 @@ export function SettingsPage({
   }
 
   return (
-    <form className="settings-page" onSubmit={saveSettings}>
+    <form ref={pageRef} className="settings-page" onSubmit={saveSettings}>
       <div className="page-title-block">
         <div>
           <p className="section-overline">MAKE IT YOURS</p>
           <h1>Settings</h1>
-          <p>Control the voice, providers, and what your league-mate is allowed to do.</p>
+          <p>Choose a section to manage.</p>
         </div>
-        <button
-          type="submit"
-          className="primary-button"
-          disabled={section === 'storage' || saving || !dirtySections.includes(section)}
-        >
-          <Save size={15} /> {saving ? 'Saving…' : 'Save ' + sectionLabels[section]}
-        </button>
+        <div className="settings-save-bar">
+          <span role="status">
+            {saving
+              ? 'Saving…'
+              : dirtySections.includes(section) ||
+                  Object.values(secretValues).some((value) => Boolean(value.trim())) ||
+                  backupDirty
+                ? saveFailed
+                  ? 'Could not save. Your changes are still here.'
+                  : 'Unsaved changes'
+                : section === 'storage'
+                  ? 'Changes are saved on each card'
+                  : 'Saved'}
+          </span>
+          <button
+            type="submit"
+            className="primary-button"
+            disabled={section === 'storage' || saving || !dirtySections.includes(section)}
+          >
+            <Save size={15} /> {saving ? 'Saving…' : 'Save ' + sectionLabels[section]}
+          </button>
+          {section === 'storage' && <small>Use the Save button in each storage card.</small>}
+        </div>
       </div>
       <nav className="settings-tabs" aria-label="Settings sections">
         {(Object.keys(sectionLabels) as SettingsSection[]).map((key) => (
@@ -591,13 +676,23 @@ export function SettingsPage({
             key={key}
             aria-current={section === key ? 'page' : undefined}
             className={section === key ? 'small-button active' : 'small-button'}
-            onClick={() => setSection(key)}
+            onClick={() => {
+              if (backupDirty && !window.confirm('Discard unsaved backup settings?')) return;
+              onSearchSettingClear?.();
+              setSection(key);
+            }}
           >
             {sectionLabels[key]}
             {dirtySections.includes(key) ? ' · Unsaved' : ''}
           </button>
         ))}
       </nav>
+      {highlightedSetting && (
+        <p className="search-setting-notice" role="status">
+          Here’s <strong>{highlightedSetting}</strong>. Review the setting below; nothing has been
+          changed.
+        </p>
+      )}
       {dirtySections.length > 0 && (
         <p className="unsaved-settings" role="status">
           Unsaved changes: {dirtySections.map((key) => sectionLabels[key]).join(', ')}. Save each
@@ -620,6 +715,16 @@ export function SettingsPage({
           </button>
         </p>
       )}
+      {runtimeError && section === 'ai' && (
+        <FriendlyError
+          message="Your AI connection needs attention. Check your saved key and connection settings, then test again."
+          detail={runtimeError}
+          action="Test connection again"
+          onAction={() => {
+            if (!runtimeBusy) void testRuntime();
+          }}
+        />
+      )}
       {message && (
         <div className="notice" role="status">
           {message}
@@ -630,26 +735,30 @@ export function SettingsPage({
       )}
       {section === 'delivery' && (
         <>
-          <YahooConnectionSection
-            headingRef={yahooHeadingRef}
-            status={yahooOAuthStatus}
-            statusLoading={yahooStatusLoading}
-            statusError={yahooStatusError}
-            clientId={yahooClientId}
-            clientSecret={yahooClientSecret}
-            authorizationUrl={yahooAuthorizationUrl}
-            authorizationCode={yahooAuthorizationCode}
-            onClientIdChange={setYahooClientId}
-            onClientSecretChange={setYahooClientSecret}
-            onAuthorizationCodeChange={setYahooAuthorizationCode}
-            onSaveClient={() => void saveYahooClient()}
-            onAuthorize={() => void authorizeYahoo()}
-            onDisconnect={() => void disconnectYahoo()}
-            onCompleteAuthorization={() => void completeYahooAuthorization()}
-            onRetryStatus={() => void refreshYahooOAuthStatus()}
-          />
+          <details className="settings-disclosure">
+            <summary>Yahoo league connection</summary>
+            <YahooConnectionSection
+              headingRef={yahooHeadingRef}
+              status={yahooOAuthStatus}
+              statusLoading={yahooStatusLoading}
+              statusError={yahooStatusError}
+              clientId={yahooClientId}
+              clientSecret={yahooClientSecret}
+              authorizationUrl={yahooAuthorizationUrl}
+              authorizationCode={yahooAuthorizationCode}
+              onClientIdChange={setYahooClientId}
+              onClientSecretChange={setYahooClientSecret}
+              onAuthorizationCodeChange={setYahooAuthorizationCode}
+              onSaveClient={() => void saveYahooClient()}
+              onAuthorize={() => void authorizeYahoo()}
+              onDisconnect={() => void disconnectYahoo()}
+              onCompleteAuthorization={() => void completeYahooAuthorization()}
+              onRetryStatus={() => void refreshYahooOAuthStatus()}
+            />
+          </details>
         </>
       )}
+      {section === 'storage' && <AppearanceSettings />}
       {section === 'storage' && (
         <>
           <DesktopSettingsSections
@@ -657,14 +766,25 @@ export function SettingsPage({
             onDataDirectoryLoaded={setDataDirectory}
             onNotice={setMessage}
           />
-          <LocalBackupSection
-            onNotice={setMessage}
-            onRestored={async () => {
-              await onRestored();
-              await refreshImages();
-            }}
-            onSettingsRestored={handleRestoredSettings}
-          />
+          <details className="settings-disclosure">
+            <summary>Diagnostics</summary>
+            <DiagnosticsSection />
+          </details>
+          <details className="settings-disclosure">
+            <summary>Automatic backups</summary>
+            <RoutineBackupSection onNotice={setMessage} onDirtyChange={setBackupDirty} />
+          </details>
+          <details className="settings-disclosure">
+            <summary>Export & restore a backup</summary>
+            <LocalBackupSection
+              onNotice={setMessage}
+              onRestored={async () => {
+                await onRestored();
+                await refreshImages();
+              }}
+              onSettingsRestored={handleRestoredSettings}
+            />
+          </details>
         </>
       )}
       {section === 'voice' && (
@@ -723,6 +843,15 @@ export function SettingsPage({
       )}
       {section === 'ai' && (
         <>
+          {onGuidedSetup && (
+            <section className="settings-card">
+              <h2>Need help connecting?</h2>
+              <p>Connect and test your AI in a few steps.</p>
+              <button type="button" className="small-button" onClick={onGuidedSetup}>
+                Guided AI setup
+              </button>
+            </section>
+          )}
           <AIRuntimeSection
             headingRef={aiHeadingRef}
             runtime={runtime}
@@ -736,6 +865,7 @@ export function SettingsPage({
             busy={runtimeBusy}
             onChange={setRuntime}
             onOpenCredentials={() => {
+              if (credentialsHeadingRef.current) revealSetting(credentialsHeadingRef.current);
               credentialsHeadingRef.current?.scrollIntoView({ block: 'start' });
               credentialsHeadingRef.current?.focus();
             }}
@@ -788,21 +918,24 @@ export function SettingsPage({
       {section === 'schedules' && (
         <>
           <section className="settings-card">
-            <AutomaticActionsSection
-              actions={form.actions}
-              leagues={leagues}
-              onApplySuggestions={applyScheduleSuggestions}
-              onActionChange={(kind, patch) =>
-                setForm((current) => ({
-                  ...current,
-                  actions: current.actions.map((action) =>
-                    action.kind === kind ? { ...action, ...patch } : action,
-                  ),
-                }))
-              }
-              onScheduleChange={setSchedule}
-              onActionLeague={setActionLeague}
-            />
+            <details className="settings-disclosure">
+              <summary>Report schedules</summary>
+              <AutomaticActionsSection
+                actions={form.actions}
+                leagues={leagues}
+                onApplySuggestions={applyScheduleSuggestions}
+                onActionChange={(kind, patch) =>
+                  setForm((current) => ({
+                    ...current,
+                    actions: current.actions.map((action) =>
+                      action.kind === kind ? { ...action, ...patch } : action,
+                    ),
+                  }))
+                }
+                onScheduleChange={setSchedule}
+                onActionLeague={setActionLeague}
+              />
+            </details>
             <small className="schedule-explainer">
               Reports use the league’s latest connected data. One-time events run on their selected
               local date and time if the service is running that day. Review mode saves a draft;
@@ -811,6 +944,7 @@ export function SettingsPage({
             <label className="switch-label">
               <input
                 type="checkbox"
+                data-search-target="mcp-delivery"
                 checked={form.mcpDeliveryEnabled ?? false}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, mcpDeliveryEnabled: event.target.checked }))
@@ -827,6 +961,7 @@ export function SettingsPage({
             <label className="report-length-setting">
               WARN WHEN LEAGUE DATA IS OLDER THAN
               <select
+                data-search-target="league-staleness"
                 value={form.leagueStaleAfterHours ?? defaultLeagueStaleAfterHours}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -852,31 +987,35 @@ export function SettingsPage({
               The Leagues page warns at this age. Old snapshots remain available, but may no longer
               reflect current rosters or standings.
             </small>
-            <LeagueCalendarSettings
-              leagues={leagues}
-              events={form.calendarEvents ?? []}
-              actionNames={actionNames}
-              onAddEvent={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  calendarEvents: [...(current.calendarEvents ?? []), event],
-                }))
-              }
-              onDeleteEvent={(eventId) =>
-                setForm((current) => ({
-                  ...current,
-                  calendarEvents: (current.calendarEvents ?? []).filter(
-                    (event) => event.id !== eventId,
-                  ),
-                }))
-              }
-              onNotice={setMessage}
-            />
+            <details className="settings-disclosure">
+              <summary>League calendar</summary>
+              <LeagueCalendarSettings
+                leagues={leagues}
+                events={form.calendarEvents ?? []}
+                actionNames={actionNames}
+                onAddEvent={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    calendarEvents: [...(current.calendarEvents ?? []), event],
+                  }))
+                }
+                onDeleteEvent={(eventId) =>
+                  setForm((current) => ({
+                    ...current,
+                    calendarEvents: (current.calendarEvents ?? []).filter(
+                      (event) => event.id !== eventId,
+                    ),
+                  }))
+                }
+                onNotice={setMessage}
+              />
+            </details>
             <div className="news-source-settings">
               <h3>SCHEDULED LEAGUE REFRESH RETRIES</h3>
               <label>
                 ADDITIONAL ATTEMPTS
                 <select
+                  data-search-target="refresh-retries"
                   value={form.scheduledSyncRetries ?? 0}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -898,7 +1037,9 @@ export function SettingsPage({
               </small>
             </div>
             <div className="news-source-settings">
-              <h3>FOOTBALL NEWS SOURCES</h3>
+              <h3 data-search-target="news-sources" tabIndex={-1}>
+                FOOTBALL NEWS SOURCES
+              </h3>
               {supportedNewsSources.map((source) => (
                 <label className="switch-label news-source-option" key={source.id}>
                   <input
@@ -931,6 +1072,7 @@ export function SettingsPage({
               <label className="switch-label news-source-option">
                 <input
                   type="checkbox"
+                  data-search-target="injury-reports"
                   checked={form.nflInjuryReportsEnabled === true}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -974,6 +1116,7 @@ export function SettingsPage({
                   max={1440}
                   step={1}
                   required
+                  data-search-target="news-refresh"
                   value={form.newsRefreshMinutes ?? 15}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -1063,7 +1206,9 @@ export function SettingsPage({
           <section className="settings-card">
             <div className="settings-card-title">
               <div>
-                <h2>Local runtime logs</h2>
+                <h2 data-search-target="runtime-logs" tabIndex={-1}>
+                  Local runtime logs
+                </h2>
                 <p>Recent background service events stored on this computer.</p>
               </div>
               <button
@@ -1137,4 +1282,10 @@ function todayLocalDate(timezone: string): string {
   }).formatToParts(new Date());
   const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
   return `${values.year}-${values.month}-${values.day}`;
+}
+
+function revealSetting(target: HTMLElement) {
+  for (let ancestor = target.parentElement; ancestor; ancestor = ancestor.parentElement) {
+    if (ancestor instanceof HTMLDetailsElement) ancestor.open = true;
+  }
 }

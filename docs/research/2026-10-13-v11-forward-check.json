@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-10-13T19:20:18.946Z",
+  "recordSha256": "8f686cf56fecd12624b2bebca9f3896530606d2409ab34d94915ddb4ce2f5fce",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "outcomes": [
+    {
+      "gameId": "2026_06_HOU_JAX",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_SEA_DEN",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_CHI_ATL",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_BAL_CLE",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_TEN_IND",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_NYJ_NE",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_NO_NYG",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_CAR_PHI",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_PIT_TB",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_ARI_LA",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_LAC_KC",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_BUF_LV",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_DAL_GB",
+      "status": "pending"
+    },
+    {
+      "gameId": "2026_06_WAS_SF",
+      "status": "pending"
+    }
+  ],
+  "resolvedGames": 0,
+  "pendingGames": 14,
+  "results": {
+    "price": {
+      "n": 0
+    },
+    "flow": {
+      "n": 0
+    },
+    "media": {
+      "n": 0
+    },
+    "combined": {
+      "n": 0
+    }
+  },
+  "warning": "Independent result sidecar; issued probabilities and book quotes are never replaced. Markets/variants from one game are correlated. No accuracy claim from pending games."
+}

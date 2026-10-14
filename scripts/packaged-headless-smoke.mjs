@@ -53,11 +53,8 @@ const child = spawn(executable, runtimeArgs, {
   cwd: dataDirectory,
   env: {
     ...process.env,
-    APPDATA: join(dataDirectory, 'appdata'),
-    HOME: dataDirectory,
-    LOCALAPPDATA: join(dataDirectory, 'localappdata'),
     SIDEKICK_USER_DATA_DIR: join(dataDirectory, 'data'),
-    USERPROFILE: dataDirectory,
+    SIDEKICK_VERIFICATION_ROOT: dataDirectory,
     ...(display ? { DISPLAY: `:${display}` } : {}),
   },
   stdio: ['ignore', 'pipe', 'pipe'],

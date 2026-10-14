@@ -1,5 +1,20 @@
 import type { Platform } from './index.js';
 
+/** Detect a supported link using the same allowlist as parsing; pasted links are never fetched. */
+export function detectLeagueLink(
+  input: string,
+): { platform: Platform; leagueId: string; season?: number } | undefined {
+  if (!/^https?:\/\//i.test(input.trim())) return undefined;
+  for (const platform of ['sleeper', 'espn', 'yahoo'] as const) {
+    try {
+      return { platform, ...parseLeagueInput(platform, input) };
+    } catch {
+      // A link must pass the selected provider's complete validation before detection succeeds.
+    }
+  }
+  return undefined;
+}
+
 /** Accept only league links on the selected provider's own hosts; never fetch pasted URLs. */
 export function parseLeagueInput(
   platform: Platform,

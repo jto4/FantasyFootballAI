@@ -1,0 +1,131 @@
+{
+  "checkedAt": "2026-10-13T15:35:02.578Z",
+  "rawReparseMatches": true,
+  "sourceRows": 5948,
+  "joinedRows": 5938,
+  "rejectedJoinRows": 10,
+  "rejected": [
+    {
+      "gameId": "2016_01_LA_SF",
+      "team": "LA",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2016_01_LA_SF",
+      "team": "SF",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2017_01_LAC_DEN",
+      "team": "DEN",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2017_01_LAC_DEN",
+      "team": "LAC",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2020_01_LV_CAR",
+      "team": "CAR",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2020_01_LV_CAR",
+      "team": "LV",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2026_05_BAL_ATL",
+      "team": "ATL",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2026_05_BAL_ATL",
+      "team": "BAL",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2026_05_BUF_LA",
+      "team": "BUF",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    },
+    {
+      "gameId": "2026_05_BUF_LA",
+      "team": "LA",
+      "reason": "not in completed fixed context observations",
+      "snapshotRow": "REG"
+    }
+  ],
+  "bySeason": [
+    {
+      "season": 2015,
+      "sourceRows": 512,
+      "rejected": 0
+    },
+    {
+      "season": 2016,
+      "sourceRows": 512,
+      "rejected": 2
+    },
+    {
+      "season": 2017,
+      "sourceRows": 512,
+      "rejected": 2
+    },
+    {
+      "season": 2018,
+      "sourceRows": 512,
+      "rejected": 0
+    },
+    {
+      "season": 2019,
+      "sourceRows": 512,
+      "rejected": 0
+    },
+    {
+      "season": 2020,
+      "sourceRows": 512,
+      "rejected": 2
+    },
+    {
+      "season": 2021,
+      "sourceRows": 544,
+      "rejected": 0
+    },
+    {
+      "season": 2022,
+      "sourceRows": 542,
+      "rejected": 0
+    },
+    {
+      "season": 2023,
+      "sourceRows": 544,
+      "rejected": 0
+    },
+    {
+      "season": 2024,
+      "sourceRows": 544,
+      "rejected": 0
+    },
+    {
+      "season": 2025,
+      "sourceRows": 544,
+      "rejected": 0
+    },
+    {
+      "season": 2026,
+      "sourceRows": 158,
+      "rejected": 4
+    }
+  ]
+}

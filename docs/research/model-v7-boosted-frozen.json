@@ -1,0 +1,94 @@
+{
+  "frozenAt": "2026-10-13T04:45:24.661Z",
+  "developmentSeasons": [2018, 2021],
+  "developmentSha256": "c3ee9beae92d7a3cb490d856fa99c5997e0dddc60881cc4e5e84b180aab26f5d",
+  "contextSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "parameters": {
+    "rounds": 20,
+    "learningRate": 0.05,
+    "leafPenalty": 20,
+    "minLeaf": 60,
+    "minTrain": 200,
+    "fitSeasons": 4,
+    "maxLogitCorrection": 0.5,
+    "blendSeasons": 2,
+    "blendPenalty": 1
+  },
+  "selection": {
+    "moneyline": {
+      "id": "tree-1-120-all-direct",
+      "spec": {
+        "depth": 1,
+        "halfLifeDays": 120,
+        "features": "all",
+        "rule": "direct"
+      },
+      "brier": 0.21005128341196683
+    },
+    "spread": {
+      "id": "tree-2-730-market-direct",
+      "spec": {
+        "depth": 2,
+        "halfLifeDays": 730,
+        "features": "market",
+        "rule": "direct"
+      },
+      "brier": 0.24829933200361234
+    },
+    "total": {
+      "id": "tree-2-730-market-direct",
+      "spec": {
+        "depth": 2,
+        "halfLifeDays": 730,
+        "features": "market",
+        "rule": "direct"
+      },
+      "brier": 0.248752653739635
+    }
+  },
+  "bestTree": {
+    "moneyline": {
+      "id": "tree-1-120-all-direct",
+      "spec": {
+        "depth": 1,
+        "halfLifeDays": 120,
+        "features": "all",
+        "rule": "direct"
+      },
+      "brier": 0.21005128341196683
+    },
+    "spread": {
+      "id": "tree-2-730-market-direct",
+      "spec": {
+        "depth": 2,
+        "halfLifeDays": 730,
+        "features": "market",
+        "rule": "direct"
+      },
+      "brier": 0.24829933200361234
+    },
+    "total": {
+      "id": "tree-2-730-market-direct",
+      "spec": {
+        "depth": 2,
+        "halfLifeDays": 730,
+        "features": "market",
+        "rule": "direct"
+      },
+      "brier": 0.248752653739635
+    }
+  },
+  "candidateCountPerMarket": 18,
+  "warnings": [
+    "Later seasons were examined for diagnosis and are reused audits; this is not an untouched holdout.",
+    "Structures/rules chosen only on 2018\u20132021. No later-season subgroup thresholds or return optimization."
+  ],
+  "developmentArtifactSha256": "d0a66040c765b57f19a642876cf90f7564959526a94ed48b6a0e711cf438d718",
+  "codeHashes": {
+    "packages/core/src/boosted-market-model.ts": "437af284529e7bbca8cafb7010c67404a9a44a4f04451e77c4ae77f96c95dc2b",
+    "scripts/boosted-market-evaluation.mjs": "f02855e77c93f4a0103901bff7a1ac48ef075eefe975693c765445f5f956a9cf",
+    "scripts/develop-boosted-market.mjs": "577622a69b71ffd18a992b40389449dde5f75d521378834e93be005a400e099b",
+    "scripts/audit-boosted-market.mjs": "5f9a85efb2826ecbf4fb9b044524156ecc483c3ce5c6769dbd489ac84344561f"
+  },
+  "laterCasesUsedForDiagnosisButNotSelection": true
+}

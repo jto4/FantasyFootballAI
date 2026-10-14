@@ -1,5 +1,10 @@
 import { createHash } from 'node:crypto';
-import type { PlayerProjection } from '@sidekick/core';
+import {
+  isProjectionPeriod,
+  projectionPeriodMatchesWeek,
+  type PlayerProjection,
+  type ProjectionPeriod,
+} from '@sidekick/core';
 
 export type ProjectionImportRow = {
   playerId?: string;
@@ -9,6 +14,7 @@ export type ProjectionImportRow = {
   projectedPoints: number;
   averageDraftPosition?: number;
   week?: number;
+  period?: ProjectionPeriod;
 };
 
 export interface ProjectionSourceSummary {
@@ -20,6 +26,9 @@ export interface ProjectionSourceSummary {
   sourceName: string;
   sourceUrl?: string;
   importedAt: string;
+  periods?: ProjectionPeriod[];
+  undeclaredPeriodCount?: number;
+  additionalPeriodCount?: number;
 }
 
 /** Keep the owner-visible source identity stable for rows imported before source IDs existed. */
@@ -45,6 +54,7 @@ export function summarizeProjectionSources(
   projections: readonly PlayerProjection[],
 ): ProjectionSourceSummary[] {
   const summaries = new Map<string, ProjectionSourceSummary>();
+  const periods = new Map<string, Map<string, ProjectionPeriod>>();
   for (const projection of projections) {
     const sourceId = projectionSourceId(projection);
     const key = `${projection.leagueId}\u0000${sourceId}`;
@@ -59,9 +69,22 @@ export function summarizeProjectionSources(
       importedAt: projection.importedAt,
     };
     summary.count += 1;
+    if (projection.period) {
+      const sourcePeriods = periods.get(key) ?? new Map<string, ProjectionPeriod>();
+      const period = projection.period;
+      sourcePeriods.set(`${period.season}:${period.fromWeek}:${period.throughWeek}`, period);
+      periods.set(key, sourcePeriods);
+    } else summary.undeclaredPeriodCount = (summary.undeclaredPeriodCount ?? 0) + 1;
     summary.scoringMatched = summary.scoringMatched && projection.scoringMatched === true;
     if (projection.averageDraftPosition !== undefined) summary.adpCount += 1;
     summaries.set(key, summary);
+  }
+  for (const [key, summary] of summaries) {
+    const sourcePeriods = periods.get(key);
+    if (sourcePeriods) {
+      summary.periods = [...sourcePeriods.values()].slice(0, 32);
+      summary.additionalPeriodCount = Math.max(0, sourcePeriods.size - 32);
+    }
   }
   return [...summaries.values()].sort((left, right) =>
     right.importedAt.localeCompare(left.importedAt),
@@ -95,6 +118,9 @@ export function parseProjectionCsv(csv: string): ProjectionImportRow[] {
   const nflTeamIndex = findColumn(header, ['nflteam', 'team', 'teamabbr']);
   const weekIndex = findColumn(header, ['week', 'nflweek']);
   const adpIndex = findColumn(header, ['adp', 'averagedraftposition', 'avgdraftposition']);
+  const seasonIndex = findColumn(header, ['season', 'year']);
+  const fromIndex = findColumn(header, ['fromweek', 'startweek']);
+  const throughIndex = findColumn(header, ['throughweek', 'endweek']);
   const parsed: ProjectionImportRow[] = [];
   const seen = new Set<string>();
 
@@ -135,8 +161,27 @@ export function parseProjectionCsv(csv: string): ProjectionImportRow[] {
         averageDraftPosition > 600)
     )
       throw new Error(`Row ${rowNumber}: average draft position must be a number from 1 to 600.`);
-    const period = week === undefined ? 'season' : `week:${week}`;
-    const identity = `${period}:${playerId ? `id:${playerId}` : `name:${normalizePlayerName(playerName)}`}`;
+    const seasonText = optionalCell(row, seasonIndex, 4, rowNumber, 'season');
+    const fromText = optionalCell(row, fromIndex, 2, rowNumber, 'fromWeek');
+    const throughText = optionalCell(row, throughIndex, 2, rowNumber, 'throughWeek');
+    let period: ProjectionPeriod | undefined;
+    if (seasonText !== undefined || fromText !== undefined || throughText !== undefined) {
+      if (seasonText === undefined || (fromText === undefined) !== (throughText === undefined))
+        throw new Error(`Row ${rowNumber}: an interval needs season, fromWeek and throughWeek.`);
+      period = {
+        season: Number(seasonText),
+        fromWeek: fromText === undefined ? (week ?? 1) : Number(fromText),
+        throughWeek: throughText === undefined ? (week ?? 18) : Number(throughText),
+      };
+      if (!isProjectionPeriod(period) || !projectionPeriodMatchesWeek(period, week))
+        throw new Error(`Row ${rowNumber}: use a valid season and matching projection weeks.`);
+    }
+    const periodKey = period
+      ? `${period.season}:${period.fromWeek}:${period.throughWeek}`
+      : week === undefined
+        ? 'season'
+        : `week:${week}`;
+    const identity = `${periodKey}:${playerId ? `id:${playerId}` : `name:${normalizePlayerName(playerName)}`}`;
     if (seen.has(identity))
       throw new Error(`Row ${rowNumber}: duplicate player in projection CSV.`);
     seen.add(identity);
@@ -148,6 +193,7 @@ export function parseProjectionCsv(csv: string): ProjectionImportRow[] {
       projectedPoints,
       ...(averageDraftPosition !== undefined ? { averageDraftPosition } : {}),
       ...(week !== undefined ? { week } : {}),
+      ...(period ? { period } : {}),
     });
   }
   if (!parsed.length) throw new Error('Projection CSV has no player rows.');

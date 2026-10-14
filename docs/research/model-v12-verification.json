@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-10-13T20:55:30.533Z",
+  "checks": {
+    "tests": "827 workspace tests plus root suites passed under supported Node 22",
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "replay": "Decompressed durable context and r2 tape snapshots reproduced every probability, summary and row; only scoredAt differs.",
+  "manualReview": "Scoped ordinary code/security review: fixed public origins, bounded reads/deadlines/pagination, old units, contract identity/orientation, time and completion gates, prior-only fitting, anonymized wallet features, unchanged live dispatch and seals. No automated security scan.",
+  "auditSha256": "e0a9daf7189eab409091c9fb6ea6792e03749f17258c23341daba1c13d15fbe7",
+  "frozenSettingsSha256": "bbaa963d05a4174a485190e6ee0a512b58b164708d150bdf7283bf6146d24227",
+  "nonTotalMaximumProductionDifference": 0,
+  "preservedV11RecordSha256": "8f686cf56fecd12624b2bebca9f3896530606d2409ab34d94915ddb4ce2f5fce"
+}

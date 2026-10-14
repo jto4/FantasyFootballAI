@@ -153,6 +153,7 @@ test('generating, editing, and sending a draft respects review and destination',
     .getByRole('region', { name: 'Commissioner next actions' })
     .screenshot({ path: testInfo.outputPath('action-inbox.png') });
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
+  await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Close report review' })).toBeFocused();
   await page.keyboard.press('Shift+Tab');
@@ -172,6 +173,7 @@ test('generating, editing, and sending a draft respects review and destination',
   );
   await page.screenshot({ path: testInfo.outputPath('report-review.png'), fullPage: false });
   await page.getByRole('button', { name: 'Send saved report' }).click();
+  await page.getByRole('button', { name: /^Send email to / }).click();
   await expect(page.getByRole('dialog')).toContainText('Sent');
   expect(context.sends[0]).toMatchObject({
     revision: 1,
@@ -180,7 +182,7 @@ test('generating, editing, and sending a draft respects review and destination',
   await page.getByRole('button', { name: 'Close report review' }).click();
   await page.getByRole('combobox', { name: 'Filter reports by status' }).selectOption('draft');
   await expect(page.getByText('No reports match these filters.', { exact: false })).toBeVisible();
-  await page.getByRole('button', { name: 'League desk', exact: true }).click();
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
   await expect(page.getByText('Sent ·', { exact: false })).toBeVisible();
   expect(context.errors).toEqual([]);
 });
@@ -194,8 +196,8 @@ test('AI tests and discovery never save unrelated Voice edits', async ({ page },
     .getByRole('textbox', { name: 'Writing style', exact: false })
     .fill('Unsaved voice change');
   await page.getByRole('button', { name: 'AI', exact: true }).click();
-  await page.getByRole('button', { name: 'Save and test runtime', exact: false }).click();
-  await expect(page.getByText('AI runtime responded.', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Test connection', exact: false }).click();
+  await expect(page.getByText('Your AI connection works.', { exact: false })).toBeVisible();
   expect(context.state.settings.writingStyle).toBe(original);
   expect(context.savedSections).toEqual(['ai']);
   await page.getByRole('button', { name: 'Discover models', exact: false }).click();
@@ -228,16 +230,22 @@ test('onboarding connects a league URL, tests AI, and ends in draft review', asy
     .getByRole('button', { name: 'Connect league', exact: false })
     .click();
   await expect(page.getByText('Connected Browser Fixture', { exact: false })).toBeVisible();
-  await page.getByRole('button', { name: 'Continue setup', exact: true }).click();
   await page
-    .getByRole('dialog', { name: 'Choose and test an AI runtime' })
-    .getByRole('button', { name: 'Set up AI', exact: false })
+    .getByRole('dialog')
+    .getByRole('combobox', { name: 'Your team', exact: true })
+    .selectOption('1');
+  await page
+    .getByRole('dialog', { name: 'Connect your AI writer' })
+    .getByRole('button', { name: 'Test connection', exact: true })
     .click();
-  await page.getByRole('button', { name: 'Save and test runtime', exact: false }).click();
   await expect(
-    page.getByRole('button', { name: 'Generate first draft', exact: true }),
+    page.getByRole('button', { name: 'Create first report', exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Generate first draft', exact: true }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Create first report', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('Original draft ready for review.');
   expect(context.sends).toHaveLength(0);
   expect(context.generatedRequests[0]).toMatchObject({
@@ -253,11 +261,12 @@ test('unsaved settings and draft edits warn before leaving', async ({ page }) =>
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('combobox', { name: 'MODEL', exact: true }).fill('unsaved-model');
   page.once('dialog', (dialog) => dialog.dismiss());
-  await page.getByRole('button', { name: 'League desk', exact: true }).click();
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
   page.once('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'League desk', exact: true }).click();
+  await page.getByRole('button', { name: 'Home', exact: true }).click();
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
+  await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await page.getByRole('button', { name: 'Edit draft', exact: true }).click();
   await page.getByRole('textbox', { name: 'Report body' }).fill('Unfinished edit');
   page.once('dialog', (dialog) => dialog.dismiss());
@@ -268,6 +277,7 @@ test('unsaved settings and draft edits warn before leaving', async ({ page }) =>
 test('a failed delivery remains visible and cannot be edited before retry', async ({ page }) => {
   const context = await workspace(page);
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
+  await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.route('**/api/reports/report-1/send', async (route) => {
     context.state.reports[0]!.deliveryState = 'failed';
@@ -278,6 +288,7 @@ test('a failed delivery remains visible and cannot be edited before retry', asyn
     });
   });
   await page.getByRole('button', { name: 'Send saved report' }).click();
+  await page.getByRole('button', { name: /^Send email to / }).click();
   await expect(page.getByRole('dialog')).toContainText('Delivery failed');
   await expect(page.getByRole('button', { name: 'Retry saved report' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Edit draft', exact: true })).toHaveCount(0);

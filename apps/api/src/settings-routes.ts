@@ -34,6 +34,9 @@ export function normalizeSettingsUpdate(
     emailRecipient,
     smsRecipient,
     imessageChatGuid,
+    imessageProvider,
+    imsgExecutablePath,
+    imsgChatId,
     imessageOwnerName,
     imessageAutoSyncEnabled,
     imessageSyncIntervalMinutes,
@@ -66,6 +69,9 @@ export function normalizeSettingsUpdate(
     emailRecipient?: unknown;
     smsRecipient?: unknown;
     imessageChatGuid?: unknown;
+    imessageProvider?: unknown;
+    imsgExecutablePath?: unknown;
+    imsgChatId?: unknown;
     imessageOwnerName?: unknown;
     imessageAutoSyncEnabled?: unknown;
     imessageSyncIntervalMinutes?: unknown;
@@ -125,9 +131,18 @@ export function normalizeSettingsUpdate(
     ...(emailRecipient ? { emailRecipient } : {}),
     ...(smsRecipient ? { smsRecipient } : {}),
     ...(imessageChatGuid ? { imessageChatGuid } : {}),
+    imessageProvider: imessageProvider === 'imsg' ? 'imsg' : 'bluebubbles',
+    ...(typeof imsgExecutablePath === 'string' && imsgExecutablePath ? { imsgExecutablePath } : {}),
+    ...(typeof imsgChatId === 'number' ? { imsgChatId } : {}),
     imessageOwnerName:
       typeof imessageOwnerName === 'string' ? imessageOwnerName.trim() : 'League owner',
-    imessageAutoSyncEnabled: memoryEnabled !== false && imessageAutoSyncEnabled === true,
+    imessageAutoSyncEnabled:
+      memoryEnabled !== false &&
+      imessageAutoSyncEnabled === true &&
+      (current.settings.imessageProvider ?? 'bluebubbles') ===
+        (imessageProvider === 'imsg' ? 'imsg' : 'bluebubbles') &&
+      current.settings.imsgExecutablePath === (imsgExecutablePath || undefined) &&
+      current.settings.imsgChatId === imsgChatId,
     imessageSyncIntervalMinutes:
       imessageSyncIntervalMinutes === 5 ||
       imessageSyncIntervalMinutes === 30 ||
@@ -146,11 +161,16 @@ export function normalizeSettingsUpdate(
         ? twilioConversationSyncIntervalMinutes
         : 15,
     chatRepliesEnabled: chatRepliesEnabled === true,
-    chatRepliesAutoSend: chatRepliesEnabled === true && chatRepliesAutoSend === true,
+    chatRepliesAutoSend:
+      chatRepliesEnabled === true &&
+      chatRepliesAutoSend === true &&
+      (current.settings.imessageProvider ?? 'bluebubbles') ===
+        (imessageProvider === 'imsg' ? 'imsg' : 'bluebubbles'),
     chatAgentName: typeof chatAgentName === 'string' ? chatAgentName.trim() : 'Sunday Sidekick',
     ...(typeof chatReplyLeagueId === 'string' && chatReplyLeagueId ? { chatReplyLeagueId } : {}),
     mcpDeliveryEnabled: mcpDeliveryEnabled === true,
-    ...(current.settings.imessageSyncCursor?.chatGuid === imessageChatGuid
+    ...(current.settings.imessageSyncCursor?.chatGuid ===
+    (imessageProvider === 'imsg' ? `imsg:${imessageChatGuid}` : imessageChatGuid)
       ? { imessageSyncCursor: current.settings.imessageSyncCursor }
       : {}),
     ...(current.settings.twilioConversationSyncCursor?.conversationSid === smsRecipient
@@ -199,6 +219,8 @@ export function createSettingsRouter({
       'emailRecipient',
       'smsRecipient',
       'imessageChatGuid',
+      'imsgChatId',
+      'imsgExecutablePath',
       'chatReplyLeagueId',
     ]);
     if (Object.entries(patch).some(([key, value]) => value === null && !removable.has(key)))

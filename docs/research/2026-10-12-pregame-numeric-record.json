@@ -1,0 +1,851 @@
+{
+  "capturedAt": "2026-10-12T16:57:41.828Z",
+  "elapsedMs": 58812.652542,
+  "numericResearchOnly": true,
+  "noWagerOrAIInvocation": true,
+  "outcomes": "pending",
+  "game": {
+    "id": "2026_05_BUF_LA",
+    "kickoffAt": "2026-10-13T00:15:00.000Z",
+    "home": "LA",
+    "away": "BUF"
+  },
+  "context": {
+    "asOf": "2026-10-12T16:57:36.868Z",
+    "home": {
+      "previousQuarterbackName": "Matthew Stafford",
+      "previousQuarterbackId": "00-0026498",
+      "reportUpdatedAt": "2026-10-10T21:23:47.290Z",
+      "offenseOut": 0,
+      "defenseOut": 0,
+      "quarterbackOut": false,
+      "quarterbackDoubtful": false,
+      "expectedQuarterbackName": "Matthew Stafford",
+      "quarterbackObservedAt": "2026-10-12T16:57:36.789Z",
+      "quarterbackChanged": false,
+      "reportSource": "nfl-official",
+      "reportUrl": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "personnel": {
+        "availableBy": "2026-10-05T17:00:00.000Z",
+        "throughSeason": 2026,
+        "throughWeek": 4,
+        "reportedPlayers": 1,
+        "matchedReports": 1,
+        "quarterbackQuality": 0.07307391449802662,
+        "quarterbackAbsenceValue": 0,
+        "offenseOutSnaps": 0,
+        "defenseOutSnaps": 0,
+        "offenseQuestionableSnaps": 0,
+        "defenseQuestionableSnaps": 1
+      }
+    },
+    "away": {
+      "previousQuarterbackName": "Josh Allen",
+      "previousQuarterbackId": "00-0034857",
+      "reportUpdatedAt": "2026-10-11T02:38:00.000Z",
+      "offenseOut": 1,
+      "defenseOut": 1,
+      "quarterbackOut": false,
+      "quarterbackDoubtful": false,
+      "expectedQuarterbackName": "Josh Allen",
+      "quarterbackObservedAt": "2026-10-12T16:57:36.804Z",
+      "quarterbackChanged": false,
+      "reportSource": "espn",
+      "personnel": {
+        "availableBy": "2026-10-05T17:00:00.000Z",
+        "throughSeason": 2026,
+        "throughWeek": 4,
+        "reportedPlayers": 5,
+        "matchedReports": 4,
+        "quarterbackQuality": 0.1490928612127034,
+        "quarterbackAbsenceValue": 0,
+        "defenseOutSnaps": 0.365,
+        "offenseQuestionableSnaps": 0.4466666666666667,
+        "defenseQuestionableSnaps": 0.8166666666666667
+      }
+    }
+  },
+  "contextHistorySha256": "280b11e09db1e7419674fcec3c7e7042ac5b3dd92f3b8d5c80b3222e63e88069",
+  "codeSha256": {
+    "packages/core/src/game-rating-model.ts": "f5a9b764db2a949ffe3ae54ea26722e673a513938ed57f0ae678d19e59743112",
+    "packages/core/src/game-availability.ts": "0dbbdf2f2b2451d99b1f07addd370ccef8f718ce2dce2697d6daaa6bcad7eabb",
+    "packages/core/src/market-game-forecast.ts": "18057f6ebf2f03cd8078b463f8aad4bc9af4c30c1d984c848dce9507db574e2d",
+    "packages/core/src/market-context.ts": "f2b1a3be210252acc8875cd2fa13b04fe32586a16405dfabcc3dea5727c43bc8",
+    "packages/core/src/bet-forecast.ts": "fba1fc0faacd5661926e8415443690bcfd9f57b3735510b99a56104ebf2a4c22",
+    "packages/integrations/src/game-pregame.ts": "44c319e7b8bc6f4c05e47c3fe84eafc265438df69a9fd38c0c6223fc1168cba2",
+    "packages/integrations/src/game-personnel.ts": "849fca60b4e81d86ba26950fcf72bb4484d5ca2bfe79adadc4129fa9201600ba",
+    "packages/integrations/src/official-game-injuries.ts": "8ec80f510cd8f7216985770f70bd22b722c7d1dbffd47b119ffad440c7d33803",
+    "packages/integrations/src/sportsbook-lines.ts": "3442ef2f3645b27ef127eff1d175f3aabbb5537e72d624bffa8fe66b2c3e3f09"
+  },
+  "sources": [
+    {
+      "id": "stats-2026",
+      "name": "nflverse weekly player stats 2026",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2026.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.801Z"
+    },
+    {
+      "id": "stats-2025",
+      "name": "nflverse weekly player stats 2025",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2025.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.801Z"
+    },
+    {
+      "id": "stats-2024",
+      "name": "nflverse weekly player stats 2024",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2024.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.801Z"
+    },
+    {
+      "id": "nfl-draft-picks",
+      "name": "nflverse NFL draft picks (via Pro Football Reference)",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/draft_picks/draft_picks.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.802Z"
+    },
+    {
+      "id": "games",
+      "name": "nflverse schedules and results",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.802Z"
+    },
+    {
+      "id": "market-add",
+      "name": "Sleeper add activity (24 hours)",
+      "url": "https://api.sleeper.app/v1/players/nfl/trending/add?lookback_hours=24&limit=100",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.802Z"
+    },
+    {
+      "id": "market-drop",
+      "name": "Sleeper drop activity (24 hours)",
+      "url": "https://api.sleeper.app/v1/players/nfl/trending/drop?lookback_hours=24&limit=100",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.802Z"
+    },
+    {
+      "id": "dst-totals-2026",
+      "name": "nflverse team totals 2026 (D/ST zero verification)",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.924Z"
+    },
+    {
+      "id": "dst-totals-2025",
+      "name": "nflverse team totals 2025 (D/ST zero verification)",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.969Z"
+    },
+    {
+      "id": "dst-totals-2024",
+      "name": "nflverse team totals 2024 (D/ST zero verification)",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2024.csv",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.996Z"
+    },
+    {
+      "id": "dst-offense-401671783",
+      "name": "ESPN BUF at BAL, 2024-09-29 (offensive fumble-TD verification)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401671783",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.598Z"
+    },
+    {
+      "id": "dst-offense-401772903",
+      "name": "ESPN ARI at HOU, 2025-12-14 (offensive fumble-TD verification)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401772903",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.610Z"
+    },
+    {
+      "id": "dst-offense-401772747",
+      "name": "ESPN TEN at ARI, 2025-10-05 (offensive fumble-TD verification)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401772747",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.611Z"
+    },
+    {
+      "id": "dst-offense-401671677",
+      "name": "ESPN NE at ARI, 2024-12-15 (offensive fumble-TD verification)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401671677",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.629Z"
+    },
+    {
+      "id": "dst-offense-401671754",
+      "name": "ESPN LA at ARI, 2024-09-15 (offensive fumble-TD verification)",
+      "url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401671754",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.657Z"
+    },
+    {
+      "id": "dst-2024-1",
+      "name": "Sleeper published D/ST stats 2024 week 1",
+      "url": "https://api.sleeper.com/stats/nfl/2024/1?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.160Z"
+    },
+    {
+      "id": "dst-2024-2",
+      "name": "Sleeper published D/ST stats 2024 week 2",
+      "url": "https://api.sleeper.com/stats/nfl/2024/2?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.149Z"
+    },
+    {
+      "id": "dst-2024-3",
+      "name": "Sleeper published D/ST stats 2024 week 3",
+      "url": "https://api.sleeper.com/stats/nfl/2024/3?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.168Z"
+    },
+    {
+      "id": "dst-2024-4",
+      "name": "Sleeper published D/ST stats 2024 week 4",
+      "url": "https://api.sleeper.com/stats/nfl/2024/4?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.178Z"
+    },
+    {
+      "id": "dst-2024-5",
+      "name": "Sleeper published D/ST stats 2024 week 5",
+      "url": "https://api.sleeper.com/stats/nfl/2024/5?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.252Z"
+    },
+    {
+      "id": "dst-2024-6",
+      "name": "Sleeper published D/ST stats 2024 week 6",
+      "url": "https://api.sleeper.com/stats/nfl/2024/6?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.267Z"
+    },
+    {
+      "id": "dst-2024-7",
+      "name": "Sleeper published D/ST stats 2024 week 7",
+      "url": "https://api.sleeper.com/stats/nfl/2024/7?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.310Z"
+    },
+    {
+      "id": "dst-2024-8",
+      "name": "Sleeper published D/ST stats 2024 week 8",
+      "url": "https://api.sleeper.com/stats/nfl/2024/8?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.292Z"
+    },
+    {
+      "id": "dst-2024-9",
+      "name": "Sleeper published D/ST stats 2024 week 9",
+      "url": "https://api.sleeper.com/stats/nfl/2024/9?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.352Z"
+    },
+    {
+      "id": "dst-2024-10",
+      "name": "Sleeper published D/ST stats 2024 week 10",
+      "url": "https://api.sleeper.com/stats/nfl/2024/10?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.382Z"
+    },
+    {
+      "id": "dst-2024-11",
+      "name": "Sleeper published D/ST stats 2024 week 11",
+      "url": "https://api.sleeper.com/stats/nfl/2024/11?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.397Z"
+    },
+    {
+      "id": "dst-2024-12",
+      "name": "Sleeper published D/ST stats 2024 week 12",
+      "url": "https://api.sleeper.com/stats/nfl/2024/12?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.423Z"
+    },
+    {
+      "id": "dst-2024-13",
+      "name": "Sleeper published D/ST stats 2024 week 13",
+      "url": "https://api.sleeper.com/stats/nfl/2024/13?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.457Z"
+    },
+    {
+      "id": "dst-2024-14",
+      "name": "Sleeper published D/ST stats 2024 week 14",
+      "url": "https://api.sleeper.com/stats/nfl/2024/14?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.517Z"
+    },
+    {
+      "id": "dst-2024-15",
+      "name": "Sleeper published D/ST stats 2024 week 15",
+      "url": "https://api.sleeper.com/stats/nfl/2024/15?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.523Z"
+    },
+    {
+      "id": "dst-2024-16",
+      "name": "Sleeper published D/ST stats 2024 week 16",
+      "url": "https://api.sleeper.com/stats/nfl/2024/16?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.549Z"
+    },
+    {
+      "id": "dst-2024-17",
+      "name": "Sleeper published D/ST stats 2024 week 17",
+      "url": "https://api.sleeper.com/stats/nfl/2024/17?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.556Z"
+    },
+    {
+      "id": "dst-2024-18",
+      "name": "Sleeper published D/ST stats 2024 week 18",
+      "url": "https://api.sleeper.com/stats/nfl/2024/18?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.641Z"
+    },
+    {
+      "id": "dst-2025-1",
+      "name": "Sleeper published D/ST stats 2025 week 1",
+      "url": "https://api.sleeper.com/stats/nfl/2025/1?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.628Z"
+    },
+    {
+      "id": "dst-2025-2",
+      "name": "Sleeper published D/ST stats 2025 week 2",
+      "url": "https://api.sleeper.com/stats/nfl/2025/2?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.723Z"
+    },
+    {
+      "id": "dst-2025-3",
+      "name": "Sleeper published D/ST stats 2025 week 3",
+      "url": "https://api.sleeper.com/stats/nfl/2025/3?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.665Z"
+    },
+    {
+      "id": "dst-2025-4",
+      "name": "Sleeper published D/ST stats 2025 week 4",
+      "url": "https://api.sleeper.com/stats/nfl/2025/4?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.813Z"
+    },
+    {
+      "id": "dst-2025-5",
+      "name": "Sleeper published D/ST stats 2025 week 5",
+      "url": "https://api.sleeper.com/stats/nfl/2025/5?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.823Z"
+    },
+    {
+      "id": "dst-2025-6",
+      "name": "Sleeper published D/ST stats 2025 week 6",
+      "url": "https://api.sleeper.com/stats/nfl/2025/6?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.768Z"
+    },
+    {
+      "id": "dst-2025-7",
+      "name": "Sleeper published D/ST stats 2025 week 7",
+      "url": "https://api.sleeper.com/stats/nfl/2025/7?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.844Z"
+    },
+    {
+      "id": "dst-2025-8",
+      "name": "Sleeper published D/ST stats 2025 week 8",
+      "url": "https://api.sleeper.com/stats/nfl/2025/8?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.865Z"
+    },
+    {
+      "id": "dst-2025-9",
+      "name": "Sleeper published D/ST stats 2025 week 9",
+      "url": "https://api.sleeper.com/stats/nfl/2025/9?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.996Z"
+    },
+    {
+      "id": "dst-2025-10",
+      "name": "Sleeper published D/ST stats 2025 week 10",
+      "url": "https://api.sleeper.com/stats/nfl/2025/10?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.951Z"
+    },
+    {
+      "id": "dst-2025-11",
+      "name": "Sleeper published D/ST stats 2025 week 11",
+      "url": "https://api.sleeper.com/stats/nfl/2025/11?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.970Z"
+    },
+    {
+      "id": "dst-2025-12",
+      "name": "Sleeper published D/ST stats 2025 week 12",
+      "url": "https://api.sleeper.com/stats/nfl/2025/12?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:46.988Z"
+    },
+    {
+      "id": "dst-2025-13",
+      "name": "Sleeper published D/ST stats 2025 week 13",
+      "url": "https://api.sleeper.com/stats/nfl/2025/13?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.173Z"
+    },
+    {
+      "id": "dst-2025-14",
+      "name": "Sleeper published D/ST stats 2025 week 14",
+      "url": "https://api.sleeper.com/stats/nfl/2025/14?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.136Z"
+    },
+    {
+      "id": "dst-2025-15",
+      "name": "Sleeper published D/ST stats 2025 week 15",
+      "url": "https://api.sleeper.com/stats/nfl/2025/15?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.168Z"
+    },
+    {
+      "id": "dst-2025-16",
+      "name": "Sleeper published D/ST stats 2025 week 16",
+      "url": "https://api.sleeper.com/stats/nfl/2025/16?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.162Z"
+    },
+    {
+      "id": "dst-2025-17",
+      "name": "Sleeper published D/ST stats 2025 week 17",
+      "url": "https://api.sleeper.com/stats/nfl/2025/17?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.291Z"
+    },
+    {
+      "id": "dst-2025-18",
+      "name": "Sleeper published D/ST stats 2025 week 18",
+      "url": "https://api.sleeper.com/stats/nfl/2025/18?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.320Z"
+    },
+    {
+      "id": "dst-2026-1",
+      "name": "Sleeper published D/ST stats 2026 week 1",
+      "url": "https://api.sleeper.com/stats/nfl/2026/1?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.353Z"
+    },
+    {
+      "id": "dst-2026-2",
+      "name": "Sleeper published D/ST stats 2026 week 2",
+      "url": "https://api.sleeper.com/stats/nfl/2026/2?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.347Z"
+    },
+    {
+      "id": "dst-2026-3",
+      "name": "Sleeper published D/ST stats 2026 week 3",
+      "url": "https://api.sleeper.com/stats/nfl/2026/3?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.473Z"
+    },
+    {
+      "id": "dst-2026-4",
+      "name": "Sleeper published D/ST stats 2026 week 4",
+      "url": "https://api.sleeper.com/stats/nfl/2026/4?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.388Z"
+    },
+    {
+      "id": "dst-2026-5",
+      "name": "Sleeper published D/ST stats 2026 week 5",
+      "url": "https://api.sleeper.com/stats/nfl/2026/5?season_type=regular&position[]=DEF",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:47.485Z"
+    },
+    {
+      "id": "espn-forecasts-2026-0",
+      "name": "ESPN weekly player forecasts · page 1",
+      "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&view=mSettings&view=mStatus",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:44.099Z"
+    },
+    {
+      "id": "espn-forecasts-2026-100",
+      "name": "ESPN weekly player forecasts · page 2",
+      "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&view=mSettings&view=mStatus",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:44.046Z"
+    },
+    {
+      "id": "espn-forecasts-2026-200",
+      "name": "ESPN weekly player forecasts · page 3",
+      "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&view=mSettings&view=mStatus",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:44.027Z"
+    },
+    {
+      "id": "espn-forecasts-2026-300",
+      "name": "ESPN weekly player forecasts · page 4",
+      "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&view=mSettings&view=mStatus",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.857Z"
+    },
+    {
+      "id": "espn-forecasts-2026-400",
+      "name": "ESPN weekly player forecasts · page 5",
+      "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/2026/segments/0/leaguedefaults/3?view=kona_player_info&view=mSettings&view=mStatus",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:45.822Z"
+    },
+    {
+      "id": "game-context-injuries-2026",
+      "name": "NFL injury archive 2026 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.422Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2026.csv"
+    },
+    {
+      "id": "game-context-injuries-2025",
+      "name": "NFL injury archive 2025 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.422Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2025.csv"
+    },
+    {
+      "id": "game-context-injuries-2024",
+      "name": "NFL injury archive 2024 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2024.csv"
+    },
+    {
+      "id": "game-context-injuries-2023",
+      "name": "NFL injury archive 2023 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2023.csv"
+    },
+    {
+      "id": "game-context-injuries-2022",
+      "name": "NFL injury archive 2022 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2022.csv"
+    },
+    {
+      "id": "game-context-injuries-2021",
+      "name": "NFL injury archive 2021 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2021.csv"
+    },
+    {
+      "id": "game-context-injuries-2020",
+      "name": "NFL injury archive 2020 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2020.csv"
+    },
+    {
+      "id": "game-context-injuries-2019",
+      "name": "NFL injury archive 2019 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2019.csv"
+    },
+    {
+      "id": "game-context-injuries-2018",
+      "name": "NFL injury archive 2018 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2018.csv"
+    },
+    {
+      "id": "game-context-injuries-2017",
+      "name": "NFL injury archive 2017 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2017.csv"
+    },
+    {
+      "id": "game-context-injuries-2016",
+      "name": "NFL injury archive 2016 (date coverage varies)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:48.423Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2016.csv"
+    },
+    {
+      "id": "game-context-personnel-2016",
+      "name": "Earlier-game QB performance and snap roles 2016",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:49.752Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2017",
+      "name": "Earlier-game QB performance and snap roles 2017",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:50.747Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2019",
+      "name": "Earlier-game QB performance and snap roles 2019",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:51.852Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2018",
+      "name": "Earlier-game QB performance and snap roles 2018",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:52.530Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2021",
+      "name": "Earlier-game QB performance and snap roles 2021",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:53.755Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2020",
+      "name": "Earlier-game QB performance and snap roles 2020",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:54.455Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2023",
+      "name": "Earlier-game QB performance and snap roles 2023",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:55.791Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2022",
+      "name": "Earlier-game QB performance and snap roles 2022",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:56.769Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2024",
+      "name": "Earlier-game QB performance and snap roles 2024",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:58.253Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2026",
+      "name": "Earlier-game QB performance and snap roles 2026",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:56:58.676Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-personnel-2025",
+      "name": "Earlier-game QB performance and snap roles 2025",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:57:00.165Z",
+      "url": "https://github.com/nflverse/nflverse-data"
+    },
+    {
+      "id": "game-context-official-injuries-2025",
+      "name": "Dated official NFL injury articles 2025 (partial pregame coverage)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:57:03.062Z",
+      "url": "https://www.nfl.com/news/"
+    },
+    {
+      "id": "game-context-official-injuries-2026",
+      "name": "Dated official NFL injury articles 2026 (partial pregame coverage)",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:57:03.921Z",
+      "url": "https://www.nfl.com/news/"
+    },
+    {
+      "id": "game-context-quarterbacks-2026",
+      "name": "Dated NFL quarterback charts 2026",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:57:06.634Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+    },
+    {
+      "id": "game-context-quarterbacks-2025",
+      "name": "Dated NFL quarterback charts 2025",
+      "status": "available",
+      "retrievedAt": "2026-10-12T16:57:08.426Z",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2025.csv"
+    },
+    {
+      "id": "game-context-weather",
+      "name": "Open-Meteo JMA GSM 48-hour-lead regional forecasts",
+      "status": "available",
+      "url": "https://open-meteo.com/en/docs/previous-runs-api",
+      "retrievedAt": "2026-10-12T16:57:36.479Z"
+    }
+  ],
+  "warnings": [
+    "Weather forecast history for OAK00 is unavailable.",
+    "Weather forecast history for CIN00 is unavailable.",
+    "Weather forecast history for BUF00 is unavailable.",
+    "Weather forecast history for PIT00 is unavailable.",
+    "Weather forecast history for NAS00 is unavailable.",
+    "Weather forecast history for TAM00 is unavailable.",
+    "Weather forecast history for LAX99 is unavailable.",
+    "Weather forecast history for WAS00 is unavailable.",
+    "Weather forecast history for CHI98 is unavailable.",
+    "Weather forecast history for SFO01 is unavailable.",
+    "Weather forecast history for KAN00 is unavailable.",
+    "Weather forecast history for SEA00 is unavailable.",
+    "Weather forecast history for LON00 is unavailable.",
+    "Weather forecast history for LON02 is unavailable.",
+    "Weather forecast history for MEX00 is unavailable.",
+    "Weather forecast history for GER00 is unavailable.",
+    "Weather forecast history for SAO00 is unavailable.",
+    "Weather forecast history for FRA00 is unavailable."
+  ],
+  "results": [
+    {
+      "kind": "moneyline",
+      "asOf": "2026-10-12T16:57:37.018Z",
+      "quote": {
+        "id": "c779b1725370e6c0a2f4624d1c359d0252dbf6a2948a5125c53f47914757bd20",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "moneyline",
+        "side": "home",
+        "americanOdds": -175,
+        "oppositeAmericanOdds": 145,
+        "observedAt": "2026-10-12T16:57:37.017Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "forecast": {
+        "method": "market-context-v3",
+        "estimate": 1.423439895567217,
+        "rawProbability": 0.5423433874709976,
+        "probability": 0.6093109086729744,
+        "lower": 0.5730035365466362,
+        "upper": 0.7890866532224752,
+        "pushRate": 0.02159090909090909,
+        "residualSamples": 880,
+        "fresh": true,
+        "evaluation": {
+          "baselineKind": "sportsbook",
+          "games": 1148,
+          "weeks": 76,
+          "brier": 0.21152037107558566,
+          "baselineBrier": 0.21151072284004307,
+          "improvementLower": -0.00008405974037023797,
+          "calibrationSamples": 395,
+          "calibrationWeeks": 76,
+          "calibrationObserved": 0.6860759493670886,
+          "calibrationPredicted": 0.6913461578939414
+        }
+      },
+      "bookProbability": 0.6092362344582594,
+      "qualified": false
+    },
+    {
+      "kind": "spread",
+      "asOf": "2026-10-12T16:57:39.835Z",
+      "quote": {
+        "id": "bb66ca355016f0a79405f1d2e845d88d9976353ad681c990db03ff26e16ac6cf",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "spread",
+        "side": "home",
+        "line": -3.5,
+        "americanOdds": -102,
+        "oppositeAmericanOdds": -118,
+        "observedAt": "2026-10-12T16:57:37.017Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "forecast": {
+        "method": "market-context-v3",
+        "estimate": 1.423439895567217,
+        "rawProbability": 0.41827468785471056,
+        "probability": 0.480984050080434,
+        "lower": 0.39032595445464624,
+        "upper": 0.6221627122084885,
+        "pushRate": 0,
+        "residualSamples": 880,
+        "fresh": true,
+        "evaluation": {
+          "baselineKind": "sportsbook",
+          "games": 1117,
+          "weeks": 76,
+          "brier": 0.24982940354863978,
+          "baselineBrier": 0.2497253925762871,
+          "improvementLower": -0.0008026795382551323,
+          "calibrationSamples": 1117,
+          "calibrationWeeks": 76,
+          "calibrationObserved": 0.5004476275738585,
+          "calibrationPredicted": 0.49220965433343544
+        }
+      },
+      "bookProbability": 0.4826358742837298,
+      "qualified": false
+    },
+    {
+      "kind": "total",
+      "asOf": "2026-10-12T16:57:40.015Z",
+      "quote": {
+        "id": "3eb7f31572d49c1e93d09bd92e4a1cd810ac12c260c4d21cffbd3c31a5cb93eb",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "total",
+        "side": "over",
+        "line": 54.5,
+        "americanOdds": -118,
+        "oppositeAmericanOdds": -102,
+        "observedAt": "2026-10-12T16:57:37.017Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "forecast": {
+        "method": "health-weather-total-v4",
+        "estimate": 52.900825174668554,
+        "rawProbability": 0.43530079455164583,
+        "probability": 0.510125081645652,
+        "lower": 0.3778372877915117,
+        "upper": 0.6096740455453538,
+        "pushRate": 0,
+        "residualSamples": 880,
+        "fresh": true,
+        "evaluation": {
+          "baselineKind": "sportsbook",
+          "games": 1143,
+          "weeks": 76,
+          "brier": 0.24976291272334503,
+          "baselineBrier": 0.2500956309861467,
+          "improvementLower": -0.0008852981020225879,
+          "calibrationSamples": 1143,
+          "calibrationWeeks": 76,
+          "calibrationObserved": 0.4916885389326334,
+          "calibrationPredicted": 0.48688500743890556
+        }
+      },
+      "bookProbability": 0.5173641257162701,
+      "qualified": false
+    }
+  ]
+}

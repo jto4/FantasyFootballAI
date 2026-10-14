@@ -1,0 +1,21 @@
+{
+  "verifiedAt": "2026-10-13T21:11:04.272Z",
+  "checks": {
+    "tests": "831 workspace tests plus root suites passed under supported Node 22; amended mutation-isolation test also passes in focused rerun",
+    "typecheck": "all workspaces passed; core repeated after amended test",
+    "lint": "all passed; amended test repeated",
+    "format": "all passed",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "offlineReplay": "Freshly decompressed durable v11 contexts and v12 r2 tapes reproduced every v13 probability, metric and row. Only scoredAt differs.",
+  "preserved": "V12 frozen source hashes, settings, original audit SHA and v6/v11 pregame numerical forecast hashes verified unchanged.",
+  "manualReview": "Scoped ordinary code/security review of recency and prior-season decay, week exclusion, honest prequential feedback, exact book fallback, capped corrections, validated vectors/identities, cloning and unchanged production dispatch. No automated security scan or live network/credential/configuration/wager/owner-journal action.",
+  "inputContextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "inputSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "diagnosisSha256": "6ccd431e27c0acb0895a6103f585f895b1186d66280497cf21464cbbf87b9af5",
+  "frozenSettingsSha256": "3cda0c355b3127ab69ab4297e06f0bde6ff8806fbf2756054dbe0b539dc57433",
+  "auditSha256": "ab7886183bb3cdce4d4383b42a6b79733196e23f27d875de0d0d523a45b36113",
+  "nonTotalMaximumProductionDifference": 0,
+  "excessLate2025LossReduction": 0.44591373098355047
+}

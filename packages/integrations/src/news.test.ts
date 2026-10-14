@@ -29,6 +29,108 @@ describe('football news cache', () => {
     expect(load).toHaveBeenCalledOnce();
   });
 
+  it('keeps a bounded relevance pool for advice while ordinary news stays at ten and shares the same refresh', async () => {
+    const load = vi.fn().mockResolvedValue(
+      Array.from({ length: 120 }, (_, i) => ({
+        ...headline,
+        title: `Fictional story ${i}`,
+        url: `https://example.com/story-${i}`,
+      })),
+    );
+    let now = Date.parse(headline.publishedAt);
+    const cache = new FootballNewsCache(load, 60_000, () => now);
+    const [ordinary, advice] = await Promise.all([cache.get(), cache.getForAdvice()]);
+    expect(load).toHaveBeenCalledOnce();
+    expect(ordinary.items).toHaveLength(10);
+    expect(advice.items).toHaveLength(100);
+    expect(advice.items[20]!.title).toBe('Fictional story 20');
+    advice.items[20]!.title = 'Changed by caller';
+    expect((await cache.getForAdvice()).items[20]!.title).toBe('Fictional story 20');
+    now += 61_000;
+    load.mockRejectedValue(new Error('private provider detail'));
+    const stale = await cache.getForAdvice();
+    expect(stale.stale).toBe(true);
+    expect(stale.items).toHaveLength(100);
+    expect(stale.error).not.toContain('private provider detail');
+    cache.setSources(['pff']);
+    expect((await cache.getForAdvice()).items).toEqual([]);
+  });
+
+  it('retains stories below the ordinary ten-story cutoff for bounded advisor relevance selection', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-07T12:00:00Z'));
+    const rss = `<rss><channel>${Array.from(
+      { length: 20 },
+      (_, i) =>
+        `<item><title>Fictional story ${i}</title><link>https://example.com/${i}</link><pubDate>Wed, 07 Oct 2026 ${String(11 - Math.floor(i / 10)).padStart(2, '0')}:${String(59 - i).padStart(2, '0')}:00 GMT</pubDate></item>`,
+    ).join('')}</channel></rss>`;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => new Response(rss)),
+    );
+    expect((await fetchFootballNewsWithStatus(['espn'])).items).toHaveLength(10);
+    expect((await fetchFootballNewsWithStatus(['espn'], 100)).items).toHaveLength(20);
+    await expect(fetchFootballNewsWithStatus(['espn'], 101)).rejects.toThrow(
+      'News selection limit',
+    );
+  });
+
+  it('keeps advice headlines paired with their actual retrieval date if another refresh completes while awaiting the ordinary view', async () => {
+    let now = Date.parse(headline.publishedAt);
+    const newer = {
+      ...headline,
+      title: 'Newer football practice report',
+      publishedAt: new Date(now + 60_000).toISOString(),
+    };
+    const load = vi.fn().mockResolvedValueOnce([headline]).mockResolvedValueOnce([newer]);
+    const cache = new FootballNewsCache(load, 60_000, () => now);
+    const get = cache.get.bind(cache);
+    vi.spyOn(cache, 'get').mockImplementation(async () => {
+      const old = await get();
+      now += 61_000;
+      await get(true);
+      return old;
+    });
+    const result = await cache.getForAdvice();
+    expect(result.items).toEqual([newer]);
+    expect(result.refreshedAt).toBe(new Date(now).toISOString());
+    expect(result.stale).toBe(false);
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not turn missing or malformed publication dates into fresh headlines', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-07T12:00:00Z'));
+    const rss = `<rss><channel>
+      <item><title>Verified date</title><link>https://example.com/dated</link><pubDate>Wed, 07 Oct 2026 11:00:00 GMT</pubDate></item>
+      <item><title>Missing date</title><link>https://example.com/missing</link></item>
+      <item><title>Bad date</title><link>https://example.com/bad</link><pubDate>not a date</pubDate></item>
+    </channel></rss>`;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => new Response(rss)),
+    );
+    expect(
+      (await fetchFootballNewsWithStatus(['espn'], 100)).items.map((item) => item.url),
+    ).toEqual(['https://example.com/dated']);
+  });
+
+  it('decodes padded decimal and hexadecimal headline entities so player names remain matchable', async () => {
+    const rss = `<rss><channel><item>
+      <title>Ja&#039;Marr Chase &amp; A.J. Brown&#x27;s NFL practice update</title>
+      <link>https://example.com/football?a=1&amp;b=2</link>
+      <pubDate>Wed, 07 Oct 2026 11:00:00 GMT</pubDate>
+    </item></channel></rss>`;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => new Response(rss)),
+    );
+    expect((await fetchFootballNewsWithStatus(['espn'], 100)).items[0]).toMatchObject({
+      title: "Ja'Marr Chase & A.J. Brown's NFL practice update",
+      url: 'https://example.com/football?a=1&b=2',
+    });
+  });
+
   it('coalesces concurrent refreshes and serves stale stories after an error', async () => {
     let now = Date.parse('2026-07-20T12:00:00.000Z');
     let completeLoad!: (items: (typeof headline)[]) => void;
