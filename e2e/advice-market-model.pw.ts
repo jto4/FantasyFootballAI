@@ -200,6 +200,8 @@ test('historical comparison shows the previous model, book and paired uncertaint
 test('supported totals show dated injury and regional weather evidence, save v4 and preserve it without another inference', async ({
   page,
 }, info) => {
+  // The replay worker has a two-minute bound; allow the existing UI request budget plus setup.
+  test.setTimeout(180_000);
   const w = await apiWorkspace(),
     errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -296,8 +298,9 @@ test('supported totals show dated injury and regional weather evidence, save v4 
     await expect(forecast).toContainText('Only totals use the added variables');
     await page.getByRole('button', { name: 'Track results', exact: true }).click();
     await page.getByText('Prediction accuracy and paper results', { exact: true }).click();
-    const response = page.waitForResponse((r) =>
-      r.url().endsWith('/api/advice/performance/backtest'),
+    const response = page.waitForResponse(
+      (r) => r.url().endsWith('/api/advice/performance/backtest'),
+      { timeout: 150_000 },
     );
     await page.getByRole('button', { name: 'Test historical market prices', exact: true }).click();
     const api = await response;
