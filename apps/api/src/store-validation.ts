@@ -1,4 +1,17 @@
-import { isDeliveryEnvelope, isGenerationJob, record, settingsSectionFields } from '@sidekick/core';
+import { isAbsolute } from 'node:path';
+import {
+  isAdviceResult,
+  isPredictionRecord,
+  maximumPredictionRecords,
+  maximumPredictionBytes,
+  isProjectionPeriod,
+  projectionPeriodMatchesWeek,
+  isDeliveryEnvelope,
+  isGenerationJob,
+  isReportVisuals,
+  record,
+  settingsSectionFields,
+} from '@sidekick/core';
 import {
   defaultLeagueStaleAfterHours,
   isValidNewsSources,
@@ -18,6 +31,25 @@ export function validateState(input: unknown): AppState {
   if (!input || typeof input !== 'object' || Array.isArray(input))
     throw new Error('Invalid local state file');
   const candidate = input as Partial<AppState>;
+  if (
+    candidate.predictionRecords !== undefined &&
+    (!Array.isArray(candidate.predictionRecords) ||
+      candidate.predictionRecords.length > maximumPredictionRecords ||
+      !candidate.predictionRecords.every(isPredictionRecord) ||
+      new Set(candidate.predictionRecords.map((r) => r.id)).size !==
+        candidate.predictionRecords.length ||
+      Buffer.byteLength(JSON.stringify(candidate.predictionRecords)) > maximumPredictionBytes)
+  )
+    throw new Error('Invalid prediction track record.');
+  if (
+    candidate.adviceResults !== undefined &&
+    (!Array.isArray(candidate.adviceResults) ||
+      candidate.adviceResults.length > 100 ||
+      !candidate.adviceResults.every(isAdviceResult) ||
+      new Set(candidate.adviceResults.map((item) => item.id)).size !==
+        candidate.adviceResults.length)
+  )
+    throw new Error('Invalid saved advice results.');
   if (
     !candidate.settings ||
     !Array.isArray(candidate.leagues) ||
@@ -72,6 +104,18 @@ export function validateState(input: unknown): AppState {
       !isOptionalStoredAddress(rawSettings.emailRecipient)) ||
     (rawSettings.smsRecipient !== undefined &&
       !isOptionalStoredAddress(rawSettings.smsRecipient)) ||
+    (rawSettings.imessageProvider !== undefined &&
+      (typeof rawSettings.imessageProvider !== 'string' ||
+        !['bluebubbles', 'imsg'].includes(rawSettings.imessageProvider))) ||
+    (rawSettings.imsgChatId !== undefined &&
+      (typeof rawSettings.imsgChatId !== 'number' ||
+        !Number.isSafeInteger(rawSettings.imsgChatId) ||
+        rawSettings.imsgChatId <= 0)) ||
+    (rawSettings.imsgExecutablePath !== undefined &&
+      (typeof rawSettings.imsgExecutablePath !== 'string' ||
+        rawSettings.imsgExecutablePath.length > 2000 ||
+        (rawSettings.imsgExecutablePath !== '' && !isAbsolute(rawSettings.imsgExecutablePath)) ||
+        /[\u0000-\u001f]/.test(rawSettings.imsgExecutablePath))) ||
     (rawSettings.imessageChatGuid !== undefined &&
       (typeof rawSettings.imessageChatGuid !== 'string' ||
         rawSettings.imessageChatGuid.length > 500 ||
@@ -139,6 +183,7 @@ export function validateState(input: unknown): AppState {
             Array.isArray(report.evidence) ||
             typeof report.evidence.guidance !== 'string' ||
             report.evidence.guidance.length > 6000 ||
+            (report.evidence.visuals !== undefined && !isReportVisuals(report.evidence.visuals)) ||
             [report.evidence.leagueSyncedAt, report.evidence.newsRefreshedAt].some(
               (value) =>
                 value !== undefined &&
@@ -280,6 +325,8 @@ export function validateState(input: unknown): AppState {
     reports: candidate.reports.map((report) => ({ ...report, citations: report.citations ?? [] })),
     memories: Array.isArray(candidate.memories) ? candidate.memories : [],
     playerProjections,
+    adviceResults: candidate.adviceResults ?? [],
+    predictionRecords: candidate.predictionRecords ?? [],
     scheduledRuns,
   };
 }
@@ -414,6 +461,9 @@ function isValidPlayerProjection(
         Number.isInteger(projection.week) &&
         projection.week >= 1 &&
         projection.week <= 30)) &&
+    (projection.period === undefined ||
+      (isProjectionPeriod(projection.period) &&
+        projectionPeriodMatchesWeek(projection.period, projection.week))) &&
     typeof projection.sourceName === 'string' &&
     projection.sourceName.trim().length > 0 &&
     projection.sourceName.length <= 100 &&

@@ -1,5 +1,4 @@
 import {
-  reportSummary,
   type ReportSummary,
   type ReportPage,
   settingsSectionFields,
@@ -8,12 +7,20 @@ import {
   type SettingsSection,
 } from '@sidekick/core';
 import Database from 'better-sqlite3';
+import {
+  archiveGenerationJobs,
+  jobByRequest,
+  queryReportPage,
+  validateGenerationArchive,
+} from './store-history.js';
 import type { Database as DatabaseHandle } from 'better-sqlite3';
 import { randomUUID } from 'node:crypto';
 import {
   chmod,
   lstat,
   mkdir,
+  mkdtemp,
+  rm,
   readFile,
   readdir,
   rename,
@@ -22,7 +29,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { type AppSettings, type SavedReport } from '@sidekick/core';
 import type { AppState, DashboardStateSnapshot } from './store-types.js';
 export * from './store-types.js';
@@ -107,6 +114,58 @@ export class LocalStore {
     await chmod(dirname(destination), 0o700).catch(() => undefined);
     await this.database.backup(destination);
     await chmod(destination, 0o600).catch(() => undefined);
+  }
+
+  /** Migrate and inspect a private disposable copy; never swap data or run restore hooks. */
+  async validateBackupBuffer(
+    contents: Buffer,
+  ): Promise<{ reports: number; leagues: number; profiles: number }> {
+    if (!contents.length || contents.length > 50 * 1024 * 1024)
+      throw new Error('Invalid backup size.');
+    const directory = await mkdtemp(join(tmpdir(), 'sidekick-backup-validation-'));
+    let candidate: DatabaseHandle | undefined;
+    try {
+      const path = join(directory, 'candidate.sqlite');
+      await writeFile(path, contents, { flag: 'wx', mode: 0o600 });
+      candidate = this.openDatabase(path);
+      const integrity = candidate.pragma('integrity_check') as Array<{ integrity_check: string }>;
+      if (integrity.length !== 1 || integrity[0]?.integrity_check !== 'ok')
+        throw new Error('Invalid backup integrity.');
+      const state = this.readDatabaseState(candidate);
+      if (!state) throw new Error('Backup does not contain Sunday Sidekick state.');
+      return {
+        reports: state.reports.length,
+        leagues: state.leagues.length,
+        profiles: state.memories.length,
+      };
+    } finally {
+      candidate?.close();
+      await rm(directory, { recursive: true, force: true });
+    }
+  }
+
+  generationDiagnostics(now = Date.now()) {
+    const jobs = this.state.generationJobs ?? [];
+    const pending = jobs.filter((job) => ['queued', 'running'].includes(job.status));
+    const failures: Record<string, number> = {};
+    for (const job of jobs)
+      if (job.failureCode) failures[job.failureCode] = (failures[job.failureCode] ?? 0) + 1;
+    const archived = this.database
+      ?.prepare('SELECT COUNT(*) AS count FROM archived_generation_jobs')
+      .get() as { count: number } | undefined;
+    return {
+      queued: pending.filter((job) => job.status === 'queued').length,
+      running: pending.filter((job) => job.status === 'running').length,
+      oldestPendingSeconds: pending.length
+        ? Math.max(
+            0,
+            Math.floor((now - Math.min(...pending.map((job) => Date.parse(job.createdAt)))) / 1000),
+          )
+        : 0,
+      recentFailures: failures,
+      retainedJobs: jobs.length,
+      archivedReceipts: archived?.count ?? 0,
+    };
   }
 
   async listSafetyBackups(): Promise<Array<{ name: string; createdAt: string; size: number }>> {
@@ -275,8 +334,16 @@ export class LocalStore {
 
   /** Avoid cloning private imported text when the dashboard only needs profile summaries. */
   dashboardSnapshot(): DashboardStateSnapshot {
-    const { memories, playerProjections: _projections, ...dashboardState } = this.state;
+    const {
+      memories,
+      playerProjections: _projections,
+      adviceResults: _advice,
+      predictionRecords: _predictions,
+      ...dashboardState
+    } = this.state;
     void _projections;
+    void _advice;
+    void _predictions;
     return {
       ...structuredClone(dashboardState),
       memories: memories.map(({ sourceText, sourceAuthorId, ...profile }) => ({
@@ -297,9 +364,13 @@ export class LocalStore {
       memories,
       playerProjections: _projections,
       generationJobs,
+      adviceResults: _advice,
+      predictionRecords: _predictions,
       ...state
     } = this.state;
     void _projections;
+    void _advice;
+    void _predictions;
     const reportCounts = Object.create(null) as Record<string, { drafts: number; issues: number }>;
     for (const report of reports) {
       const count = (reportCounts[report.leagueId] ??= { drafts: 0, issues: 0 });
@@ -308,7 +379,7 @@ export class LocalStore {
     }
     return {
       ...structuredClone(state),
-      reports: reports.slice(0, 50).map(reportSummary),
+      reports: this.reportsPage(undefined, undefined, undefined, 50).items,
       reportCounts,
       generationJobs: structuredClone((generationJobs ?? []).slice(-50).reverse()),
       memories: memories.map(({ sourceText, sourceAuthorId, ...profile }) => ({
@@ -320,46 +391,36 @@ export class LocalStore {
   }
 
   generationJobByRequest(requestId: string): GenerationJob | undefined {
+    if (this.database) return jobByRequest(this.database, requestId);
     const job = this.state.generationJobs?.find((item) => item.requestId === requestId);
     return job ? structuredClone(job) : undefined;
   }
 
   reportById(id: string): SavedReport | undefined {
+    if (this.database) {
+      const row = this.database.prepare('SELECT payload FROM reports WHERE id = ?').get(id) as
+        { payload: string } | undefined;
+      return row ? (JSON.parse(row.payload) as SavedReport) : undefined;
+    }
     const report = this.state.reports.find((item) => item.id === id);
     return report ? structuredClone(report) : undefined;
   }
 
-  reportsPage(leagueId?: string, status?: string, cursor?: string, limit = 20): ReportPage {
-    const rows = this.state.reports.filter(
-      (item) =>
-        (!leagueId || item.leagueId === leagueId) &&
-        (!status ||
-          (status === 'draft'
-            ? item.status === 'draft' && !item.deliveryState
-            : status === 'sent'
-              ? item.status === 'sent'
-              : item.deliveryState === status)),
-    );
-    const sorted = [...rows].sort((a, b) => {
-      const left = `${a.createdAt}|${a.id}`,
-        right = `${b.createdAt}|${b.id}`;
-      return left < right ? 1 : left > right ? -1 : 0;
-    });
-    const after = cursor
-      ? sorted.filter((item) => `${item.createdAt}|${item.id}` < cursor)
-      : sorted;
-    const items = after.slice(0, limit).map(reportSummary);
-    const last = items.at(-1);
-    return {
-      items,
-      total: rows.length,
-      ...(after.length > limit && last ? { nextCursor: `${last.createdAt}|${last.id}` } : {}),
-    };
+  reportsPage(
+    leagueId?: string,
+    status?: string,
+    cursor?: string,
+    limit = 20,
+    search?: string,
+  ): ReportPage {
+    if (!this.database) throw new Error('Local database is not loaded.');
+    return queryReportPage(this.database, leagueId, status, cursor, limit, search);
   }
 
   /** Report generation reads profile notes, never the original imported conversation text. */
   reportSnapshot(): AppState {
-    const { memories, ...state } = this.state;
+    const { memories, predictionRecords: _predictions, ...state } = this.state;
+    void _predictions;
     return {
       ...structuredClone(state),
       memories: memories.map((profile) => {
@@ -618,6 +679,7 @@ export class LocalStore {
   }
 
   private readDatabaseState(database: DatabaseHandle): AppState | undefined {
+    validateGenerationArchive(database);
     const settingsRow = database.prepare('SELECT payload FROM app_settings WHERE id = 1').get() as
       { payload?: string } | undefined;
     if (settingsRow?.payload === undefined) return undefined;
@@ -628,7 +690,9 @@ export class LocalStore {
         | 'memories'
         | 'scheduled_runs'
         | 'player_projections'
-        | 'generation_jobs',
+        | 'generation_jobs'
+        | 'advice_results'
+        | 'prediction_records',
     ) => {
       const ordering = table === 'scheduled_runs' ? 'position' : 'rowid';
       return (
@@ -637,7 +701,7 @@ export class LocalStore {
         }>
       ).map((item) => JSON.parse(item.payload) as unknown);
     };
-    return validateState({
+    const state = validateState({
       settings: JSON.parse(settingsRow.payload) as unknown,
       leagues: readRows('leagues'),
       reports: readRows('reports'),
@@ -645,7 +709,13 @@ export class LocalStore {
       playerProjections: readRows('player_projections'),
       scheduledRuns: readRows('scheduled_runs'),
       generationJobs: readRows('generation_jobs'),
+      adviceResults: readRows('advice_results'),
+      predictionRecords: readRows('prediction_records'),
     });
+    // Upsert row IDs preserve insertion order, while new advice is prepended in memory.
+    // Restore chronology before recent-history selection or bounded retention uses it.
+    state.adviceResults?.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    return state;
   }
 
   private recoverInterruptedRuns(): void {
@@ -718,12 +788,34 @@ export class LocalStore {
         WHERE payload != excluded.payload
       `);
       settings.run(JSON.stringify(next.settings), updatedAt);
-      replaceRows(this.database!, 'leagues', next.leagues);
-      replaceRows(this.database!, 'reports', next.reports);
-      replaceRows(this.database!, 'generation_jobs', next.generationJobs ?? []);
+      replaceRows(this.database!, 'leagues', next.leagues, previous?.leagues);
+      replaceRows(this.database!, 'reports', next.reports, previous?.reports);
+      replaceRows(
+        this.database!,
+        'advice_results',
+        next.adviceResults ?? [],
+        previous?.adviceResults,
+      );
+      replaceRows(
+        this.database!,
+        'prediction_records',
+        next.predictionRecords ?? [],
+        previous?.predictionRecords,
+      );
+      replaceRows(
+        this.database!,
+        'generation_jobs',
+        next.generationJobs ?? [],
+        previous?.generationJobs,
+      );
       replaceMemoryRows(this.database!, next.memories, previous?.memories);
-      replacePlayerProjectionRows(this.database!, next.playerProjections);
-      replaceScheduledRuns(this.database!, next.scheduledRuns);
+      replacePlayerProjectionRows(
+        this.database!,
+        next.playerProjections,
+        previous?.playerProjections,
+      );
+      replaceScheduledRuns(this.database!, next.scheduledRuns, previous?.scheduledRuns);
+      archiveGenerationJobs(this.database!, next);
     });
     write(state, new Date().toISOString());
   }

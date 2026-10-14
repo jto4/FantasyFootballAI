@@ -57,7 +57,12 @@ export function createMemberMemoryRouter(dependencies: MemberMemoryRouteDependen
       updated = profile;
     });
     if (!updated) return res.status(404).json({ error: 'Member profile not found.' });
-    res.json({ ...updated, sourceText: undefined, sourceAuthorId: undefined });
+    res.json({
+      ...updated,
+      sourceText: undefined,
+      sourceAuthorId: undefined,
+      sourceLength: updated.sourceText.length,
+    });
   });
 
   router.delete('/api/memory', async (_req, res) => {

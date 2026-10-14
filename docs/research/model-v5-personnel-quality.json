@@ -1,0 +1,333 @@
+{
+  "preparedAt": "2026-10-12T16:34:54.737Z",
+  "durationSeconds": 22.767,
+  "sha256": "77c3eb2fbf72e7929277a427f4a51ae8c6696dd737075813c3d98d7c6c1ceb54",
+  "profile": [
+    {
+      "season": 2015,
+      "quarterbackRows": 602,
+      "snapRows": 22864
+    },
+    {
+      "season": 2016,
+      "quarterbackRows": 598,
+      "snapRows": 22904
+    },
+    {
+      "season": 2017,
+      "quarterbackRows": 592,
+      "snapRows": 22876
+    },
+    {
+      "season": 2018,
+      "quarterbackRows": 602,
+      "snapRows": 22895
+    },
+    {
+      "season": 2019,
+      "quarterbackRows": 589,
+      "snapRows": 22884
+    },
+    {
+      "season": 2020,
+      "quarterbackRows": 622,
+      "snapRows": 23210
+    },
+    {
+      "season": 2021,
+      "quarterbackRows": 655,
+      "snapRows": 25271
+    },
+    {
+      "season": 2022,
+      "quarterbackRows": 633,
+      "snapRows": 25168
+    },
+    {
+      "season": 2023,
+      "quarterbackRows": 663,
+      "snapRows": 25329
+    },
+    {
+      "season": 2024,
+      "quarterbackRows": 664,
+      "snapRows": 25398
+    },
+    {
+      "season": 2025,
+      "quarterbackRows": 664,
+      "snapRows": 25396
+    },
+    {
+      "season": 2026,
+      "quarterbackRows": 180,
+      "snapRows": 7277
+    }
+  ],
+  "coverage": {
+    "targets": 2639,
+    "officialGames": 130,
+    "officialTeams": 245,
+    "personnelBoth": 2636,
+    "qbQualityBoth": 2445,
+    "weightedOutBoth": 1796
+  },
+  "perYear": {
+    "2016": {
+      "games": 256,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 213,
+      "rolesBoth": 175
+    },
+    "2017": {
+      "games": 256,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 231,
+      "rolesBoth": 192
+    },
+    "2018": {
+      "games": 256,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 237,
+      "rolesBoth": 187
+    },
+    "2019": {
+      "games": 256,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 232,
+      "rolesBoth": 153
+    },
+    "2020": {
+      "games": 256,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 238,
+      "rolesBoth": 190
+    },
+    "2021": {
+      "games": 272,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 254,
+      "rolesBoth": 215
+    },
+    "2022": {
+      "games": 271,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 251,
+      "rolesBoth": 214
+    },
+    "2023": {
+      "games": 272,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 257,
+      "rolesBoth": 211
+    },
+    "2024": {
+      "games": 272,
+      "officialGames": 0,
+      "officialTeams": 0,
+      "qbBoth": 266,
+      "rolesBoth": 194
+    },
+    "2025": {
+      "games": 272,
+      "officialGames": 130,
+      "officialTeams": 245,
+      "qbBoth": 266,
+      "rolesBoth": 65
+    }
+  },
+  "official": [
+    {
+      "url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+      "season": 2026,
+      "week": 1,
+      "updatedAt": "2026-09-12T23:07:53.998Z",
+      "teams": 24,
+      "rows": 53
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-1-injury-report-player-statuses-for-all-16-games-2025-season",
+      "season": 2025,
+      "week": 1,
+      "updatedAt": "2025-09-07T19:58:35.291Z",
+      "teams": 30,
+      "rows": 75
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-10-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 10,
+      "updatedAt": "2025-11-08T21:11:39.485Z",
+      "teams": 26,
+      "rows": 147
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-11-injury-report-player-statuses-for-all-15-games",
+      "season": 2025,
+      "week": 11,
+      "updatedAt": "2025-11-16T18:10:25.072Z",
+      "teams": 27,
+      "rows": 143
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-12-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 12,
+      "updatedAt": "2025-11-22T21:56:01.223Z",
+      "teams": 24,
+      "rows": 116
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-13-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 13,
+      "updatedAt": "2025-12-01T16:46:55.035Z",
+      "teams": 30,
+      "rows": 135
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-14-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 14,
+      "updatedAt": "2025-12-07T18:49:39.243Z",
+      "teams": 27,
+      "rows": 128
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-15-injury-report-player-statuses-for-all-16-games",
+      "season": 2025,
+      "week": 15,
+      "updatedAt": "2025-12-15T21:10:09.940Z",
+      "teams": 28,
+      "rows": 146
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-16-injury-report-player-statuses-for-all-16-games",
+      "season": 2025,
+      "week": 16,
+      "updatedAt": "2025-12-21T16:50:21.119Z",
+      "teams": 29,
+      "rows": 165
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-17-injury-report-player-statuses-for-all-16-games",
+      "season": 2025,
+      "week": 17,
+      "updatedAt": "2025-12-29T17:44:30.085Z",
+      "teams": 32,
+      "rows": 211
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-18-injury-report-player-statuses-for-all-16-games",
+      "season": 2025,
+      "week": 18,
+      "updatedAt": "2026-01-03T21:32:45.952Z",
+      "teams": 31,
+      "rows": 179
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-2-injury-report-player-statuses-2025-season",
+      "season": 2025,
+      "week": 2,
+      "updatedAt": "2025-09-15T19:35:33.949Z",
+      "teams": 32,
+      "rows": 110
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-2-injury-report-player-statuses-for-all-16-games",
+      "season": 2026,
+      "week": 2,
+      "updatedAt": "2026-09-20T13:37:52.039Z",
+      "teams": 29,
+      "rows": 100
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-2025-season",
+      "season": 2025,
+      "week": 3,
+      "updatedAt": "2025-09-21T12:06:24.283Z",
+      "teams": 31,
+      "rows": 123
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+      "season": 2026,
+      "week": 3,
+      "updatedAt": "2026-09-27T18:18:08.087Z",
+      "teams": 32,
+      "rows": 117
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-2025-season",
+      "season": 2025,
+      "week": 4,
+      "updatedAt": "2025-09-28T04:04:33.525Z",
+      "teams": 32,
+      "rows": 127
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+      "season": 2026,
+      "week": 4,
+      "updatedAt": "2026-10-05T16:00:45.141Z",
+      "teams": 31,
+      "rows": 132
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 5,
+      "updatedAt": "2025-10-05T23:09:51.791Z",
+      "teams": 27,
+      "rows": 128
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "season": 2026,
+      "week": 5,
+      "updatedAt": "2026-10-10T21:23:47.290Z",
+      "teams": 29,
+      "rows": 170
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-6-injury-report-player-statuses-for-all-15-games",
+      "season": 2025,
+      "week": 6,
+      "updatedAt": "2025-10-12T14:17:52.644Z",
+      "teams": 29,
+      "rows": 159
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-7-injury-report-player-statuses-for-all-15-games",
+      "season": 2025,
+      "week": 7,
+      "updatedAt": "2025-10-19T17:31:33.576Z",
+      "teams": 29,
+      "rows": 151
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-8-injury-report-player-statuses-for-all-13-games",
+      "season": 2025,
+      "week": 8,
+      "updatedAt": "2025-10-27T20:01:43.579Z",
+      "teams": 24,
+      "rows": 132
+    },
+    {
+      "url": "https://www.nfl.com/news/nfl-week-9-injury-report-player-statuses-for-all-14-games",
+      "season": 2025,
+      "week": 9,
+      "updatedAt": "2025-11-03T15:40:35.568Z",
+      "teams": 25,
+      "rows": 134
+    }
+  ]
+}

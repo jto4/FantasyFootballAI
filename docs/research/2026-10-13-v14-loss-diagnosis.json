@@ -1,0 +1,1174 @@
+{
+  "diagnosedAt": "2026-10-13T21:30:18.713Z",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "parentSettingsSha256": "3cda0c355b3127ab69ab4297e06f0bde6ff8806fbf2756054dbe0b539dc57433",
+  "parentAuditSha256": "ab7886183bb3cdce4d4383b42a6b79733196e23f27d875de0d0d523a45b36113",
+  "late2025": {
+    "scores": {
+      "n": 151,
+      "brier": 0.25073542664420295,
+      "previousBrier": 0.2501302607032246,
+      "bookBrier": 0.2503610574991748,
+      "logLoss": 0.6946195688994109,
+      "previousLogLoss": 0.6934102417107264,
+      "bookLogLoss": 0.6938695265943464,
+      "bookImprovementInterval": [-0.001128777074017543, 0.0003800387839612596],
+      "previousImprovementInterval": [-0.002586422430681868, 0.001376090548725129],
+      "simultaneousBookInterval": [-0.0014772288587696374, 0.000728490568713354]
+    },
+    "overRate": 0.5099337748344371,
+    "meanDelta": 0.0016184196621833416,
+    "meanLinearExcess": 0.0003587448885095112,
+    "meanQuadraticExcess": 0.0000156242565186696,
+    "changed": 52,
+    "meanBlockLogits": {
+      "coverage": 0.005002125908728139,
+      "unsignedVolume": 0.003964572088768861,
+      "retained": 0.002837518280041699,
+      "allLiquidity": 0.006810036990186962
+    },
+    "fixedFitFixedFeedbackAblations": {
+      "noCoverage": {
+        "n": 151,
+        "brier": 0.2506198659816098,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6943880042269759,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.0008227487967904867, 0.00030513183192052643],
+        "previousImprovementInterval": [-0.0023214254245015275, 0.0013422148677311118],
+        "simultaneousBookInterval": [-0.0010832259225996908, 0.0005656089577297306]
+      },
+      "noUnsignedVolume": {
+        "n": 151,
+        "brier": 0.2505732456132814,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6942944776945172,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.0006165033755816104, 0.00019212714736838025],
+        "previousImprovementInterval": [-0.002170113166505307, 0.0012841433463916213],
+        "simultaneousBookInterval": [-0.0008032516440577907, 0.0003788754158445605]
+      },
+      "noCoverageOrUnsignedVolume": {
+        "n": 151,
+        "brier": 0.25046177759169225,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6940712295758967,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.0003169137279817243, 0.00011547354294685086],
+        "previousImprovementInterval": [-0.001928861086364908, 0.0012658273094295791],
+        "simultaneousBookInterval": [-0.0004167709209336731, 0.0002153307358987996]
+      },
+      "noCoverageOrLiquidity": {
+        "n": 151,
+        "brier": 0.25036095471181613,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6938693210346435,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-8.93017938600905e-8, 2.948765112202479e-7],
+        "previousImprovementInterval": [-0.0017122078093545746, 0.0012508197921714793],
+        "simultaneousBookInterval": [-1.7802542130632277e-7, 3.836001386664802e-7]
+      }
+    }
+  },
+  "weeks": [
+    {
+      "week": 9,
+      "scores": {
+        "n": 14,
+        "brier": 0.2502840369343778,
+        "previousBrier": 0.2533412033345162,
+        "bookBrier": 0.25054408203506956,
+        "logLoss": 0.6937154042891754,
+        "previousLogLoss": 0.6998391050337476,
+        "bookLogLoss": 0.694235607213243,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.5,
+      "meanDelta": 0.0005976757307901981,
+      "meanLinearExcess": -0.0002607934548110095,
+      "meanQuadraticExcess": 7.483541192453459e-7,
+      "changed": 13,
+      "meanBlockLogits": {
+        "coverage": 0.008157549821480075,
+        "unsignedVolume": 0.005008233784438207,
+        "retained": 0.0037180845590800257,
+        "allLiquidity": 0.008723667965086144
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 14,
+          "brier": 0.25035839802577614,
+          "previousBrier": 0.2533412033345162,
+          "bookBrier": 0.25054408203506956,
+          "logLoss": 0.6938641388216972,
+          "previousLogLoss": 0.6998391050337476,
+          "bookLogLoss": 0.694235607213243,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 14,
+          "brier": 0.2503923335987344,
+          "previousBrier": 0.2533412033345162,
+          "bookBrier": 0.25054408203506956,
+          "logLoss": 0.6939320634348356,
+          "previousLogLoss": 0.6998391050337476,
+          "bookLogLoss": 0.694235607213243,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 14,
+          "brier": 0.25046692018218775,
+          "previousBrier": 0.2533412033345162,
+          "bookBrier": 0.25054408203506956,
+          "logLoss": 0.6940812437475217,
+          "previousLogLoss": 0.6998391050337476,
+          "bookLogLoss": 0.694235607213243,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 14,
+          "brier": 0.250544065015895,
+          "previousBrier": 0.2533412033345162,
+          "bookBrier": 0.25054408203506956,
+          "logLoss": 0.69423557335389,
+          "previousLogLoss": 0.6998391050337476,
+          "bookLogLoss": 0.694235607213243,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 10,
+      "scores": {
+        "n": 14,
+        "brier": 0.2505392114383221,
+        "previousBrier": 0.249303324392748,
+        "bookBrier": 0.24976604766067914,
+        "logLoss": 0.6942258600670848,
+        "previousLogLoss": 0.6917570359595159,
+        "bookLogLoss": 0.6926783744283733,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.5,
+      "meanDelta": 0.009212003259727005,
+      "meanLinearExcess": 0.0006678321143430791,
+      "meanQuadraticExcess": 0.0001053316632998283,
+      "changed": 14,
+      "meanBlockLogits": {
+        "coverage": 0.015086403699844248,
+        "unsignedVolume": 0.013242571542110865,
+        "retained": 0.008540669543690855,
+        "allLiquidity": 0.02181004857859949
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 14,
+          "brier": 0.25025316273380954,
+          "previousBrier": 0.249303324392748,
+          "bookBrier": 0.24976604766067914,
+          "logLoss": 0.6936532627784946,
+          "previousLogLoss": 0.6917570359595159,
+          "bookLogLoss": 0.6926783744283733,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 14,
+          "brier": 0.25031627871644524,
+          "previousBrier": 0.249303324392748,
+          "bookBrier": 0.24976604766067914,
+          "logLoss": 0.6937791422781477,
+          "previousLogLoss": 0.6917570359595159,
+          "bookLogLoss": 0.6926783744283733,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 14,
+          "brier": 0.2500598598898702,
+          "previousBrier": 0.249303324392748,
+          "bookBrier": 0.24976604766067914,
+          "logLoss": 0.6932662471067931,
+          "previousLogLoss": 0.6917570359595159,
+          "bookLogLoss": 0.6926783744283733,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 14,
+          "brier": 0.24976627024652082,
+          "previousBrier": 0.249303324392748,
+          "bookBrier": 0.24976604766067914,
+          "logLoss": 0.6926788225023274,
+          "previousLogLoss": 0.6917570359595159,
+          "bookLogLoss": 0.6926783744283733,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 11,
+      "scores": {
+        "n": 15,
+        "brier": 0.2504995975368225,
+        "previousBrier": 0.24900814314590272,
+        "bookBrier": 0.25094120339597153,
+        "logLoss": 0.6941467829765448,
+        "previousLogLoss": 0.6911661395988963,
+        "bookLogLoss": 0.6950296941508144,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.4,
+      "meanDelta": 0.002393924204310342,
+      "meanLinearExcess": -0.0004535019147677823,
+      "meanQuadraticExcess": 0.000011896055618754801,
+      "changed": 12,
+      "meanBlockLogits": {
+        "coverage": 0.007075771997547751,
+        "unsignedVolume": 0.007512755732450558,
+        "retained": 0.004231595140101606,
+        "allLiquidity": 0.011752481116252187
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 15,
+          "brier": 0.2504946398776674,
+          "previousBrier": 0.24900814314590272,
+          "bookBrier": 0.25094120339597153,
+          "logLoss": 0.6941366400868013,
+          "previousLogLoss": 0.6911661395988963,
+          "bookLogLoss": 0.6950296941508144,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 15,
+          "brier": 0.25072258325301516,
+          "previousBrier": 0.24900814314590272,
+          "bookBrier": 0.25094120339597153,
+          "logLoss": 0.6945926499192203,
+          "previousLogLoss": 0.6911661395988963,
+          "bookLogLoss": 0.6950296941508144,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 15,
+          "brier": 0.25072084016046614,
+          "previousBrier": 0.24900814314590272,
+          "bookBrier": 0.25094120339597153,
+          "logLoss": 0.694588891714833,
+          "previousLogLoss": 0.6911661395988963,
+          "bookLogLoss": 0.6950296941508144,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 15,
+          "brier": 0.250940286830799,
+          "previousBrier": 0.24900814314590272,
+          "bookBrier": 0.25094120339597153,
+          "logLoss": 0.6950278609329065,
+          "previousLogLoss": 0.6911661395988963,
+          "bookLogLoss": 0.6950296941508144,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 12,
+      "scores": {
+        "n": 14,
+        "brier": 0.25964165704868036,
+        "previousBrier": 0.251453583096286,
+        "bookBrier": 0.2556437879551679,
+        "logLoss": 0.7124481353537038,
+        "previousLogLoss": 0.6960516346149187,
+        "bookLogLoss": 0.7044396998055774,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.2857142857142857,
+      "meanDelta": 0.005081214289842044,
+      "meanLinearExcess": 0.0039481761180717116,
+      "meanQuadraticExcess": 0.0000496929754407683,
+      "changed": 13,
+      "meanBlockLogits": {
+        "coverage": 0.005783116357767507,
+        "unsignedVolume": 0.011165114809065044,
+        "retained": 0.006491952720799142,
+        "allLiquidity": 0.017679164031778858
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 14,
+          "brier": 0.25861225215006317,
+          "previousBrier": 0.251453583096286,
+          "bookBrier": 0.2556437879551679,
+          "logLoss": 0.7103852750960894,
+          "previousLogLoss": 0.6960516346149187,
+          "bookLogLoss": 0.7044396998055774,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 14,
+          "brier": 0.257768141576769,
+          "previousBrier": 0.251453583096286,
+          "bookBrier": 0.2556437879551679,
+          "logLoss": 0.7086941385627581,
+          "previousLogLoss": 0.6960516346149187,
+          "bookLogLoss": 0.7044396998055774,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 14,
+          "brier": 0.2567495791861959,
+          "previousBrier": 0.251453583096286,
+          "bookBrier": 0.2556437879551679,
+          "logLoss": 0.7066539896467203,
+          "previousLogLoss": 0.6960516346149187,
+          "bookLogLoss": 0.7044396998055774,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 14,
+          "brier": 0.2556434557875313,
+          "previousBrier": 0.251453583096286,
+          "bookBrier": 0.2556437879551679,
+          "logLoss": 0.7044390326447948,
+          "previousLogLoss": 0.6960516346149187,
+          "bookLogLoss": 0.7044396998055774,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 13,
+      "scores": {
+        "n": 16,
+        "brier": 0.2474857455399403,
+        "previousBrier": 0.24639014186236186,
+        "bookBrier": 0.2474857455399403,
+        "logLoss": 0.6881180331847714,
+        "previousLogLoss": 0.6859272802674196,
+        "bookLogLoss": 0.6881180331847714,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.4375,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": -0.006979361725944863,
+        "unsignedVolume": -0.008160162226004736,
+        "retained": 0.00007715537505020013,
+        "allLiquidity": -0.008067641697845622
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 16,
+          "brier": 0.2474857455399403,
+          "previousBrier": 0.24639014186236186,
+          "bookBrier": 0.2474857455399403,
+          "logLoss": 0.6881180331847714,
+          "previousLogLoss": 0.6859272802674196,
+          "bookLogLoss": 0.6881180331847714,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2474857455399403,
+          "previousBrier": 0.24639014186236186,
+          "bookBrier": 0.2474857455399403,
+          "logLoss": 0.6881180331847714,
+          "previousLogLoss": 0.6859272802674196,
+          "bookLogLoss": 0.6881180331847714,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2474857455399403,
+          "previousBrier": 0.24639014186236186,
+          "bookBrier": 0.2474857455399403,
+          "logLoss": 0.6881180331847714,
+          "previousLogLoss": 0.6859272802674196,
+          "bookLogLoss": 0.6881180331847714,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 16,
+          "brier": 0.2474857455399403,
+          "previousBrier": 0.24639014186236186,
+          "bookBrier": 0.2474857455399403,
+          "logLoss": 0.6881180331847714,
+          "previousLogLoss": 0.6859272802674196,
+          "bookLogLoss": 0.6881180331847714,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 14,
+      "scores": {
+        "n": 14,
+        "brier": 0.25024139666778233,
+        "previousBrier": 0.25414477834298593,
+        "bookBrier": 0.25024139666778233,
+        "logLoss": 0.6936307679547765,
+        "previousLogLoss": 0.7014394457690086,
+        "bookLogLoss": 0.6936307679547765,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.7857142857142857,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": -0.009132050857222603,
+        "unsignedVolume": -0.008157948044443754,
+        "retained": 0.00046233378950670415,
+        "allLiquidity": -0.007682210560365096
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 14,
+          "brier": 0.25024139666778233,
+          "previousBrier": 0.25414477834298593,
+          "bookBrier": 0.25024139666778233,
+          "logLoss": 0.6936307679547765,
+          "previousLogLoss": 0.7014394457690086,
+          "bookLogLoss": 0.6936307679547765,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 14,
+          "brier": 0.25024139666778233,
+          "previousBrier": 0.25414477834298593,
+          "bookBrier": 0.25024139666778233,
+          "logLoss": 0.6936307679547765,
+          "previousLogLoss": 0.7014394457690086,
+          "bookLogLoss": 0.6936307679547765,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 14,
+          "brier": 0.25024139666778233,
+          "previousBrier": 0.25414477834298593,
+          "bookBrier": 0.25024139666778233,
+          "logLoss": 0.6936307679547765,
+          "previousLogLoss": 0.7014394457690086,
+          "bookLogLoss": 0.6936307679547765,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 14,
+          "brier": 0.25024139666778233,
+          "previousBrier": 0.25414477834298593,
+          "bookBrier": 0.25024139666778233,
+          "logLoss": 0.6936307679547765,
+          "previousLogLoss": 0.7014394457690086,
+          "bookLogLoss": 0.6936307679547765,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 15,
+      "scores": {
+        "n": 16,
+        "brier": 0.24860029418890367,
+        "previousBrier": 0.2469809006156421,
+        "bookBrier": 0.24860029418890367,
+        "logLoss": 0.690345948184149,
+        "previousLogLoss": 0.6871070940505436,
+        "bookLogLoss": 0.690345948184149,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.625,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": 0.002621262757547995,
+        "unsignedVolume": 0.0009582232670823529,
+        "retained": 0.0012914798564547373,
+        "allLiquidity": 0.002262212523288766
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 16,
+          "brier": 0.24860029418890367,
+          "previousBrier": 0.2469809006156421,
+          "bookBrier": 0.24860029418890367,
+          "logLoss": 0.690345948184149,
+          "previousLogLoss": 0.6871070940505436,
+          "bookLogLoss": 0.690345948184149,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 16,
+          "brier": 0.24860029418890367,
+          "previousBrier": 0.2469809006156421,
+          "bookBrier": 0.24860029418890367,
+          "logLoss": 0.690345948184149,
+          "previousLogLoss": 0.6871070940505436,
+          "bookLogLoss": 0.690345948184149,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 16,
+          "brier": 0.24860029418890367,
+          "previousBrier": 0.2469809006156421,
+          "bookBrier": 0.24860029418890367,
+          "logLoss": 0.690345948184149,
+          "previousLogLoss": 0.6871070940505436,
+          "bookLogLoss": 0.690345948184149,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 16,
+          "brier": 0.24860029418890367,
+          "previousBrier": 0.2469809006156421,
+          "bookBrier": 0.24860029418890367,
+          "logLoss": 0.690345948184149,
+          "previousLogLoss": 0.6871070940505436,
+          "bookLogLoss": 0.690345948184149,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 16,
+      "scores": {
+        "n": 16,
+        "brier": 0.25173171522284715,
+        "previousBrier": 0.2496212295924563,
+        "bookBrier": 0.25173171522284715,
+        "logLoss": 0.6966116005423113,
+        "previousLogLoss": 0.6923893963745228,
+        "bookLogLoss": 0.6966116005423113,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.625,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": 0.008628912234532942,
+        "unsignedVolume": 0.005581150607703964,
+        "retained": 0.002066287096947,
+        "allLiquidity": 0.007627506624551827
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 16,
+          "brier": 0.25173171522284715,
+          "previousBrier": 0.2496212295924563,
+          "bookBrier": 0.25173171522284715,
+          "logLoss": 0.6966116005423113,
+          "previousLogLoss": 0.6923893963745228,
+          "bookLogLoss": 0.6966116005423113,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 16,
+          "brier": 0.25173171522284715,
+          "previousBrier": 0.2496212295924563,
+          "bookBrier": 0.25173171522284715,
+          "logLoss": 0.6966116005423113,
+          "previousLogLoss": 0.6923893963745228,
+          "bookLogLoss": 0.6966116005423113,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 16,
+          "brier": 0.25173171522284715,
+          "previousBrier": 0.2496212295924563,
+          "bookBrier": 0.25173171522284715,
+          "logLoss": 0.6966116005423113,
+          "previousLogLoss": 0.6923893963745228,
+          "bookLogLoss": 0.6966116005423113,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 16,
+          "brier": 0.25173171522284715,
+          "previousBrier": 0.2496212295924563,
+          "bookBrier": 0.25173171522284715,
+          "logLoss": 0.6966116005423113,
+          "previousLogLoss": 0.6923893963745228,
+          "bookLogLoss": 0.6966116005423113,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 17,
+      "scores": {
+        "n": 16,
+        "brier": 0.2520181886721781,
+        "previousBrier": 0.2533253360470679,
+        "bookBrier": 0.2520181886721781,
+        "logLoss": 0.6971854217867195,
+        "previousLogLoss": 0.6998093210432484,
+        "bookLogLoss": 0.6971854217867195,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.4375,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": 0.013215153970379123,
+        "unsignedVolume": 0.011410745462442392,
+        "retained": 0.0018691986740677763,
+        "allLiquidity": 0.013266420629059288
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 16,
+          "brier": 0.2520181886721781,
+          "previousBrier": 0.2533253360470679,
+          "bookBrier": 0.2520181886721781,
+          "logLoss": 0.6971854217867195,
+          "previousLogLoss": 0.6998093210432484,
+          "bookLogLoss": 0.6971854217867195,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2520181886721781,
+          "previousBrier": 0.2533253360470679,
+          "bookBrier": 0.2520181886721781,
+          "logLoss": 0.6971854217867195,
+          "previousLogLoss": 0.6998093210432484,
+          "bookLogLoss": 0.6971854217867195,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2520181886721781,
+          "previousBrier": 0.2533253360470679,
+          "bookBrier": 0.2520181886721781,
+          "logLoss": 0.6971854217867195,
+          "previousLogLoss": 0.6998093210432484,
+          "bookLogLoss": 0.6971854217867195,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 16,
+          "brier": 0.2520181886721781,
+          "previousBrier": 0.2533253360470679,
+          "bookBrier": 0.2520181886721781,
+          "logLoss": 0.6971854217867195,
+          "previousLogLoss": 0.6998093210432484,
+          "bookLogLoss": 0.6971854217867195,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    },
+    {
+      "week": 18,
+      "scores": {
+        "n": 16,
+        "brier": 0.2472682583120085,
+        "previousBrier": 0.2486290650491521,
+        "bookBrier": 0.2472682583120085,
+        "logLoss": 0.6876809220430795,
+        "previousLogLoss": 0.6904064898302432,
+        "bookLogLoss": 0.6876809220430795,
+        "bookImprovementInterval": null,
+        "previousImprovementInterval": null,
+        "simultaneousBookInterval": null
+      },
+      "overRate": 0.5,
+      "meanDelta": 0,
+      "meanLinearExcess": 0,
+      "meanQuadraticExcess": 0,
+      "changed": 0,
+      "meanBlockLogits": {
+        "coverage": 0.00567991813527002,
+        "unsignedVolume": 0.001981757897585678,
+        "retained": 0.0006964267850864383,
+        "allLiquidity": 0.0026989387061368306
+      },
+      "fixedFitFixedFeedbackAblations": {
+        "noCoverage": {
+          "n": 16,
+          "brier": 0.2472682583120085,
+          "previousBrier": 0.2486290650491521,
+          "bookBrier": 0.2472682583120085,
+          "logLoss": 0.6876809220430795,
+          "previousLogLoss": 0.6904064898302432,
+          "bookLogLoss": 0.6876809220430795,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2472682583120085,
+          "previousBrier": 0.2486290650491521,
+          "bookBrier": 0.2472682583120085,
+          "logLoss": 0.6876809220430795,
+          "previousLogLoss": 0.6904064898302432,
+          "bookLogLoss": 0.6876809220430795,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrUnsignedVolume": {
+          "n": 16,
+          "brier": 0.2472682583120085,
+          "previousBrier": 0.2486290650491521,
+          "bookBrier": 0.2472682583120085,
+          "logLoss": 0.6876809220430795,
+          "previousLogLoss": 0.6904064898302432,
+          "bookLogLoss": 0.6876809220430795,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        },
+        "noCoverageOrLiquidity": {
+          "n": 16,
+          "brier": 0.2472682583120085,
+          "previousBrier": 0.2486290650491521,
+          "bookBrier": 0.2472682583120085,
+          "logLoss": 0.6876809220430795,
+          "previousLogLoss": 0.6904064898302432,
+          "bookLogLoss": 0.6876809220430795,
+          "bookImprovementInterval": null,
+          "previousImprovementInterval": null,
+          "simultaneousBookInterval": null
+        }
+      }
+    }
+  ],
+  "largestLosses": [
+    {
+      "id": "2025_10_BAL_MIN",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.49344841736968026,
+      "p": 0.5247187082644741,
+      "delta": 0.013884472078125154,
+      "reliabilityWeight": 1,
+      "excess": 0.014378105942647712,
+      "linear": 0.014185327377759504,
+      "quadratic": 0.00019277856488823705,
+      "contributions": {
+        "coverage": 0.01750788171501543,
+        "unsignedVolume": 0.024264194864431626,
+        "retained": 0.013839697540060793,
+        "allLiquidity": 0.038073317387323766
+      },
+      "ablations": {
+        "noCoverage": 0.5203506566107542,
+        "noUnsignedVolume": 0.5186641509738992,
+        "noCoverageOrUnsignedVolume": 0.5142919624079506,
+        "noCoverageOrLiquidity": 0.5108418763491935
+      }
+    },
+    {
+      "id": "2025_10_PIT_LAC",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4891657638136511,
+      "previous": 0.48165741319768546,
+      "p": 0.503055916595451,
+      "delta": 0.013890152781799892,
+      "reliabilityWeight": 1,
+      "excess": 0.013782110734296665,
+      "linear": 0.01358917438999491,
+      "quadratic": 0.00019293634430174325,
+      "contributions": {
+        "coverage": 0.01750788171501543,
+        "unsignedVolume": 0.024264194864431626,
+        "retained": 0.013795471225243026,
+        "allLiquidity": 0.038073317387323766
+      },
+      "ablations": {
+        "noCoverage": 0.498678987292001,
+        "noUnsignedVolume": 0.49698994229502996,
+        "noCoverageOrUnsignedVolume": 0.4926134729254946,
+        "noCoverageOrLiquidity": 0.48916235259214197
+      }
+    },
+    {
+      "id": "2025_10_PHI_GB",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5043297540699689,
+      "previous": 0.4776561789794431,
+      "p": 0.5170309848894086,
+      "delta": 0.012701230819439635,
+      "reliabilityWeight": 1,
+      "excess": 0.012972538495436503,
+      "linear": 0.012811217231107803,
+      "quadratic": 0.00016132126432868323,
+      "contributions": {
+        "coverage": 0.018100742657062352,
+        "unsignedVolume": 0.011655786098843757,
+        "retained": 0.021074326159250673,
+        "allLiquidity": 0.03279744106667154
+      },
+      "ablations": {
+        "noCoverage": 0.5125097791003547,
+        "noUnsignedVolume": 0.5141198742520211,
+        "noCoverageOrUnsignedVolume": 0.5095972649392071,
+        "noCoverageOrLiquidity": 0.5043129231251222
+      }
+    },
+    {
+      "id": "2025_10_LV_DEN",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5,
+      "previous": 0.5011981111533605,
+      "p": 0.5112235950487296,
+      "delta": 0.011223595048729607,
+      "reliabilityWeight": 1,
+      "excess": 0.011349564134547463,
+      "linear": 0.011223595048729607,
+      "quadratic": 0.00012596908581786773,
+      "contributions": {
+        "coverage": 0.018100742657062352,
+        "unsignedVolume": 0.02073925806375739,
+        "retained": 0.0060619221599540266,
+        "allLiquidity": 0.026806560098086976
+      },
+      "ablations": {
+        "noCoverage": 0.5066998940144188,
+        "noUnsignedVolume": 0.5060403723256989,
+        "noCoverageOrUnsignedVolume": 0.5015154758992378,
+        "noCoverageOrLiquidity": 0.49999865503140606
+      }
+    },
+    {
+      "id": "2025_12_BUF_HOU",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5122309892805897,
+      "p": 0.5214343182967317,
+      "delta": 0.01060008211038277,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.010942131437486735,
+      "linear": 0.010829769696739927,
+      "quadratic": 0.00011236174074685681,
+      "contributions": {
+        "coverage": 0.010556076647055478,
+        "unsignedVolume": 0.01894978505076328,
+        "retained": 0.01938534746936533,
+        "allLiquidity": 0.03829107870996741
+      },
+      "ablations": {
+        "noCoverage": 0.5191472472411478,
+        "noUnsignedVolume": 0.5173279635136457,
+        "noCoverageOrUnsignedVolume": 0.5150392136900052,
+        "noCoverageOrLiquidity": 0.5108437944312978
+      }
+    },
+    {
+      "id": "2025_12_NYJ_BAL",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5173641257162701,
+      "previous": 0.5021412972543099,
+      "p": 0.5276242431954191,
+      "delta": 0.010260117479149011,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.010721703429378227,
+      "linear": 0.0106164334186923,
+      "quadratic": 0.00010527001068593906,
+      "contributions": {
+        "coverage": 0.010556076647055478,
+        "unsignedVolume": 0.020382676941177066,
+        "retained": 0.016432601639858734,
+        "allLiquidity": 0.03685306367152603
+      },
+      "ablations": {
+        "noCoverage": 0.5253399629432979,
+        "noUnsignedVolume": 0.5232123839313912,
+        "noCoverageOrUnsignedVolume": 0.5209257442549535,
+        "noCoverageOrLiquidity": 0.5173559336114556
+      }
+    },
+    {
+      "id": "2025_10_NO_CAR",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5045655826554039,
+      "p": 0.5208873051284015,
+      "delta": 0.010053068942052601,
+      "reliabilityWeight": 1,
+      "excess": 0.010371967783837921,
+      "linear": 0.010270903588684295,
+      "quadratic": 0.0001010641951536626,
+      "contributions": {
+        "coverage": 0.01750788171501543,
+        "unsignedVolume": 0.015185486841428685,
+        "retained": 0.007560774777585264,
+        "allLiquidity": 0.02280432775676603
+      },
+      "ablations": {
+        "noCoverage": 0.516516486301147,
+        "noUnsignedVolume": 0.5170964289774261,
+        "noCoverageOrUnsignedVolume": 0.5127233786429451,
+        "noCoverageOrLiquidity": 0.5108197264586293
+      }
+    },
+    {
+      "id": "2025_12_PHI_DAL",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5217391304347826,
+      "previous": 0.5130948428519535,
+      "p": 0.5312580084206059,
+      "delta": 0.009518877985823293,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.010023351284185467,
+      "linear": 0.00993274224607648,
+      "quadratic": 0.00009060903810899132,
+      "contributions": {
+        "coverage": 0.010278329050461311,
+        "unsignedVolume": 0.0228214033587857,
+        "retained": 0.01088416048231531,
+        "allLiquidity": 0.03375059815485267
+      },
+      "ablations": {
+        "noCoverage": 0.529035713095128,
+        "noUnsignedVolume": 0.5263218987287668,
+        "noCoverageOrUnsignedVolume": 0.524096702624889,
+        "noCoverageOrLiquidity": 0.5217293733277037
+      }
+    },
+    {
+      "id": "2025_12_CAR_SF",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5033066252036886,
+      "p": 0.5203945971478677,
+      "delta": 0.009560360961518799,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.009858919880601003,
+      "linear": 0.009767519378886489,
+      "quadratic": 0.00009140050171453266,
+      "contributions": {
+        "coverage": 0.010278329050461311,
+        "unsignedVolume": 0.0228214033587857,
+        "retained": 0.010991996906292911,
+        "allLiquidity": 0.03375059815485267
+      },
+      "ablations": {
+        "noCoverage": 0.5181672634612766,
+        "noUnsignedVolume": 0.515447970613595,
+        "noCoverageOrUnsignedVolume": 0.5132188353956872,
+        "noCoverageOrLiquidity": 0.5108478622002764
+      }
+    },
+    {
+      "id": "2025_12_NE_CIN",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5173641257162701,
+      "previous": 0.500396013784267,
+      "p": 0.5257692930516444,
+      "delta": 0.00840516733537433,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.008767710937865436,
+      "linear": 0.008697064099929784,
+      "quadratic": 0.00007064683793564363,
+      "contributions": {
+        "coverage": 0.010556076647055478,
+        "unsignedVolume": 0.013616932223017134,
+        "retained": 0.014625813431184964,
+        "allLiquidity": 0.028326350503812468
+      },
+      "ablations": {
+        "noCoverage": 0.5234839630791915,
+        "noUnsignedVolume": 0.5228210794905072,
+        "noCoverageOrUnsignedVolume": 0.5205342534155247,
+        "noCoverageOrLiquidity": 0.5173459995128726
+      }
+    },
+    {
+      "id": "2025_12_ATL_NO",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4826358742837298,
+      "previous": 0.4832188333360683,
+      "p": 0.4914096136190007,
+      "delta": 0.008773739335270925,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.008546021211555371,
+      "linear": 0.008469042709632066,
+      "quadratic": 0.00007697850192328029,
+      "contributions": {
+        "coverage": 0.011162242843100051,
+        "unsignedVolume": 0.0228214033587857,
+        "retained": 0.006461285634370763,
+        "allLiquidity": 0.02930102242584446
+      },
+      "ablations": {
+        "noCoverage": 0.4889873630970442,
+        "noUnsignedVolume": 0.4864578620400912,
+        "noCoverageOrUnsignedVolume": 0.4840368832226253,
+        "noCoverageOrLiquidity": 0.48263189945519547
+      }
+    },
+    {
+      "id": "2025_12_IND_KC",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4956702459300312,
+      "previous": 0.4705175389598202,
+      "p": 0.5034845767787302,
+      "delta": 0.00781433084869898,
+      "reliabilityWeight": 0.868278080892233,
+      "excess": 0.00780772635371943,
+      "linear": 0.007746662587106505,
+      "quadratic": 0.00006106376661292853,
+      "contributions": {
+        "coverage": 0.010556076647055478,
+        "unsignedVolume": 0.01894978505076328,
+        "retained": 0.006494322637687981,
+        "allLiquidity": 0.025502414963064532
+      },
+      "ablations": {
+        "noCoverage": 0.5011932825033609,
+        "noUnsignedVolume": 0.49937127394893144,
+        "noCoverageOrUnsignedVolume": 0.4970798944016011,
+        "noCoverageOrLiquidity": 0.49565759015019534
+      }
+    }
+  ],
+  "warnings": [
+    "These fixed-coefficient, fixed-feedback ablations are diagnosis only; the requested removal will refit both coefficients and honest feedback independently.",
+    "Previously inspected seasons remain reused research and cannot establish untouched validation."
+  ]
+}

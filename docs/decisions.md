@@ -183,3 +183,178 @@ Treat every attempted report as immutable outbound content. Freeze its entire re
 Use independent Settings section revisions checked against SQLite, including background/derived changes. Preserve pending edits on conflict and reload one section only after an owner action. Keep the legacy full-settings API for compatibility, while the dashboard requires revisioned section writes.
 
 Use lightweight live state and cursor-paged report summaries, fetching bodies for review. Keep provider-boundary browser substitutes while exercising production routers and real temporary SQLite. Preserve package public imports while splitting domain/persistence modules and focused Settings hooks. Consolidate CSS tokens and remove superseded exact-selector declarations without changing cascade order.
+
+## Durable local operations
+
+Use one saved request contract for dashboard and MCP generation. A retry after a lost response
+must resolve the original request rather than starting paid inference again. Compact terminal
+receipts have no automatic expiry; failed/interrupted/cancelled jobs require a new ID for a
+deliberate retry. Cancellation aborts adapters and guards the save transaction, preserving
+completed reports and refusing late publication. Schema 6 indexes report summaries and skips
+unrelated row serialization/writes while preserving the existing domain-cache API.
+
+Use hash URLs for pages, leagues, and report review because the desktop serves a static Vite
+bundle. Guard browser history as well as menu navigation against unsaved Settings/report loss.
+
+Keep routine backup scheduling machine-local, separate from portable restored settings. Store
+only non-secret schedule/status on disk and the exact recovery passphrase in the OS credential
+store. Authenticate, parse, and validate every new encrypted archive before rotation. Do not
+expire safety copies through routine rotation. Dry-run restore validation operates on a private
+disposable database, preserving current data. Diagnostic downloads omit free-form log strings
+and sensitive domain text; correlation IDs are independently generated UUIDs.
+
+## Plain-language local navigation search
+
+For users who do not know the app's technical labels, settings search uses a reviewed catalog of
+natural aliases and typed destinations. Deterministic local ranking gives immediate results,
+works without an AI account, and avoids sending queries or private settings to a model. A result
+opens and highlights a control; it never changes it. Explicit anchors and bookmarkable setting
+URLs are shared by mouse, keyboard, reload, and history navigation.
+
+Saved report search is metadata-only and uses bounded local SQL lookup beyond the dashboard's
+recent report window. Full-text message/body search, natural-language account changes, and
+remote/AI-assisted search are outside this scope. Small typo tolerance is available for catalog
+and recent metadata matching; historical SQL lookup treats title/type words literally.
+
+## Guide everyday tasks while keeping advanced control
+
+Present Home, Reports, Schedule, and Settings as the main workflow; secondary tools
+remain searchable and available through More tools. Preserve route keys and stored
+writing-style values to avoid breaking existing bookmarks and customization. Guided AI
+setup offers one starting connection with billing and data-sharing guidance, tests
+existing connections without replacing them, and keeps alternative providers available.
+Individual schedule presets always return to draft review. Sending is a distinct
+confirmation after the exact destination and saved text are shown. Failure details
+stay expandable, and sticky settings feedback stays visible without covering dialogs.
+
+## Task-first discovery without silent execution
+
+Use bounded local task interpretation plus exact settings/help destinations rather
+than sending search queries to a remote AI. Preserve negation, named report/channel
+scope, and explicit save/confirmation. Schedule proposals start in draft mode, and
+a changed delivery revision requires a new recipient preview. Keep sample examples
+fictional and isolated from real data and jobs. Manual sharing must not change
+provider delivery state. Human usability validation and managed account infrastructure
+remain separate from automated local workflow checks.
+
+Reject compound delivery channels and unsupported schedule cadence rather than
+silently selecting a channel or converting the request to weekly. Bind manual
+sharing feedback to its text snapshot, including late browser API completions.
+When a dialog replaces a focused control, restore focus to its container instead
+of letting subsequent keyboard events reach the background page.
+
+Use friendly timezone labels only at the presentation boundary, preserving stored
+IANA identifiers and configured custom choices. Non-weekly search guidance is a
+non-mutating Schedule page destination, not a prefilled or saved cadence. Expose
+delivery channel and policy labels with full-width phone controls so review policy
+is readable before a user saves.
+
+Keep keyboard search closed while another dialog is active, preserving unfinished
+work and focus. Shared dialogs (including guided setup) lock background scrolling
+until the last dialog closes and restore the prior body styles. Report refreshes
+are scoped to the selected report and editing session; cancel background refreshes
+when either changes and ignore stale retry/post-send results. Wrap long titles and
+league names inside the review rather than allowing horizontal scrolling.
+
+Give saved report reviews a sticky title/status and Close control, with metadata
+behind a native Details disclosure. Keep missing data dates visible in its summary
+and evidence guidance separately reachable. Deduplicate only when the literal saved
+body equals the delivery text and the reading view has no citation-link conversion.
+Keep separate exact previews while editing, after channel truncation, or when a saved
+retry envelope differs. Recipient, subject, retry warnings, and explicit confirmation
+remain visible; this presentation change does not alter sending or revision checks.
+
+Scope draft-save responses and status feedback to the editing session that submitted
+them, including failures and completion after navigation. Lock title/body and cancel
+editing during a save; explicitly explain that closing leaves the pending save
+running. Refresh persisted state after completion without replacing another review.
+
+Share one delivery-text policy between browser previews, newly captured delivery
+envelopes, and direct sends. Retain existing UTF-16 size caps (1500 direct SMS, 1600
+for a valid Twilio Conversation SID, 10000 iMessage) but shorten only at grapheme
+boundaries so emoji, combining accents, and joined characters remain intact. Retry
+with the existing immutable envelope without shortening it again.
+
+Retain dialog keyboard focus when its current control becomes disabled, as well as
+when that control is removed. Observe disabled-attribute changes and move focus to
+the dialog only if the browser has dropped it to the background body.
+
+Use one explicit draft-edit path for the top Edit button and the shortening shortcut.
+The shortcut focuses the full saved body rather than changing or saving text. Keep
+its visibility tied to editable drafts and its disabled state tied to sending/saving.
+Render friendly delivery labels only at the presentation boundary, preserving channel
+IDs, destinations, envelopes, revision checks, and explicit send confirmation.
+
+## Public price snapshots and independent prospective ledger
+
+Use keyless public ESPN structured current pregame prices for the initial
+moneyline/spread/total coverage. Preserve source and retrieval time, require an
+explicit choice and exact-term verification, and retain manual entry for coverage
+gaps/props. Public coverage and executable fills are not guaranteed. Keep archived
+prices separate; they have no verified publication timestamps or book identity.
+
+Persist pre-kickoff predictions in an independent bounded SQLite table rather
+than rebuilding performance from retained advice. Never backdate forecasts or
+choose a retry after seeing its outcome. Grade against verified final games and
+complete supported scoring; missing appearances stay unknown. Paper results are
+hypothetical one-unit selections, not wagers. A fixed chronological archived-price
+simulation is supplementary evidence; historical outcomes existed during method
+development, so its later season is not called an untouched holdout. Preserve
+negative findings and require future outcomes before claiming prospective quality.
+
+## Book-anchored corrections instead of unsupported scores-only market confidence
+
+The paired-price game model uses the sportsbook as an explicit input and learns
+small penalized adjustments from earlier opponents/scoring and book calibration.
+Choose parameter procedures on older development seasons before viewing later
+comparison results. Compare each historical game at its own line with the matched
+book probability and prior model, reporting missing coverage and weekly
+uncertainty. Do not call a reused historical comparison untouched or prospective.
+Generic frequency improvement alone cannot support a current game-market edge.
+Keep legacy/prop numerical paths and saved method identities without regrading
+old predictions. The independent scores-only candidate is documented research;
+large improvement from book inputs is not independent market prediction.
+
+## Past-only context corrections and adaptive moneyline blending
+
+V3 adds schedule rest, season phase, selected line context and earlier team errors
+against their own archived lines to the book-anchored correction. Exclude same
+week/target/future outcomes, including when computing context and blending weights.
+Learn moneyline correction strength from earlier out-of-week probability losses,
+with a fixed penalty toward the book and weights restricted to zero through one.
+Choose the prediction rule using older development probability error, never later
+paper returns. Preserve the previous market-aware method for matched comparisons
+and keep all saved methods separate. A pooled small improvement with mixed
+season/market findings and an interval spanning zero does not satisfy consistent
+sportsbook superiority. Require future pre-kickoff evidence before such a claim.
+
+## Health, quarterback and weather corrections
+
+Choose additional market corrections using older-season probability error and
+retain prior procedures where they perform better. The health/weather joint
+correction is enabled only for totals; moneyline/spread retain v3. Learn bounded
+regularized effects rather than assigning guessed injury point penalties.
+
+Require publication/capture evidence before kickoff. Retrieval never repairs an
+undated historical report. Previous QB identity must come from an earlier completed
+game; a captured chart listing is not a confirmed starter. Regional forecast lead
+and an explicit availability allowance must be disclosed; observed game weather
+is not a historical pregame feature. Exclude covered/retractable venues.
+
+Current dated ESPN labels can supply missing team-level injury context, excluding
+IR, with the unverified historical vendor bridge disclosed. Missing inputs stay
+unknown and do not establish health or market advantage. Preserve old saved model
+methods and unchanged action gates. [Evidence](reviews/2026-10-12-model-v4-comparison.md).
+
+## Preserve prediction quality when better sources do not improve it
+
+Prefer dated official injury articles as descriptive current evidence, but do not
+authorize their later edits using an early original publication date. New source
+coverage and richer player metrics do not imply a measured prediction advantage.
+The snap-role and QB-efficiency candidates lose to the existing procedures on
+older development; the official-count counterfactual raises later measured error.
+Keep these numerical effects disabled and retain v3/v4. Expose the source and
+research limits in Advice/Help. Avoid bulk historical downloads for disabled
+features; capture only relevant current-season/previous-season descriptive roles.
+Keep explicit research replay separate from HTTP/live dispatch, and preserve
+future pre-kickoff numerical records unchanged for later grading.

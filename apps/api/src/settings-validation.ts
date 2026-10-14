@@ -1,3 +1,4 @@
+import { isAbsolute } from 'node:path';
 import type { LocalStore } from './store.js';
 import {
   isLeagueStaleAfterHours,
@@ -92,6 +93,9 @@ export function isValidSettingsUpdate(value: unknown, leagueIds: ReadonlySet<str
     emailRecipient,
     smsRecipient,
     imessageChatGuid,
+    imessageProvider,
+    imsgExecutablePath,
+    imsgChatId,
     imessageOwnerName,
     imessageAutoSyncEnabled,
     imessageSyncIntervalMinutes,
@@ -151,6 +155,17 @@ export function isValidSettingsUpdate(value: unknown, leagueIds: ReadonlySet<str
     optionalAddress(emailRecipient) &&
     optionalAddress(smsRecipient) &&
     optionalChatGuid(imessageChatGuid) &&
+    (imessageProvider === undefined ||
+      imessageProvider === 'imsg' ||
+      imessageProvider === 'bluebubbles') &&
+    (imsgExecutablePath === undefined ||
+      imsgExecutablePath === '' ||
+      (typeof imsgExecutablePath === 'string' &&
+        imsgExecutablePath.length <= 2000 &&
+        isAbsolute(imsgExecutablePath) &&
+        !/[\u0000-\u001f]/.test(imsgExecutablePath))) &&
+    (imsgChatId === undefined ||
+      (typeof imsgChatId === 'number' && Number.isSafeInteger(imsgChatId) && imsgChatId > 0)) &&
     (imessageOwnerName === undefined ||
       (typeof imessageOwnerName === 'string' &&
         Boolean(imessageOwnerName.trim()) &&

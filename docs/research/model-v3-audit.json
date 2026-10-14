@@ -1,0 +1,161 @@
+{
+  "method": "market-context-v3",
+  "source": {
+    "snapshotSha256": "c2323a79d0abfe38c10f577520bec65718c5f62cbf618b323b1a1c5a19c94092",
+    "publicationTimingVerified": false
+  },
+  "scoredAt": "2026-10-12T09:12:46.552Z",
+  "pooled": {
+    "games": 3221,
+    "brier": 0.23660618137197145,
+    "v2Brier": 0.2367841936631604,
+    "bookBrier": 0.23666634848761556,
+    "bookImprovementInterval": [-0.0004272762666125158, 0.000547610497896308],
+    "v2ImprovementInterval": [-0.0001460657110773859, 0.0005020902934561542]
+  },
+  "markets": [
+    {
+      "season": 2022,
+      "kind": "moneyline",
+      "games": 269,
+      "brier": 0.21083148660671813,
+      "v2Brier": 0.21103165122747372,
+      "bookBrier": 0.21082110150076128,
+      "bookImprovementInterval": [-0.00008145378573287213, 0.000060683573819289185],
+      "v2ImprovementInterval": [-0.0004006184476940402, 0.000800947689205488],
+      "simultaneousBookInterval": [-0.00011427953869271184, 0.0000935093267791289]
+    },
+    {
+      "season": 2022,
+      "kind": "spread",
+      "games": 261,
+      "brier": 0.24819035213566945,
+      "v2Brier": 0.24867201206519962,
+      "bookBrier": 0.24853204884571245,
+      "bookImprovementInterval": [-0.0011797641965650006, 0.0018631576166504098],
+      "v2ImprovementInterval": [-0.0002759596913813933, 0.0012392795504414353],
+      "simultaneousBookInterval": [-0.0018825083591935497, 0.002565901779278959]
+    },
+    {
+      "season": 2022,
+      "kind": "total",
+      "games": 268,
+      "brier": 0.2489232110182635,
+      "v2Brier": 0.24893114409667957,
+      "bookBrier": 0.2502122792134749,
+      "bookImprovementInterval": [0.00007887966529604722, 0.0024992567251268328],
+      "v2ImprovementInterval": [-0.0005437006214045157, 0.0005595667782364251],
+      "simultaneousBookInterval": [-0.00048009159803681254, 0.0030582279884596927]
+    },
+    {
+      "season": 2023,
+      "kind": "moneyline",
+      "games": 272,
+      "brier": 0.21871339632507586,
+      "v2Brier": 0.21893375991377173,
+      "bookBrier": 0.2187095146255924,
+      "bookImprovementInterval": [-0.00020249363749350751, 0.0001947302385270641],
+      "v2ImprovementInterval": [-0.0008357059624278872, 0.0012764331398197938],
+      "simultaneousBookInterval": [-0.00029423005967754414, 0.00028646666071110066]
+    },
+    {
+      "season": 2023,
+      "kind": "spread",
+      "games": 258,
+      "brier": 0.2507307155465004,
+      "v2Brier": 0.25039819099216454,
+      "bookBrier": 0.2500004625992449,
+      "bookImprovementInterval": [-0.002748466611214381, 0.0012879607167032804],
+      "v2ImprovementInterval": [-0.0013116481552514275, 0.0006465990465794135],
+      "simultaneousBookInterval": [-0.0036806547897765903, 0.0022201488952654897]
+    },
+    {
+      "season": 2023,
+      "kind": "total",
+      "games": 270,
+      "brier": 0.24823442170774404,
+      "v2Brier": 0.24944177890233046,
+      "bookBrier": 0.25006922521405495,
+      "bookImprovementInterval": [-0.001129418014648076, 0.004799025027270158],
+      "v2ImprovementInterval": [0.000018672560143343777, 0.002396041829029771],
+      "simultaneousBookInterval": [-0.0024985556385890397, 0.006168162651211122]
+    },
+    {
+      "season": 2024,
+      "kind": "moneyline",
+      "games": 272,
+      "brier": 0.20009656252586755,
+      "v2Brier": 0.19973773319562085,
+      "bookBrier": 0.20016161878885597,
+      "bookImprovementInterval": [-0.00007815935246329303, 0.00020827187844046425],
+      "v2ImprovementInterval": [-0.0013497387471484846, 0.0006320800866551168],
+      "simultaneousBookInterval": [-0.0001443088915799184, 0.00027442141755708966]
+    },
+    {
+      "season": 2024,
+      "kind": "spread",
+      "games": 268,
+      "brier": 0.25092003543216984,
+      "v2Brier": 0.25134128915378207,
+      "bookBrier": 0.25107183948242473,
+      "bookImprovementInterval": [-0.0010621486679036165, 0.001365756768413403],
+      "v2ImprovementInterval": [-0.0007186115593288501, 0.0015611190025530443],
+      "simultaneousBookInterval": [-0.001622858563693871, 0.0019264666642036575]
+    },
+    {
+      "season": 2024,
+      "kind": "total",
+      "games": 269,
+      "brier": 0.251140121816382,
+      "v2Brier": 0.2511828343993818,
+      "bookBrier": 0.24977944777848365,
+      "bookImprovementInterval": [-0.003875018376260248, 0.0011536703004635742],
+      "v2ImprovementInterval": [-0.0012006513158624341, 0.0012860764818617518],
+      "simultaneousBookInterval": [-0.005036363238259757, 0.002315015162463083]
+    },
+    {
+      "season": 2025,
+      "kind": "moneyline",
+      "games": 271,
+      "brier": 0.21221429694628238,
+      "v2Brier": 0.2122383886045877,
+      "bookBrier": 0.21213896835079188,
+      "bookImprovementInterval": [-0.0002601317080172819, 0.00010947451703686395],
+      "v2ImprovementInterval": [-0.0004801710106979896, 0.0005283543273092208],
+      "simultaneousBookInterval": [-0.0003454900027982814, 0.0001948328118178635]
+    },
+    {
+      "season": 2025,
+      "kind": "spread",
+      "games": 271,
+      "brier": 0.2500252881532331,
+      "v2Brier": 0.24961284405332546,
+      "bookBrier": 0.24958671312680858,
+      "bookImprovementInterval": [-0.0014889906399807719, 0.0006118405871312852],
+      "v2ImprovementInterval": [-0.0013808088972888121, 0.0005559206974734478],
+      "simultaneousBookInterval": [-0.001974164749650299, 0.001097014696800812]
+    },
+    {
+      "season": 2025,
+      "kind": "total",
+      "games": 272,
+      "brier": 0.2507625762340612,
+      "v2Brier": 0.25138764757212056,
+      "bookBrier": 0.2504056398371012,
+      "bookImprovementInterval": [-0.003403893434707231, 0.002690020640787369],
+      "v2ImprovementInterval": [-0.001343734694739175, 0.0025938773708585423],
+      "simultaneousBookInterval": [-0.004811245580764696, 0.004097372786844833]
+    }
+  ],
+  "consistency": {
+    "comparisons": 12,
+    "beatsBook": 5,
+    "beatsV2": 9,
+    "simultaneousPositive": 0
+  },
+  "warnings": [
+    "Reused retrospective archive; not an untouched or prospective holdout. Odds are an explicit model input.",
+    "Lower Brier measures probability accuracy, not betting profitability. Mixed season/market results cannot establish consistent superiority.",
+    "Intervals cluster all outcomes by NFL season/week. Individual 95% intervals are nominal; simultaneous intervals use a fixed Bonferroni normal approximation for twelve season/market comparisons."
+  ]
+}

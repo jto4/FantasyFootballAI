@@ -1,4 +1,13 @@
-import type { AppSettings, SavedReport, ReportSummary } from '@sidekick/core';
+import type { AppSettings, SavedReport, ReportSummary, ActionSetting } from '@sidekick/core';
+
+export function deliveryChannelLabel(channel: ActionSetting['channel']): string {
+  return {
+    email: 'Email',
+    sms: 'Text message',
+    imessage: 'iMessage',
+    dashboard: 'In-app only',
+  }[channel];
+}
 export function reportStatus(report: ReportSummary): string {
   if (report.status === 'sent') return 'Sent';
   if (report.deliveryState === 'sending') return 'Sending';

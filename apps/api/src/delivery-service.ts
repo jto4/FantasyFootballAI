@@ -1,7 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { deliveryText } from '@sidekick/core';
 import type { SavedReport, DeliveryEnvelope, MessageChannel } from '@sidekick/core';
 import {
   BlueBubblesChannel,
+  ImsgChannel,
+  resolveImsgExecutable,
+  isImsgChatGuid,
   DeliveryFailure,
   ResendChannel,
   TwilioChannel,
@@ -17,6 +21,7 @@ export interface DeliveryDependencies {
   store: LocalStore;
   readCredential: (provider: CredentialProvider) => Promise<string | null>;
   deliveryGuard: DeliveryGuard;
+  resolveImsg?: (path?: string) => Promise<string>;
   channels?: Partial<
     Record<
       DeliveryEnvelope['channel'],
@@ -29,6 +34,7 @@ export function createDeliveryService({
   readCredential,
   deliveryGuard,
   channels,
+  resolveImsg = resolveImsgExecutable,
 }: DeliveryDependencies) {
   async function deliver(
     report: { title: string; body: string },
@@ -100,7 +106,7 @@ export function createDeliveryService({
           new TwilioConversationsChannel(config.accountSid, config.authToken)
         ).send({
           to: recipient,
-          body: report.body.slice(0, 1_600),
+          body: envelope?.body ?? deliveryText(report.body, 'sms', recipient),
         });
       }
       if (typeof config.from !== 'string')
@@ -110,10 +116,36 @@ export function createDeliveryService({
         new TwilioChannel(config.accountSid, config.authToken, config.from)
       ).send({
         to: recipient,
-        body: report.body.slice(0, 1500),
+        body: envelope?.body ?? deliveryText(report.body, 'sms', recipient),
       });
     }
     if (channel === 'imessage') {
+      const settings = store.settingsSnapshot();
+      if (settings.imessageProvider === 'imsg') {
+        if (!recipient || !isImsgChatGuid(recipient))
+          throw new DeliveryFailure('Choose a valid iMessage chat GUID for imsg.', false);
+        const executable = await resolveImsg(settings.imsgExecutablePath);
+        if (
+          (store.settingsSnapshot().imessageProvider ?? 'bluebubbles') !== 'imsg' ||
+          store.settingsSnapshot().imsgExecutablePath !== settings.imsgExecutablePath ||
+          (envelope && envelope.providerIdentity !== `imsg:${executable}`)
+        )
+          throw new DeliveryFailure(
+            'The original iMessage provider or imsg executable changed. Restore its configuration before retrying.',
+            false,
+          );
+        return (
+          channels?.imessage?.({ executable }, recipient) ?? new ImsgChannel(executable)
+        ).send({
+          to: recipient,
+          body: envelope?.body ?? deliveryText(report.body, 'imessage', recipient),
+        });
+      }
+      if (envelope?.providerIdentity?.startsWith('imsg:'))
+        throw new DeliveryFailure(
+          'The original iMessage provider changed. Restore imsg before retrying.',
+          false,
+        );
       const config = parseSecret(await readCredential('bluebubbles'));
       if (typeof config.serverUrl !== 'string' || typeof config.serverPassword !== 'string')
         throw new Error('Configure a BlueBubbles server URL and password in Settings.');
@@ -127,7 +159,7 @@ export function createDeliveryService({
         new BlueBubblesChannel(config.serverUrl, config.serverPassword)
       ).send({
         to: recipient,
-        body: report.body.slice(0, 10_000),
+        body: envelope?.body ?? deliveryText(report.body, 'imessage', recipient),
       });
     }
     throw new Error('Unsupported delivery channel.');
@@ -146,6 +178,25 @@ export function createDeliveryService({
       throw new Error(
         'This older uncertain attempt has no saved delivery envelope. Check provider history; automatic retry is unavailable.',
       );
+    const nativeSettings = store.settingsSnapshot();
+    if (channel === 'imessage' && nativeSettings.imessageProvider === 'imsg') {
+      if (!recipient || !isImsgChatGuid(recipient))
+        throw new DeliveryFailure('Choose a valid iMessage chat GUID for imsg.', false);
+      const executable = await resolveImsg(nativeSettings.imsgExecutablePath);
+      if (
+        store.settingsSnapshot().imessageProvider !== 'imsg' ||
+        store.settingsSnapshot().imsgExecutablePath !== nativeSettings.imsgExecutablePath
+      )
+        throw new DeliveryFailure('The iMessage provider changed before delivery.', false);
+      return {
+        channel,
+        destination: recipient,
+        sender: '',
+        providerIdentity: `imsg:${executable}`,
+        subject: report.title,
+        body: deliveryText(report.body, channel, recipient),
+      };
+    }
     const config = parseSecret(
       await readCredential(
         channel === 'email' ? 'resend' : channel === 'sms' ? 'twilio' : 'bluebubbles',
@@ -184,12 +235,7 @@ export function createDeliveryService({
         ? { providerIdentity: config.serverUrl }
         : {}),
       subject: emailSubject ?? (replyToId ? `Re: ${report.title}` : report.title),
-      body:
-        channel === 'sms'
-          ? report.body.slice(0, /^CH/.test(destination) ? 1600 : 1500)
-          : channel === 'imessage'
-            ? report.body.slice(0, 10000)
-            : report.body,
+      body: deliveryText(report.body, channel, destination),
       ...(replyToId ? { replyToId } : {}),
     };
   }
@@ -284,6 +330,14 @@ export function createDeliveryService({
         recipient.length > 500 ||
         /[\r\n]/.test(recipient) ||
         (channel === 'sms' && !/^CH[0-9a-fA-F]{32}$/.test(recipient))
+      )
+        continue;
+      if (
+        channel === 'imessage' &&
+        draft.sourceMessageId &&
+        ((draft.sourceMessageId.startsWith('imsg:') && settings.imessageProvider !== 'imsg') ||
+          (draft.sourceMessageId.startsWith('bluebubbles:') &&
+            settings.imessageProvider === 'imsg'))
       )
         continue;
       const configuredDestination =

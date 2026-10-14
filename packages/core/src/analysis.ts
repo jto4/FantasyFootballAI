@@ -1,9 +1,26 @@
 import type { ReportKind, LeagueConnection, PlayerProjection } from './domain-types.js';
 import { leagueSeasonPhase, boundedSettingInteger } from './league-status.js';
+import { isProjectionPeriod, projectionPeriodMatchesWeek } from './projection-period.js';
+import { isInactiveFootballStatus } from './player-availability.js';
+
+function projectionMatchesReportPeriod(
+  projection: PlayerProjection,
+  league: LeagueConnection,
+  scope: 'season' | 'week',
+): boolean {
+  if (scope === 'season' ? projection.week !== undefined : projection.week === undefined)
+    return false;
+  const period = projection.period;
+  if (period === undefined) return true;
+  if (!isProjectionPeriod(period) || period.season !== league.season) return false;
+  return scope === 'season'
+    ? period.fromWeek === 1 && period.throughWeek === 18
+    : projectionPeriodMatchesWeek(period, projection.week);
+}
 export function analyzeLeague(league: LeagueConnection, kind: ReportKind, style: string) {
   const titleByKind: Record<ReportKind, string> = {
     'offseason-update': `${league.displayName}: offseason check-in`,
-    'draft-hype': `${league.displayName}: draft day is here`,
+    'draft-hype': `${league.displayName}: draft outlook`,
     'draft-review': `${league.displayName}: the draft receipts`,
     'power-rankings': `${league.displayName}: power rankings`,
     'matchup-preview': `${league.displayName}: matchup preview`,
@@ -95,7 +112,9 @@ function preseasonRosterProjectionEvidence(
   const sources = projectionSourceGroups(projections)
     .map((source) => ({
       ...source,
-      projections: source.projections.filter((projection) => projection.week === undefined),
+      projections: source.projections.filter((projection) =>
+        projectionMatchesReportPeriod(projection, league, 'season'),
+      ),
     }))
     .filter(
       (source) =>
@@ -171,6 +190,17 @@ export function reportEvidenceGuidance(
   kind: ReportKind,
   projections: PlayerProjection[] = [],
 ): string {
+  const season = Number.isInteger(league.season)
+    ? `League season: ${league.season}. `
+    : 'League season is not recorded. ';
+  return `${season}${reportEvidenceDetails(league, kind, projections)}`;
+}
+
+function reportEvidenceDetails(
+  league: LeagueConnection,
+  kind: ReportKind,
+  projections: PlayerProjection[] = [],
+): string {
   if (kind === 'power-rankings') {
     const { basis, tieBreaker } = rankTeams(league);
     const preseasonEvidence = basis
@@ -211,8 +241,22 @@ export function reportEvidenceGuidance(
       : hasRosterPlayers
         ? `Current roster players are available, but this snapshot has no draft pick log or pick order. Discuss current roster construction only; do not attribute players to draft rounds. ${draftProjectionEvidence(league, projections)}`
         : `This snapshot has no draft pick log or player-level roster data. Explain the data gap. ${draftProjectionEvidence(league, projections)}`;
-  if (kind === 'draft-hype')
-    return 'No draft date, draft order, or live draft room status is available. Keep this as general draft-day hype and do not invent logistics.';
+  if (kind === 'draft-hype') {
+    const draft = league.draft;
+    const status = draft?.status?.toLowerCase();
+    const scheduledAt = draft?.scheduledAt ?? league.draftScheduledAt;
+    const date =
+      scheduledAt && Number.isFinite(Date.parse(scheduledAt))
+        ? `The platform records a draft start of ${scheduledAt}; this is a recorded time, not proof the draft is currently live.`
+        : 'No confirmed draft start time is supplied.';
+    return `${date} ${
+      status === 'complete' || status === 'completed'
+        ? 'The supplied draft status is complete. Write a retrospective draft celebration or preparation for a future draft; do not say this draft is upcoming, today, or still accepting picks.'
+        : status
+          ? `Supplied draft status: ${JSON.stringify(status)}. Do not infer live draft-room access or unrecorded logistics.`
+          : 'Live draft status is unknown. Keep excitement general.'
+    } Logged draft slots describe the supplied draft only; do not present them as a future draft order.`;
+  }
   return hasRosterPlayers
     ? 'Current roster players are available, but there is no transaction history or historical roster snapshot. Keep offseason claims limited to current roster construction, standings, and supplied news.'
     : 'This snapshot has no transaction history or player-level roster data. Keep offseason claims general unless supported by the supplied standings or news.';
@@ -250,7 +294,9 @@ function draftProjectionEvidence(
   const seasonSources = projectionSourceGroups(projections)
     .map((source) => ({
       ...source,
-      projections: source.projections.filter((projection) => projection.week === undefined),
+      projections: source.projections.filter((projection) =>
+        projectionMatchesReportPeriod(projection, league, 'season'),
+      ),
     }))
     .filter((source) => source.projections.length > 0)
     .sort((left, right) => right.importedAt.localeCompare(left.importedAt));
@@ -262,7 +308,7 @@ function draftProjectionEvidence(
   if (!seasonProjections.length)
     return seasonSources.length
       ? 'Season projection files are available, but none is confirmed by the owner as matching this league’s scoring settings. Do not use their point totals, ADP, or positional baselines for draft grades.'
-      : 'Only week-specific projections were imported; there are no season projections for draft value analysis.';
+      : 'No matching full-season projections are available for draft value analysis; weekly, remaining and other-season intervals cannot supply draft grades.';
   const adpSources = scoringMatchedSources.filter((source) =>
     source.projections.some((projection) => projection.averageDraftPosition !== undefined),
   );
@@ -507,7 +553,9 @@ function matchupProjectionEvidence(
   const allWeeklySources = projectionSourceGroups(projections)
     .map((source) => ({
       ...source,
-      projections: source.projections.filter((projection) => projection.week !== undefined),
+      projections: source.projections.filter((projection) =>
+        projectionMatchesReportPeriod(projection, league, 'week'),
+      ),
     }))
     .filter((source) => source.projections.length > 0)
     .sort((left, right) => right.importedAt.localeCompare(left.importedAt));
@@ -538,6 +586,16 @@ function matchupProjectionEvidence(
     const sides = matchup.teams.slice(0, 2).map((team) => {
       const starters = matchupStarterIds(league, team.teamId, team.starters);
       if (starters.length === 0) return undefined;
+      const roster = league.teams.find((candidate) => candidate.id === team.teamId)?.roster ?? [];
+      if (
+        roster.some(
+          (player) =>
+            starters.includes(player.id) &&
+            (isInactiveFootballStatus(player.status) ||
+              isInactiveFootballStatus(player.injuryStatus)),
+        )
+      )
+        return undefined;
       const matched = starters.map((id) => byId.get(id));
       if (matched.some((projection) => projection === undefined)) return undefined;
       const total = matched.reduce((sum, projection) => sum + projection!.projectedPoints, 0);
@@ -547,7 +605,7 @@ function matchupProjectionEvidence(
     return [`week ${matchup.week}: ${sides[0]} vs ${sides[1]}`];
   });
   if (!estimates.length)
-    return 'Week-specific projections are imported, but no matchup has a complete starter-ID and projection match; do not estimate a team total or winner.';
+    return 'Week-specific projections are imported, but no matchup has a complete starter-ID, projection and eligible-availability match; do not estimate a team total or winner. A recorded Out or reserve starter requires an updated lineup; do not count their estimate or assume a zero-point replacement.';
   const sourcesText = [...selectedSources.values()]
     .map(
       (source) =>
@@ -712,12 +770,17 @@ function platformAvailabilityEvidence(league: LeagueConnection): string {
   ]);
   const statuses = league.teams.flatMap((team) =>
     (team.roster ?? []).flatMap((player) => {
-      const status = player.status
-        ?.trim()
-        .replace(/[\s_-]+/g, ' ')
-        .toUpperCase();
-      if (!status || !allowed.has(status)) return [];
-      return [`${JSON.stringify(player.name)}: ${JSON.stringify(status)}`];
+      const labels = [
+        ...new Set(
+          [player.status, player.injuryStatus].map((value) =>
+            value
+              ?.trim()
+              .replace(/[\s_-]+/g, ' ')
+              .toUpperCase(),
+          ),
+        ),
+      ].filter((value): value is string => Boolean(value && allowed.has(value)));
+      return labels.map((status) => `${JSON.stringify(player.name)}: ${JSON.stringify(status)}`);
     }),
   );
   if (!statuses.length)

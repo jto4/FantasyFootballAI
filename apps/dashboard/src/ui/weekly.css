@@ -1,0 +1,180 @@
+.weekly-home,
+.decision-summary,
+.data-readiness,
+.readiness-entry,
+.betting-research-entry,
+.advice-journal {
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.weekly-home-heading,
+.betting-research-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.weekly-home-heading label {
+  min-width: 220px;
+}
+.weekly-home label {
+  display: grid;
+  gap: 8px;
+}
+.weekly-home select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--surface);
+}
+.weekly-home-grid,
+.decision-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.decision-summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.weekly-home h3,
+.decision-summary h4 {
+  margin: 8px 0;
+}
+.weekly-home p,
+.decision-summary p,
+.data-readiness p {
+  line-height: 1.6;
+}
+.advice-journal article {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.advice-journal p,
+.data-readiness li {
+  overflow-wrap: anywhere;
+}
+.betting-research-entry h2 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.betting-research-entry p {
+  margin: 0;
+}
+.readiness-entry ul,
+.data-readiness ul {
+  padding-left: 20px;
+}
+@media (max-width: 760px) {
+  .weekly-home-heading,
+  .betting-research-entry {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .weekly-home-grid,
+  .decision-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .weekly-home,
+  .decision-summary,
+  .data-readiness,
+  .readiness-entry,
+  .betting-research-entry,
+  .advice-journal {
+    padding: 16px;
+  }
+}
+
+/* Keep routine decisions ahead of optional league and report detail. */
+.home-disclosure,
+.settings-disclosure,
+.result-disclosure {
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: var(--surface);
+}
+.home-disclosure > summary,
+.settings-disclosure > summary,
+.result-disclosure > summary,
+.advice-connection > summary,
+.advice-model-choice > summary {
+  cursor: pointer;
+  min-height: 32px;
+  padding: 6px 0;
+  font-weight: 600;
+}
+.home-disclosure[open] > summary,
+.settings-disclosure[open] > summary,
+.result-disclosure[open] > summary {
+  margin-bottom: 12px;
+}
+.home-disclosure .home-status,
+.home-disclosure .action-inbox {
+  margin-bottom: 0;
+}
+.next-action-compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+}
+.next-action-compact h2 {
+  margin: 0 auto 0 0;
+  font-size: 18px;
+}
+.next-action-compact > p {
+  display: none;
+}
+.next-action-compact .primary-button {
+  margin: 0;
+}
+.result-availability {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.availability-flag {
+  border: 1px solid var(--warning-border);
+  border-radius: 5px;
+  padding: 6px 8px;
+  color: var(--warning);
+  background: var(--warning-bg);
+}
+.advice-result .lineup-estimate > ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-left: 20px;
+  gap: 8px 24px;
+  font-size: 14px;
+}
+.advice-result .lineup-estimate > p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.advice-result > .decision-summary {
+  margin-block: 16px;
+  padding: 16px;
+}
+@media (max-width: 760px) {
+  .advice-result .lineup-estimate > ul {
+    grid-template-columns: 1fr;
+  }
+  .home-disclosure,
+  .settings-disclosure,
+  .result-disclosure {
+    padding: 10px 12px;
+  }
+}

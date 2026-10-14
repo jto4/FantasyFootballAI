@@ -1,6 +1,7 @@
 import { isValidLeagueCalendarEvent, isValidTimezone } from './schedules.js';
 import { isValidWritingStylePresets } from './index.js';
 import type { AppSettings, LeagueConnection, ReportKind, SavedReport } from './index.js';
+import type { ReportVisuals } from './domain-types.js';
 
 /** Durable outbound data contains public routing identity, never provider credentials. */
 export interface DeliveryEnvelope {
@@ -22,12 +23,13 @@ export interface GenerationRequest {
 export interface GenerationJob extends GenerationRequest {
   id: string;
   automaticDelivery?: boolean;
-  status: 'queued' | 'running' | 'completed' | 'failed' | 'interrupted';
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
   createdAt: string;
   startedAt?: string;
   finishedAt?: string;
   reportId?: string;
   error?: string;
+  failureCode?: 'credentials' | 'timeout' | 'provider' | 'storage' | 'configuration' | 'cancelled';
 }
 export type ReportSummary = Pick<
   SavedReport,
@@ -105,19 +107,26 @@ export function isGenerationJob(value: unknown): value is GenerationJob {
         'finishedAt',
         'reportId',
         'error',
+        'failureCode',
       ].includes(key),
     ) &&
     text(value.id, 128) &&
     text(value.requestId, 128) &&
     text(value.leagueId, 256) &&
     reportKinds.includes(value.kind as ReportKind) &&
-    ['queued', 'running', 'completed', 'failed', 'interrupted'].includes(String(value.status)) &&
+    ['queued', 'running', 'completed', 'failed', 'interrupted', 'cancelled'].includes(
+      String(value.status),
+    ) &&
     (value.automaticDelivery === undefined || typeof value.automaticDelivery === 'boolean') &&
     date(value.createdAt) &&
     (value.startedAt === undefined || date(value.startedAt)) &&
     (value.finishedAt === undefined || date(value.finishedAt)) &&
     (value.reportId === undefined || text(value.reportId, 128)) &&
     (value.error === undefined || text(value.error, 500, true)) &&
+    (value.failureCode === undefined ||
+      ['credentials', 'timeout', 'provider', 'storage', 'configuration', 'cancelled'].includes(
+        String(value.failureCode),
+      )) &&
     (value.status !== 'completed' || text(value.reportId, 128))
   );
 }
@@ -181,6 +190,42 @@ export function isDeliveryEnvelope(value: unknown): value is DeliveryEnvelope {
     (value.replyToId === undefined || isEmailMessageId(value.replyToId))
   );
 }
+export function isReportVisuals(value: unknown): value is ReportVisuals {
+  return (
+    record(value) &&
+    (value.season === undefined || boundedNumber(value.season, 2000, 2099, true)) &&
+    boundedNumber(value.teamCount, 0, Number.MAX_SAFE_INTEGER, true) &&
+    (value.currentWeek === undefined || boundedNumber(value.currentWeek, 1, 30, true)) &&
+    Array.isArray(value.teams) &&
+    value.teams.length <= 64 &&
+    value.teams.every(
+      (team) =>
+        record(team) &&
+        text(team.id, 256) &&
+        text(team.name, 500) &&
+        ['wins', 'losses'].every(
+          (key) => team[key] === undefined || boundedNumber(team[key], 0, 10_000, true),
+        ) &&
+        (team.pointsFor === undefined || boundedNumber(team.pointsFor, -1_000_000, 1_000_000)),
+    ) &&
+    Array.isArray(value.matchups) &&
+    value.matchups.length <= 32 &&
+    value.matchups.every(
+      (matchup) =>
+        record(matchup) &&
+        boundedNumber(matchup.week, 1, 30, true) &&
+        Array.isArray(matchup.teams) &&
+        matchup.teams.length <= 2 &&
+        matchup.teams.every(
+          (side) =>
+            record(side) &&
+            text(side.teamId, 256) &&
+            (side.points === undefined || boundedNumber(side.points, -1_000_000, 1_000_000)),
+        ),
+    )
+  );
+}
+
 export function isSavedReport(value: unknown): value is SavedReport {
   return (
     record(value) &&
@@ -223,6 +268,7 @@ export function isSavedReport(value: unknown): value is SavedReport {
     (value.evidence === undefined ||
       (record(value.evidence) &&
         text(value.evidence.guidance, 6000, true) &&
+        (value.evidence.visuals === undefined || isReportVisuals(value.evidence.visuals)) &&
         [value.evidence.leagueSyncedAt, value.evidence.newsRefreshedAt].every(
           (item) => item === undefined || date(item),
         )))
@@ -310,6 +356,20 @@ export function isAppSettings(value: unknown): value is AppSettings {
       'chatAgentName',
       'chatReplyLeagueId',
     ].every((key) => optionalText(value[key], 500))
+  )
+    return false;
+  if (
+    !optionalText(value.imsgExecutablePath, 2000) ||
+    (value.imsgExecutablePath !== undefined &&
+      !/^(?:\/|[A-Za-z]:[\\/])/.test(String(value.imsgExecutablePath)))
+  )
+    return false;
+  if (
+    (value.imessageProvider !== undefined &&
+      (typeof value.imessageProvider !== 'string' ||
+        !['bluebubbles', 'imsg'].includes(value.imessageProvider))) ||
+    (value.imsgChatId !== undefined &&
+      (!Number.isSafeInteger(value.imsgChatId) || Number(value.imsgChatId) <= 0))
   )
     return false;
   if (

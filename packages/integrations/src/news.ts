@@ -41,7 +41,10 @@ export async function fetchFootballNews(
 
 export async function fetchFootballNewsWithStatus(
   selectedSources: NewsSourceId[] = [...defaultNewsSources],
+  itemLimit = 10,
 ): Promise<FootballNewsLoad> {
+  if (!Number.isInteger(itemLimit) || itemLimit < 1 || itemLimit > 100)
+    throw new Error('News selection limit must be between 1 and 100.');
   const sources = normalizeNewsSources(selectedSources);
   if (!sources.length) return { items: [] };
   const results = await Promise.allSettled(sources.map((source) => fetchFeed(source)));
@@ -62,7 +65,7 @@ export async function fetchFootballNewsWithStatus(
   for (const item of successful) if (!unique.has(item.url)) unique.set(item.url, item);
   const items = [...unique.values()]
     .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt))
-    .slice(0, 10);
+    .slice(0, itemLimit);
   return {
     items,
     ...(failedSources.length
@@ -97,12 +100,12 @@ async function fetchFeed(source: NewsSourceId): Promise<NewsItem[]> {
       const url = xmlText(item.match(/<link>([\s\S]*?)<\/link>/i)?.[1]);
       const publishedAt = xmlText(item.match(/<pubDate>([\s\S]*?)<\/pubDate>/i)?.[1]);
       if (source === 'fox' && /<category>\s*betting\s*<\/category>/i.test(item)) return [];
+      // Retrieval cannot establish when an undated story was published.
+      if (!Number.isFinite(Date.parse(publishedAt))) return [];
       return {
         title,
         url,
-        publishedAt: Number.isNaN(Date.parse(publishedAt))
-          ? new Date().toISOString()
-          : new Date(publishedAt).toISOString(),
+        publishedAt: new Date(publishedAt).toISOString(),
         source: details.name,
       };
     })
@@ -139,9 +142,9 @@ export class FootballNewsCache {
   private sourceVersion = 0;
 
   constructor(
-    private readonly load: (
-      sources: NewsSourceId[],
-    ) => Promise<NewsItem[] | FootballNewsLoad> = fetchFootballNewsWithStatus,
+    private readonly load: (sources: NewsSourceId[]) => Promise<NewsItem[] | FootballNewsLoad> = (
+      sources,
+    ) => fetchFootballNewsWithStatus(sources, 100),
     private maxAgeMs = defaultCacheMs,
     private readonly now: () => number = Date.now,
   ) {}
@@ -191,7 +194,7 @@ export class FootballNewsCache {
             'News source selection changed; refresh the feed to load current sources.',
           );
         const result = Array.isArray(loaded) ? { items: loaded } : loaded;
-        this.cachedItems = result.items;
+        this.cachedItems = result.items.slice(0, 100);
         this.refreshedAtMs = this.now();
         this.lastFailureAtMs = undefined;
         this.lastFailureMessage = undefined;
@@ -217,10 +220,15 @@ export class FootballNewsCache {
     return request;
   }
 
-  private snapshot(error?: string): FootballNewsSnapshot {
+  async getForAdvice(): Promise<FootballNewsSnapshot> {
+    const result = await this.get();
+    return this.snapshot(result.error, 100);
+  }
+
+  private snapshot(error?: string, itemLimit = 10): FootballNewsSnapshot {
     const refreshedAtMs = this.refreshedAtMs;
     const result: FootballNewsSnapshot = {
-      items: structuredClone(this.cachedItems),
+      items: structuredClone(this.cachedItems.slice(0, itemLimit)),
       stale:
         this.sources.length > 0 && (!refreshedAtMs || this.now() - refreshedAtMs >= this.maxAgeMs),
       ...(refreshedAtMs ? { refreshedAt: new Date(refreshedAtMs).toISOString() } : {}),
@@ -238,6 +246,18 @@ function xmlText(value = '') {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(
+      /&#(?:x([0-9a-f]+)|(\d+));/gi,
+      (entity, hexadecimal: string | undefined, decimal: string | undefined) => {
+        const codePoint = hexadecimal ? Number.parseInt(hexadecimal, 16) : Number(decimal);
+        return codePoint >= 32 &&
+          codePoint <= 0x10ffff &&
+          !(codePoint >= 0xd800 && codePoint <= 0xdfff)
+          ? String.fromCodePoint(codePoint)
+          : entity;
+      },
+    )
     .trim();
 }

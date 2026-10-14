@@ -1,9 +1,23 @@
 export {
   OpenAICompatibleProvider,
   LocalCLIProvider,
+  ClaudeCLIProvider,
+  createLocalCLIProvider,
   AppleFoundationModelCLIProvider,
   parseCLIArguments,
 } from './ai.js';
+export { adviceModelChoices, isOfficialOpenAI, isOpenAIReasoningModel } from './ai-capabilities.js';
+export { adviceInjuryEvidence } from './injuries.js';
+export {
+  SignedInClaudeConnection,
+  SignedInAIError,
+  type SignedInAIConnection,
+} from './signed-in-ai.js';
+export {
+  SignedInCodexConnection,
+  SignedInCodexError,
+  signedInCodexModel,
+} from './signed-in-codex.js';
 export { YahooOAuthClient } from './yahoo-oauth.js';
 export {
   BlueBubblesChannel,
@@ -37,6 +51,7 @@ export type {
   MatchedNFLInjuryReport,
   NFLInjuryReportRow,
   NFLInjuryReportSnapshot,
+  AdviceInjuryEvidence,
 } from './injuries.js';
 export { fetchFootballNews as getFootballNews, FootballNewsCache } from './news.js';
 export type { FootballNewsLoad, FootballNewsSnapshot } from './news.js';
@@ -48,3 +63,66 @@ export {
   SleeperPlayerCatalog,
   YahooConnector,
 } from './platforms.js';
+export { readBoundedJson } from './http.js';
+export { nflDraftPicksUrl, parseNFLDraftPicks } from './nfl-draft-data.js';
+export {
+  PublicPlayerForecasts,
+  publicPlayerForecastUrl,
+  publicPlayerForecastFilter,
+  parsePublicPlayerForecasts,
+} from './player-forecasts.js';
+export { getSleeperPlayerCatalog } from './platforms/sleeper.js';
+export {
+  PublicFootballData,
+  playerStatsUrl,
+  footballScheduleUrl,
+  parsePlayerGameStats,
+  parseFootballGames,
+  parsePlayerMarket,
+} from './football-data.js';
+
+export {
+  PublicTeamDefenseData,
+  parseTeamDefenseStats,
+  parseTeamDefenseTotals,
+  defenseStatsUrl,
+  teamStatsUrl,
+} from './team-defense-data.js';
+export {
+  PublicSportsbookLines,
+  parseSportsbookQuotes,
+  parseFinalFootballResult,
+} from './sportsbook-lines.js';
+export {
+  buildPregameAvailability,
+  parseQuarterbackObservations,
+  type QuarterbackObservation,
+} from './game-availability.js';
+export {
+  gameWeatherRequest,
+  parseGameWeather,
+  fetchGameWeather,
+  weatherVenue,
+} from './game-weather.js';
+export { PublicPregameEvidence, type PregameEvidenceProvider } from './game-pregame.js';
+export { fetchHistoricalQuarterbacks, fetchCurrentQuarterbacks } from './game-quarterbacks.js';
+
+export { fetchDatedGameInjuries, parseDatedGameInjuries } from './game-injuries.js';
+export {
+  parsePersonnelPerformance,
+  parsePersonnelSnaps,
+  fetchPersonnelSeason,
+  addPregamePersonnel,
+  preparePersonnelEvidence,
+  type PersonnelPerformance,
+  type PersonnelSnaps,
+} from './game-personnel.js';
+export {
+  parseOfficialGameInjuries,
+  officialInjuriesForGame,
+  fetchOfficialGameInjuries,
+  type OfficialGameInjuries,
+} from './official-game-injuries.js';
+
+export { ImsgClient, ImsgChannel, isImsgChatGuid, resolveImsgExecutable } from './imsg.js';
+export { resolveVerificationProfile } from './verification-profile.js';

@@ -1,4 +1,5 @@
 import type { Database as DatabaseHandle } from 'better-sqlite3';
+import { isDeepStrictEqual } from 'node:util';
 import { type MemberMemory, type PlayerProjection } from '@sidekick/core';
 import type { AppState, ScheduledRun } from './store-types.js';
 export const migrations: Array<(database: DatabaseHandle) => void> = [
@@ -82,6 +83,30 @@ export const migrations: Array<(database: DatabaseHandle) => void> = [
       'CREATE TABLE generation_jobs (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;',
     );
   },
+  (database) => {
+    database.exec(`
+      ALTER TABLE reports ADD COLUMN league_id TEXT GENERATED ALWAYS AS (json_extract(payload, '$.leagueId')) VIRTUAL;
+      ALTER TABLE reports ADD COLUMN created_at TEXT GENERATED ALWAYS AS (json_extract(payload, '$.createdAt')) VIRTUAL;
+      ALTER TABLE reports ADD COLUMN report_status TEXT GENERATED ALWAYS AS (json_extract(payload, '$.status')) VIRTUAL;
+      ALTER TABLE reports ADD COLUMN delivery_state TEXT GENERATED ALWAYS AS (json_extract(payload, '$.deliveryState')) VIRTUAL;
+      CREATE INDEX reports_by_date ON reports(created_at DESC, id DESC);
+      CREATE INDEX reports_by_league_date ON reports(league_id, created_at DESC, id DESC);
+      CREATE INDEX reports_by_status_date ON reports(report_status, delivery_state, created_at DESC, id DESC);
+      CREATE UNIQUE INDEX generation_jobs_by_request ON generation_jobs(json_extract(payload, '$.requestId'));
+      CREATE TABLE archived_generation_jobs (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;
+      CREATE UNIQUE INDEX archived_jobs_by_request ON archived_generation_jobs(json_extract(payload, '$.requestId'));
+    `);
+  },
+  (database) => {
+    database.exec(
+      'CREATE TABLE advice_results (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;',
+    );
+  },
+  (database) => {
+    database.exec(
+      'CREATE TABLE prediction_records (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT;',
+    );
+  },
 ];
 
 /** Skip serializing large, unchanged imported conversations during unrelated updates. */
@@ -94,7 +119,7 @@ export function replaceMemoryRows(
     previous?.length === rows.length &&
     previous.every((profile, index) => profile.id === rows[index]?.id);
   if (!sameOrder) {
-    replaceRows(database, 'memories', rows);
+    replaceRows(database, 'memories', rows, previous);
     return;
   }
 
@@ -126,7 +151,13 @@ export function isSafetyBackupName(name: string): boolean {
 
 export function migrateRows(
   database: DatabaseHandle,
-  table: 'leagues' | 'reports' | 'memories' | 'generation_jobs',
+  table:
+    | 'leagues'
+    | 'reports'
+    | 'memories'
+    | 'generation_jobs'
+    | 'advice_results'
+    | 'prediction_records',
   rows: unknown[],
 ): void {
   const insert = database.prepare(`INSERT INTO ${table} (id, payload) VALUES (?, ?)`);
@@ -139,8 +170,15 @@ export function migrateRows(
 
 export function replaceRows(
   database: DatabaseHandle,
-  table: 'leagues' | 'reports' | 'memories' | 'generation_jobs',
+  table:
+    | 'leagues'
+    | 'reports'
+    | 'memories'
+    | 'generation_jobs'
+    | 'advice_results'
+    | 'prediction_records',
   rows: Array<{ id: string }>,
+  previous?: Array<{ id: string }>,
 ): void {
   const upsert = database.prepare(`
     INSERT INTO ${table} (id, payload) VALUES (?, ?)
@@ -148,25 +186,36 @@ export function replaceRows(
     WHERE payload != excluded.payload
   `);
   const ids = new Set<string>();
+  const prior = new Map(previous?.map((row) => [row.id, row]));
   for (const row of rows) {
     if (ids.has(row.id)) throw new Error(`Duplicate ${table} record ID.`);
     ids.add(row.id);
-    upsert.run(row.id, JSON.stringify(row));
+    if (!isDeepStrictEqual(row, prior.get(row.id))) upsert.run(row.id, JSON.stringify(row));
   }
-  deleteRemovedRows(database, table, ids);
+  if (previous) {
+    const remove = database.prepare(`DELETE FROM ${table} WHERE id = ?`);
+    for (const row of previous) if (!ids.has(row.id)) remove.run(row.id);
+  } else deleteRemovedRows(database, table, ids);
 }
 
-export function replaceScheduledRuns(database: DatabaseHandle, runs: ScheduledRun[]): void {
+export function replaceScheduledRuns(
+  database: DatabaseHandle,
+  runs: ScheduledRun[],
+  previous?: ScheduledRun[],
+): void {
   const upsert = database.prepare(`
     INSERT INTO scheduled_runs (id, position, payload) VALUES (?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET position = excluded.position, payload = excluded.payload
     WHERE position != excluded.position OR payload != excluded.payload
   `);
   const ids = new Set<string>();
+  const prior = new Map(previous?.map((row, index) => [row.id, { row, index }]));
   runs.forEach((run, position) => {
     if (ids.has(run.id)) throw new Error('Duplicate scheduled run ID.');
     ids.add(run.id);
-    upsert.run(run.id, position, JSON.stringify(run));
+    const old = prior.get(run.id);
+    if (!old || old.index !== position || !isDeepStrictEqual(old.row, run))
+      upsert.run(run.id, position, JSON.stringify(run));
   });
   deleteRemovedRows(database, 'scheduled_runs', ids);
 }
@@ -174,6 +223,7 @@ export function replaceScheduledRuns(database: DatabaseHandle, runs: ScheduledRu
 export function replacePlayerProjectionRows(
   database: DatabaseHandle,
   rows: PlayerProjection[],
+  previous?: PlayerProjection[],
 ): void {
   const upsert = database.prepare(`
     INSERT INTO player_projections (id, league_id, payload) VALUES (?, ?, ?)
@@ -181,10 +231,12 @@ export function replacePlayerProjectionRows(
     WHERE league_id != excluded.league_id OR payload != excluded.payload
   `);
   const ids = new Set<string>();
+  const prior = new Map(previous?.map((row) => [row.id, row]));
   for (const row of rows) {
     if (ids.has(row.id)) throw new Error('Duplicate player projection ID.');
     ids.add(row.id);
-    upsert.run(row.id, row.leagueId, JSON.stringify(row));
+    if (!isDeepStrictEqual(row, prior.get(row.id)))
+      upsert.run(row.id, row.leagueId, JSON.stringify(row));
   }
   deleteRemovedRows(database, 'player_projections', ids);
 }
@@ -197,7 +249,9 @@ export function deleteRemovedRows(
     | 'memories'
     | 'scheduled_runs'
     | 'player_projections'
-    | 'generation_jobs',
+    | 'generation_jobs'
+    | 'advice_results'
+    | 'prediction_records',
   retainedIds: Set<string>,
 ): void {
   const existingIds = database.prepare(`SELECT id FROM ${table}`).all() as Array<{ id: string }>;

@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import {
   AppleFoundationModelCLIProvider,
   LocalCLIProvider,
+  ClaudeCLIProvider,
+  createLocalCLIProvider,
   OpenAICompatibleProvider,
   parseCLIArguments,
 } from './ai.js';
@@ -12,6 +14,42 @@ const originalFetch = globalThis.fetch;
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  vi.unstubAllEnvs();
+});
+
+describe('Claude CLI budgets', () => {
+  it('sets per-child reasoning/output/retry bounds without changing the parent environment', async () => {
+    vi.stubEnv('CLAUDE_CODE_MAX_OUTPUT_TOKENS', '99999');
+    vi.stubEnv('CLAUDE_CODE_EFFORT_LEVEL', 'max');
+    vi.stubEnv('CLAUDE_CODE_MAX_RETRIES', '10');
+    const provider = new ClaudeCLIProvider(process.execPath, [
+      '-e',
+      'process.stdout.write(JSON.stringify({output:process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS,effort:process.env.CLAUDE_CODE_EFFORT_LEVEL,retries:process.env.CLAUDE_CODE_MAX_RETRIES,structured:process.env.MAX_STRUCTURED_OUTPUT_RETRIES}));',
+    ]);
+    const result = JSON.parse(
+      await provider.generate({
+        system: 'fictional',
+        prompt: 'fictional',
+        maxOutputTokens: 8192,
+        reasoningEffort: 'high',
+      }),
+    );
+    expect(result).toEqual({ output: '8192', effort: 'high', retries: '0', structured: '1' });
+    expect(process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS).toBe('99999');
+    expect(process.env.CLAUDE_CODE_EFFORT_LEVEL).toBe('max');
+    expect(process.env.CLAUDE_CODE_MAX_RETRIES).toBe('10');
+  });
+  it('rejects invalid Claude budgets before spawning and limits provider detection to an exact executable name', async () => {
+    const provider = new ClaudeCLIProvider('/missing-cli');
+    for (const maxOutputTokens of [127, 16385, NaN, 128.5])
+      await expect(provider.generate({ system: '', prompt: '', maxOutputTokens })).rejects.toThrow(
+        'output limit',
+      );
+    expect(createLocalCLIProvider('/usr/local/bin/claude').id).toBe('claude-cli');
+    expect(createLocalCLIProvider('C:\\Tools\\claude.exe').id).toBe('claude-cli');
+    expect(createLocalCLIProvider('claude-wrapper').id).toBe('cli');
+    expect(createLocalCLIProvider('codex').id).toBe('cli');
+  });
 });
 
 describe('parseCLIArguments', () => {
@@ -46,7 +84,192 @@ describe('parseCLIArguments', () => {
   });
 });
 
+describe('reasoning requests on the existing connection', () => {
+  it('uses compatible reasoning parameters for official models without creating credentials', async () => {
+    const bodies: Record<string, unknown>[] = [];
+    globalThis.fetch = vi.fn(async (_url, init) => {
+      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+      return Response.json({
+        status: 'completed',
+        output: [
+          {
+            type: 'message',
+            role: 'assistant',
+            status: 'completed',
+            content: [{ type: 'output_text', text: 'analysis' }],
+          },
+        ],
+      });
+    });
+    for (const model of ['o3', 'gpt-5-mini', 'gpt-5.4', 'gpt-6.1-sol']) {
+      await new OpenAICompatibleProvider('fixture-only', model).generate({
+        system: 'system',
+        prompt: 'data',
+        temperature: 0,
+        maxOutputTokens: 16_384,
+        reasoningEffort: 'high',
+      });
+    }
+    expect(bodies).toHaveLength(4);
+    for (const body of bodies) {
+      expect(body.reasoning).toEqual({ effort: 'high' });
+      expect(body.max_output_tokens).toBe(16_384);
+      expect(body.store).toBe(false);
+      expect(body.instructions).toBe('system');
+      expect(body.input).toBe('data');
+      expect(body).not.toHaveProperty('temperature');
+      expect(body).not.toHaveProperty('max_tokens');
+    }
+  });
+  it('preserves custom endpoint and ordinary-model contracts', async () => {
+    const bodies: Record<string, unknown>[] = [];
+    globalThis.fetch = vi.fn(async (_url, init) => {
+      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+      return Response.json({ choices: [{ message: { content: 'analysis' } }] });
+    });
+    for (const provider of [
+      new OpenAICompatibleProvider('fixture', 'gpt-5.4', 'https://ai.example/v1'),
+      new OpenAICompatibleProvider('fixture', 'gpt-4o-mini'),
+    ])
+      await provider.generate({
+        system: 'system',
+        prompt: 'data',
+        temperature: 0,
+        maxOutputTokens: 2_000,
+        reasoningEffort: 'high',
+      });
+    expect(
+      bodies.every(
+        (body) =>
+          body.temperature === 0 && body.max_tokens === 2_000 && !('reasoning_effort' in body),
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('Responses API trust boundary', () => {
+  const request = {
+    system: 'system',
+    prompt: 'football evidence',
+    reasoningEffort: 'high' as const,
+  };
+  const message = {
+    type: 'message',
+    role: 'assistant',
+    status: 'completed',
+    phase: 'final_answer',
+    content: [{ type: 'output_text', text: 'verified final text' }],
+  };
+  it('retains only final assistant text and bounded usage, including Responses-only models', async () => {
+    const fetch = vi.fn(async (_input: RequestInfo | URL) =>
+      Response.json({
+        status: 'completed',
+        output: [
+          { type: 'reasoning', summary: [{ text: 'private reasoning' }] },
+          {
+            ...message,
+            phase: 'commentary',
+            content: [{ type: 'output_text', text: 'intermediate commentary' }],
+          },
+          message,
+        ],
+        usage: { input_tokens: 20, output_tokens: 40 },
+      }),
+    );
+    globalThis.fetch = fetch;
+    expect(
+      await new OpenAICompatibleProvider('fixture-only', 'gpt-5.4-pro').generateDetailed(request),
+    ).toEqual({ text: 'verified final text', usage: { inputTokens: 20, outputTokens: 40 } });
+    expect(fetch.mock.calls[0]?.[0]).toBe('https://api.openai.com/v1/responses');
+  });
+  it('rejects incomplete, refused, malformed or tool-only answers without a second paid request', async () => {
+    for (const value of [
+      { status: 'incomplete', output: [message] },
+      {
+        status: 'completed',
+        output: [{ ...message, content: [{ type: 'refusal', refusal: 'no' }] }],
+      },
+      { status: 'completed', output: [{ type: 'function_call', arguments: '{}' }] },
+      {
+        status: 'completed',
+        output: [{ ...message, content: [{ type: 'output_text', text: { private: 'data' } }] }],
+      },
+      { status: 'completed', output: [{ type: 'reasoning', summary: [{ text: 'not final' }] }] },
+    ]) {
+      const fetch = vi.fn(async () => Response.json(value));
+      globalThis.fetch = fetch;
+      await expect(
+        new OpenAICompatibleProvider('fixture', 'gpt-6-astra').generate(request),
+      ).rejects.toThrow();
+      expect(fetch).toHaveBeenCalledTimes(1);
+    }
+  });
+  it('rejects invalid per-call deadlines before contacting a provider', async () => {
+    const fetch = vi.fn();
+    globalThis.fetch = fetch;
+    for (const timeoutMs of [0, 120_001, NaN, 1500.5])
+      await expect(
+        new OpenAICompatibleProvider('fixture').generate({ ...request, timeoutMs }),
+      ).rejects.toThrow('timeout');
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('generation cancellation', () => {
+  it('passes owner cancellation to API requests while retaining the adapter timeout', async () => {
+    const controller = new AbortController();
+    let observed: AbortSignal | undefined;
+    globalThis.fetch = vi.fn(async (_input, options) => {
+      observed = options?.signal as AbortSignal;
+      return new Promise<Response>((_resolve, reject) =>
+        observed!.addEventListener('abort', () => reject(observed!.reason), { once: true }),
+      );
+    });
+    const result = new OpenAICompatibleProvider('fixture-key').generate({
+      system: 'private',
+      prompt: 'private',
+      signal: controller.signal,
+    });
+    controller.abort();
+    await expect(result).rejects.toMatchObject({ name: 'AbortError' });
+    expect(observed).not.toBe(controller.signal);
+    expect(observed?.aborted).toBe(true);
+  });
+  it('stops a CLI that ignores ordinary termination and rejects without retaining output', async () => {
+    const controller = new AbortController();
+    const provider = new LocalCLIProvider(process.execPath, [
+      '-e',
+      "process.on('SIGTERM',()=>{});setInterval(()=>{},100);process.stdout.write('private-cli-output');",
+    ]);
+    const result = provider.generate({
+      system: 'private',
+      prompt: 'private',
+      signal: controller.signal,
+    });
+    const rejection = expect(result).rejects.toMatchObject({ name: 'AbortError' });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    controller.abort();
+    await rejection;
+  }, 5000);
+});
+
 describe('LocalCLIProvider', () => {
+  it('honors a per-analysis deadline and stops the CLI without exposing partial output', async () => {
+    const provider = new LocalCLIProvider(process.execPath, [
+      '-e',
+      "process.stdout.write('private partial answer');setInterval(()=>{},100);",
+    ]);
+    await expect(
+      provider.generate({ system: 'instructions', prompt: 'fictional data', timeoutMs: 1_000 }),
+    ).rejects.toMatchObject({ name: 'TimeoutError', message: 'AI CLI request timed out.' });
+  }, 5000);
+  it('rejects invalid deadlines before launching a local tool', async () => {
+    const provider = new LocalCLIProvider('/nonexistent-evaluation-cli');
+    for (const timeoutMs of [0, 999, 120_001, NaN, 1500.5])
+      await expect(provider.generate({ system: '', prompt: '', timeoutMs })).rejects.toThrow(
+        'request timeout',
+      );
+  });
   it('passes the prompt over stdin without invoking a shell', async () => {
     const provider = new LocalCLIProvider(process.execPath, [
       '-e',

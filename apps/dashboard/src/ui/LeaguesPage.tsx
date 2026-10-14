@@ -34,7 +34,7 @@ export function LeaguesPage({
         <div>
           <p className="section-overline">YOUR COMPETITIONS</p>
           <h1>Leagues</h1>
-          <p>Connected league snapshots stay on this computer.</p>
+          <p>Saved league data stay on this computer.</p>
         </div>
         <button className="primary-button" onClick={onConnect}>
           <Plus size={15} /> Connect a league
@@ -64,8 +64,8 @@ export function LeaguesPage({
                 </small>
                 {freshness === 'stale' && (
                   <small className="sync-stale" role="status">
-                    Snapshot is older than your configured warning threshold. Refresh before relying
-                    on this data.
+                    Saved league data is older than your configured warning threshold. Refresh
+                    before relying on this data.
                   </small>
                 )}
               </div>

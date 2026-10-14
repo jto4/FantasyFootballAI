@@ -1,0 +1,44 @@
+{
+  "frozenAt": "2026-10-13T04:55:26.742Z",
+  "developmentSeasons": [2018, 2021],
+  "developmentSha256": "c3ee9beae92d7a3cb490d856fa99c5997e0dddc60881cc4e5e84b180aab26f5d",
+  "contextSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+  "parameters": {
+    "tree": {
+      "depth": 2,
+      "halfLifeDays": 730,
+      "features": "market",
+      "rule": "direct"
+    },
+    "maxCalibrationLogit": 0.35,
+    "blendPenalty": 1,
+    "maxRows": 10000
+  },
+  "candidateCount": 17,
+  "selection": {
+    "id": "hybrid-unadapted",
+    "spec": null,
+    "brier": 0.248752653739635
+  },
+  "bestAdaptive": {
+    "id": "seasonal-4-100-0.25-direct",
+    "spec": {
+      "halfLifeWeeks": 4,
+      "penalty": 100,
+      "priorSeasonWeight": 0.25,
+      "rule": "direct"
+    },
+    "brier": 0.24889524247811817
+  },
+  "warnings": [
+    "Hybrid structure is user-requested after reused later audits; this is a new retrospective hypothesis.",
+    "Only older 2018\u20132021 outcomes select adaptation parameters. Current production moneyline/spread remain fixed."
+  ],
+  "developmentArtifactSha256": "9aff4c6db11286b0a8ae24d5e48011993c2a6fb7e709451b818dfe2ad53846cc",
+  "codeHashes": {
+    "packages/core/src/seasonal-hybrid-model.ts": "4c38b091e511c4aec279d7b3e74302a37bc19d88b941fb4b3a9c03b9d1ca54b9",
+    "scripts/seasonal-hybrid-evaluation.mjs": "31260c94302d19fcd04a4819fd0a9cbd079c2b35b161cf9602656327e7e1d5df",
+    "scripts/develop-seasonal-hybrid.mjs": "20bb6b0ac59949eb95ab875305125b1ef512df6d10787bea38bf8a57a6f1f576",
+    "scripts/audit-seasonal-hybrid.mjs": "ac3d54d26611da6170e6ebb9fe6fd967b7d68e22e86fedd0b7870bd5c464d4a8"
+  }
+}

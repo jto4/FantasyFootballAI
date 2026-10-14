@@ -28,6 +28,7 @@ function normalizeSettingsForm(settings: AppSettings, leagues: LeagueConnection[
     analyzeImportsWithAI: settings.analyzeImportsWithAI ?? false,
     includeMemberContextInReports: settings.includeMemberContextInReports ?? false,
     includeMemberContextInChatReplies: settings.includeMemberContextInChatReplies ?? false,
+    imessageProvider: settings.imessageProvider ?? 'bluebubbles',
     imessageOwnerName: settings.imessageOwnerName ?? 'League owner',
     imessageAutoSyncEnabled: settings.imessageAutoSyncEnabled ?? false,
     imessageSyncIntervalMinutes: settings.imessageSyncIntervalMinutes ?? 15,

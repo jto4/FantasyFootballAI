@@ -1,3 +1,6 @@
+import { createImsgRouter } from './imsg-routes.js';
+import { RoutineBackups } from './routine-backups.js';
+import { createOperationsRouter } from './operations-routes.js';
 import { createLocalHttpApp } from './http-app.js';
 import { createGenerationQueue, createGenerationRouter } from './generation-jobs.js';
 import { storageStartupFailure } from './storage-startup.js';
@@ -5,6 +8,7 @@ import { createReportRouter } from './report-routes.js';
 import { createSettingsRouter } from './settings-routes.js';
 import { createDeliveryService } from './delivery-service.js';
 import { createReportService } from './report-service.js';
+import { createScheduledReportRunner, saveSyncedLeague } from './scheduled-reports.js';
 import { createChatSyncRouter } from './chat-sync-routes.js';
 import { parseSecret } from './provider-config.js';
 import express from 'express';
@@ -15,9 +19,6 @@ import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import {
-  leaguesForAction,
-  leagueSeasonPhase,
-  scheduledReportPhaseSkipReason,
   type ActionSetting,
   type LeagueConnection,
   type LeagueCalendarEvent,
@@ -27,8 +28,10 @@ import {
   connectorFor,
   FootballNewsCache,
   imessageAvailability,
+  ImsgClient,
+  resolveImsgExecutable,
   isBlueBubblesConfigured,
-  LocalCLIProvider,
+  createLocalCLIProvider,
   AppleFoundationModelCLIProvider,
   parseCLIArguments,
   OpenAICompatibleProvider,
@@ -36,6 +39,12 @@ import {
   verifyTwilioCredentials,
   generateImage,
   NFLInjuryReportCache,
+  PublicFootballData,
+  PublicSportsbookLines,
+  PublicPregameEvidence,
+  SignedInClaudeConnection,
+  SignedInCodexConnection,
+  getSleeperPlayerCatalog,
 } from '@sidekick/integrations';
 import { LocalStore } from './store.js';
 import type { ScheduledLeagueResult } from './store.js';
@@ -65,6 +74,7 @@ import { startIntervalPoll } from './interval-poll.js';
 
 import { createStateRouter } from './state-routes.js';
 import { createProjectionRouter } from './projection-routes.js';
+import { createAdviceRouter } from './advice-routes.js';
 import { createCredentialHealthRouter } from './credential-health-routes.js';
 import { createBackupRouter } from './backup-routes.js';
 import { createLeagueRouter } from './league-routes.js';
@@ -83,6 +93,26 @@ const port = Number(process.env.SIDEKICK_PORT ?? 4173);
 const isDevelopment =
   process.env.SIDEKICK_DEV_MODE === '1' || process.env.npm_lifecycle_event === 'dev';
 const store = new LocalStore();
+async function currentDatabaseBackup() {
+  const directory = await mkdtemp(join(tmpdir(), 'sunday-sidekick-backup-'));
+  try {
+    const path = join(directory, 'state.sqlite');
+    await store.backupTo(path);
+    return await readFile(path);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+async function currentBackup() {
+  return createPortableBackup(await currentDatabaseBackup(), store.path);
+}
+const routineBackups = new RoutineBackups({
+  store,
+  currentBackup,
+  readPassphrase: () => readCredential('backup-encryption'),
+  savePassphrase: (value) => saveCredential('backup-encryption', value),
+  removePassphrase: () => removeCredential('backup-encryption'),
+});
 const reportScheduler = new ReportScheduler(
   runScheduledAction,
   undefined,
@@ -98,6 +128,9 @@ const deliveryGuard = new DeliveryGuard();
 const retryingScheduledRuns = new Set<string>();
 const footballNewsCache = new FootballNewsCache();
 const nflInjuryReportCache = new NFLInjuryReportCache();
+const publicFootballData = new PublicFootballData();
+const publicSportsbookLines = new PublicSportsbookLines();
+const publicPregameEvidence = new PublicPregameEvidence();
 let footballNewsRefreshTimer: NodeJS.Timeout | undefined;
 let conversationRetentionTimer: NodeJS.Timeout | undefined;
 let blueBubblesAutoSyncTimer: NodeJS.Timeout | undefined;
@@ -179,22 +212,29 @@ app.use(
   }),
 );
 app.use(
+  createOperationsRouter({
+    store,
+    backups: routineBackups,
+    logs: () =>
+      readApiLogTail(
+        process.env.SIDEKICK_USER_DATA_DIR,
+        process.env.SIDEKICK_SERVICE === '1' ? 'service.log' : 'api.log',
+      ),
+  }),
+);
+app.use(
   createBackupRouter({
-    currentBackup: async () => {
-      const directory = await mkdtemp(join(tmpdir(), 'sunday-sidekick-backup-'));
-      try {
-        const databasePath = join(directory, 'state.sqlite');
-        await store.backupTo(databasePath);
-        return createPortableBackup(await readFile(databasePath), store.path);
-      } finally {
-        await rm(directory, { recursive: true, force: true });
-      }
-    },
+    currentBackup,
+    databaseBackup: currentDatabaseBackup,
+    validateBackup: (database) => store.validateBackupBuffer(database),
     listSafetyBackups: () => store.listSafetyBackups(),
     readSafetyBackup: (name) => store.readSafetyBackup(name),
     deleteSafetyBackup: (name) => store.deleteSafetyBackup(name),
-    restoreBackup: (database, images) =>
-      store.restoreFromBuffer(database, () => replaceLocalImages(store.path, images)),
+    restoreBackup: async (database, images) => {
+      await store.validateBackupBuffer(database);
+      await routineBackups.disableAfterRestore();
+      return store.restoreFromBuffer(database, () => replaceLocalImages(store.path, images));
+    },
     afterRestore: async () => {
       await store.purgeExpiredConversationSources();
       const restored = store.snapshot();
@@ -266,6 +306,10 @@ app.post('/api/bluebubbles/webhook/:token', async (req, res) => {
   if (!expectedToken || !sameWebhookToken(req.params.token, expectedToken))
     return res.status(404).end();
 
+  if (store.settingsSnapshot().imessageProvider === 'imsg')
+    return res
+      .status(409)
+      .json({ error: 'BlueBubbles webhooks are disabled for the local imsg provider.' });
   const chatGuid = store.settingsSnapshot().imessageChatGuid?.trim();
   if (!chatGuid || !isRelevantBlueBubblesMessageEvent(req.body, chatGuid))
     return res.status(202).json({ accepted: true, imported: 0 });
@@ -447,13 +491,34 @@ app.use(
   }),
 );
 app.use(createNewsRouter({ getNews: (forceRefresh) => footballNewsCache.get(forceRefresh) }));
+app.use(
+  createImsgRouter({
+    settingsSnapshot: () => store.settingsSnapshot(),
+    reports: () => store.snapshot().reports,
+  }),
+);
 app.get('/api/capabilities', async (_req, res) =>
   res.json({
     platforms: ['sleeper', 'espn', 'yahoo'],
     channels: ['dashboard', 'email', 'sms', 'imessage'],
-    imessage: imessageAvailability(
-      isBlueBubblesConfigured(parseSecret(await readCredential('bluebubbles'))),
-    ),
+    imessage:
+      store.settingsSnapshot().imessageProvider === 'imsg'
+        ? await (async () => {
+            try {
+              await new ImsgClient(
+                await resolveImsgExecutable(store.settingsSnapshot().imsgExecutablePath),
+              ).version();
+              return { available: true };
+            } catch {
+              return {
+                available: false,
+                reason: 'Install local imsg on macOS and configure it in Delivery channels.',
+              };
+            }
+          })()
+        : imessageAvailability(
+            isBlueBubblesConfigured(parseSecret(await readCredential('bluebubbles'))),
+          ),
   }),
 );
 app.use(
@@ -467,6 +532,36 @@ app.use(
   }),
 );
 app.use(createMemoryImportRouter({ store, configuredAI }));
+app.use(
+  createAdviceRouter({
+    store,
+    configuredAI,
+    signedInAI: new SignedInClaudeConnection(),
+    signedInCodex: new SignedInCodexConnection(),
+    discoverModels: async (settings) => {
+      // Custom providers retain their saved model/contract. Discovery sends no
+      // football data and reads the same OS-stored credential as generation.
+      if (
+        (settings.aiRuntime?.baseUrl ?? 'https://api.openai.com/v1').replace(/\/$/, '') !==
+        'https://api.openai.com/v1'
+      )
+        return [];
+      const key = await readCredential('openai');
+      if (!key) return [];
+      return new OpenAICompatibleProvider(
+        key,
+        settings.aiRuntime?.model,
+        settings.aiRuntime?.baseUrl,
+      ).listModels();
+    },
+    data: publicFootballData,
+    odds: publicSportsbookLines,
+    pregame: publicPregameEvidence,
+    catalog: getSleeperPlayerCatalog,
+    news: footballNewsCache,
+    injuries: nflInjuryReportCache,
+  }),
+);
 app.use(
   createSettingsRouter({
     store,
@@ -530,7 +625,7 @@ async function configuredAI(
   if (runtime?.mode === 'apple-cli')
     return process.platform === 'darwin' ? new AppleFoundationModelCLIProvider() : null;
   if (runtime?.mode === 'cli')
-    return new LocalCLIProvider(runtime.command, parseCLIArguments(runtime.args));
+    return createLocalCLIProvider(runtime.command, parseCLIArguments(runtime.args));
   const key = await readCredential('openai');
   return key ? new OpenAICompatibleProvider(key, runtime?.model, runtime?.baseUrl) : null;
 }
@@ -539,173 +634,22 @@ function yahooRedirectUri(): string {
   return 'oob';
 }
 async function runScheduledAction(action: ActionSetting, occurrenceKey?: string): Promise<void> {
-  const runId = randomUUID();
-  const startedAt = new Date().toISOString();
-  let currentAction: ActionSetting | undefined;
-  let claimed = false;
-  await store.update((state) => {
-    const savedAction = state.settings.actions.find((item) => item.kind === action.kind);
-    if (
-      !savedAction?.enabled ||
-      !savedAction.schedule.enabled ||
-      !sameScheduleOccurrence(savedAction, action)
-    )
-      return;
-    if (occurrenceKey && state.scheduledRuns.some((run) => run.occurrenceKey === occurrenceKey))
-      return;
-    if (action.schedule.frequency === 'once') {
-      if (savedAction.schedule.frequency !== 'once' || savedAction.schedule.completedAt) return;
-      savedAction.schedule.completedAt = startedAt;
-    }
-    state.scheduledRuns.unshift({
-      id: runId,
-      kind: action.kind,
-      startedAt,
-      status: 'running',
-      ...(occurrenceKey ? { occurrenceKey } : {}),
-    });
-    state.scheduledRuns = state.scheduledRuns.slice(0, 100);
-    currentAction = structuredClone(savedAction);
-    claimed = true;
-  });
-  if (!claimed || !currentAction) return;
-  const allLeagues = store.snapshot().leagues;
-  const selectedLeagueIds = currentAction.leagueIds;
-  const leagueIds = leaguesForAction(currentAction, allLeagues).map((league) => league.id);
-  const failures: string[] = [];
-  const leagueResults: ScheduledLeagueResult[] = [];
-  try {
-    if (selectedLeagueIds?.length === 0)
-      failures.push('No leagues are selected for this scheduled action.');
-    else if (selectedLeagueIds && leagueIds.length === 0)
-      failures.push('No selected leagues are currently connected.');
-    for (const leagueId of leagueIds) {
-      const latestState = store.snapshot();
-      const league = latestState.leagues.find((item) => item.id === leagueId);
-      if (!league) continue;
-      const latestAction = latestState.settings.actions.find((item) => item.kind === action.kind);
-      if (!latestAction?.enabled || !latestAction.schedule.enabled) break;
-
-      let refreshed: LeagueConnection;
-      try {
-        const credential =
-          league.platform === 'espn'
-            ? ((await readCredential('espn')) ?? undefined)
-            : league.platform === 'yahoo'
-              ? ((await getYahooAccessToken(
-                  { readCredential, saveCredential },
-                  yahooRedirectUri(),
-                )) ?? undefined)
-              : undefined;
-        refreshed = await retryLeagueFetch(
-          () => connectorFor(league.platform, credential, league.season).fetchLeague(league.id),
-          store.settingsSnapshot().scheduledSyncRetries ?? 0,
-        );
-        await store.update((state) => {
-          state.leagues = state.leagues.map((item) =>
-            item.id === refreshed.id
-              ? {
-                  ...refreshed,
-                  displayName: item.displayName,
-                  connectedAt: item.connectedAt,
-                  lastSyncedAt: new Date().toISOString(),
-                }
-              : item,
-          );
-        });
-      } catch (error) {
-        const detail = leagueSyncErrorMessage(error);
-        await store.update((state) => {
-          state.leagues = state.leagues.map((item) =>
-            item.id === league.id ? { ...item, lastSyncError: detail } : item,
-          );
-        });
-        failures.push(`${league.displayName}: ${detail}`);
-        leagueResults.push({
-          leagueId: league.id,
-          displayName: league.displayName,
-          status: 'failed',
-          detail,
-        });
-        continue;
-      }
-
-      const phaseSkip = scheduledReportPhaseSkipReason(
-        action.kind,
-        leagueSeasonPhase(refreshed),
-        action.schedule.frequency,
-      );
-      if (phaseSkip) {
-        leagueResults.push({
-          leagueId: refreshed.id,
-          displayName: refreshed.displayName,
-          status: 'skipped',
-          detail: phaseSkip,
-        });
-        continue;
-      }
-
-      try {
-        const result = await generateAndSaveReport(
-          refreshed,
-          store.reportSnapshot(),
-          action.kind,
-          true,
-          action.channel,
-        );
-        if (result.deliveryError) {
-          failures.push(`${league.displayName}: automatic delivery failed; report remains saved`);
-          leagueResults.push({
-            leagueId: league.id,
-            displayName: league.displayName,
-            status: 'failed',
-            detail: 'Report saved, but automatic delivery failed. Review its delivery status.',
-          });
-        } else {
-          leagueResults.push({
-            leagueId: league.id,
-            displayName: league.displayName,
-            status: 'succeeded',
-          });
-        }
-      } catch {
-        const detail = 'Report generation failed. Check AI settings and try again.';
-        failures.push(`${league.displayName}: ${detail}`);
-        leagueResults.push({
-          leagueId: league.id,
-          displayName: league.displayName,
-          status: 'failed',
-          detail,
-        });
-      }
-    }
-    if (failures.length) throw new Error(failures.join('; ').slice(0, 1000));
-  } finally {
-    const finishedAt = new Date().toISOString();
-    await store.update((state) => {
-      const run = state.scheduledRuns.find((item) => item.id === runId);
-      if (!run) return;
-      run.finishedAt = finishedAt;
-      run.status = failures.length ? 'failed' : 'succeeded';
-      if (leagueResults.length) run.leagueResults = leagueResults;
-      run.detail = failures.length
-        ? failures.join('; ').slice(0, 1000)
-        : `${leagueResults.filter((result) => result.status === 'succeeded').length} league(s) processed; ${leagueResults.filter((result) => result.status === 'skipped').length} paused by season phase.`;
-    });
-  }
+  return createScheduledReportRunner({
+    store,
+    generateAndSaveReport,
+    fetchLeague: fetchScheduledLeague,
+  })(action, occurrenceKey);
 }
 
-function sameScheduleOccurrence(current: ActionSetting, scheduled: ActionSetting): boolean {
-  const left = current.schedule;
-  const right = scheduled.schedule;
-  return (
-    left.frequency === right.frequency &&
-    left.weekday === right.weekday &&
-    left.dayOfMonth === right.dayOfMonth &&
-    left.date === right.date &&
-    left.time === right.time &&
-    left.timezone === right.timezone
-  );
+async function fetchScheduledLeague(league: LeagueConnection): Promise<LeagueConnection> {
+  const credential =
+    league.platform === 'espn'
+      ? ((await readCredential('espn')) ?? undefined)
+      : league.platform === 'yahoo'
+        ? ((await getYahooAccessToken({ readCredential, saveCredential }, yahooRedirectUri())) ??
+          undefined)
+        : undefined;
+  return connectorFor(league.platform, credential, league.season).fetchLeague(league.id);
 }
 
 async function markMissedScheduledAction(action: ActionSetting, missedAt: Date): Promise<void> {
@@ -813,19 +757,9 @@ async function runLeagueCalendarEvent(event: LeagueCalendarEvent): Promise<void>
       });
       throw error;
     }
-    const lastSyncedAt = new Date().toISOString();
-    await store.update((state) => {
-      state.leagues = state.leagues.map((current) =>
-        current.id === refreshed.id
-          ? {
-              ...refreshed,
-              displayName: current.displayName,
-              connectedAt: current.connectedAt,
-              lastSyncedAt,
-            }
-          : current,
-      );
-    });
+    const synced = await saveSyncedLeague(store, refreshed);
+    if (!synced) throw new Error('This league is no longer connected.');
+    refreshed = synced;
     try {
       await generateAndSaveReport(
         refreshed,
@@ -963,6 +897,7 @@ try {
 if (store.settingsSnapshot().conversationRetentionDays !== undefined) {
   await store.purgeExpiredConversationSources();
 }
+routineBackups.start();
 configureFootballNewsRefresh(store.settingsSnapshot().newsRefreshMinutes ?? 15);
 configureFootballNewsSources(store.settingsSnapshot().newsSources);
 configureConversationRetention(store.settingsSnapshot().conversationRetentionDays);
@@ -1117,6 +1052,7 @@ stopApplication = createShutdownAction(
         );
       },
     },
+    routineBackups,
     reportScheduler,
     leagueCalendarScheduler,
     footballNewsRefreshTask,

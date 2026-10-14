@@ -1,8 +1,20 @@
 # Architecture
 
+Dashboard appearance uses semantic CSS tokens with white as the default and an
+optional dark palette. A versioned, validated browser preference is restored by
+a local blocking `theme-init.js` before the React entry point, preserving
+`script-src 'self'`. The header switch and Settings radios share a React external
+store with local and cross-tab notifications. Browser-only clients use local
+storage. Electron persists a private `appearance.json` outside the selected data
+directory so the choice survives its changing loopback port. Its isolated preload
+reads only a cached theme through trusted-dashboard IPC before paint; atomic
+writes run asynchronously in request order and drain before graceful quit.
+This device-local preference does not enter the API settings schema, SQLite,
+provider payloads, or backups.
+
 The repository is an npm workspaces monorepo. `apps/api` owns the localhost HTTP boundary, versioned SQLite persistence, and scheduling; feature routers such as `backup-routes.ts`, `image-routes.ts`, `league-routes.ts`, `member-memory-routes.ts`, `provider-routes.ts`, `state-routes.ts`, `projection-routes.ts`, `settings-routes.ts`, `report-routes.ts`, and `chat-sync-routes.ts` keep backup lifecycle, image generation/library, authorized league connection and lifecycle, member profile controls, credential/AI setup and health, read-only state, and projection import behavior outside the bootstrap through injected dependencies. `settings-validation.ts` holds the complete untrusted dashboard-settings boundary, including current league membership checks, separately from API route orchestration. Backup restore reconfigures schedules, news, retention, and chat polling through an explicit post-restore callback after the database and image library have been replaced. `apps/dashboard` is a React/Vite client; `app-state.ts` owns initial dashboard state and validates API state/news/credential payloads before rendering, the Leagues page owns connection-list rendering, the Schedule page owns schedules and job history, the Reports page owns draft editing and delivery review, the League desk owns next-action rendering, and reusable date and season-status presentation helpers stay in focused UI modules. `apps/desktop` hosts the Electron shell and packaging configuration. `packages/core` contains domain types, settings defaults, validation, and scoring-aware analysis. `packages/integrations` contains platform, AI, news, email, SMS, BlueBubbles iMessage, image, and MCP adapters. Platform adapters live in separate `platforms/sleeper.ts`, `platforms/yahoo.ts`, and `platforms/espn.ts` modules; `platforms/shared.ts` holds bounded parsing helpers, and `platforms.ts` preserves the stable connector barrel for consumers. `npm start` builds each workspace in dependency order before starting the production-style local app; `npm run dev` remains the development workflow. Operational API events are JSON lines with allowlisted metadata only. Desktop installs persist those events to a private rotating log set in the selected local data folder; unstructured API stderr is drained and discarded.
 
-Provider secrets use a small credential-manager boundary backed by keytar and the operating system's keychain, credential vault, or Secret Service. Only known provider names are accepted for read, write, and delete operations; values are trimmed and limited to 8,000 characters. The dashboard receives configured/not-configured status only, never stored secret values. The manager contract is tested with an in-memory fake backend so provider validation and value handling can be checked without reading or changing a developer's actual credential store.
+Provider secrets use a small credential-manager boundary backed by keytar and the operating system's keychain, credential vault, or Secret Service. Only known provider names are accepted for read, write, and delete operations; ordinary provider values are trimmed and limited to 8,000 characters. Backup passphrases preserve exact whitespace and are limited to 12–200 characters. The dashboard receives configured/not-configured status only, never stored secret values. The manager contract is tested with an in-memory fake backend so provider validation and value handling can be checked without reading or changing a developer's actual credential store.
 
 `npm run desktop:make` builds those same workspaces, stages a standalone copy outside the npm workspace tree, installs regular runtime dependencies, and uses stable Electron Forge 7.11.2 with a maintained `@electron/rebuild` 4 override to package the desktop app for the current operating system. Packaging dependencies install only in the isolated staging app, keeping Forge out of a contributor's normal `npm ci`. The local macOS ARM package passed API/dashboard, MCP, and headless lifecycle smokes; Windows/Linux packaging remains unverified, and installer dependencies still report deprecations. Before copying artifacts, packaging rewrites internal absolute framework symlinks to relative links and preserves those link targets during copy. Smoke checks run against the copied final artifact before staging cleanup to catch broken package paths. The Electron main process starts the API in an isolated utility process on a reserved loopback port; the dashboard runs in a sandboxed, context-isolated window. The service uses the OS application-data directory for SQLite and the OS credential manager for secrets. Desktop Settings can choose another local data directory: it copies a consistent SQLite backup, existing safety backups, and saved generated images, stores the selection in an app-data preference, then shuts down and restarts against the new location. The old directory is intentionally retained for owner-managed rollback or deletion. Desktop Settings can register the app to open at sign-in using Electron login items on macOS/Windows and an XDG autostart entry on Linux. Closing the dashboard hides it to the system tray while the local API and scheduled jobs continue; choosing **Quit Sunday Sidekick** in the tray stops the API. Owners can opt to start hidden at sign-in. Launching the packaged executable with `--sidekick-headless` starts the same loopback API and scheduled jobs without creating a window or tray icon; a regular launch with the same user-data directory can then open the dashboard. The packaged macOS ARM headless smoke checks API health and SIGTERM shutdown. The source-checkout service manager remains the recommended managed background option.
 
@@ -63,7 +75,7 @@ Source commands support Node 22 LTS only, pinned in `.nvmrc`/`.node-version` and
 
 `http-app.ts` owns the shared loopback host/origin and response-header boundary. Production and browser integration fixtures use it with the same feature routers; only provider interfaces and credential backends are substituted in fixtures. Provider adapters stay in `packages/integrations`.
 
-`generation-jobs.ts` persists manual requests in the schema-version-5 `generation_jobs` table. `POST /api/generation-jobs` accepts a bounded request ID, league ID, and report kind, returns 202, and always creates drafts. Request IDs deduplicate both concurrent retries and completed requests; changing their input is a conflict. The queue allows 20 pending/running jobs and executes one at a time. Report generation itself also serializes provider work shared with scheduled callers. Completion links the job and saved draft in the same SQLite transaction. Shutdown/restart/restore marks unfinished jobs interrupted; provider calls are never replayed automatically. Legacy report creation waits on the same durable queue and keeps its 201 response; explicit legacy automatic-delivery requests retain their existing owner policy. Scheduled runs retain their existing durable history.
+`generation-jobs.ts` persists manual requests in `generation_jobs`, introduced in schema version 5 and indexed alongside archived receipts in schema version 6. `POST /api/generation-jobs` accepts a bounded request ID, league ID, and report kind, returns 202, and always creates drafts. Request IDs deduplicate both concurrent retries and completed requests; changing their input is a conflict. The queue allows 20 pending/running jobs and executes one at a time. Report generation itself also serializes provider work shared with scheduled callers. Completion links the job and saved draft in the same SQLite transaction. Shutdown/restart/restore marks unfinished jobs interrupted; provider calls are never replayed automatically. Legacy report creation waits on the same durable queue and keeps its 201 response; explicit legacy automatic-delivery requests retain their existing owner policy. Scheduled runs retain their existing durable history.
 
 Settings section PATCH requests require a numeric `If-Match` revision from `settings.sectionRevisions`. SQLite checks the current revision under its write lock, merges the section, and increments every section changed by normalization, including derived privacy controls. Different sections can be saved independently. Restores invalidate existing form revisions. The legacy full-settings PUT remains available for older local clients; dashboard saves use the guarded PATCH contract.
 
@@ -72,3 +84,702 @@ Before the first outbound attempt, `delivery-service.ts` saves a credential-free
 The dashboard requests `/api/state?view=summary`, with at most 50 report summaries, recent jobs, and complete per-league review/issue counts. This endpoint never serializes report bodies or imported conversation source text. Visible windows poll every three seconds and refresh on focus; polling skips credential/news reads and keeps local form/editor state. `/api/report-history` returns filtered pages of up to 50 summaries using a stable date/ID cursor; full report content is fetched through `/api/reports/:id` when review opens. The default state response and MCP summary endpoints preserve their existing shapes.
 
 `packages/core` separates domain types, league state, schedules, analysis, and workflow contracts behind its existing barrel. Shared guards validate nested Settings, league, report, schedule/job, edit/send, and error payloads. `api-errors.ts` adds stable error codes to legacy messages. Persistence separates defaults, types, SQL/migrations, validation/restore, and retention. Settings uses focused form/revision, Yahoo, and image-library hooks. Dashboard CSS uses canonical `tokens.css`, an ordered `app.css`, and focused `workflow.css`; consolidation preserves cascade order and selector specificity.
+
+## Durable operations
+
+For operational contracts, see [local operations](operations.md). MCP draft creation uses
+the same durable asynchronous queue as the dashboard. SQLite schema 6 adds indexed report
+summary columns and compact archived request receipts; write helpers skip unchanged rows.
+Dashboard hash routes encode page, league, and report selection and guard Back/Forward against
+discarding unsaved edits. A top-level error boundary supports renderer recovery.
+
+`routine-backups.ts` serializes configuration and capture, keeps machine-local schedule/status
+beside encrypted archives, and stores the recovery passphrase only in the OS vault. Unlike
+ordinary provider tokens, backup passphrases retain their exact whitespace. Capture validates
+before publication/rotation; dry-run validation migrates only disposable copies. The internal
+desktop database-copy endpoint returns SQLite explicitly; portable backups remain archives.
+`operations-routes.ts` exposes backup lifecycle and sanitized diagnostic summaries through the
+existing loopback/origin boundary. Data-folder moves preserve the routine backup folder.
+
+## Workspace search
+
+The dashboard's `search-catalog.ts` is the reviewed destination registry for settings and pages.
+`search.ts` ranks plain-language aliases, words, prefixes, and bounded typos locally. Search
+results use the existing route guard; setting URLs select the section, scroll, focus, and highlight
+an explicit `data-search-target`. Accepted navigation resets dirty Settings forms, while rejected
+navigation retains them. Search never executes a setting or outbound action.
+
+`WorkspaceSearch` includes connected league metadata and current reports, with debounced,
+cancellable local title/type lookup through the bounded report-history endpoint for older reports.
+SQL LIKE queries bind escaped literals and return summaries only. Search query text is ephemeral
+and never enters credentials, settings, persistent URLs, logs, exports, or provider requests.
+See [workspace search](search.md) for behavior and matching limits.
+
+## Guided user workflows
+
+The dashboard keeps its stable internal hash destinations while presenting four primary
+navigation choices and searchable optional tools. Guided setup reuses the existing
+credential, settings-section, and data-free AI-test endpoints. A fresh section revision
+is read before changing only AI settings; the trusted OpenAI configuration is saved
+before a new key, and a newly discovered custom connection blocks provider replacement.
+Keys remain transient password-field state and OS-vault values. Individual schedule
+presets change the pending form to review mode; saving retains the existing optimistic
+concurrency boundary. Report choice creates a durable generation job, review fetches a
+saved report, and explicit send confirmation retains the existing revision/destination
+checks and saved-envelope delivery semantics. Dialog portals isolate modal layering
+from sticky navigation/save bars without changing focus trapping or restoration.
+
+## Tasks, sample mode, and in-app help
+
+Task search is a deterministic bounded local interpreter over owner queries, separate
+from keyword/fuzzy ranking. Its typed destinations open Help, a Schedule editor, or
+a delivery-policy preview; they never directly execute a mutation. Help entries and
+FAQ routing share content and validate bookmark IDs. New preview/help components
+load on demand; dialogs retain body portals and existing focus restoration.
+
+Sample mode has isolated component state and fictional prewritten content; it does
+not use service mutation endpoints, saved league/report state, provider generation,
+or delivery. Real report sharing exports only saved title/body through clipboard,
+plain-text download, or a user-initiated native share menu, with manual fallback.
+Provider delivery records remain independent of manual sharing.
+
+Inline Schedule editing pins a base schedules revision and saves through the existing
+section-scoped endpoint. Automatic send previews also check the current delivery
+revision before allowing stale recipients to be enabled. Section writes are not a
+cross-process or cross-section transaction; partial report/chat-policy saves have
+explicit recovery messaging. The shared timezone planner supplies display estimates,
+not new scheduler execution logic or guaranteed sends.
+
+Versioned browser setup progress stores only validated league IDs and safe wizard
+choices; secrets remain in the OS vault. Managed outbound AI hosting has a separate
+[proposed threat model and authentication design](managed-ai-design.md), with no
+remote listener or hosted service added by this work.
+
+The fantasy/betting advisor foundation keeps provider-specific public-data fetching
+and parsing in integrations and pure evidence/roster/odds calculations in core.
+Historical samples exclude future/target-week outcomes. Source dates survive outages,
+missing values remain missing, and confidence denotes evidence quality rather than
+win probability. The advice router uses the existing configured AI for analysis
+and review, validates source/metric/player references, and atomically rejects late
+canceled results. SQLite migration 7 stores up to 100 advice results independently
+of reports, with backup/restore/salvage support and on-demand UI reads. Advice is
+lazy-loaded and reachable through shared navigation/search/help definitions. No
+platform-write or betting execution interface exists; see [advice.md](advice.md).
+
+Advice model capability preferences live in integrations. Advice can override only
+the model and per-pass output budget for its current request, reusing the saved
+endpoint and credential. Overrides are checked against discovered supported choices
+and never persist into report settings. Saved model prices cannot estimate an
+override's cost. Responses requests disable storage and retain only completed final
+assistant text. Core decision policy is included before prompting and enforced after
+review, so missing evidence and uncalibrated betting forecasts cannot acquire a
+strong verdict solely through model wording. History validation preserves previously
+valid stored declarations; new generated recommendations require visible numbers.
+
+Core football context computes descriptive role changes, recorded team shares and
+opponent-position totals with identity, completeness and date cutoffs. It does not
+silently adjust imported projections. API evidence budgeting preserves comparison
+players, primary estimates/provenance and decision totals, shares repeated metric
+metadata/caveats and indexed player warnings once in model prompts, and discloses
+omitted secondary detail. Both passes receive explicit table-decoding instructions. Saved metrics retain
+descriptions. Required evidence that exceeds the limits fails before generation;
+source references close over retained evidence, including unavailable metadata.
+
+Core advice perception selects bounded recent player/team news, deduplicates coverage
+and records publication dates separately from retrieval dates. The API protects
+coverage/activity references through evidence budgeting and enforces unknown tone
+without a directly cited current headline. Saved optional coverage is validated
+before rendering; old history remains compatible. Explicit catalog Sleeper IDs
+enable cross-platform activity matching without conflating player-ID namespaces.
+
+The injury integration retains validated GSIS, season type and optional explicit-
+timezone report updates. Advice matching requires current regular-season week,
+team/position and a verified identity. A separate report/retrieval freshness policy
+and conflict check gate status overrides; undated or missing reports remain unknown.
+Player warnings carry practice/update context into prompts and saved rendering.
+Weekly uncertain availability limits recommendation strength outside the model.
+
+Core rolling betting forecasts separate fitted estimates, chronological probability
+evaluation and empirical calibration from AI judgments and retrospective hit rates.
+Only earlier weeks enter each evaluation case. A source/sample/calibration/price gate
+can permit at most a tentative choice; unsupported cases remain Hold. Optional
+forecast metadata is validated in saved advice and old history remains compatible.
+Evidence freshness is anchored after public-context downloads finish, preventing
+fresh retrievals from appearing future-dated relative to request start.
+
+The opt-in advice evaluation uses fictional snapshots and isolated in-memory state
+through the production service. Fixed expectations and raw reviewed-answer grading
+separate model judgment from deterministic policy corrections. It never loads the
+owner's settings/history or credentials. CLI generation honors validated per-request
+deadlines with its existing cancellation, output bounds and forced termination.
+Complete lineup comparisons can account for a recorded inactive bench player
+without manufacturing an estimate; missing active-player estimates remain unknown.
+Exact Claude CLI executable names select a provider-specific adapter for per-child
+output/reasoning limits and requested zero retries. Arbitrary CLI tools retain the
+generic interface; no credentials, authentication flow or owner settings are rewritten.
+Betting confidence stays Low when no evaluated forecast supports a pick, including
+when the model omits its optional forecast.
+
+Lineup candidates include eligible roster alternatives rather than only the
+optimizer's highest-estimate starters. Shared domain validation checks the model's
+entire starting selection against the actual slots and requires visible estimate
+support for replacements and displaced players. The saved selection has its own
+computed total; a different highest-estimate lineup remains an explicit comparison.
+
+Lineup requests may instead supply two to twenty candidate IDs for a single
+start/sit spot. Core checks selected-team ownership and shared supported slot
+eligibility, evaluates coverage only for those selected players, and stores an
+optional `startSit` scope instead of whole-lineup assignments. Both model passes
+must cite each eligible alternative's weekly estimate and select exactly one.
+Unknown selected active estimates still withhold a pick; inactive options cannot
+be selected. A contextual lower estimate receives an actual opportunity-cost
+metric and the existing tentative verdict/confidence reduction. Dashboard slot
+checks reuse the shared parser and fixed typed server errors reject invalid
+ownership/eligibility without inference. Request/result bounds and loopback,
+provider, credential and transaction boundaries remain unchanged.
+Contextual departures stay tentative with a confidence cap and no borrowed optimizer
+margin. Invalid first drafts receive fixed local validation feedback without raw
+rejected text or provider diagnostics.
+
+Advice can explicitly select the typed `SignedInAIConnection` integration. The
+installed Claude CLI login check exposes only availability, and generation uses
+the subscription-backed Opus preset in an isolated working directory. Neither
+client paths nor CLI arguments are accepted by advice routes. Both passes use the
+same selected provider; failure cannot invoke the saved report provider. Fixed
+connection probes serialize with analyses and cancel on disconnect. Selection is
+stored in the result request, with no report/schedule/settings or vault mutation.
+
+The subscription adapter validates the native JSON result envelope, including its
+error flag, and extracts only result text and bounded usage counts. Failure output,
+native session/account metadata and billing estimates never leave the integration.
+Fixed provider-limit/budget/invalid-response categories preserve no-fallback semantics.
+
+Projection periods are shared validated season/week intervals. Imports and database
+validation enforce their shape; advice matches the exact requested horizon. Trades
+consume explicit remaining projections through the selected league final week rather
+than full-season totals or historical subtraction. Scope/period remain in saved
+evidence, preserving old history without relabeling its original estimates.
+
+### Existing ChatGPT login for advice
+
+Advisor numerical placeholders include their computed value and unit. The shared
+core renderer removes only an identical immediately repeated unit in explanation
+text, preserving stored assessments, metric values, different units and paragraph
+boundaries. Analysis and review instructions disclose this formatting contract so
+the model can write readable descriptions without adding duplicate units.
+
+`SignedInCodexConnection` is a typed integrations adapter selected explicitly with
+`connection: codex-cli`. The saved AI/report/schedule configuration is untouched.
+Both passes use GPT-6.1-Sol with high reasoning; failures do not select another
+provider. Login status is native, bounded and reduced to availability. No tokens
+or account identifiers are opened, copied, returned or persisted by Sidekick.
+
+Generation supports verified Codex CLI 0.162.0-alpha.2 and, on macOS,
+0.162.0-alpha.17.2. It runs in an owned temporary directory
+with an owned system-instructions file, stdin evidence, ephemeral/read-only execution,
+ignored user config/rules, no project instructions/history/web/tools/plugins/apps and
+canonical installed-skill disables. Discovery is bounded and detects symlink cycles;
+incomplete discovery and unverified native versions fail closed. Child environment
+removes inherited API routing and desktop/session pipes, preserving native CODEX_HOME.
+Owned files are removed on success, failure and cancellation. CLI output is bounded;
+only a final agent message plus terminal completion and safe usage counts are retained.
+Native reasoning, session IDs, errors and stderr are not saved or exposed.
+The newer macOS build additionally disables orchestrator skills/MCP, native agent
+and request-input tools, and shared-daemon startup. An owned pinned model catalog
+uses standard tool mode, no patch/experimental tools and no Node runtime; server
+model capability metadata otherwise overrides feature disables. The selected model
+and high reasoning remain unchanged. macOS `sandbox-exec` denies reads of canonical
+global instruction paths without relocating or opening login credentials. This
+wrapper permits normal native authentication/networking; the read-only CLI sandbox
+and absent model tools provide the advice execution restrictions. Missing isolation
+controls fail closed. The exact expected global-instruction read denial is tolerated
+only before a turn, alongside the known Code Mode startup notice. The exact
+known startup notice for disabled Code Mode is tolerated before the turn; other errors
+and tool events reject the result.
+
+The subscription route has no supported per-pass token cap. UI omits that selector and
+the service rejects explicit overrides. Time/response-size limits and cancellation
+remain active. This is an experimental local integration: native upgrades require a
+fresh captured-request isolation proof, and Windows/native packaging remains unverified.
+
+Advisor prompts now include explicit selected/comparison roster ownership and, for
+draft decisions, the saved pick log, draft status/season and candidate eligibility
+checks. These are source-snapshot facts, not live/future availability guarantees.
+Draft planning is identified as a conditional comparison. Unknown future pick timing
+limits timing claims; current rosters do not establish past picks. This closes the
+missing roster/board context found by the live model evaluation while retaining
+96 KB data-block bounds, strict numerical/reference validation and no transaction
+capability. Proposed-answer review wording avoids confusing the first answer with
+a fantasy draft.
+
+Both passes define trade verdict direction relative to the specified exchange:
+Recommend/Lean support accepting it, while rejection or waiting uses Hold. The
+controlled evaluator retains wrong-verdict failures even when the prose correctly
+rejects a harmful exchange. Current/stale fictional media cases separately grade
+tone, citations and freshness; they do not model representative public opinion.
+
+Native protocol errors carry a fixed typed category for local evaluator diagnostics,
+such as missing final answer, duplicate answers or unexpected events. The evaluator
+allowlists these values even when passed an adapter error instance. Public error
+messages remain fixed, and raw native diagnostic text is never printed or persisted.
+
+### Automatic fantasy interval estimates
+
+The core prepares one chronological position-cohort model per league scoring system
+and advice snapshot, reusing indexed identity, schedule, history and fitted models
+across candidate players. The integrations adapter loads current/two prior weekly
+stat CSVs with the existing fixed URLs, byte limits, deadlines and cache. Verified
+Eastern kickoff times become optional UTC timestamps. No credentials or extra
+provider keys are introduced.
+
+The core produces conditional full/remaining-season points with a recorded/future
+split, numerical model decomposition, empirical residual ranges and earlier-week
+error tests. Completed weeks are predicted before any same-week outcome updates.
+Incomplete scoring/opponent contributors, duplicates and unknown timing do not
+become zero. Matching owner-confirmed imports retain priority. API budgeting protects
+uncertainty and evaluation alongside estimates, and both model passes receive the
+same source-linked facts and caveats. Saved validators accept the new method IDs
+without changing legacy results. Automatic comparisons remain Lean at most with
+capped evidence confidence; injury/role/availability changes and prospective season
+accuracy are not established by this calculation.
+
+The shared upcoming-game predicate handles timezone-qualified kickoff times and UTC
+day rollover. Options, weekly active estimates and betting history/forecasts reject
+known-started and unknown same-day games. Betting rechecks recorded kickoff after
+inference and in the save transaction; a fixed typed error returns actionable guidance
+without provider diagnostics. Draft review exposes current positional replacement
+values as source-linked metrics with explicit draft-time/roster-gain limits. The entire
+current roster accompanies saved picks so current starters and backups can be
+compared. Missing contemporaneous draft evidence prevents a historical grade, not a
+supported current conditional roster comparison.
+
+The shared news cache retains at most one hundred dated feed stories for advisor
+relevance selection while ordinary news remains ten and report prompts remain five.
+Both views share the same bounded/coalesced refresh. Advice selects at most eight
+relevant stories before inference. Invalid/missing RSS publication dates are excluded
+rather than replaced by retrieval time, and decimal/hexadecimal entities are decoded
+before name matching. Publisher/headline counts remain coverage, not public opinion.
+
+Kicker scoring uses the same typed player-stat adapter and cache, with optional
+numeric counts and bounded individual-distance metadata. Keep raw missed/blocked
+stats separate; the core composes platform penalties and verifies blocked distances
+when distance-specific miss rules need them. Made-yard-over-thirty scoring sums
+individual excesses rather than deriving them from aggregate yards. Legacy offensive
+schemas stay usable without inventing missing kicking values. K forms its own
+chronological forecast cohort; public history cannot establish current weather,
+kicking-job availability or team-defense fantasy points.
+
+Team-defense evidence comes through a separate typed integration adapter. Bounded
+filtered Sleeper weekly responses supply its own scoring semantics; bounded public
+team CSV totals prove selected omitted event zeroes. Both raw resource caches retain
+their actual retrieval dates through outages. Four shared request permits and one
+load deadline bound remote work. Canonical team/game joins and explicit per-row
+source IDs separate these records from GSIS player statistics. The fantasy model
+trains D/ST separately, gates complete recent appearances and preserves remaining
+versus recorded value. Advice source/metric provenance is bounded at 75 references
+to accommodate three seasons of individually dated weekly evidence; prompt and
+saved-byte limits remain unchanged. Unreferenced D/ST sources are budgeted out.
+
+Unresolved positive fumble-TD totals can additionally use a bounded public ESPN
+game summary, addressed only by the schedule's validated numeric event identity.
+At most twelve recent unresolved games share the adapter's request permits, load
+deadline and raw cache. Final game identity, scores, structured possession and unit
+records establish observed offensive fumble touchdowns; only exhaustion of the
+independent aggregate can prove remaining D/ST zeroes. Summary labels alone do
+not classify units. Preserve all three resource dates and source references;
+unavailable, conflicting and unfamiliar cases remain unknown. Remote links are
+never followed and no additional credential is required.
+
+NFL draft facts use one fixed nflverse release CSV through the existing public
+football-data cache. Parse at most 20,000 rows from a six-megabyte, timed response;
+retain identity, position, year, round, pick, drafting team and college only. Drop
+career totals/honors to avoid hindsight entering draft decisions. Validate modern
+and legacy GSIS IDs and bounded PFR IDs, including documented-name punctuation;
+identifiers are metadata, never remote URL fragments or commands. Missing IDs stay
+absent. Cache outages preserve the original source date.
+
+Core joins draft profiles by explicit GSIS identity or a unique normalized name and
+position when GSIS is absent. A conflicting explicit ID or ambiguous match withholds
+facts. Drafting-team codes never overwrite current catalog/roster membership. A
+conservative May 1 cutoff withholds current-class facts before draft completion;
+the feed cannot establish the actual historical publication time. Same-position,
+similar-round rookie cohorts use scoring-complete recorded appearances from two
+earlier classes, equal player weights and explicit selection-bias disclosures.
+They provide descriptive context only, never fill missing player estimates.
+Explicit draft/waiver shortlists retain selected players without estimates so the
+model and saved UI can explain gaps; incomplete comparisons cannot become picks.
+Closed saved-profile schemas and source closure retain provenance through budgeting.
+
+Public individual offensive forecasts sit behind a separate typed integration and
+`FootballDataSnapshot.playerForecasts`; they never enter observed `players` history.
+ESPN's fixed public default universe is read without credentials using bounded,
+coalesced weekly pages. Exact provider identity/period/team and complete publisher
+formula checks precede normalization of sparse expected zeroes. Season aggregates
+are ignored. Core composes exact verified future games under supported league rules,
+adds recorded production separately only in full-season scope, and gives matching
+imports priority. Cached outages retain retrieval dates and trigger short retries.
+The saved public method is always tentative, with expected statistics protected in
+evidence budgeting. This source does not validate future playing time or accuracy.
+
+### Sportsbook prices and prediction performance
+
+Public pregame prices and final receipts pass through the typed, bounded ESPN
+adapter in `packages/integrations`, separate from archived schedule reference
+lines. Advice verifies a selected quote before inference and before saving.
+The `prediction_records` SQLite table stores newly saved pre-kickoff forecasts
+independently of advice history. Explicit outcome refresh freezes no prediction
+inputs and never infers missing appearances as zero. Shared core calculates
+settlement, error/calibration and one-unit paper returns; HTTP routes and the
+Advice disclosure expose them without delivery or wager adapters. Archived-market
+replay runs in a bounded, cancellable worker, with fixed parameters, paired prices
+and no secrets/inherited environment. See [advice.md](advice.md) for contracts and
+methodological limits.
+
+The v2 game forecast combines typed paired prices with deterministic, regularized
+opponent offense/defense and neutral-aware home effects. Separate prequential
+windows fit rating residuals and a book-anchored correction; historical evaluation
+uses each game's own prices. Strict earlier-week/issuance boundaries avoid target
+and future outcomes. Four exact-content model contexts and bounded LRU correction
+origins reuse public data only. New/legacy forecast methods and their stated
+baselines are validated separately, preserved in saved history and tracked in
+separate prospective groups. See [advice.md](advice.md) and the
+[model comparison](reviews/2026-10-12-model-v2-comparison.md).
+
+### V3 game-market context
+
+The shared core derives bounded context from validated earlier regular-season
+games; it does not import archive QB/weather columns or add a provider endpoint.
+V3's eight-feature ridge logistic correction retains the book probability as an
+explicit offset. Moneyline uses a past-only Brier blend, evaluated with candidate
+fits preceding every earlier outcome. Live context includes three nested
+four-season market/blend windows plus residual and rating warmup (seventeen
+seasons); a four-context cache and bounded LRU origins prevent unbounded retention.
+Current quote thresholds override target archive line fields. V2 adjustment remains
+available only for matched upgrade measurement. Numeric forecasts, schemas,
+prompts, UI and the forward ledger retain explicit method identities. The API
+worker remains bounded/cancellable with no tuning inputs or inherited app state.
+
+## Typed pregame evidence
+
+`PublicPregameEvidence` in integrations enriches game snapshots with validated
+publication/capture times, earlier completed quarterback identities and fixed
+regional forecast records. Current event-linked ESPN injury labels are a dated
+team-level alternative when NFLverse reports lack dates; no IR-to-Out conversion
+is made. Current chart observations use actual retrieval times. The core accepts
+only context available by issuance and before kickoff, bounds report/chart age,
+and verifies forecast venue, units, lead and valid hour. Unknown data stays absent.
+History enrichment has a combined deadline, bounded provider responses and two
+six-hour cache contexts; clones prevent mutation of retained evidence. It passes
+only public game data into the historical worker.
+
+Totals use the regularized joint health/weather correction when enough earlier
+eligible cases exist, otherwise v3; moneyline/spread remain v3. Fits exclude the
+entire target week. Method identities, source coverage and paired book tests are
+retained in results; existing qualification gates are unchanged. See the
+[v4 review](reviews/2026-10-12-model-v4-comparison.md) for source timing assumptions.
+
+## Personnel source observations and research isolation
+
+Integrations validates bounded same-origin official NFL article discovery, latest
+modification dates, recognized team/status lists and precise source links. Weekly
+QB/snap adapters validate signed units and strict game/season/week/team identity.
+Indexed, cloned evidence rejects conflicting duplicates and future/current-week
+statistics. Current roles require only two source seasons; full historical
+personnel loading is an opt-in research constructor option. Production avoids
+downloading a corpus for rejected numerical corrections.
+
+The core preserves descriptive official reports and role/efficiency context but
+masks the rejected official injury feature class in production. The explicit
+research flag is confined to local model construction and never enabled by HTTP
+request bodies. No new v5 ledger method is deployed; v3/v4 dispatch and all
+qualification gates remain. [Evidence](reviews/2026-10-12-personnel-data-comparison.md).
+
+## Richer personnel research
+
+Current typed personnel evidence includes shrunken earlier-game passing/rushing
+EPA, team-relative QB performance, separate offensive-line/skill absence roles
+and injury-related practice/Doubtful roles. Prior weeks, completed scores, exact
+game/team/GSIS joins and the 24-hour availability allowance bound inputs. Missing
+practice observations/matches and stale Out charts withhold measurements. These
+facts are descriptive in Advice and preserve all production probabilities.
+
+The separate `rich-personnel-model` module is used only by local research commands.
+It fits ridge corrections to earlier out-of-week production logits, with optional
+past-only shrinkage toward the book and bounded caches. Candidate grids freeze on
+older data, and audits verify snapshot/development hashes; recent snapshots must
+preserve every historical row. The v6 experiment improves aggregate error slightly
+but fails consistency/uncertainty checks, so HTTP callers and ledger methods remain
+on v3/v4. [Evidence](reviews/2026-10-12-model-v6-comparison.md).
+
+## Alternate sportsbook model research
+
+The isolated boosted-market module fits deterministic shallow Newton trees to
+paired-book logits, replacing rather than stacking the retained linear corrections.
+Only earlier NFL weeks supply labels, residual features and optional adaptive book
+weights. Training-only quantile splits, minimum leaf/training sizes, numeric/data
+bounds, capped logit corrections and bounded caches contain model work. CLI
+selection removes later rows before preparation and audit checks frozen inputs
+and parameters; saved code hashes identify the implementation. HTTP and production forecasting keep v3/v4.
+
+Paired Brier diagnostics attribute loss to correction variance versus outcome
+alignment and distinguish inherited, weather and personnel layers. Post-hoc
+season/line/coverage subgroups cannot authorize tuning or placement. Forward
+outcomes live in sidecars keyed by the original issued-record hash, preserving
+forecast issuance/probabilities. [Evidence](reviews/2026-10-13-model-v7-comparison.md).
+
+## Totals hybrid seasonal research
+
+The isolated seasonal-hybrid module preserves current v3 moneyline/spread
+probabilities and dispatches totals to the fixed depth-two, 730-day market tree.
+An optional ridge intercept calibrates earlier out-of-week total forecasts with
+weekly decay and explicit season carry/reset. Optional book blending learns from
+earlier calibrated predictions and labels, excluding the full target week.
+Inputs/settings are cloned, identities and probabilities validated, and shifts,
+rows and caches bounded. Local CLI selection/audit checks frozen context hashes,
+parameters and specifications; there is no HTTP option or ledger method.
+
+Older selection rejects enabled seasonal recalibration; the plain hybrid improves
+aggregate reused archive error but fails uncertainty/current-season tests. Live
+v3/v4 dispatch remains. [Evidence](reviews/2026-10-13-model-v8-hybrid-comparison.md).
+
+## Online totals-expert research
+
+The expert-totals module mixes book, slow/fast totals trees and production totals
+with convex weights learned only from completed earlier NFL weeks. Weekly mean
+Brier updates, fixed share to a nonuniform prior, and explicit season resets/carry
+allow recovery when expert reliability changes. Data/settings and returned weights
+are isolated; numeric values, rows, identities and caches are bounded. Research
+CLI selection removes later rows before preparation and checks frozen context/
+parameter/specification identities on audit. Moneyline/spread call the same v3
+calculation exactly, and live v3/v4 dispatch remains unchanged.
+
+A fixed-weight explanatory control distinguishes reduced correction strength
+from actual learned adaptation gains; neither is selected from later results.
+The v9 online mixture reduces current totals loss but still trails book/production
+and loses older selection. [Evidence](reviews/2026-10-13-model-v9-expert-comparison.md).
+
+## Team-stat matchup totals research
+
+A separate typed integration validates and bounds public weekly team-stat CSVs;
+raw snapshots remain outside the repository with source hashes/provenance saved
+for research. Historic franchise aliases are local to this join and do not change
+production score ratings. The core research module fits shrunken offense/defense
+effects on prior-week per-play EPA, play counts, first downs and explosive plays,
+with an explicit lag, support flag and missing-history fallback. These counts
+are a volume proxy, not measured neutral-script pace; revised EPA/stat vintages
+are not certified historical pregame snapshots.
+
+Totals-only tree/ridge candidates condition book corrections on matchup features.
+Older selection removes later game/stat rows before preparation. Frozen CLIs
+audit the separately best new-feature candidate and the selected plain hybrid,
+with identical controls and exact production moneyline/spread output. New archive
+gains and current feature-free ablation gains do not overcome the fixed mixture's
+current performance; production dispatch remains v3/v4. No HTTP toggle, credentials,
+ledger write or deployment path is added.
+[Evidence](reviews/2026-10-13-model-v10-matchup-comparison.md).
+
+## Prediction-market external totals research
+
+Public prediction-market reads live behind a typed integrations adapter with
+fixed origins, bounded response/page/rate limits and no trading credentials.
+Exact NFL full-game half-point contracts must match team/date/kickoff identity
+and exist before the cutoff. Kalshi candle midpoint and Polymarket aggregate
+transaction prices remain distinct observation types. Settled-market resolution
+points can masquerade as old prices; reject all ambiguous terminal points and
+all price windows that overlap the cutoff. Completed trades need local time
+filtering, correct taker direction and an explicit pagination-completion gate.
+
+The core research model fits only earlier-week residuals to production totals,
+with separate price/flow/headline/combined families and past-only shrunken wallet
+directional-information weights. Current holder/leaderboard snapshots cannot
+establish historical skill or positions. Headline scoring-language features
+require independent dated captured coverage; this is not general public opinion.
+No HTTP or production-dispatch path is added. Explicit capture, frozen replay,
+sealed pregame records and independent outcome-sidecar CLIs are separate from
+the owner Advice journal. Public normalized context/tapes are saved compressed
+with hashes; raw responses remain outside the repository.
+[Evidence](reviews/2026-10-13-model-v11-external-markets.md).
+
+The separate historical research adapter handles archived Kalshi endpoints,
+legacy dollar strings and verified older Polymarket totals/title variants. Older
+CLOB minute samples must finish before cutoff; terminal prices remain excluded.
+An optional seven-day earlier-execution window extends the frozen one-day tape
+without changing the v11 contract or algorithm. Earlier windows have independent
+validation/completion gates and cannot be imputed from current holdings.
+
+The expanded research totals adapter compares book/production offsets and fits
+bounded residual corrections weekly over two prior seasons. Large execution
+weights are capped; wallet weights require relevant earlier resolved games and
+shrinkage. Local acquisition, initial development, coverage-only revision and
+hash-checked audit CLIs preserve distinct evidence. Production dispatch and
+earlier numerical forecasts remain unchanged.
+[Evidence](reviews/2026-10-13-model-v12-historical-totals.md).
+
+The separate seasonal external adapter reuses frozen as-of feature vectors and
+fits a recency-weighted sportsbook-offset likelihood. Optional weakened prior
+seasons decay further as current-season weeks pass; the selected research setting
+resets fitting and feedback each season. A bounded probability mixture evaluates
+earlier forecasts fitted at their own origins, avoiding optimistic in-sample
+feedback. Poor/insufficient evidence returns book exactly. Feature construction,
+existing adapters/models, live dispatch and earlier numeric records remain fixed.
+Development and hash-checked audit scripts report active and fallback cases
+separately. [Evidence](reviews/2026-10-13-model-v13-seasonal-external-totals.md).
+
+The fixed directional research wrapper validates full source vectors, then removes
+coverage and unsigned relative-volume columns before fitting or forecasting. A
+separate fixed price-only policy also removes all trade-flow/wallet columns.
+Source eligibility/freshness/completion guards remain active; they cannot become
+directional coefficients. Both policies reuse frozen seasonal math and retrain
+earlier prequential feedback on the retained predictors. New replay artifacts
+seal parent settings/audit and report active and practically negligible changes
+without changing production dispatch or issued forecasts.
+[Evidence](reviews/2026-10-13-model-v14-directional-totals.md).
+
+The canonical Kalshi research parser treats outcome-side and book-side as the
+same directional exposure bit, rejects contradictory pairs, and carries explicit
+block-trade state. The preserved legacy parser incorrectly combined those fields;
+its v11–v14 Kalshi signed inputs are known defective. New normalized tapes must
+carry verified canonical provenance before the robust feature builder accepts them.
+
+The robust totals builder measures recent pressure changes relative to the same
+contract's prior three hours, aggregates wallet/minute or anonymous minute before
+caps and size classification, and uses distinct-minute evidence gates. Identified
+wallets can contribute equal-wallet pressure, never inferred inventory or skill.
+A fixed alternate policy requires contemporaneous matching price movement.
+Fitting/feedback reuse the existing seasonal engine; separate source-fix-only
+comparison, durable repair patch and exact replay isolate data repair from changed
+signals. Existing live dispatch and issued numerical records remain unchanged.
+[Evidence](reviews/2026-10-13-model-v15-robust-trade-flow.md).
+
+A separate research-only drive adapter validates bounded nflverse PBP and retains
+selected raw fields for offline derivation. Repaired fixed drives identify scoring
+opportunities; original drive IDs deduplicate clocks. Missing/invalid numerical
+metadata makes a game unavailable. Prior completed weeks with a 48-hour lag feed
+opponent-adjusted efficiency, scoring/opportunity and clock-consumption profiles;
+coverage gates support without becoming a directional feature. Latest source
+revisions are not certified historical publication vintages.
+
+The research residual learner predicts final total minus archived book line,
+then applies a bounded probability correction and earlier-origin forecast
+feedback with weakened prior-season carryover. Optional corrected flow columns
+are a separately refitted ablation. Frozen development selection and hash-checked
+audit preserve all matched cases and exact non-total production delegation.
+No production dispatch or issued forecasts are changed.
+[Evidence](reviews/2026-10-13-model-v16-drive-totals.md).
+
+A separate research feedback adapter consumes immutable raw totals forecasts
+fitted at their own origins. It leaves football features, residual fitting and
+non-total production calculations fixed. Feedback has an independent bounded
+current-season window and decay, with either season reset or a capped preceding-
+season seed that fades out by Week 5. Evidence gates require distinct weeks and
+effective games; a correction cap limits variance. Zero trust still observes
+subsequent raw forecast outcomes so abstention cannot prevent recovery.
+
+Development selection and hash-checked audits retain all eight declared variants,
+paired book/parent/raw comparisons and exact fallback counts. New machine records
+are canonically formatted before sealing; old research bytes remain unchanged.
+This adapter is not routed to live predictions.
+[Evidence](reviews/2026-10-13-model-v17-recent-feedback.md).
+
+A separate research stability wrapper consumes the same immutable raw forecasts
+and inherited recent feedback contributions. It discounts alignment by weekly
+cluster variability or the weakest leave-week-out slope, with pooled or separate
+Over/Under heads. Three-week evidence and existing effective-game/time guards
+remain active; direction is known from the pregame source forecast. Returned
+reliability and internal policy are frozen against caller mutation.
+
+The new feedback selector uses the earlier 2021–2022 cohort, while retaining
+explicit warnings about later-selected inherited settings and revised historical
+inputs. All six variants and unchanged source/non-total comparisons are sealed.
+The wrapper is rejected as a replacement after later-season regressions and is
+not routed to live forecasts.
+[Evidence](reviews/2026-10-13-model-v18-stable-feedback.md).
+
+Advice calculation review: `draft-replacement.ts` uses bounded min-cost flow for
+joint league-wide starting demand, with at most 384 starting assignments and
+2,000 input players. Optional waiver `dropPlayerId` is validated at the HTTP
+boundary and against selected-team ownership before inference; the core planner
+rechecks ownership and recomputes all starting slots. Source-linked before/drop/
+after/gain metrics survive prompt budgeting and final explanation validation.
+Explicit identity conflicts withhold scoring/workload history. Forecast error
+reporting separates selected baseline from rejected adjustment candidate; betting
+action gates require a sportsbook baseline. No new provider or storage schema is
+introduced; old saved requests remain valid without the optional drop field.
+
+## Local Messages through imsg
+
+`ImsgClient`/`ImsgChannel` implement bounded CLI integration on macOS, selected by
+`imessageProvider: imsg`; absent/legacy settings retain BlueBubbles. Native paths
+are ordinary local settings, not new credentials. Dedicated loopback endpoints
+check the version or explicitly discover safe recent chat metadata. History uses
+`imsgChatId` only after matching the stable `imessageChatGuid`; each message is
+validated against both. Only selected text, author handles, timestamps and GUIDs
+enter the shared memory workflow; native account/attachment metadata is discarded.
+Existing polling invokes the same guarded sync route and storage/analysis/reply
+consent remains separate. Native history uses a provider namespace and the same
+retention representation/pruner. Provider/path/row-ID changes revoke in-flight sync
+before additional AI work or saving; provider switches require renewed automation
+consent. BlueBubbles webhook events cannot trigger native reads.
+
+Native report delivery sends text to the stable GUID, pins the resolved executable
+in the immutable envelope and rejects backend changes on retry. Missing receipt or
+post-spawn failure is uncertain. Processes use no shell, scrub inherited AI/session
+variables, bound time/output, discard stderr and terminate their process group on
+cancellation/deadline. The trusted CLI retains its native account/OS permissions;
+no background watcher or private-framework injection is used. Full Disk Access and
+Messages Automation depend on the actual source-service/Electron parent identity.
+
+## Weekly readiness and prospective journal
+
+The local advice router exposes read-only weekly summaries and the existing-request
+readiness POST without invoking a model. Core computes validated readiness and
+journal views; integrations expose dated injury evidence and typed verification
+profile isolation. New optional prediction-record metadata keeps old archives
+readable while recording workflow, fixed numerical-code protocol and complete
+hypothetical decision sets. The existing settlement service supplies final
+outcomes. Installed-code fingerprinting stays in the API filesystem boundary.
+
+Desktop team preferences use guarded IPC and atomic private preference files,
+independent of the service's changing loopback port. Optional imsg read probes
+verify only the saved target and discard history without using the memory, AI or
+delivery pipeline. See the dated weekly-decision review for verification limits.
+
+When the desktop uses `SIDEKICK_VERIFICATION_ROOT`, its API utility process receives
+the same root and a confined legacy `state.json` path as well as the private SQLite
+and data-directory paths. Verification uses a bounded process-memory credential
+backend without importing the native vault binding; restart discards credentials.
+Normal launches retain the OS vault and never fall back to memory. The private
+test browser session is nonpersistent and uses the macOS mock-Keychain switch,
+avoiding Chromium cookie-encryption prompts independently of API credentials.
+A trusted read-only preload flag identifies this profile. Only these launches
+skip Stop and before-unload close confirmations; navigation and send guards
+remain. Test startup/API failures report diagnostics and exit nonzero without a
+modal. HOME and ordinary profiles remain unchanged.
+Validated advice results are sorted by descending creation time when SQLite state
+is read. Upsert insertion order cannot preserve the newest-first in-memory list;
+normalizing it protects weekly recents and subsequent bounded history retention
+after restart or backup restore.
+
+Advice evidence records a weekly bye only from a complete unambiguous NFL team
+schedule; planners can exclude that bench slot without inventing zero points or
+relaxing unknown-active-player gates. Shared reserve-status checks exclude PUP/NFI
+from active choices. Public projection identity matching permits only unique
+optional suffix variants with consistent provider/position/team identity, keeping
+explicit-ID conflicts blocked. Both reasoning passes receive saved current-week
+starter identities, while platform slot assignments and transaction eligibility
+remain unverified. Real-data evaluation uses isolated public snapshots and small
+synthetic PPR scenarios with a separate exhaustive arithmetic oracle.
+
+## Report library and numeric charts
+
+The Reports library exposes the five supported report kinds through the existing durable generation queue and report scheduler. Its weekly-plan preview captures the schedule revision and proposes Tuesday 09:00 rankings and Wednesday 09:00 matchup previews in each action’s existing timezone, scoped to the active league, with `mode: draft` and `channel: dashboard`. Saving patches only the schedules section; conflicting updates fail closed. Other schedules, voice, credentials and recipients remain as configured. Individual draft event automation starts as one-time, review-only setup. Service/awake requirements, AI context sharing and usage charges remain visible.
+
+`reportVisuals` in core selects the current platform week (or latest available week when unknown) before bounding matchup rows and captures at most 64 teams and 32 two-sided matchups. API generation freezes this minimal evidence before waiting on providers and persists it under `SavedReport.evidence.visuals`; numbers come from the platform, not parsing AI prose. Shared and backup-import validators bound numeric values and collections. The renderer uses accessible SVG bars, explicit missing values, zero-based scales that handle negative scores, expandable raw data and platform sync dates. Current league charts and saved-report charts are separate; legacy reports have no synthetic historical chart. This adds no dependencies, provider requests or changes to numerical advice models.
+
+## Real report quality checks and season boundaries
+
+The production scheduled runner is a typed, dependency-injected API module. `saveSyncedLeague` persists a connector result while preserving the latest owner label/connection date and stamping sync time; the exact result is passed into inference. Recurring jobs recheck enabled state, cadence and selected league after awaited sync. Calendar drafts use the same persisted evidence. The existing credential/connector boundary, occurrence claims, duplicate handling, season pauses, delivery policy and loopback service remain intact.
+
+Report prompts include the season, generation time and league sync time. News publication dates must be valid, nonfuture and within the league season (including the following January/February); old/future setups omit current catalog status and legacy undated estimates. Explicitly dated owner projection periods remain usable for the matching season. This prevents a newly retrieved archive from borrowing current availability/news as historical evidence. Availability guidance uses both status and injuryStatus. A recorded inactive starter invalidates an active matchup sum; it does not create zero points or invent a substitute.
+
+Numeric chart snapshots include an optional season for backwards compatibility. Recorded scores use two decimals; wins use integer counts. Sleeper commissioner `custom_points` values take precedence over calculated points, including zero. Plain-text report instructions avoid unsupported Markdown rendering. No numerical advice model or provider dependency changes are introduced.

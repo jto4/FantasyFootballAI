@@ -156,7 +156,41 @@ await test('partial-row salvage preserves valid records and omits malformed rows
     CREATE TABLE scheduled_runs (id TEXT PRIMARY KEY, position INTEGER NOT NULL, payload TEXT NOT NULL);
     CREATE TABLE player_projections (id TEXT PRIMARY KEY, league_id TEXT NOT NULL, payload TEXT NOT NULL);
     CREATE TABLE generation_jobs (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
+    CREATE TABLE archived_generation_jobs (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
+    CREATE TABLE prediction_records (id TEXT PRIMARY KEY, payload TEXT NOT NULL);
   `);
+  const prediction = {
+    id: 'paper',
+    adviceId: 'old',
+    recordedAt: '2026-10-07T12:00:00Z',
+    method: 'rolling-residual-v1',
+    kind: 'bet',
+    season: 2026,
+    forecast: 0.6,
+    selected: false,
+    status: 'pending',
+    terms: { kind: 'moneyline', gameId: 'game', side: 'home', americanOdds: -110 },
+    games: [
+      {
+        id: 'game',
+        espnId: '401872994',
+        season: 2026,
+        week: 5,
+        seasonType: 'REG',
+        date: '2026-10-11',
+        kickoffAt: '2026-10-11T17:00:00Z',
+        home: 'BUF',
+        away: 'MIA',
+      },
+    ],
+  };
+  addRow(database, 'prediction_records', 'paper', JSON.stringify(prediction));
+  addRow(
+    database,
+    'prediction_records',
+    'bad',
+    JSON.stringify({ ...prediction, id: 'bad', recordedAt: '2026-10-12T12:00:00Z' }),
+  );
   addRow(
     database,
     'app_settings',
@@ -270,6 +304,17 @@ await test('partial-row salvage preserves valid records and omits malformed rows
   addRow(database, 'generation_jobs', job.id, JSON.stringify(job));
   addRow(
     database,
+    'archived_generation_jobs',
+    'archived-job',
+    JSON.stringify({
+      ...job,
+      id: 'archived-job',
+      requestId: 'archived-request',
+      status: 'cancelled',
+    }),
+  );
+  addRow(
+    database,
     'generation_jobs',
     'job-bad',
     JSON.stringify({ ...job, id: 'job-bad', requestId: 'bad-request', status: 'unknown' }),
@@ -285,8 +330,9 @@ await test('partial-row salvage preserves valid records and omits malformed rows
     assert.equal(result.counts.memories, 1);
     assert.equal(result.counts.projections, 1);
     assert.equal(result.counts.runs, 1);
-    assert.equal(result.counts.jobs, 1);
-    assert.equal(result.counts.skipped, 6);
+    assert.equal(result.counts.jobs, 2);
+    assert.equal(result.counts.skipped, 7);
+    assert.equal(result.counts.predictions, 1);
     const backupPath = join(backups, result.backupName);
     assert.match(result.backupName, /-salvage-[a-f\d]{8}\.sqlite$/);
     assert.equal(isValidAppDatabase(backupPath), true);
@@ -305,6 +351,10 @@ await test('partial-row salvage preserves valid records and omits malformed rows
     assert.equal(settings.actions[0].schedule.enabled, false);
     assert.equal(recovered.prepare('SELECT COUNT(*) AS count FROM leagues').get().count, 1);
     assert.equal(recovered.prepare('SELECT COUNT(*) AS count FROM reports').get().count, 1);
+    assert.deepEqual(
+      JSON.parse(recovered.prepare('SELECT payload FROM prediction_records').get().payload),
+      prediction,
+    );
     recovered.close();
     assert.equal(isValidAppDatabase(databasePath), false, 'salvage must not change the source DB');
   } finally {

@@ -40,9 +40,18 @@ describe('local MCP server', () => {
                     ? { id: 'report-1', body: 'Draft body', citations: [] }
                     : pathname === '/api/news'
                       ? [{ title: 'Test headline', url: 'https://example.test/story' }]
-                      : pathname === '/api/reports/power-rankings'
-                        ? { id: 'report-2', status: 'draft' }
-                        : { error: 'not found' },
+                      : pathname === '/api/report-history'
+                        ? { items: [], total: 0 }
+                        : pathname.startsWith('/api/generation-jobs')
+                          ? {
+                              id: 'job-2',
+                              requestId: 'request-stable-123',
+                              leagueId: 'league-1',
+                              kind: 'power-rankings',
+                              status: pathname.endsWith('/cancel') ? 'cancelled' : 'queued',
+                              createdAt: new Date().toISOString(),
+                            }
+                          : { error: 'not found' },
           ),
           {
             status: method === 'POST' ? 201 : 200,
@@ -98,6 +107,9 @@ describe('local MCP server', () => {
         'get_report',
         'get_football_news',
         'create_report_draft',
+        'get_generation_job',
+        'cancel_generation_job',
+        'list_report_history',
         'send_report_draft',
       ]);
       expect(
@@ -118,20 +130,31 @@ describe('local MCP server', () => {
       expect(
         JSON.stringify(
           await callTool('create_report_draft', {
+            requestId: 'request-stable-123',
             leagueId: 'league-1',
             kind: 'power-rankings',
           }),
         ),
-      ).toContain('report-2');
-      const draftRequest = requests.find((entry) =>
-        entry.url.endsWith('/api/reports/power-rankings'),
-      );
+      ).toContain('job-2');
+      const draftRequest = requests.find((entry) => entry.url.endsWith('/api/generation-jobs'));
       expect(draftRequest?.method).toBe('POST');
       expect(JSON.parse(draftRequest?.body ?? '{}')).toEqual({
         leagueId: 'league-1',
-        draftOnly: true,
+        kind: 'power-rankings',
+        requestId: 'request-stable-123',
       });
 
+      expect(
+        JSON.stringify(await callTool('get_generation_job', { requestId: 'request-stable-123' })),
+      ).toContain('queued');
+      expect(
+        JSON.stringify(
+          await callTool('cancel_generation_job', { requestId: 'request-stable-123' }),
+        ),
+      ).toContain('cancelled');
+      expect(JSON.stringify(await callTool('list_report_history', { limit: 10 }))).toContain(
+        'total',
+      );
       const sendResult = await callTool('send_report_draft', { reportId: 'report-1' });
       expect(sendResult.isError).toBe(true);
       expect(JSON.stringify(sendResult)).toContain('MCP sending is disabled');

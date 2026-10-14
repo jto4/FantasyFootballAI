@@ -7,6 +7,29 @@ import {
 } from './projections.js';
 
 describe('owner projection imports', () => {
+  it('parses explicit remaining intervals without confusing them with season or weekly estimates', () => {
+    expect(
+      parseProjectionCsv('player,points,season,fromWeek,throughWeek\nFictional,130,2026,5,18')[0],
+    ).toMatchObject({
+      projectedPoints: 130,
+      period: { season: 2026, fromWeek: 5, throughWeek: 18 },
+    });
+    expect(parseProjectionCsv('player,points,season\nFictional,400,2026')[0]!.period).toEqual({
+      season: 2026,
+      fromWeek: 1,
+      throughWeek: 18,
+    });
+    expect(parseProjectionCsv('player,points,season,week\nFictional,10,2026,5')[0]!.period).toEqual(
+      { season: 2026, fromWeek: 5, throughWeek: 5 },
+    );
+    for (const csv of [
+      'player,points,fromWeek,throughWeek\nFictional,130,5,18',
+      'player,points,season,fromWeek\nFictional,130,2026,5',
+      'player,points,season,fromWeek,throughWeek\nFictional,130,2026,8,5',
+      'player,points,season,fromWeek,throughWeek,week\nFictional,130,2026,5,18,5',
+    ])
+      expect(() => parseProjectionCsv(csv)).toThrow();
+  });
   it('parses quoted names and supported column aliases', () => {
     expect(
       parseProjectionCsv(

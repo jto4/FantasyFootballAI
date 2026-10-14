@@ -1,0 +1,1908 @@
+{
+  "provenance": {
+    "capturedAt": "2026-10-05T04:06:40.465Z",
+    "documentation": "https://docs.sleeper.com/#get-a-specific-league",
+    "source": "https://api.sleeper.app/v1/league/289646328504385536",
+    "scope": "Historical public documentation sample. Owner IDs and names removed; manager labels synthesized. NFL player IDs and numeric league semantics retained. No current-season or private-account claim."
+  },
+  "league": {
+    "league_id": "289646328504385536",
+    "name": "Sanitized public sample",
+    "season": "2018",
+    "status": "complete",
+    "total_rosters": 12,
+    "draft_id": "289646328508579840",
+    "roster_positions": [
+      "QB",
+      "RB",
+      "RB",
+      "WR",
+      "WR",
+      "TE",
+      "FLEX",
+      "FLEX",
+      "DEF",
+      "BN",
+      "BN",
+      "BN",
+      "BN",
+      "BN",
+      "BN"
+    ],
+    "scoring_settings": {
+      "sack": 1,
+      "qb_hit": 0,
+      "fgm_40_49": 4,
+      "bonus_rec_yd_100": 0,
+      "bonus_rush_yd_100": 0,
+      "pass_int": -2,
+      "pts_allow_0": 10,
+      "bonus_pass_yd_400": 0,
+      "pass_2pt": 2,
+      "blk_kick_ret_yd": 0,
+      "st_td": 6,
+      "sack_yd": 0,
+      "pr_td": 0,
+      "rec_td": 6,
+      "tkl_ast": 0,
+      "fgm_30_39": 3,
+      "kr_td": 0,
+      "xpmiss": -1,
+      "rush_td": 6,
+      "fg_ret_yd": 0,
+      "idp_tkl": 0,
+      "fgm": 0,
+      "idp_blk": 0,
+      "rec_2pt": 2,
+      "int_ret_yd": 0,
+      "idp_tkl_solo": 0,
+      "pass_att": 0,
+      "st_fum_rec": 1,
+      "ff": 1,
+      "idp_int": 0,
+      "fgmiss_30_39": -1,
+      "rec": 1,
+      "idp_safe": 0,
+      "pts_allow_14_20": 1,
+      "def_2pt": 0,
+      "fgm_0_19": 3,
+      "int": 2,
+      "def_st_fum_rec": 0,
+      "fum_lost": -2,
+      "pts_allow_1_6": 7,
+      "kr_yd": 0,
+      "fgmiss_20_29": -1,
+      "rush_att": 0,
+      "st_tkl_solo": 0,
+      "idp_sack": 0,
+      "fgm_20_29": 3,
+      "pts_allow_21_27": 0,
+      "bonus_pass_yd_300": 0,
+      "xpm": 1,
+      "pass_sack": 0,
+      "fgmiss_0_19": -1,
+      "pass_cmp": 0,
+      "tkl_loss": 0,
+      "rush_2pt": 2,
+      "def_pass_def": 0,
+      "fum_rec": 2,
+      "idp_pass_def": 0,
+      "bonus_rec_yd_200": 0,
+      "def_st_td": 0,
+      "tkl": 0,
+      "fgm_50p": 5,
+      "def_td": 6,
+      "idp_fum_rec": 0,
+      "bonus_rush_yd_200": 0,
+      "safe": 2,
+      "pass_yd": 0.03999999910593033,
+      "blk_kick": 2,
+      "pass_td": 6,
+      "tkl_solo": 0,
+      "rush_yd": 0.10000000149011612,
+      "pr_yd": 0,
+      "fum": 0,
+      "pts_allow_28_34": -1,
+      "pts_allow_35p": -4,
+      "rec_yd": 0.10000000149011612,
+      "fum_ret_yd": 0,
+      "def_st_ff": 0,
+      "pts_allow_7_13": 4,
+      "idp_ff": 0,
+      "st_ff": 1,
+      "idp_tkl_ast": 0
+    },
+    "settings": {
+      "bench_lock": 0,
+      "daily_waivers": 0,
+      "daily_waivers_hour": 0,
+      "draft_rounds": 3,
+      "last_report": 13,
+      "last_scored_leg": 16,
+      "league_average_match": 0,
+      "leg": 16,
+      "max_keepers": 3,
+      "num_teams": 12,
+      "offseason_adds": 0,
+      "pick_trading": 0,
+      "playoff_teams": 6,
+      "playoff_type": 0,
+      "playoff_week_start": 14,
+      "reserve_allow_doubtful": 0,
+      "reserve_allow_out": 1,
+      "reserve_allow_sus": 1,
+      "reserve_slots": 1,
+      "start_week": 2,
+      "taxi_allow_vets": 0,
+      "taxi_deadline": 0,
+      "taxi_slots": 0,
+      "taxi_years": 0,
+      "trade_deadline": 10,
+      "trade_review_days": 2,
+      "type": 0,
+      "waiver_budget": 100,
+      "waiver_clear_days": 2,
+      "waiver_day_of_week": 2,
+      "waiver_type": 2,
+      "was_auto_archived": 1
+    }
+  },
+  "rosters": [
+    {
+      "roster_id": 1,
+      "owner_id": "anonymous-1",
+      "players": [
+        "1352",
+        "1387",
+        "2118",
+        "2133",
+        "2182",
+        "223",
+        "2319",
+        "2449",
+        "3208",
+        "4035",
+        "421",
+        "4881",
+        "4892",
+        "788"
+      ],
+      "starters": ["4881", "4035", "788", "2133", "2449", "2118", "223", "1352"],
+      "settings": {
+        "fpts": 1776,
+        "fpts_against": 1695,
+        "fpts_against_decimal": 36,
+        "fpts_decimal": 6,
+        "losses": 6,
+        "ppts": 2004,
+        "ppts_decimal": 42,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 4,
+        "wins": 7
+      }
+    },
+    {
+      "roster_id": 2,
+      "owner_id": "anonymous-2",
+      "players": [
+        "1793",
+        "1825",
+        "2078",
+        "3178",
+        "3242",
+        "331",
+        "4038",
+        "4066",
+        "4866",
+        "4962",
+        "5248",
+        "5250",
+        "5284",
+        "536"
+      ],
+      "starters": ["331", "4866", "4962", "1825", "536", "4066", "3242", "5284"],
+      "settings": {
+        "fpts": 1736,
+        "fpts_against": 1678,
+        "fpts_against_decimal": 44,
+        "fpts_decimal": 2,
+        "losses": 7,
+        "ppts": 1985,
+        "ppts_decimal": 8,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 6,
+        "wins": 6
+      }
+    },
+    {
+      "roster_id": 3,
+      "owner_id": "anonymous-3",
+      "players": [
+        "1234",
+        "1451",
+        "1502",
+        "184",
+        "2320",
+        "3423",
+        "367",
+        "4018",
+        "4037",
+        "4080",
+        "4146",
+        "4351",
+        "4994",
+        "4998",
+        "538"
+      ],
+      "starters": ["1234", "2320", "4018", "4998", "3423", "367", "4146", "4994"],
+      "settings": {
+        "fpts": 1731,
+        "fpts_against": 1560,
+        "fpts_against_decimal": 98,
+        "fpts_decimal": 72,
+        "losses": 3,
+        "ppts": 1957,
+        "ppts_decimal": 22,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 11,
+        "wins": 10
+      }
+    },
+    {
+      "roster_id": 4,
+      "owner_id": "anonymous-4",
+      "players": [
+        "1339",
+        "1386",
+        "1476",
+        "2306",
+        "2309",
+        "3202",
+        "3321",
+        "3868",
+        "4131",
+        "4152",
+        "4988",
+        "5068",
+        "5076",
+        "5347",
+        "730"
+      ],
+      "starters": ["2306", "4152", "4988", "4131", "2309", "1339", "3321", "3202"],
+      "settings": {
+        "fpts": 1736,
+        "fpts_against": 1811,
+        "fpts_against_decimal": 18,
+        "fpts_decimal": 52,
+        "losses": 8,
+        "ppts": 1975,
+        "ppts_decimal": 32,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 7,
+        "wins": 5
+      }
+    },
+    {
+      "roster_id": 5,
+      "owner_id": "anonymous-5",
+      "players": [
+        "1500",
+        "1992",
+        "2024",
+        "2197",
+        "2216",
+        "232",
+        "24",
+        "2460",
+        "3198",
+        "3306",
+        "4036",
+        "4137",
+        "574",
+        "717",
+        "956"
+      ],
+      "starters": ["24", "956", "3198", "2216", "2197", "2460", "4036", "1992"],
+      "settings": {
+        "fpts": 1635,
+        "fpts_against": 1548,
+        "fpts_against_decimal": 98,
+        "fpts_decimal": 28,
+        "losses": 5,
+        "ppts": 1844,
+        "ppts_decimal": 14,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 21,
+        "waiver_position": 3,
+        "wins": 8
+      }
+    },
+    {
+      "roster_id": 6,
+      "owner_id": "anonymous-6",
+      "players": [
+        "1149",
+        "1426",
+        "1601",
+        "175",
+        "1833",
+        "1944",
+        "3199",
+        "3294",
+        "3594",
+        "4034",
+        "4171",
+        "4217",
+        "4981",
+        "4992"
+      ],
+      "starters": ["3294", "4034", "1833", "1426", "3199", "4217", "4981", "1149"],
+      "settings": {
+        "fpts": 1899,
+        "fpts_against": 1668,
+        "fpts_against_decimal": 68,
+        "fpts_decimal": 78,
+        "losses": 2,
+        "ppts": 2161,
+        "ppts_decimal": 80,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 12,
+        "wins": 11
+      }
+    },
+    {
+      "roster_id": 7,
+      "owner_id": "anonymous-7",
+      "players": [
+        "1346",
+        "1555",
+        "2374",
+        "2391",
+        "4029",
+        "4046",
+        "4995",
+        "5013",
+        "5026",
+        "5136",
+        "5170",
+        "642",
+        "676",
+        "954"
+      ],
+      "starters": ["4046", "2391", "4029", "2374", "642", "4995", "5170", "676"],
+      "settings": {
+        "fpts": 1704,
+        "fpts_against": 1694,
+        "fpts_against_decimal": 44,
+        "fpts_decimal": 54,
+        "losses": 7,
+        "ppts": 1858,
+        "ppts_decimal": 28,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 10,
+        "wins": 6
+      }
+    },
+    {
+      "roster_id": 8,
+      "owner_id": "anonymous-8",
+      "players": [
+        "1166",
+        "1479",
+        "1817",
+        "1848",
+        "2325",
+        "2381",
+        "2822",
+        "4082",
+        "4199",
+        "4263",
+        "455",
+        "4651",
+        "5046",
+        "928",
+        "943"
+      ],
+      "starters": ["1166", "1848", "4263", "2822", "4082", "943", "1479", "2381"],
+      "settings": {
+        "fpts": 1538,
+        "fpts_against": 1814,
+        "fpts_against_decimal": 20,
+        "fpts_decimal": 12,
+        "losses": 9,
+        "ppts": 1710,
+        "ppts_decimal": 32,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 89,
+        "waiver_position": 5,
+        "wins": 4
+      }
+    },
+    {
+      "roster_id": 9,
+      "owner_id": "anonymous-9",
+      "players": [
+        "1901",
+        "1911",
+        "2214",
+        "2341",
+        "2431",
+        "289",
+        "3200",
+        "3225",
+        "3969",
+        "4149",
+        "5038",
+        "5086",
+        "5107",
+        "947",
+        "988"
+      ],
+      "starters": ["289", "4149", "3969", "947", "3225", "2214", "5107", "5038"],
+      "settings": {
+        "fpts": 1664,
+        "fpts_against": 1774,
+        "fpts_against_decimal": 40,
+        "fpts_decimal": 6,
+        "losses": 8,
+        "ppts": 1863,
+        "ppts_decimal": 64,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 72,
+        "waiver_position": 9,
+        "wins": 5
+      }
+    },
+    {
+      "roster_id": 10,
+      "owner_id": "anonymous-10",
+      "players": [
+        "1048",
+        "1195",
+        "1689",
+        "2315",
+        "2378",
+        "2399",
+        "3976",
+        "4017",
+        "4033",
+        "4068",
+        "4111",
+        "4273",
+        "5045",
+        "5310"
+      ],
+      "starters": ["4017", "2378", "1048", "1689", "5045", "4033", "4273", "2315"],
+      "settings": {
+        "fpts": 1805,
+        "fpts_against": 1632,
+        "fpts_against_decimal": 36,
+        "fpts_decimal": 46,
+        "losses": 5,
+        "ppts": 1962,
+        "ppts_decimal": 16,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 100,
+        "waiver_position": 8,
+        "wins": 8
+      }
+    },
+    {
+      "roster_id": 11,
+      "owner_id": "anonymous-11",
+      "players": [
+        "1071",
+        "1110",
+        "138",
+        "1408",
+        "2382",
+        "2430",
+        "344",
+        "4455",
+        "4983",
+        "5007",
+        "560",
+        "616",
+        "949",
+        "96"
+      ],
+      "starters": ["96", "4455", "2382", "4983", "1110", "616", "344", "1071"],
+      "settings": {
+        "fpts": 1374,
+        "fpts_against": 1730,
+        "fpts_against_decimal": 62,
+        "fpts_decimal": 54,
+        "losses": 11,
+        "ppts": 1554,
+        "ppts_decimal": 26,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 52,
+        "waiver_position": 2,
+        "wins": 2
+      }
+    },
+    {
+      "roster_id": 12,
+      "owner_id": "anonymous-12",
+      "players": [
+        "1111",
+        "1466",
+        "147",
+        "1517",
+        "2346",
+        "2583",
+        "3163",
+        "3164",
+        "4040",
+        "4157",
+        "4663",
+        "491",
+        "515"
+      ],
+      "starters": ["1111", "3164", "4157", "4040", "491", "1466", "515", "147"],
+      "settings": {
+        "fpts": 1706,
+        "fpts_against": 1698,
+        "fpts_against_decimal": 90,
+        "fpts_decimal": 44,
+        "losses": 7,
+        "ppts": 2021,
+        "ppts_decimal": 8,
+        "ties": 0,
+        "total_moves": 0,
+        "waiver_budget_used": 12,
+        "waiver_position": 1,
+        "wins": 6
+      }
+    }
+  ],
+  "users": [
+    {
+      "user_id": "anonymous-1",
+      "display_name": "Manager 1"
+    },
+    {
+      "user_id": "anonymous-2",
+      "display_name": "Manager 2"
+    },
+    {
+      "user_id": "anonymous-3",
+      "display_name": "Manager 3"
+    },
+    {
+      "user_id": "anonymous-4",
+      "display_name": "Manager 4"
+    },
+    {
+      "user_id": "anonymous-5",
+      "display_name": "Manager 5"
+    },
+    {
+      "user_id": "anonymous-6",
+      "display_name": "Manager 6"
+    },
+    {
+      "user_id": "anonymous-7",
+      "display_name": "Manager 7"
+    },
+    {
+      "user_id": "anonymous-8",
+      "display_name": "Manager 8"
+    },
+    {
+      "user_id": "anonymous-9",
+      "display_name": "Manager 9"
+    },
+    {
+      "user_id": "anonymous-10",
+      "display_name": "Manager 10"
+    },
+    {
+      "user_id": "anonymous-11",
+      "display_name": "Manager 11"
+    },
+    {
+      "user_id": "anonymous-12",
+      "display_name": "Manager 12"
+    }
+  ],
+  "draft": {
+    "league_id": "289646328504385536",
+    "season": "2018",
+    "status": "complete",
+    "type": "snake",
+    "settings": {
+      "cpu_autopick": 0,
+      "pick_timer": 120,
+      "player_type": 0,
+      "rounds": 15,
+      "slots_bn": 6,
+      "slots_def": 1,
+      "slots_flex": 2,
+      "slots_qb": 1,
+      "slots_rb": 2,
+      "slots_te": 1,
+      "slots_wr": 2,
+      "teams": 12
+    }
+  },
+  "picks": [
+    {
+      "player_id": "2315",
+      "roster_id": 10,
+      "round": 1,
+      "pick_no": 1,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2391",
+      "roster_id": 7,
+      "round": 1,
+      "pick_no": 2,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "1408",
+      "roster_id": 11,
+      "round": 1,
+      "pick_no": 3,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "3164",
+      "roster_id": 12,
+      "round": 1,
+      "pick_no": 4,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4866",
+      "roster_id": 3,
+      "round": 1,
+      "pick_no": 5,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "4035",
+      "roster_id": 1,
+      "round": 1,
+      "pick_no": 6,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "536",
+      "roster_id": 8,
+      "round": 1,
+      "pick_no": 7,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "2078",
+      "roster_id": 2,
+      "round": 1,
+      "pick_no": 8,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "2320",
+      "roster_id": 5,
+      "round": 1,
+      "pick_no": 9,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1426",
+      "roster_id": 4,
+      "round": 1,
+      "pick_no": 10,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "4098",
+      "roster_id": 6,
+      "round": 1,
+      "pick_no": 11,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "3969",
+      "roster_id": 9,
+      "round": 1,
+      "pick_no": 12,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "947",
+      "roster_id": 9,
+      "round": 2,
+      "pick_no": 13,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "3199",
+      "roster_id": 6,
+      "round": 2,
+      "pick_no": 14,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "4029",
+      "roster_id": 4,
+      "round": 2,
+      "pick_no": 15,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "2216",
+      "roster_id": 5,
+      "round": 2,
+      "pick_no": 16,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "4034",
+      "roster_id": 2,
+      "round": 2,
+      "pick_no": 17,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1479",
+      "roster_id": 8,
+      "round": 2,
+      "pick_no": 18,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "2133",
+      "roster_id": 1,
+      "round": 2,
+      "pick_no": 19,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "4018",
+      "roster_id": 3,
+      "round": 2,
+      "pick_no": 20,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "515",
+      "roster_id": 12,
+      "round": 2,
+      "pick_no": 21,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "96",
+      "roster_id": 11,
+      "round": 2,
+      "pick_no": 22,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "830",
+      "roster_id": 7,
+      "round": 2,
+      "pick_no": 23,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "2168",
+      "roster_id": 10,
+      "round": 2,
+      "pick_no": 24,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "1689",
+      "roster_id": 10,
+      "round": 3,
+      "pick_no": 25,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "676",
+      "roster_id": 7,
+      "round": 3,
+      "pick_no": 26,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "1110",
+      "roster_id": 11,
+      "round": 3,
+      "pick_no": 27,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "1466",
+      "roster_id": 12,
+      "round": 3,
+      "pick_no": 28,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "2161",
+      "roster_id": 3,
+      "round": 3,
+      "pick_no": 29,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "3306",
+      "roster_id": 1,
+      "round": 3,
+      "pick_no": 30,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "3327",
+      "roster_id": 8,
+      "round": 3,
+      "pick_no": 31,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "2449",
+      "roster_id": 2,
+      "round": 3,
+      "pick_no": 32,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "3198",
+      "roster_id": 5,
+      "round": 3,
+      "pick_no": 33,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1339",
+      "roster_id": 4,
+      "round": 3,
+      "pick_no": 34,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "3321",
+      "roster_id": 6,
+      "round": 3,
+      "pick_no": 35,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "988",
+      "roster_id": 9,
+      "round": 3,
+      "pick_no": 36,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "2452",
+      "roster_id": 9,
+      "round": 4,
+      "pick_no": 37,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "2309",
+      "roster_id": 6,
+      "round": 4,
+      "pick_no": 38,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "2197",
+      "roster_id": 4,
+      "round": 4,
+      "pick_no": 39,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "1244",
+      "roster_id": 5,
+      "round": 4,
+      "pick_no": 40,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1825",
+      "roster_id": 2,
+      "round": 4,
+      "pick_no": 41,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "5046",
+      "roster_id": 8,
+      "round": 4,
+      "pick_no": 42,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "3242",
+      "roster_id": 1,
+      "round": 4,
+      "pick_no": 43,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "223",
+      "roster_id": 3,
+      "round": 4,
+      "pick_no": 44,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "4040",
+      "roster_id": 12,
+      "round": 4,
+      "pick_no": 45,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "560",
+      "roster_id": 11,
+      "round": 4,
+      "pick_no": 46,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "642",
+      "roster_id": 7,
+      "round": 4,
+      "pick_no": 47,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "4017",
+      "roster_id": 10,
+      "round": 4,
+      "pick_no": 48,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "1048",
+      "roster_id": 10,
+      "round": 5,
+      "pick_no": 49,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "5068",
+      "roster_id": 7,
+      "round": 5,
+      "pick_no": 50,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "616",
+      "roster_id": 11,
+      "round": 5,
+      "pick_no": 51,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "4157",
+      "roster_id": 12,
+      "round": 5,
+      "pick_no": 52,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "1234",
+      "roster_id": 3,
+      "round": 5,
+      "pick_no": 53,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "788",
+      "roster_id": 1,
+      "round": 5,
+      "pick_no": 54,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "1067",
+      "roster_id": 8,
+      "round": 5,
+      "pick_no": 55,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "4036",
+      "roster_id": 2,
+      "round": 5,
+      "pick_no": 56,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1992",
+      "roster_id": 5,
+      "round": 5,
+      "pick_no": 57,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "4985",
+      "roster_id": 4,
+      "round": 5,
+      "pick_no": 58,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "167",
+      "roster_id": 6,
+      "round": 5,
+      "pick_no": 59,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "58",
+      "roster_id": 9,
+      "round": 5,
+      "pick_no": 60,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "289",
+      "roster_id": 9,
+      "round": 6,
+      "pick_no": 61,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "4066",
+      "roster_id": 6,
+      "round": 6,
+      "pick_no": 62,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "1329",
+      "roster_id": 4,
+      "round": 6,
+      "pick_no": 63,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "956",
+      "roster_id": 5,
+      "round": 6,
+      "pick_no": 64,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1346",
+      "roster_id": 2,
+      "round": 6,
+      "pick_no": 65,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "943",
+      "roster_id": 8,
+      "round": 6,
+      "pick_no": 66,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "3157",
+      "roster_id": 1,
+      "round": 6,
+      "pick_no": 67,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "4962",
+      "roster_id": 3,
+      "round": 6,
+      "pick_no": 68,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "2346",
+      "roster_id": 12,
+      "round": 6,
+      "pick_no": 69,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "344",
+      "roster_id": 11,
+      "round": 6,
+      "pick_no": 70,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "928",
+      "roster_id": 7,
+      "round": 6,
+      "pick_no": 71,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "1817",
+      "roster_id": 10,
+      "round": 6,
+      "pick_no": 72,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2378",
+      "roster_id": 10,
+      "round": 7,
+      "pick_no": 73,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "954",
+      "roster_id": 7,
+      "round": 7,
+      "pick_no": 74,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "1387",
+      "roster_id": 11,
+      "round": 7,
+      "pick_no": 75,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "1111",
+      "roster_id": 12,
+      "round": 7,
+      "pick_no": 76,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4149",
+      "roster_id": 3,
+      "round": 7,
+      "pick_no": 77,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "2257",
+      "roster_id": 1,
+      "round": 7,
+      "pick_no": 78,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "455",
+      "roster_id": 8,
+      "round": 7,
+      "pick_no": 79,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "284",
+      "roster_id": 2,
+      "round": 7,
+      "pick_no": 80,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1901",
+      "roster_id": 5,
+      "round": 7,
+      "pick_no": 81,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "2382",
+      "roster_id": 4,
+      "round": 7,
+      "pick_no": 82,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "1149",
+      "roster_id": 6,
+      "round": 7,
+      "pick_no": 83,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "5052",
+      "roster_id": 9,
+      "round": 7,
+      "pick_no": 84,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "4039",
+      "roster_id": 9,
+      "round": 8,
+      "pick_no": 85,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "4152",
+      "roster_id": 6,
+      "round": 8,
+      "pick_no": 86,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "1837",
+      "roster_id": 4,
+      "round": 8,
+      "pick_no": 87,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "3161",
+      "roster_id": 5,
+      "round": 8,
+      "pick_no": 88,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "4199",
+      "roster_id": 2,
+      "round": 8,
+      "pick_no": 89,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "745",
+      "roster_id": 8,
+      "round": 8,
+      "pick_no": 90,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "421",
+      "roster_id": 1,
+      "round": 8,
+      "pick_no": 91,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "538",
+      "roster_id": 3,
+      "round": 8,
+      "pick_no": 92,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "175",
+      "roster_id": 12,
+      "round": 8,
+      "pick_no": 93,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "3423",
+      "roster_id": 11,
+      "round": 8,
+      "pick_no": 94,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "1793",
+      "roster_id": 7,
+      "round": 8,
+      "pick_no": 95,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "4273",
+      "roster_id": 10,
+      "round": 8,
+      "pick_no": 96,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "269",
+      "roster_id": 10,
+      "round": 9,
+      "pick_no": 97,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2325",
+      "roster_id": 7,
+      "round": 9,
+      "pick_no": 98,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "JAX",
+      "roster_id": 11,
+      "round": 9,
+      "pick_no": 99,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "3163",
+      "roster_id": 12,
+      "round": 9,
+      "pick_no": 100,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "2410",
+      "roster_id": 3,
+      "round": 9,
+      "pick_no": 101,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "1352",
+      "roster_id": 1,
+      "round": 9,
+      "pick_no": 102,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "2182",
+      "roster_id": 8,
+      "round": 9,
+      "pick_no": 103,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "5347",
+      "roster_id": 2,
+      "round": 9,
+      "pick_no": 104,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1500",
+      "roster_id": 5,
+      "round": 9,
+      "pick_no": 105,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1502",
+      "roster_id": 4,
+      "round": 9,
+      "pick_no": 106,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "2319",
+      "roster_id": 6,
+      "round": 9,
+      "pick_no": 107,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "3200",
+      "roster_id": 9,
+      "round": 9,
+      "pick_no": 108,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "2399",
+      "roster_id": 9,
+      "round": 10,
+      "pick_no": 109,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "1451",
+      "roster_id": 6,
+      "round": 10,
+      "pick_no": 110,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "4981",
+      "roster_id": 4,
+      "round": 10,
+      "pick_no": 111,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "3594",
+      "roster_id": 5,
+      "round": 10,
+      "pick_no": 112,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "1706",
+      "roster_id": 2,
+      "round": 10,
+      "pick_no": 113,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1386",
+      "roster_id": 8,
+      "round": 10,
+      "pick_no": 114,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "4146",
+      "roster_id": 1,
+      "round": 10,
+      "pick_no": 115,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "1848",
+      "roster_id": 3,
+      "round": 10,
+      "pick_no": 116,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "1987",
+      "roster_id": 12,
+      "round": 10,
+      "pick_no": 117,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4983",
+      "roster_id": 11,
+      "round": 10,
+      "pick_no": 118,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "4651",
+      "roster_id": 7,
+      "round": 10,
+      "pick_no": 119,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "4033",
+      "roster_id": 10,
+      "round": 10,
+      "pick_no": 120,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "1555",
+      "roster_id": 10,
+      "round": 11,
+      "pick_no": 121,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2374",
+      "roster_id": 7,
+      "round": 11,
+      "pick_no": 122,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "2699",
+      "roster_id": 11,
+      "round": 11,
+      "pick_no": 123,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "4988",
+      "roster_id": 12,
+      "round": 11,
+      "pick_no": 124,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4068",
+      "roster_id": 3,
+      "round": 11,
+      "pick_no": 125,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "5038",
+      "roster_id": 1,
+      "round": 11,
+      "pick_no": 126,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "1166",
+      "roster_id": 8,
+      "round": 11,
+      "pick_no": 127,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "LAR",
+      "roster_id": 2,
+      "round": 11,
+      "pick_no": 128,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "1476",
+      "roster_id": 5,
+      "round": 11,
+      "pick_no": 129,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "5013",
+      "roster_id": 4,
+      "round": 11,
+      "pick_no": 130,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "4147",
+      "roster_id": 6,
+      "round": 11,
+      "pick_no": 131,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "3202",
+      "roster_id": 9,
+      "round": 11,
+      "pick_no": 132,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "MIN",
+      "roster_id": 9,
+      "round": 12,
+      "pick_no": 133,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "3657",
+      "roster_id": 6,
+      "round": 12,
+      "pick_no": 134,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "4131",
+      "roster_id": 4,
+      "round": 12,
+      "pick_no": 135,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "1984",
+      "roster_id": 5,
+      "round": 12,
+      "pick_no": 136,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "4217",
+      "roster_id": 2,
+      "round": 12,
+      "pick_no": 137,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "3209",
+      "roster_id": 8,
+      "round": 12,
+      "pick_no": 138,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "5045",
+      "roster_id": 1,
+      "round": 12,
+      "pick_no": 139,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "2238",
+      "roster_id": 3,
+      "round": 12,
+      "pick_no": 140,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "3178",
+      "roster_id": 12,
+      "round": 12,
+      "pick_no": 141,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4455",
+      "roster_id": 11,
+      "round": 12,
+      "pick_no": 142,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "5100",
+      "roster_id": 7,
+      "round": 12,
+      "pick_no": 143,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "3503",
+      "roster_id": 10,
+      "round": 12,
+      "pick_no": 144,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "730",
+      "roster_id": 10,
+      "round": 13,
+      "pick_no": 145,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2093",
+      "roster_id": 7,
+      "round": 13,
+      "pick_no": 146,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "1388",
+      "roster_id": 11,
+      "round": 13,
+      "pick_no": 147,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "1517",
+      "roster_id": 12,
+      "round": 13,
+      "pick_no": 148,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4037",
+      "roster_id": 3,
+      "round": 13,
+      "pick_no": 149,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "PHI",
+      "roster_id": 1,
+      "round": 13,
+      "pick_no": 150,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "NO",
+      "roster_id": 8,
+      "round": 13,
+      "pick_no": 151,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "2028",
+      "roster_id": 2,
+      "round": 13,
+      "pick_no": 152,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "4055",
+      "roster_id": 5,
+      "round": 13,
+      "pick_no": 153,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "DEN",
+      "roster_id": 4,
+      "round": 13,
+      "pick_no": 154,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "1195",
+      "roster_id": 6,
+      "round": 13,
+      "pick_no": 155,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "4038",
+      "roster_id": 9,
+      "round": 13,
+      "pick_no": 156,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "24",
+      "roster_id": 9,
+      "round": 14,
+      "pick_no": 157,
+      "draft_slot": 12
+    },
+    {
+      "player_id": "147",
+      "roster_id": 6,
+      "round": 14,
+      "pick_no": 158,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "4046",
+      "roster_id": 4,
+      "round": 14,
+      "pick_no": 159,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "HOU",
+      "roster_id": 5,
+      "round": 14,
+      "pick_no": 160,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "818",
+      "roster_id": 2,
+      "round": 14,
+      "pick_no": 161,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "LAC",
+      "roster_id": 8,
+      "round": 14,
+      "pick_no": 162,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "4531",
+      "roster_id": 1,
+      "round": 14,
+      "pick_no": 163,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "2307",
+      "roster_id": 3,
+      "round": 14,
+      "pick_no": 164,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "BAL",
+      "roster_id": 12,
+      "round": 14,
+      "pick_no": 165,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "4111",
+      "roster_id": 11,
+      "round": 14,
+      "pick_no": 166,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "331",
+      "roster_id": 7,
+      "round": 14,
+      "pick_no": 167,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "2583",
+      "roster_id": 10,
+      "round": 14,
+      "pick_no": 168,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "2341",
+      "roster_id": 10,
+      "round": 15,
+      "pick_no": 169,
+      "draft_slot": 1
+    },
+    {
+      "player_id": "4125",
+      "roster_id": 7,
+      "round": 15,
+      "pick_no": 170,
+      "draft_slot": 2
+    },
+    {
+      "player_id": "138",
+      "roster_id": 11,
+      "round": 15,
+      "pick_no": 171,
+      "draft_slot": 3
+    },
+    {
+      "player_id": "4663",
+      "roster_id": 12,
+      "round": 15,
+      "pick_no": 172,
+      "draft_slot": 4
+    },
+    {
+      "player_id": "CAR",
+      "roster_id": 3,
+      "round": 15,
+      "pick_no": 173,
+      "draft_slot": 5
+    },
+    {
+      "player_id": "1892",
+      "roster_id": 1,
+      "round": 15,
+      "pick_no": 174,
+      "draft_slot": 6
+    },
+    {
+      "player_id": "2118",
+      "roster_id": 8,
+      "round": 15,
+      "pick_no": 175,
+      "draft_slot": 7
+    },
+    {
+      "player_id": "4950",
+      "roster_id": 2,
+      "round": 15,
+      "pick_no": 176,
+      "draft_slot": 8
+    },
+    {
+      "player_id": "4137",
+      "roster_id": 5,
+      "round": 15,
+      "pick_no": 177,
+      "draft_slot": 9
+    },
+    {
+      "player_id": "2214",
+      "roster_id": 4,
+      "round": 15,
+      "pick_no": 178,
+      "draft_slot": 10
+    },
+    {
+      "player_id": "1601",
+      "roster_id": 6,
+      "round": 15,
+      "pick_no": 179,
+      "draft_slot": 11
+    },
+    {
+      "player_id": "3868",
+      "roster_id": 9,
+      "round": 15,
+      "pick_no": 180,
+      "draft_slot": 12
+    }
+  ]
+}

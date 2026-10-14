@@ -81,7 +81,7 @@ and both Linux workflows include RPM tooling for Fedora/RHEL packages. Intel Mac
 hosted verification is pending. Linux DEB/RPM builds have earlier hosted evidence in the support matrix; current-source packages must be rechecked. Successful runner results and interactive installation
 checks on each OS are still required before claiming support.
 
-On the League desk, choose **Guided setup** to connect a league, save and test an AI runtime, then generate and review your first draft. Paste an ID or supported HTTPS league URL for Sleeper, ESPN, or Yahoo; ESPN URLs can also supply the season. The URL is parsed locally; it is not fetched. Use **Continue setup** after connecting and **Generate first draft** after a successful data-free runtime test. API and CLI readiness reflects a successful test of the currently saved runtime in this browser session; a saved key alone does not count as a working model. Changing the runtime or credentials requires another test. Voice, delivery providers, and the desktop data folder remain optional.
+On Home, choose **Guided setup** to paste a league link, connect and test your AI writer, then choose and review your first report. Supported links identify the platform locally and can supply the ESPN season; IDs still work. Existing saved connections receive a fixed data-free test once per configuration/AI-key change in this app session. New OpenAI connections use guided key entry with separate API billing guidance; custom services and local tools remain in Advanced. Creation always saves a draft, and sending requires an explicit destination-specific confirmation after the saved-message preview. See [Everyday use](usability.md) for connection requirements, presets, saving, and recovery.
 
 Settings has AI, Voice, Delivery & access, Schedules & sources, Privacy, and Storage & desktop sections. Each configuration section saves independently. AI testing and model discovery save only AI configuration; pending edits elsewhere remain unsaved. Navigating away or closing the browser warns about pending edits. Credential and storage operations use their own explicit action buttons.
 
@@ -243,3 +243,33 @@ Settings saves apply one section and its current revision. If another window or 
 Report history loads in pages. Open a report to fetch its saved body, review its evidence, and edit it before any delivery attempt. Visible dashboard windows refresh background activity without replacing unsaved edits.
 
 Retries use the saved recipient, sender, subject/thread, and rendered text. If sender/account configuration changed, restore the original configuration before retrying. Resend credential changes also block retry, even when the sender address matches. An older uncertain attempt without saved delivery details has no retry control. Check the provider’s history before creating another report. Email idempotency remains subject to the provider’s retention window; SMS/iMessage retries still require confirmation because a previous delivery can be uncertain.
+
+For saved generation requests, URL navigation, diagnostics, scheduled encrypted backups, and
+nondestructive backup validation, see [local operations](operations.md). All of these features
+remain local-only. Native GUI evidence can be collected with `npm run desktop:verify` after
+building a current artifact; the command and its platform limits are documented there.
+
+## Local iMessage with imsg (macOS)
+
+Install `imsg` 0.15.10 or later with `brew install steipete/tap/imsg` on the Mac
+running Sunday Sidekick. In Settings → Delivery & access, choose **Local Messages
+via imsg (macOS)**. **Check imsg installation** reads only its version. **Find
+iMessage chats** reads bounded recent conversation metadata; choose a conversation
+to fill its stable GUID and local history ID, then **Save Delivery & access**.
+An optional absolute executable path supports another local install location.
+
+Grant Full Disk Access to the app/service parent for history and Automation →
+Messages for sending, then restart that parent if macOS requires it. Source
+terminal grants do not prove permissions for a packaged Electron app. Do not disable
+SIP or enable injected advanced imsg helpers. The app supports ordinary text and
+bounded history only. Sync the chosen chat in Imports; AI analysis and all automatic
+sync/reply/send controls remain separately opt-in. Switching providers disables
+polling and automatic sends until reapproved. Review a report's destination before
+sending. An uncertain receipt requires checking Messages before any manual retry.
+Existing BlueBubbles settings remain available for macOS, Windows and Linux.
+
+See the [weekly-decision workflow review](reviews/2026-10-13-weekly-decision-workflows.md)
+for the weekly Home, team-before-AI setup, evidence readiness, clearer results,
+prospective cohorts and fantasy outcome journal. Local messaging read verification
+is explicit and discards contents; sending still uses saved-report review and
+confirmation. Native team preferences persist across localhost port changes.

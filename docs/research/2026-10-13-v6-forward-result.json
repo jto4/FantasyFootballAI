@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-13T04:43:26.748Z",
+  "status": "scored",
+  "record": "docs/research/2026-10-12-v6-pregame-numeric-record.json",
+  "recordSha256": "c34a06cd0c54562866d46797103b66619cee0b4191a4fbe6b8b49601c3082fc0",
+  "capturedAt": "2026-10-12T18:37:53.238Z",
+  "final": {
+    "gameId": "2026_05_BUF_LA",
+    "espnId": "401872994",
+    "home": "LA",
+    "away": "BUF",
+    "kickoffAt": "2026-10-13T00:15:00.000Z",
+    "homeScore": 34,
+    "awayScore": 37,
+    "observedAt": "2026-10-13T04:43:26.747Z",
+    "sourceUrl": "https://www.espn.com/nfl/game/_/gameId/401872994"
+  },
+  "rows": [
+    {
+      "kind": "moneyline",
+      "threshold": 0,
+      "push": false,
+      "y": 0,
+      "candidateBrier": 0.3711087784589609,
+      "productionBrier": 0.3712597834278858,
+      "bookBrier": 0.3711687893768792
+    },
+    {
+      "kind": "spread",
+      "threshold": 3.5,
+      "push": false,
+      "y": 0,
+      "candidateBrier": 0.23134565643177743,
+      "productionBrier": 0.23134565643177743,
+      "bookBrier": 0.2329373871456202
+    },
+    {
+      "kind": "total",
+      "threshold": 54.5,
+      "push": false,
+      "y": 1,
+      "candidateBrier": 0.23970216597587102,
+      "productionBrier": 0.23970216597587102,
+      "bookBrier": 0.23293738714562032
+    }
+  ],
+  "independentGameClusters": 1,
+  "usedForSelection": false
+}

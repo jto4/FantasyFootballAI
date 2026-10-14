@@ -1,0 +1,47 @@
+{
+  "frozenAt": "2026-10-12T16:39:49.317Z",
+  "preparedSha256": "77c3eb2fbf72e7929277a427f4a51ae8c6696dd737075813c3d98d7c6c1ceb54",
+  "selection": {
+    "moneyline": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "moneyline",
+      "n": 1034,
+      "brier": 0.210826837347873,
+      "previousBrier": 0.210826837347873,
+      "bookBrier": 0.21082834472930922
+    },
+    "spread": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "spread",
+      "n": 1016,
+      "brier": 0.2490703366103935,
+      "previousBrier": 0.2490703366103935,
+      "bookBrier": 0.24946182670687445
+    },
+    "total": {
+      "procedure": "previous",
+      "family": "all",
+      "penalty": 200,
+      "kind": "total",
+      "n": 1027,
+      "brier": 0.24967575998436367,
+      "previousBrier": 0.24967575998436367,
+      "bookBrier": 0.24993866188950456
+    }
+  },
+  "candidateProcedures": [
+    "previous",
+    "all-200",
+    "all-1000",
+    "quarterback-200",
+    "quarterback-1000",
+    "injuries-200",
+    "injuries-1000"
+  ],
+  "initialJointAuditNotUsedForSelection": true,
+  "reusedHistoricalEvidence": true
+}

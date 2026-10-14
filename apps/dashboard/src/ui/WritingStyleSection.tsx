@@ -33,18 +33,26 @@ const channelNames = {
 } as const;
 
 const writingStylePresets = [
-  { name: 'Commissioner clean', value: 'Clear, concise league updates with light humor.' },
   {
-    name: 'Sharp league-mate',
+    name: 'Friendly',
+    value: 'Clear, concise league updates with light humor.',
+    sample: 'The standings are tightening up. Who will make their move this week?',
+  },
+  {
+    name: 'Playful trash talk',
+    sample: 'That bench had a great week. Unfortunately, bench points still don’t count.',
     value:
       'Funny, sharp fantasy-football banter. Tease roster choices and predictions, then back it up with league data.',
   },
   {
-    name: 'Dry analyst',
+    name: 'Straight analysis',
+    sample:
+      'The top two teams are separated by one win. Total points could become the deciding factor.',
     value: 'Wry, understated commentary with concise analysis. Let the stats make the joke.',
   },
   {
     name: 'Hype crew',
+    sample: 'New week. New matchups. Time to make a statement.',
     value:
       'High-energy, celebratory football commentary. Build anticipation and make every matchup feel big.',
   },
@@ -127,8 +135,16 @@ export function WritingStyleSection({
           </select>
         </label>
       </div>
+      {selectedBuiltInPreset && (
+        <aside className="voice-preview" aria-label="Writing style example">
+          <strong>Example tone</strong>
+          <p>{selectedBuiltInPreset.sample}</p>
+          <small>Illustration only; your reports use your league’s actual data.</small>
+        </aside>
+      )}
       <textarea
         aria-label="Writing style"
+        data-search-target="writing-style"
         value={writingStyle}
         maxLength={1000}
         onChange={(event) => onWritingStyleChange(event.target.value)}
@@ -138,7 +154,7 @@ export function WritingStyleSection({
         Choose a starting voice, then edit every word. Use fantasy decisions as the target of jokes.
         Excluded topics are passed to the AI as boundaries for every generated report.
       </small>
-      <div className="custom-style-presets">
+      <div className="custom-style-presets" data-search-target="style-presets">
         <label>
           SAVE THIS VOICE AS
           <input
@@ -165,19 +181,27 @@ export function WritingStyleSection({
             type="button"
             className="small-button danger"
             aria-label={`Delete saved style ${preset.name}`}
-            onClick={() => onDeleteCustomPreset(preset.name)}
+            onClick={() => {
+              if (
+                window.confirm(
+                  `Delete saved style ${preset.name}? Your current writing style will be kept.`,
+                )
+              )
+                onDeleteCustomPreset(preset.name);
+            }}
           >
             Delete {preset.name}
           </button>
         ))}
         <small>
-          Saved voices stay in local settings and are limited to 20 presets. Click Save Settings to
+          Saved voices stay in local settings and are limited to 20 presets. Click Save Voice to
           keep preset changes.
         </small>
       </div>
       <label className="report-length-setting">
         REPORT LENGTH
         <select
+          data-search-target="report-length"
           value={reportLength}
           onChange={(event) =>
             onReportLengthChange(event.target.value as NonNullable<AppSettings['reportLength']>)
@@ -191,6 +215,7 @@ export function WritingStyleSection({
       <label className="switch-label">
         <input
           type="checkbox"
+          data-search-target="profanity"
           checked={allowProfanity}
           onChange={(event) => onProfanityChange(event.target.checked)}
         />
@@ -200,6 +225,8 @@ export function WritingStyleSection({
         <label>
           TOPICS TO AVOID
           <textarea
+            data-search-target="excluded-topics"
+            aria-label="Topics to avoid"
             value={excludedTopics}
             maxLength={2000}
             onChange={(event) => onExcludedTopicsChange(event.target.value)}
@@ -207,7 +234,7 @@ export function WritingStyleSection({
           />
         </label>
       </div>
-      <div className="channel-boundaries">
+      <div className="channel-boundaries" data-search-target="channel-boundaries">
         <h3>Additional channel boundaries</h3>
         <p>
           Add subjects to avoid for each destination. Only the selected destination’s boundary is

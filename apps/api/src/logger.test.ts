@@ -1,7 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { errorName, logEvent } from './logger.js';
+import { errorName, logEvent, sanitizeLogFields } from './logger.js';
 
 describe('structured application logging', () => {
+  it('retains only UUID correlation IDs, never arbitrary client request strings', () => {
+    expect(
+      sanitizeLogFields({
+        jobId: '00000000-0000-4000-8000-000000000000',
+        requestId: 'private-supplied-token',
+        runId: '/private/path',
+      }),
+    ).toEqual({ jobId: '00000000-0000-4000-8000-000000000000' });
+  });
   it('writes structured events while discarding unapproved message and secret fields', () => {
     const write = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
     try {

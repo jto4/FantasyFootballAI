@@ -19,7 +19,11 @@ export function purgeExpiredConversationSources(state: AppState, now = Date.now(
       }
       continue;
     }
-    if (profile.sourceName === blueBubblesMemorySource && profile.sourceText) {
+    if (
+      (profile.sourceName === blueBubblesMemorySource ||
+        profile.sourceName === 'imsg group chat') &&
+      profile.sourceText
+    ) {
       const pruned = pruneBlueBubblesHistory(profile.sourceText, cutoff);
       if (pruned.removed > 0) {
         profile.sourceText = pruned.sourceText;

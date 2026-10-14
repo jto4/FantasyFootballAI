@@ -1,0 +1,90 @@
+{
+  "frozenAt": "2026-10-12T09:58:53.630Z",
+  "developmentSeasons": [2018, 2021],
+  "auditSeasons": [2022, 2025],
+  "selection": {
+    "moneyline": {
+      "procedure": "v3",
+      "penalty": 200,
+      "kind": "moneyline",
+      "n": 1034,
+      "brier": 0.210826837347873,
+      "v3Brier": 0.210826837347873,
+      "bookBrier": 0.21082834472930922
+    },
+    "spread": {
+      "procedure": "v3",
+      "penalty": 200,
+      "kind": "spread",
+      "n": 1016,
+      "brier": 0.2490703366103935,
+      "v3Brier": 0.2490703366103935,
+      "bookBrier": 0.24946182670687445
+    },
+    "total": {
+      "procedure": "joint",
+      "penalty": 200,
+      "kind": "total",
+      "n": 1027,
+      "brier": 0.24967575998436367,
+      "v3Brier": 0.2497186047632952,
+      "bookBrier": 0.24993866188950456
+    }
+  },
+  "candidatePenalties": [200, 1000],
+  "preparedGamesSha256": "3fccd9613e9b9ece2b5ddb187ce75c5928e0d924f7681471ea5e244c81de2fca",
+  "sources": {
+    "preparedAt": "2026-10-12T09:51:15.146Z",
+    "hashes": {
+      "schedule": "c2323a79d0abfe38c10f577520bec65718c5f62cbf618b323b1a1c5a19c94092",
+      "injuries2016": "504e05968cb9c54ddc730fd9b6e7d1dd16a62db8029cc784d3d7bafcea7ff7cb",
+      "injuries2017": "0d5139fbf41b0866517bd2bd5fd85bb20dbd4dd9bc36a706fed030a88731de6f",
+      "injuries2018": "4724e1f37cc3076f564e997fbf269190e7dbe795a39315b903788e0a9c40065e",
+      "injuries2019": "daddfe8e04ddc3a29bce14f362e774fbadfb274c807f1f0fde7b5bf32aaf6cdf",
+      "injuries2020": "706cca82824214f6b73ba0c6e537d3ee39766a50c644b8974b9fc28d7518de90",
+      "injuries2021": "1049fb9ff0fe7cfcf3ba8bfe1f5a35d3aba985c461c8fb7bf5201735b6d34254",
+      "injuries2022": "5f0d60324e597edd1a2ced8540b04e40b51dd440591dd1df11b8d96343387c9e",
+      "injuries2023": "16b04e21da5aa3944cfa9c22cafcc84ed7e6d9866eaddf0344e9b8cbf2f63afe",
+      "injuries2024": "498bce8e13cb64b2ab9bb0ad6cb81d0a63c2ddb24016c9fc90c2de2126fae449",
+      "injuries2025": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735",
+      "injuries2026": "8dd06b0e55128af411713591a14c22d3fe7135dbdfab0731c597ea1cf16037f4",
+      "filteredDepth2025": "45b8ebe1d653924fd316db7f0f90bd961bbdcd1a00a0f98a1ee2d3e129bca256",
+      "filteredDepth2026": "fdbbd0177134e65aca90ee625c2aecb41d415b3b370dea9fd380943d92419a32",
+      "weatherPHI00": "35af910f9690c2a209e5a2202b7229ca27f83af96505ede89945aa0cf134dd70",
+      "weatherBAL00": "949184d0003a0a575e528dc55de2e98daf430080e9a890c1a57529c1b5dd11d2",
+      "weatherCLE00": "0ea7cc00fd7cc31d51a4055b5cf49afd77f223358faa3c86c5a9d7232d8b7cbe",
+      "weatherMIA00": "b5724d0b69966a1a74e82aea6504ea26d4296d4c926feb9e5ffa363c84cf8325",
+      "weatherBOS00": "35595c49296e6fa6f8108f0b01eeee5ed0b8afc50cfe87f7da0206526cff6562",
+      "weatherNYC01": "49cf4cc70819c6bdb6699b3d880df9b7b27eb7a5eebb3c02f361d0590edc9f0b",
+      "weatherLAX97": "e060fb5e2b4953ff87c5a9026b3fbc8955a5075329104ec9dca4dc8063fbceb8",
+      "weatherCAR00": "c39b5b4333cfc9f51c8c87a3bf15302ca9d3748c736dc57bbfd834eb04b44ec3",
+      "weatherDEN00": "2f75713ac0004f4dc0fa636bde5148269790e4b8c7aa6025ce72035414e63951",
+      "weatherGNB00": "5d574d53e0bb887c51ea59b4c88dd1f8f10c0e7467083ce36e728dc9ab4bf031",
+      "weatherOAK00": "b8b70f3b0f6aba49991e1f73ff34c27d16413117cabca7773fca9965fdcc9e57",
+      "weatherCIN00": "59bd079d7794253164e7fba6a90660e2cdb25f6bc838c177cdb2ba65bbeace3b",
+      "weatherBUF00": "fcf3baab47ad1f847cfd025ceeae267247ffd420377007739614f59cfd5dea06",
+      "weatherPIT00": "43f622cf9db5e5f03bdb32cf8d528406fde8841831681a73dc74c75684e04f28",
+      "weatherTAM00": "b607a658a40aca9a2fa77a07b0d500d8ca491ff8cb82f3fb82d435aab4b4159b",
+      "weatherNAS00": "2026e93be0001dd086f6a28250f207e16cdfb611f63ff3e27e8c399bc9df886a",
+      "weatherWAS00": "01d0f2e4cdd1901ee8cff79fc13dc1ff223b482122cad17ca50daea97ebd5447",
+      "weatherLAX99": "ae6ac2e128bdb9f4a3317048afac639cf3e47b4f6e91f2dec67add09effcebb3",
+      "weatherSFO01": "917ab9d4898e598f515fc81a48c6846a1023b21ddeb4a8d6e7f60622dda59f04",
+      "weatherCHI98": "04177493d43bae898809209bc41b835bea457ec6803136a7517c12b5999e7742",
+      "weatherKAN00": "9ceff7a81ecbd89b1b04eb8751cf03006341da230a3f7df661351426c749d63c",
+      "weatherSEA00": "e867e3eb816d6d8463c0e2ccaf22a39fb124009a80a7073e4b2b49166dd53e8c",
+      "weatherLON00": "f536788990311a9ae61e39de99f331c281f0384fdb29b44da9aba3b8a4e4cc26",
+      "weatherLON02": "1a34db73f18bb1c323e458765c617a2de1c6df221815c54f5d849d6768f1b3f5",
+      "weatherMEX00": "493e3e7580d09136083d74afad7f1457f88526105da8cd4440fd9518b20ed241"
+    },
+    "coverage": {
+      "games": 2639,
+      "injuries": 2359,
+      "qbChanges": 256,
+      "weather": 1379
+    }
+  },
+  "reusedHistoricalEvidence": true,
+  "initialJointFrozenAt": "2026-10-12T09:54:14.075Z",
+  "candidateProcedures": ["v3", "joint-200", "joint-1000", "offset-200", "offset-1000"],
+  "initialJointAuditNotUsedForSelection": true
+}

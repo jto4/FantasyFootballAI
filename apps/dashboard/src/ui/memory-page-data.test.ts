@@ -76,6 +76,33 @@ describe('Members & Imports response validation', () => {
     ).toBe(false);
   });
 
+  it('rejects malformed or oversized projection periods while preserving legacy summaries', () => {
+    const source = {
+      leagueId: 'league-1',
+      sourceId: 'remaining',
+      count: 20,
+      adpCount: 0,
+      scoringMatched: true,
+      sourceName: 'Remaining forecast',
+      importedAt,
+    };
+    const period = { season: 2026, fromWeek: 5, throughWeek: 17 };
+    expect(isProjectionSummaryList([source])).toBe(true);
+    expect(
+      isProjectionSummaryList([
+        { ...source, periods: [period], undeclaredPeriodCount: 0, additionalPeriodCount: 0 },
+      ]),
+    ).toBe(true);
+    for (const periods of [
+      [{ ...period, fromWeek: 18 }],
+      [{ ...period, season: '2026' }],
+      [{ ...period, throughWeek: NaN }],
+      Array.from({ length: 33 }, () => period),
+    ])
+      expect(isProjectionSummaryList([{ ...source, periods }])).toBe(false);
+    expect(isProjectionSummaryList([{ ...source, undeclaredPeriodCount: -1 }])).toBe(false);
+  });
+
   it('validates received email records before rendering the inbox list', () => {
     expect(
       isReceivedEmailList([

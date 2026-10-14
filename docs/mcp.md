@@ -84,13 +84,27 @@ Available tools:
 - `get_football_news` returns cached NFL news with source links.
 - `list_reports` returns report metadata without report bodies; `get_report` reads one
   selected report and its citations.
-- `create_report_draft` creates one of the supported report types for a selected league.
-  It always requests a draft and never sends email, SMS, or iMessage.
+- `create_report_draft` queues a review-only generation job and returns immediately. Supply
+  a unique `requestId` (8–128 letters, digits, underscores, or hyphens; a UUID is recommended),
+  `leagueId`, and `kind`. Reuse the same request ID after a timeout or reconnect; it cannot be
+  reused for different inputs. It never sends email, SMS, or iMessage.
+- `get_generation_job` polls that request ID. For `completed`, use its `reportId` with
+  `get_report`; `failed`, `interrupted`, and `cancelled` require a deliberate new request ID
+  to generate again. Restarts never replay unfinished provider work automatically.
+- `cancel_generation_job` cancels queued or running work by request ID. Completed reports
+  remain saved; cancellation blocks late draft publication but cannot reverse provider billing.
+- `list_report_history` returns body-free pages with optional `leagueId`, `status`, `limit`
+  (1–50), and `cursor`. Pass `nextCursor` to continue; use `get_report` to read a body.
 - `send_report_draft` sends one existing draft through the configured report channel. It is
   disabled by default and requires **Allow MCP clients to send reports** in Settings. Each
   explicit tool call approves one send. If delivery is uncertain, MCP refuses a retry; inspect
   provider status and confirm any retry in the dashboard. Email thread replies also remain a
   dashboard action.
+
+Clients using the earlier synchronous draft tool must migrate: `requestId` is now required
+and the result is a generation job, not a completed report. Recent full jobs are retained
+locally; compact older receipts remain retrievable and preserve deduplication after restart
+and backup restore.
 
 ### Packaged desktop app
 

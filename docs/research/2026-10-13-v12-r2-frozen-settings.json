@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "frozenAt": "2026-10-13T20:50:34.943Z",
+  "development": "2024 regular season and 2025 Weeks 1–8 only; older source coverage checked without outcomes",
+  "audit": "2025 Weeks 9–18 and 2026 Weeks 1–5; reused retrospective seasons",
+  "parameters": {
+    "minimumTrainingGames": 20,
+    "labelSeasons": 2,
+    "maxAddedLogit": 0.15,
+    "largeCashFloor": 500,
+    "walletPriorGames": 30,
+    "walletMinimumGames": 10,
+    "featureCount": 18
+  },
+  "selected": {
+    "family": "positions",
+    "anchor": "book",
+    "penalty": 400
+  },
+  "results": [
+    {
+      "spec": {
+        "family": "positions",
+        "anchor": "book",
+        "penalty": 400
+      },
+      "totals": {
+        "n": 390,
+        "brier": 0.2501020887231209,
+        "previousBrier": 0.25126780548226796,
+        "bookBrier": 0.24999098924545732,
+        "logLoss": 0.6933519471718003,
+        "previousLogLoss": 0.6956829295500695,
+        "bookLogLoss": 0.6931296091162142,
+        "bookImprovementInterval": [-0.00029825511974168216, 0.00007605616441452463],
+        "previousImprovementInterval": [-0.0014322948273361013, 0.003763728345630225],
+        "simultaneousBookInterval": [-0.00038470001911581833, 0.00016250106378866083]
+      },
+      "supported": {
+        "n": 122,
+        "brier": 0.2511470643381588,
+        "previousBrier": 0.2502140370197524,
+        "bookBrier": 0.25079191027021697,
+        "logLoss": 0.6954430142316865,
+        "previousLogLoss": 0.693570550020562,
+        "bookLogLoss": 0.6947322614310427,
+        "bookImprovementInterval": [-0.0009348668408101483, 0.00022455870492646228],
+        "previousImprovementInterval": [-0.005799373870448827, 0.003933319233636052],
+        "simultaneousBookInterval": [-0.001202629072074269, 0.0004923209361905831]
+      },
+      "changed": 95,
+      "coverage": 122,
+      "priceGames": 122,
+      "flowGames": 87,
+      "earlyGames": 2,
+      "walletGames": 0,
+      "nonTotalMaximumProductionDifference": 0
+    }
+  ],
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "codeHashes": {
+    "packages/core/src/expanded-total-tape.ts": "fb900b10431555d259561477ad0eaccf3634b17637d61df02bbab7e13121e1f8",
+    "packages/core/src/expanded-external-totals-model.ts": "4f3007fc0d35ddc3bffaa39e0c138c50cc17e9054c8a88ce68dd8403f78133d8",
+    "packages/core/src/external-total-signals.ts": "ef4949d804eb07efe837faf7172e64e417543f9402dbac7b20dc4bb930718c7b",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/core/src/market-context.ts": "f2b1a3be210252acc8875cd2fa13b04fe32586a16405dfabcc3dea5727c43bc8",
+    "packages/integrations/src/historical-prediction-market-data.ts": "43bfe9f4105997a63bf1f93e13ceae7e1bf9e58e121cfc2856520865f1700ac2",
+    "packages/integrations/src/prediction-market-data.ts": "0dc0db14ebdeb8e1bd67f01e9cb71b685ad8205b933acc068f00257154d24580",
+    "scripts/expanded-total-evaluation.mjs": "c97af8c355bff7b32e21037b86f88680da183130db4bfd7a46e46d80f2d0f7a4",
+    "packages/integrations/src/historical-total-catalog.ts": "4be8c6c186c1e34d0cdc295fbabf0072fdf6e356a9d1efc0d3d6b37f197bb1e6",
+    "scripts/retry-historical-external-totals.mjs": "339742849ac869621eeec5d3c1b063d0fa72e594d94b44fe9ffdb89808822588",
+    "scripts/prepare-expanded-total-snapshot.mjs": "444efad851fbb2b9bd6cc74f01e959180923f6f8343129bf796490f9e0e32be1",
+    "scripts/freeze-expanded-total-revision.mjs": "6df0e851f602b0130eb4d1b852abd1888b73869f7250d76ee658b779e66395ea",
+    "scripts/audit-expanded-totals.mjs": "78f79ed3124565e9f11a694c88f94de00d9fdfd8de0ca80f8e5bbf6933ca86e0",
+    "scripts/develop-expanded-totals.mjs": "210ecc4ad7194bd3fe57d97097cd4ff142bf54483ba481456482a1da9d915dda"
+  },
+  "revision": {
+    "priorSettingsSha256": "33e682aa24ad67b00cda8d4b65654ef536ed5871c9a201c180612c789e005b4c",
+    "priorSignalsSha256": "e88660028b5d37df0b11d1e2100db40687994169bf1747f4ee68932ebe336c9b",
+    "reason": "Source-coverage QA recovered four team-prefixed 2024 totals. Family, anchor, penalty and model math remain fixed after initial audit; no re-selection on later outcomes.",
+    "recommendedProductionChange": false,
+    "bookControlDevelopmentBrier": 0.24999098924545732
+  }
+}

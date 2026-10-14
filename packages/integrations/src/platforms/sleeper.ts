@@ -67,12 +67,21 @@ export class SleeperPlayerCatalog {
       const position = boundedString(player.position, 12);
       const nflTeam = boundedString(player.team, 8);
       const status = boundedString(player.status, 32);
+      const gsisId = boundedId(player.gsis_id, 40);
+      const espnId = boundedId(player.espn_id, 40);
+      const yahooId = boundedId(player.yahoo_id, 40);
+      const injuryStatus = boundedString(player.injury_status, 80);
       players.set(id, {
         id,
+        sleeperId: id,
         name,
         ...(position ? { position } : {}),
         ...(nflTeam ? { nflTeam } : {}),
         ...(status ? { status } : {}),
+        ...(gsisId ? { gsisId } : {}),
+        ...(espnId ? { espnId } : {}),
+        ...(yahooId ? { yahooId } : {}),
+        ...(injuryStatus ? { injuryStatus } : {}),
       });
     }
     if (players.size === 0) throw new Error('Sleeper player catalog contained no usable players.');
@@ -84,6 +93,7 @@ export class SleeperPlayerCatalog {
 }
 
 const sharedSleeperPlayerCatalog = new SleeperPlayerCatalog();
+export const getSleeperPlayerCatalog = () => sharedSleeperPlayerCatalog.get();
 
 export class SleeperConnector implements LeagueConnector {
   platform = 'sleeper' as const;
@@ -309,7 +319,8 @@ async function sleeperCurrentWeekMatchups(
       const teams = byMatchup.get(key) ?? [];
       const rosterId = numberOrUndefined(row.roster_id);
       if (rosterId === undefined) continue;
-      const points = numberOrUndefined(row.points);
+      // Commissioner-entered scores override the calculated total, including an explicit zero.
+      const points = numberOrUndefined(row.custom_points) ?? numberOrUndefined(row.points);
       teams.push({
         teamId: String(rosterId),
         ...(points !== undefined ? { points } : {}),

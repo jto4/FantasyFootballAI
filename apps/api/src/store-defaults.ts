@@ -46,6 +46,8 @@ export const initialState: AppState = {
   reports: [],
   memories: [],
   playerProjections: [],
+  adviceResults: [],
+  predictionRecords: [],
   scheduledRuns: [],
 };
 

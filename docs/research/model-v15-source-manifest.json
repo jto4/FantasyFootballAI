@@ -1,0 +1,72 @@
+{
+  "createdAt": "2026-10-13T21:56:33.040Z",
+  "files": [
+    {
+      "path": "docs/research/model-v15-corrected-signals.json.gz",
+      "plaintextSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+      "compressedSha256": "a51e0aa76780b86ff7565848263dc8528e68dbb0418e31bc370bd69c9a9f7ebe",
+      "bytes": 27433030,
+      "compressedBytes": 5342944
+    },
+    {
+      "path": "docs/research/model-v15-direction-evidence.json.gz",
+      "plaintextSha256": "760350ef5570225e0fa3c47c4f0637cac4a787b7f5668a290fa2d5a1357719af",
+      "compressedSha256": "087d98164e0d31055b4749c5eb405e314afc84957f967e3d8ed69eadcf28b97c",
+      "bytes": 39582238,
+      "compressedBytes": 3485335
+    }
+  ],
+  "originalContext": {
+    "path": "docs/research/model-v11-contexts.json.gz",
+    "plaintextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f"
+  },
+  "originalSignals": {
+    "path": "docs/research/model-v12-external-signals-r2.json.gz",
+    "plaintextSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28"
+  },
+  "canonicalRuleSource": "https://docs.kalshi.com/getting_started/order_direction",
+  "counts": {
+    "joined": 117536,
+    "changed": 70673,
+    "over": 70673,
+    "under": 46863,
+    "blocks": 0
+  },
+  "seasons": [
+    {
+      "season": 2023,
+      "tapes": 0,
+      "rows": 0,
+      "over": 0,
+      "under": 0,
+      "blockTrades": 0
+    },
+    {
+      "season": 2024,
+      "tapes": 0,
+      "rows": 0,
+      "over": 0,
+      "under": 0,
+      "blockTrades": 0
+    },
+    {
+      "season": 2025,
+      "tapes": 156,
+      "rows": 59178,
+      "over": 36144,
+      "under": 23034,
+      "blockTrades": 0
+    },
+    {
+      "season": 2026,
+      "tapes": 57,
+      "rows": 58358,
+      "over": 34529,
+      "under": 23829,
+      "blockTrades": 0
+    }
+  ],
+  "sourceResponseCount": 264,
+  "canonicalDocumentationSpecSha256": "091f171718a0376b0c1a2e9348b02b1ce003d0786dd04d772dd11005ca414bf4",
+  "note": "All included Kalshi trades joined to original captured raw rows by contract/id/time/size/price and response SHA. Only direction plus schema/block-state metadata differs. Polymarket tapes, game contexts, lines/odds and prices unchanged. Prior records retained; old Kalshi parser is known defective."
+}

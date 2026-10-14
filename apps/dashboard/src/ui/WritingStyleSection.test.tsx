@@ -31,7 +31,7 @@ describe('writing style settings section', () => {
     );
 
     expect(markup).toContain('Writing style');
-    expect(markup).toContain('Dry analyst');
+    expect(markup).toContain('Straight analysis');
     expect(markup).toContain('Long · 450–650 words');
     expect(markup).toContain('Allow profanity');
     expect(markup).toContain('Family and health');

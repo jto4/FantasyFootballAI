@@ -1,0 +1,44 @@
+{
+  "verifiedAt": "2026-10-13T22:22:47.979Z",
+  "checks": {
+    "tests": "851 workspace tests (313 API, 84 dashboard, 231 core, 223 integrations) plus root suites passed under supported Node 22",
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed; four generated hash-sealed JSON records explicitly exempted to retain their original bytes; source and documentation checked",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "replay": "Freshly decompressed shared context/original/corrected market inputs; all eight selected raw PBP archives reconstruct 3,822 normalized team-game rows exactly, matching the saved snapshot. Four complete audits reproduce every probability, metric and row, excluding only scoredAt. No network or temporary raw source files required.",
+  "manualReview": "Scoped ordinary manual code/security review of bounded network/decompression/CSV, source identity/duplicate checks, paired joins, original/fixed drive identities, missing-data quarantine, prior-only features/continuous-target fitting/prequential feedback, frozen development-only selection, source hashes and exact non-total delegation. No automated security scans.",
+  "production": "No new adapter is routed to live predictions. Production totals/moneyline/spreads and owner configuration/credentials/history are unchanged. No wager or AI call.",
+  "limitations": "Repeated retrospective development and audit, revised historical PBP not certified as-of publication, sportsbook quotes without observation times, only five current-season week clusters; no executable returns or consistent edge established.",
+  "frozenSettingsSha256": "673e659e6229a0d47be2ceeaed54addba9f321c8bdacbb5d3ee7dc2e56d1aa3e",
+  "auditSha256": "000b2578e0bf7d260594308a217a0557a13d66a7e0fff4f28b831eb3cc063101",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "driveStatsPlaintextSha256": "eb69a73e18dd90926dd6ddf43ae85802423de376a2f377cfabeb37d598fbbba3",
+  "additionalHashes": {
+    "docs/research/2026-10-13-v16-flow-diagnosis.json": "064b4779e29d0df038701520fa0fee27581920cd42a5ff06f065c88b11c735df",
+    "docs/research/model-v16-drive-provenance.json": "d3b8e8a2e378a185d7af8aa9dabf3f4be7fd1e57a92636d770a9cd562d131144",
+    "docs/research/model-v16-drive-stats.json.gz": "8b5daa0e92d1379acd74ae1ccf43e0e477e3cada836168708e2e03f9155ac1c2",
+    "docs/research/2026-10-13-v16-result-diagnostics.json": "9ce98408f22f84349a3ed62b0f0473acf92cfcd00e72d128afae8cb8560d9b45",
+    "packages/core/src/index.ts": "681ec096a8c29811bd1d90cc07b623a7a4eadb47f8d2245c8b6021614c8fa929",
+    ".prettierignore": "9e4a06ce4c5c7878bccaff05aa704caffead457c84340cacc396a94228842f35"
+  },
+  "preservedIssuedSeals": {
+    "docs/research/2026-10-12-v6-pregame-numeric-record.json": "c34a06cd0c54562866d46797103b66619cee0b4191a4fbe6b8b49601c3082fc0",
+    "docs/research/2026-10-13-v11-pregame-numeric-record.json": "8f686cf56fecd12624b2bebca9f3896530606d2409ab34d94915ddb4ce2f5fce"
+  },
+  "nonTotalMaximumProductionDifference": {
+    "drive-residual-25-football-only": 0,
+    "drive-residual-25-with-flow": 0,
+    "drive-residual-100-football-only": 0,
+    "drive-residual-100-with-flow": 0
+  },
+  "selected": {
+    "penalty": 100,
+    "flow": false
+  },
+  "primary": "drive-residual-100-football-only"
+}

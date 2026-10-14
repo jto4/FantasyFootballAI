@@ -10,12 +10,20 @@ import {
   utilityProcess,
   autoUpdater,
 } from 'electron';
+import { mkdirSync } from 'node:fs';
 import { lstat, mkdir, readFile, realpath, rename, rm, unlink, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
+import { resolveVerificationProfile } from '@sidekick/integrations';
 import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
+import {
+  getTeamSelectionPreference,
+  setTeamSelectionPreference,
+  validateTeamSelections,
+} from './team-selection-preference.mjs';
+import { getAppearancePreference, setAppearancePreference } from './appearance-preference.mjs';
 import {
   getStartHiddenPreference,
   setStartHiddenPreference,
@@ -36,6 +44,22 @@ import {
 } from './data-directory.mjs';
 
 const startupTimeoutMs = 30_000;
+const verificationProfile = resolveVerificationProfile(
+  process.env.SIDEKICK_VERIFICATION_ROOT,
+  process.env.SIDEKICK_USER_DATA_DIR,
+);
+if (verificationProfile) {
+  // Electron's cookie encryption can prompt independently of the app credential adapter.
+  if (process.platform === 'darwin') app.commandLine.appendSwitch('use-mock-keychain');
+  // Set these before deriving preference paths or acquiring the single-instance lock.
+  const applicationData = join(verificationProfile.root, 'preferences');
+  const browserData = join(verificationProfile.root, 'chromium');
+  mkdirSync(applicationData, { recursive: true, mode: 0o700 });
+  mkdirSync(browserData, { recursive: true, mode: 0o700 });
+  app.setPath('appData', applicationData);
+  app.setPath('userData', browserData);
+  process.env.SIDEKICK_USER_DATA_DIR = verificationProfile.dataDirectory;
+}
 const smokeTest = process.argv.includes('--sidekick-smoke-test');
 const mcpMode = process.argv.includes('--sidekick-mcp');
 const headlessMode = isHeadlessLaunch(process.argv);
@@ -60,15 +84,68 @@ let quitPromise;
 let mainWindow;
 let tray;
 let dashboardOrigin;
+ipcMain.on('sidekick:is-verification-mode', (event) => {
+  try {
+    assertTrustedDashboard(event);
+    event.returnValue = Boolean(verificationProfile);
+  } catch {
+    event.returnValue = false;
+  }
+});
 // Keep the selection outside the selected folder so startup can find it after a move.
 const dataDirectoryPreference = join(app.getPath('appData'), app.getName(), 'data-directory.json');
 const startupPreference = join(app.getPath('appData'), app.getName(), 'startup.json');
+const appearancePreference = join(app.getPath('appData'), app.getName(), 'appearance.json');
+const teamPreference = join(app.getPath('appData'), app.getName(), 'team-selection.json');
+let teamSelections = {};
+let teamSelectionWrites = Promise.resolve();
+ipcMain.on('sidekick:get-team-selections', (event) => {
+  try {
+    assertTrustedDashboard(event);
+    event.returnValue = { ...teamSelections };
+  } catch {
+    event.returnValue = {};
+  }
+});
+ipcMain.handle('sidekick:set-team-selections', (event, teams) => {
+  assertTrustedDashboard(event);
+  teamSelections = validateTeamSelections(teams);
+  const safe = { ...teamSelections };
+  teamSelectionWrites = teamSelectionWrites
+    .catch(() => undefined)
+    .then(() => setTeamSelectionPreference(teamPreference, safe));
+  return teamSelectionWrites;
+});
+let appearanceTheme = 'light';
+let appearanceWrites = Promise.resolve();
+
+// A cached synchronous reply lets the local startup script choose colors before paint.
+// File I/O runs only at startup or through the asynchronous write handler.
+ipcMain.on('sidekick:get-theme', (event) => {
+  try {
+    assertTrustedDashboard(event);
+    event.returnValue = appearanceTheme;
+  } catch {
+    event.returnValue = 'light';
+  }
+});
+ipcMain.handle('sidekick:set-theme', (event, theme) => {
+  assertTrustedDashboard(event);
+  if (theme !== 'light' && theme !== 'dark') throw new TypeError('Unknown appearance.');
+  appearanceTheme = theme;
+  mainWindow.setBackgroundColor(theme === 'dark' ? '#000000' : '#ffffff');
+  // Serialize rapid toggles so an older write cannot replace the latest choice.
+  appearanceWrites = appearanceWrites
+    .catch(() => undefined)
+    .then(() => setAppearancePreference(appearancePreference, theme));
+  return appearanceWrites;
+});
 const nativeUpdater = createNativeUpdater({
   autoUpdater,
   platform: process.platform,
   architecture: process.arch,
   version: app.getVersion(),
-  packaged: app.isPackaged && !smokeTest && !mcpMode && !headlessMode,
+  packaged: app.isPackaged && !smokeTest && !mcpMode && !headlessMode && !verificationProfile,
 });
 nativeUpdater.subscribe((status) => {
   for (const window of BrowserWindow.getAllWindows()) {
@@ -190,6 +267,7 @@ ipcMain.handle('sidekick:choose-data-directory', async (event) => {
   const databasePath = join(nextDirectory, 'state.sqlite');
   const backupsPath = join(nextDirectory, 'backups');
   const imagesPath = join(nextDirectory, 'images');
+  const routinePath = join(nextDirectory, 'routine-backups');
   const existingDatabase = await lstat(databasePath).catch(() => undefined);
   if (existingDatabase) {
     if (!existingDatabase.isFile())
@@ -225,11 +303,19 @@ ipcMain.handle('sidekick:choose-data-directory', async (event) => {
   )
     throw new Error('That folder already contains an images folder. Choose another folder.');
 
+  if (
+    await lstat(routinePath).then(
+      () => true,
+      () => false,
+    )
+  )
+    throw new Error('That folder already contains scheduled backups. Choose another folder.');
+  let routineCreated = false;
   let databaseCreated = false;
   let backupsCreated = false;
   let imagesCreated = false;
   try {
-    const response = await fetch(`http://127.0.0.1:${apiPort}/api/backup`, {
+    const response = await fetch(`http://127.0.0.1:${apiPort}/api/backup/database`, {
       signal: AbortSignal.timeout(15_000),
     });
     if (!response.ok) throw new Error('Could not create a consistent local database copy.');
@@ -247,12 +333,17 @@ ipcMain.handle('sidekick:choose-data-directory', async (event) => {
     backupsCreated = await copyLocalDirectory(oldBackupsPath, backupsPath);
     const oldImagesPath = join(currentDirectory, 'images');
     imagesCreated = await copyLocalDirectory(oldImagesPath, imagesPath);
+    routineCreated = await copyLocalDirectory(
+      join(currentDirectory, 'routine-backups'),
+      routinePath,
+    );
     await restartWithDataDirectory(nextDirectory, currentDirectory);
     return { changed: true };
   } catch (error) {
     if (databaseCreated) await unlink(databasePath).catch(() => undefined);
     if (backupsCreated) await rm(backupsPath, { recursive: true, force: true });
     if (imagesCreated) await rm(imagesPath, { recursive: true, force: true });
+    if (routineCreated) await rm(routinePath, { recursive: true, force: true });
     throw error;
   }
 });
@@ -285,6 +376,8 @@ if (mcpMode) {
 }
 
 async function start() {
+  teamSelections = await getTeamSelectionPreference(teamPreference);
+  appearanceTheme = await getAppearancePreference(appearancePreference);
   await writeSmokeStatus('starting');
   apiPort = await reserveLoopbackPort();
   const dataDirectory = await getDataDirectory();
@@ -293,7 +386,7 @@ async function start() {
   try {
     await startLocalApi(dataDirectory);
   } catch (error) {
-    if (!storageOpenFailed || smokeTest) throw error;
+    if (!storageOpenFailed || smokeTest || verificationProfile) throw error;
     await removeServicePortFile(dataDirectory);
     const recovery = await offerDatabaseRecovery(dataDirectory);
     if (!recovery.restored) throw new Error(recovery.detail);
@@ -386,6 +479,13 @@ async function startLocalApi(dataDirectory) {
       SIDEKICK_PORT: String(apiPort),
       SIDEKICK_DATABASE_FILE: join(dataDirectory, 'state.sqlite'),
       SIDEKICK_USER_DATA_DIR: dataDirectory,
+      ...(verificationProfile
+        ? {
+            // Child credentials and legacy migration must stay inside the same disposable profile.
+            SIDEKICK_VERIFICATION_ROOT: verificationProfile.root,
+            SIDEKICK_DATA_FILE: join(dataDirectory, 'state.json'),
+          }
+        : {}),
     },
     stdio: 'pipe',
   });
@@ -417,6 +517,12 @@ async function startLocalApi(dataDirectory) {
     if (!quitting && !startupInProgress) {
       const closeAfterExit = () => app.quit();
       if (code !== 0) {
+        if (verificationProfile) {
+          // Automated failures must exit visibly to the harness rather than wait on a modal.
+          console.error('Verification local service exited unexpectedly.');
+          void apiLogFlushPromise.finally(() => app.exit(1));
+          return;
+        }
         const window = BrowserWindow.getAllWindows()[0];
         if (window) {
           void dialog
@@ -544,8 +650,10 @@ function createWindow({ initiallyHidden = false } = {}) {
     minWidth: 900,
     minHeight: 640,
     show: false,
+    backgroundColor: appearanceTheme === 'dark' ? '#000000' : '#ffffff',
     title: 'Sunday Sidekick',
     webPreferences: {
+      ...(verificationProfile ? { partition: 'sidekick-verification' } : {}),
       preload: join(app.getAppPath(), 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
@@ -573,6 +681,10 @@ function createWindow({ initiallyHidden = false } = {}) {
   });
   window.webContents.on('will-navigate', (event, url) => {
     if (url !== dashboardUrl && !url.startsWith(`${dashboardUrl}/`)) event.preventDefault();
+  });
+  window.webContents.on('will-prevent-unload', (event) => {
+    // Only disposable test teardown may discard unsaved input without a close prompt.
+    if (verificationProfile && quitting) event.preventDefault();
   });
   window.once('ready-to-show', () => {
     if (!initiallyHidden) window.show();
@@ -664,13 +776,22 @@ function requestGracefulQuit() {
   if (quitPromise) return quitPromise;
   quitting = true;
   tray?.destroy();
-  quitPromise = stopApi()
+  quitPromise = Promise.allSettled([appearanceWrites, teamSelectionWrites])
+    .catch(() => undefined)
+    .then(() => stopApi())
     .catch((error) => console.error('Could not stop the local service cleanly.', error))
     .finally(() => app.quit());
   return quitPromise;
 }
 
 async function showStartupError(error) {
+  if (verificationProfile) {
+    console.error('Verification startup failed. Inspect the private API logs.');
+    quitting = true;
+    await stopApi().catch(() => undefined);
+    app.exit(1);
+    return;
+  }
   if (mcpMode || headlessMode) {
     console.error(error);
     app.exit(1);

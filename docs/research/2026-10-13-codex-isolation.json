@@ -1,0 +1,133 @@
+{
+  "recordedAt": "2026-10-13T23:49:41.083Z",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "node": "v22.23.3",
+  "adapterSha256": "3fc22c4fc5d4e8a93b30579436e3d0dfc154b3a87b56dceece718ce2f2ddb755",
+  "fixture": {
+    "version": "codex-cli 0.162.0-alpha.17.2",
+    "executableSha256": "0d5ac7aae20c4eda6242428d5e218c55ba96d8763fda2a271088ff37104b9d28",
+    "passed": true,
+    "authorizationPresent": false,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "toolCount": 0,
+    "payloadKeys": [
+      "model",
+      "stream",
+      "input",
+      "tool_choice",
+      "parallel_tool_calls",
+      "reasoning",
+      "store",
+      "include",
+      "prompt_cache_key",
+      "text",
+      "client_metadata"
+    ],
+    "path": "/v1/responses",
+    "toolNames": [],
+    "onlySuppliedText": true,
+    "onlySuppliedInput": true,
+    "systemPresent": true,
+    "canaryMatches": [],
+    "canaryLeak": false,
+    "skillContext": false,
+    "inputSummary": [
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": false,
+            "prompt": true
+          }
+        ]
+      }
+    ],
+    "requestSha256": "38d022c4d2dfeb38d3a296c339bb07edd29f0c5487528d196473792f6ae0e081",
+    "globalReadBlocked": true,
+    "mcpFixtureLaunched": false,
+    "sessionPersisted": false,
+    "scope": "Owned fixture home; production isolation arguments; loopback transport only; no authentication or remote inference."
+  },
+  "existingNativeHome": {
+    "version": "codex-cli 0.162.0-alpha.17.2",
+    "executableSha256": "0d5ac7aae20c4eda6242428d5e218c55ba96d8763fda2a271088ff37104b9d28",
+    "passed": true,
+    "authorizationPresent": false,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "toolCount": 0,
+    "payloadKeys": [
+      "model",
+      "stream",
+      "input",
+      "tool_choice",
+      "parallel_tool_calls",
+      "reasoning",
+      "store",
+      "include",
+      "prompt_cache_key",
+      "text",
+      "client_metadata"
+    ],
+    "path": "/v1/responses",
+    "toolNames": [],
+    "onlySuppliedText": true,
+    "onlySuppliedInput": true,
+    "systemPresent": true,
+    "canaryMatches": [],
+    "canaryLeak": false,
+    "skillContext": false,
+    "inputSummary": [
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": false,
+            "prompt": true
+          }
+        ]
+      }
+    ],
+    "requestSha256": "764e94d27146778d75886beeebe1fae747dd541f3d41b2c70c3441a9d1ec974e",
+    "globalReadBlocked": true,
+    "scope": "Existing native home; no fixture files written there; production isolation arguments; loopback transport only; no authentication or remote inference."
+  },
+  "nativeProbe": {
+    "passed": true,
+    "inputTokens": 29,
+    "outputTokens": 9
+  },
+  "limitations": [
+    "Capture changes only provider transport to an owned no-auth loopback receiver; it is not a captured authenticated remote request.",
+    "No raw request bodies, headers, credentials, account/session metadata or native reasoning are retained.",
+    "Native CLI/provider trust is external; macOS source verification is not verification of Windows/Linux or rebuilt installers."
+  ]
+}

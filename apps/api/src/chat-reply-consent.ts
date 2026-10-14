@@ -15,6 +15,7 @@ export type ChatReplyConsentCheck = {
   channel: GroupChatSyncChannel;
   target: string;
   isBackgroundPoll: boolean;
+  expectedSettings?: AppSettings;
 };
 
 /** Abort before AI receives chat text when the owner's current sharing settings changed. */
@@ -22,7 +23,13 @@ export function assertChatReplyConsent(check: ChatReplyConsentCheck): void {
   const { currentState, expectedLeagueId, memberContext, channel, target, isBackgroundPoll } =
     check;
   const { settings, leagues, memories } = currentState;
-  const blocked = groupChatSyncBlockReason(settings, channel, target, isBackgroundPoll);
+  const blocked = groupChatSyncBlockReason(
+    settings,
+    channel,
+    target,
+    isBackgroundPoll,
+    check.expectedSettings,
+  );
   if (blocked) throw new Error(blocked);
   if (!settings.chatRepliesEnabled)
     throw new Error('Group chat replies were disabled before AI generation.');

@@ -1,0 +1,285 @@
+{
+  "collectedAt": "2026-10-12T16:23:09.575055+00:00",
+  "files": {
+    "stats2015": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2015.csv",
+      "bytes": 7881066,
+      "sha256": "21052baa3b3291a92faf3e6827891295010dca8cc5cefd5a909984b9d7b64664"
+    },
+    "stats2016": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2016.csv",
+      "bytes": 7852359,
+      "sha256": "eb0264c65d1ef593196afcd4ba24e9f2e9b7942923bf6f4bb4639684e2c4d470"
+    },
+    "stats2018": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2018.csv",
+      "bytes": 7792665,
+      "sha256": "c53021bcfc9f89d30edd6f1fe145a1d7d6ce469efeec75974fe9f0adac568642"
+    },
+    "stats2019": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2019.csv",
+      "bytes": 7767165,
+      "sha256": "a05558126b1209b80fe11a8f18938cb35816370bf9990975a87de49e9eed7376"
+    },
+    "stats2021": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2021.csv",
+      "bytes": 8477784,
+      "sha256": "41915fb49238902ad1f129ebf0405b11a1e710454ae0fe8f7b3e4f9145875f48"
+    },
+    "stats2020": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2020.csv",
+      "bytes": 7883270,
+      "sha256": "05b992676faccc8940efbf6242cb76358069372d31d7c2e02c1a4acdcd3cbe18"
+    },
+    "stats2023": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2023.csv",
+      "bytes": 8332874,
+      "sha256": "f19cb71a5de0dce7fd09376026237c9ee9d5a93fe13815a2ea3ec2d37204cb17"
+    },
+    "stats2022": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2022.csv",
+      "bytes": 8408729,
+      "sha256": "ad426c3fe5bf1cc30c3f137fdfe96d054e19d400879ee4413129da49fa7b54be"
+    },
+    "stats2024": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2024.csv",
+      "bytes": 8470040,
+      "sha256": "3ddc45a84f759aa348ce465ae001752c530575455717657cdfe1f8abfcdb4759"
+    },
+    "stats2017": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2017.csv",
+      "bytes": 7821392,
+      "sha256": "592b0916065987b0b3afb0480162f03350d16b12250dc42b0f194e2ab1378563"
+    },
+    "stats2026": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2026.csv",
+      "bytes": 2418866,
+      "sha256": "be274edeaf5e47c581117a2ac4de165c0ec66f37b7b2cfddfeb739760a5518a9"
+    },
+    "snaps2015": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2015.csv",
+      "bytes": 2155797,
+      "sha256": "841496252ada825c3c50d3ba9b4b26d3f4fabd0fedc5fb44f286ddaaa5bdb7e0"
+    },
+    "snaps2016": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2016.csv",
+      "bytes": 2157110,
+      "sha256": "a778e24e9eb665ffe8f16093b03c5a263dca0250b3aa92bd6002f61f534bea59"
+    },
+    "snaps2017": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2017.csv",
+      "bytes": 2157818,
+      "sha256": "eab2fad2df99249d4061ed9c5c34d312cdba07cf3159d027d255bdc9b6526917"
+    },
+    "stats2025": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2025.csv",
+      "bytes": 8656387,
+      "sha256": "e5e0615b3d96a3eaebfaee91e55afb4a4e7fe0caf057454177bcd7d6ad4bcfc2"
+    },
+    "snaps2018": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2018.csv",
+      "bytes": 2157555,
+      "sha256": "9a408b78a55f799110aed70de3564e157faf089ce9bed780d0368bf49ae13e0b"
+    },
+    "snaps2021": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2021.csv",
+      "bytes": 2388493,
+      "sha256": "8e4dae054a4749cf2d4919508d9161a6068fd67509979aefa385bfb3803d0ee5"
+    },
+    "snaps2019": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2019.csv",
+      "bytes": 2156311,
+      "sha256": "0cd52be8fa57f18503b670cb8263246c4f548375b768cbcad1c7a7462c98970d"
+    },
+    "snaps2020": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2020.csv",
+      "bytes": 2257664,
+      "sha256": "512e35f17d076eb5d99b933c4a144eb95dcddf40c0320dbb397cae3c35683716"
+    },
+    "snaps2022": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2022.csv",
+      "bytes": 2379719,
+      "sha256": "0018a4833fbf0f825286c1c27450c6254391b548d6c55bcde728e93e4816815a"
+    },
+    "snaps2023": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2023.csv",
+      "bytes": 2394875,
+      "sha256": "303b61aa5c33ffda863f93a750fc14483f397f9187ad502b1ce71e9b516a64c0"
+    },
+    "snaps2024": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2024.csv",
+      "bytes": 2402841,
+      "sha256": "a2aa58efe093f8aa0ad5aadf09f81d8ec690a1183bd2dde68d20e7f109a9c335"
+    },
+    "snaps2026": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2026.csv",
+      "bytes": 653116,
+      "sha256": "8957f4ea47c0e6655f4c79f38268595a5678e0583692ac8f182924ade1a19017"
+    },
+    "snaps2025": {
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/snap_counts/snap_counts_2025.csv",
+      "bytes": 2401290,
+      "sha256": "3fc2deb0e9ad86d34d4578cb80bb21c95253e088ee22ca028adf46f7485eff1f"
+    },
+    "nflindex202510": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2025/10",
+      "bytes": 342023,
+      "sha256": "e38f87a960f25d9f7b4edabb50459c6068f234d341a5859edd692b95c248582a"
+    },
+    "nflindex202511": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2025/11",
+      "bytes": 325196,
+      "sha256": "4ef5921b5b536ebfaef684fb33a49f8f35a936606c9f4557ab882ab0599f4517"
+    },
+    "nflindex20259": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2025/9",
+      "bytes": 322376,
+      "sha256": "360c31afcb8dd24329a753c23a47a5a2c3e48dbc06c4f4354d5e13ece60f7bfa"
+    },
+    "nflindex202512": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2025/12",
+      "bytes": 328091,
+      "sha256": "a62795533b62b4d6b5d7d0b5bc0200918d1ac6578be7f84399de0fe4d9e6cd32"
+    },
+    "nflindex20269": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2026/9",
+      "bytes": 306321,
+      "sha256": "8b8fdc79fd73492c16984195de0dc8a158d25922397cd5cf9f759ce153042e79"
+    },
+    "nflindex202610": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2026/10",
+      "bytes": 228229,
+      "sha256": "b453e144903d2f17ce31904f013b9561bf84396a60cffa0d1588849b6127d57c"
+    },
+    "nflindex202611": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2026/11",
+      "bytes": 192612,
+      "sha256": "3be0e4457f9edfde304674f0039bb794ae21c098ae28cea17b6812561b035727"
+    },
+    "nflindex202612": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2026/12",
+      "bytes": 192612,
+      "sha256": "6e56466cc10f1eb236501f417ea2a5fdbe93d4f1d9aead5e142aea62ce6c5e8a"
+    },
+    "nflindex20261": {
+      "url": "https://www.nfl.com/sitemap/html/articles/2026/1",
+      "bytes": 320162,
+      "sha256": "f4675fe5f4aa791d960b206e48ac1039d3a8d3369ca4a52043c7382ed439489e"
+    },
+    "nflreport-nfl-week-1-injury-report-player-statuses-for-all-16-games-2025-season": {
+      "url": "https://www.nfl.com/news/nfl-week-1-injury-report-player-statuses-for-all-16-games-2025-season",
+      "bytes": 1023342,
+      "sha256": "3a8555c4147145b2ba8e2d21a968a0cf9a5cb089658a33922900adaaaf7e4792"
+    },
+    "nflreport-nfl-week-1-injury-report-2026-season": {
+      "url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
+      "bytes": 961162,
+      "sha256": "5a065a670471297161dc2ad54fb0e03aa20ea0dbed27289e57c16466dd592fe6"
+    },
+    "nflreport-nfl-week-10-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-10-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1172818,
+      "sha256": "eb7e51b16940697817cf7a49fe670696e2874aedaaee70ea9f7851b7a79fb465"
+    },
+    "nflreport-nfl-week-11-injury-report-player-statuses-for-all-15-games": {
+      "url": "https://www.nfl.com/news/nfl-week-11-injury-report-player-statuses-for-all-15-games",
+      "bytes": 1171361,
+      "sha256": "126ee5ecd25519a790772f35903e65a5d1818a9ea15136c36d6c685cab1796ed"
+    },
+    "nflreport-nfl-week-12-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-12-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1106673,
+      "sha256": "e213ed3d418fe2d5d45e0641e0c52a4cfbc08b550d3eb78e9cf26bebb226cb17"
+    },
+    "nflreport-nfl-week-14-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-14-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1117496,
+      "sha256": "36f18b5b7a55889e79df79f4a30e1df5cd0f6f5bda0ec2c0a5401934304a6fdc"
+    },
+    "nflreport-nfl-week-13-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-13-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1163943,
+      "sha256": "4a9c4435cf8085bcf821c45dbe21e377c348ab1285347cb35252687adb16e29a"
+    },
+    "nflreport-nfl-week-15-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-15-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1196233,
+      "sha256": "bf1db463189ce7f0d00bbdc70cb08698129f087806425c01d9d6735e54271f5d"
+    },
+    "nflreport-nfl-week-17-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-17-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1288573,
+      "sha256": "67750026928b90aa796c658a36197f8a1f722205a197b06d0f2f8c172c1b9498"
+    },
+    "nflreport-nfl-week-18-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-18-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1220454,
+      "sha256": "dc3e4c4a57e5bdfc25b34fd38349f1ce037b958d1bdbbb938436b3c15141d043"
+    },
+    "nflreport-nfl-week-2-injury-report-player-statuses-2025-season": {
+      "url": "https://www.nfl.com/news/nfl-week-2-injury-report-player-statuses-2025-season",
+      "bytes": 1111145,
+      "sha256": "7646fb0a3b86a7c5d1321629d9a243a9b30d29179849faf9d72b4c72e69af79b"
+    },
+    "nflreport-nfl-week-16-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-16-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1226697,
+      "sha256": "be80dbcc1e584e3af357507e8c6685cf508578926b9bcbe05f47aacb89aca65e"
+    },
+    "nflreport-nfl-week-2-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-2-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1014231,
+      "sha256": "ca9e703fec8d34e4fdd00ca7de449d16c1a0e9336c2fa1a71d1a949e518fff00"
+    },
+    "nflreport-nfl-week-3-injury-report-player-statuses-2025-season": {
+      "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-2025-season",
+      "bytes": 1153887,
+      "sha256": "5e856334639c62c0ee09de0be8231b9065d1b71e710ec1fb439cd050a7383b90"
+    },
+    "nflreport-nfl-week-4-injury-report-player-statuses-2025-season": {
+      "url": "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-2025-season",
+      "bytes": 1128394,
+      "sha256": "029dc717bdb77a70a148eb900983a8d182c6503ad1d94356f2f770e291884c63"
+    },
+    "nflreport-nfl-week-3-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-3-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1040342,
+      "sha256": "18b77c986cd3b13c359679223aab944208820d368d58927b5c44042ac6c1f6dd"
+    },
+    "nflreport-nfl-week-4-injury-report-player-statuses-for-all-16-games": {
+      "url": "https://www.nfl.com/news/nfl-week-4-injury-report-player-statuses-for-all-16-games",
+      "bytes": 1036919,
+      "sha256": "aec2927160bcc8c5cb70e95f4833605e8051ff7cbd5a86e8c668fba3ebc32cbb"
+    },
+    "nflreport-nfl-week-5-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1124791,
+      "sha256": "5936e2e818572ca8aa16e566b4587569034a08fb4b60886e4b81a3729cbb36e1"
+    },
+    "nflreport-nfl-week-5-injury-report-player-statuses-for-all-15-games": {
+      "url": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "bytes": 1048900,
+      "sha256": "aaf5dd87618ac5454d81dbaa6599cc5c6cd0994f2a07499d69d66c396899ee58"
+    },
+    "nflreport-nfl-week-6-injury-report-player-statuses-for-all-15-games": {
+      "url": "https://www.nfl.com/news/nfl-week-6-injury-report-player-statuses-for-all-15-games",
+      "bytes": 1179512,
+      "sha256": "d86166466e3b19625901c9b9778caf61863f1e56e45b43dd1bb526e6e46fcfac"
+    },
+    "nflreport-nfl-week-7-injury-report-player-statuses-for-all-15-games": {
+      "url": "https://www.nfl.com/news/nfl-week-7-injury-report-player-statuses-for-all-15-games",
+      "bytes": 1172222,
+      "sha256": "87169059386c25a66d8aec236f2889787df588edbae87f3c08c66911e280e4ac"
+    },
+    "nflreport-nfl-week-8-injury-report-player-statuses-for-all-13-games": {
+      "url": "https://www.nfl.com/news/nfl-week-8-injury-report-player-statuses-for-all-13-games",
+      "bytes": 1100008,
+      "sha256": "6edf9db7150b141f20d2494104401172776b548a84e5076af405e2ac99693fd9"
+    },
+    "nflreport-nfl-week-9-injury-report-player-statuses-for-all-14-games": {
+      "url": "https://www.nfl.com/news/nfl-week-9-injury-report-player-statuses-for-all-14-games",
+      "bytes": 1135763,
+      "sha256": "6a39aa321593af46c640aa3012887b4e1f753a8b9b6814f4e67968fbb9b9708f"
+    }
+  }
+}

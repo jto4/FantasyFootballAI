@@ -1,0 +1,43 @@
+{
+  "frozenAt": "2026-10-13T19:15:18.177Z",
+  "parameters": {
+    "cutoffMinutes": 30,
+    "windowHours": 24,
+    "priceMaxAgeMinutes": 60,
+    "minimumTrainingGames": 30,
+    "penalty": 100,
+    "maxAddedLogit": 0.15,
+    "largeCashFloor": 500,
+    "largeQuantile": 0.95,
+    "walletPriorGames": 20,
+    "walletMinimumGames": 10
+  },
+  "families": ["price", "flow", "media", "combined"],
+  "selection": "none; fixed conservative research settings",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "77db759a5d62432b6717db80e80c8f07a2e5d9279242704ced95bd203f6f56cb",
+  "schedule": {
+    "url": "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv",
+    "capturedAt": "2026-10-13T19:02:33.707Z",
+    "sha256": "7b9be2f06a762420aefe077d01952dc9b3510f5df55879aa8bd8f7ca974422ea",
+    "bytes": 2184485
+  },
+  "codeHashes": {
+    "packages/core/src/external-total-signals.ts": "ef4949d804eb07efe837faf7172e64e417543f9402dbac7b20dc4bb930718c7b",
+    "packages/integrations/src/prediction-market-data.ts": "0dc0db14ebdeb8e1bd67f01e9cb71b685ad8205b933acc068f00257154d24580",
+    "scripts/capture-external-totals.mjs": "6d49e5b973139d329f147f0f491d5e39289542030399b9f8aed709bd5027e881",
+    "scripts/audit-external-totals.mjs": "a03ceae44038b51aefbc0f5782120cc7c08577d73dbf3e6571be9eac05ca3213",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "scripts/game-context-snapshot.mjs": "fd9a6e0b61a4a341e73505244f7a79c7ffdbe1e5edf64435c11bef79aaa52173",
+    "scripts/rich-personnel-evaluation.mjs": "0fa18d0c2dce12a5a660bdebacd79caa7d2ff3922352f1e343f9e07798df7123",
+    "scripts/seasonal-hybrid-evaluation.mjs": "31260c94302d19fcd04a4819fd0a9cbd079c2b35b161cf9602656327e7e1d5df"
+  },
+  "warnings": [
+    "Fresh schedule capture includes 79 completed 2026 games; previous temporary personnel context is unavailable. Comparisons use the same fresh base for every family. Old frozen results are not overwritten.",
+    "All past samples are reused retrospective research. Archive sportsbook publication time is not verified."
+  ],
+  "historicalTapesSha256": "99e45f3052608e2ed325817ba89783594f7b95ad375ad633d9f229d1bdc46a70",
+  "provenanceGuardUpdatedAt": "2026-10-13T19:16:19.469Z",
+  "provenanceGuardNote": "Strengthened frozen history/pending training identity checks after the first execution and before inspecting numerical scores; model parameters/source remain unchanged."
+}

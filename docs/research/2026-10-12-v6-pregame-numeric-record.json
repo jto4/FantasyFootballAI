@@ -1,0 +1,169 @@
+{
+  "capturedAt": "2026-10-12T18:37:53.238Z",
+  "numericResearchOnly": true,
+  "noWagerOrAIInvocation": true,
+  "outcomes": "pending",
+  "game": {
+    "id": "2026_05_BUF_LA",
+    "kickoffAt": "2026-10-13T00:15:00.000Z",
+    "home": "LA",
+    "away": "BUF"
+  },
+  "context": {
+    "asOf": "2026-10-12T18:37:48.976Z",
+    "home": {
+      "previousQuarterbackName": "Matthew Stafford",
+      "previousQuarterbackId": "00-0026498",
+      "reportUpdatedAt": "2026-10-10T21:23:47.290Z",
+      "offenseOut": 0,
+      "defenseOut": 0,
+      "quarterbackOut": false,
+      "quarterbackDoubtful": false,
+      "expectedQuarterbackName": "Matthew Stafford",
+      "quarterbackObservedAt": "2026-10-12T18:37:47.873Z",
+      "quarterbackChanged": false,
+      "reportSource": "nfl-official",
+      "reportUrl": "https://www.nfl.com/news/nfl-week-5-injury-report-player-statuses-for-all-15-games",
+      "personnel": {
+        "availableBy": "2026-10-05T17:00:00.000Z",
+        "throughSeason": 2026,
+        "throughWeek": 4,
+        "reportedPlayers": 1,
+        "matchedReports": 1,
+        "quarterbackQuality": 0.07307391449802662,
+        "quarterbackEpa": 0.07361242582028871,
+        "quarterbackRushEpa": -0.01971770010206099,
+        "quarterbackAbsenceValue": 0,
+        "offenseOutSnaps": 0,
+        "defenseOutSnaps": 0,
+        "offenseQuestionableSnaps": 0,
+        "defenseQuestionableSnaps": 1,
+        "offensiveLineOutSnaps": 0,
+        "skillOutSnaps": 0,
+        "offenseDoubtfulSnaps": 0,
+        "defenseDoubtfulSnaps": 0
+      }
+    },
+    "away": {
+      "previousQuarterbackName": "Josh Allen",
+      "previousQuarterbackId": "00-0034857",
+      "reportUpdatedAt": "2026-10-11T02:38:00.000Z",
+      "offenseOut": 1,
+      "defenseOut": 1,
+      "quarterbackOut": false,
+      "quarterbackDoubtful": false,
+      "expectedQuarterbackName": "Josh Allen",
+      "quarterbackObservedAt": "2026-10-12T18:37:47.817Z",
+      "quarterbackChanged": false,
+      "reportSource": "espn",
+      "personnel": {
+        "availableBy": "2026-10-05T17:00:00.000Z",
+        "throughSeason": 2026,
+        "throughWeek": 4,
+        "reportedPlayers": 5,
+        "matchedReports": 4,
+        "quarterbackQuality": 0.1490928612127034,
+        "quarterbackEpa": 0.11544162698870362,
+        "quarterbackRushEpa": 0.03203011699676541,
+        "quarterbackTeamDelta": -0.01383840209909791,
+        "quarterbackAbsenceValue": 0,
+        "defenseOutSnaps": 0.365,
+        "offenseQuestionableSnaps": 0.4466666666666667,
+        "defenseQuestionableSnaps": 0.8166666666666667,
+        "offensiveLineOutSnaps": 0,
+        "offenseDoubtfulSnaps": 0,
+        "defenseDoubtfulSnaps": 0
+      }
+    }
+  },
+  "contextSnapshotSha256": "ee9bd4108296304bb043db7936545fafdc65dff76452d6c0abde69f66b341c82",
+  "frozenSha256": "28036cc677ff2b4fd46f93b51f4689f6257e7d30796257a931cfd08637498916",
+  "codeHashes": {
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/core/src/rich-personnel-model.ts": "0021891ca4ca2c167ec42bb062afe58e44ec7db265ac1931d0360d4b0ea00bfb",
+    "packages/integrations/src/game-personnel.ts": "14d2280bc837ef66faf5017d35d6aefe58a85300f6575286af3d6292fc499cfd",
+    "packages/integrations/src/game-pregame.ts": "a685b1e55b36aa1d8055cc36cc01548f922341792842fa5fd13c6e22fd06d484",
+    "packages/integrations/src/sportsbook-lines.ts": "3442ef2f3645b27ef127eff1d175f3aabbb5537e72d624bffa8fe66b2c3e3f09",
+    "scripts/record-rich-personnel.mjs": "dbae10784b4d0b2debbaa9b07744a1499faa7e6906bb6ce026508836c8ca3a26"
+  },
+  "results": [
+    {
+      "kind": "moneyline",
+      "quote": {
+        "id": "8e203e17f9a84a1dd0db311a1c156a32d146c752c0fc33ba4b0e147b7d303dc8",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "moneyline",
+        "side": "home",
+        "americanOdds": -175,
+        "oppositeAmericanOdds": 145,
+        "observedAt": "2026-10-12T18:37:49.099Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "threshold": 0,
+      "raw": 0.5423433874709976,
+      "bookProbability": 0.6092362344582594,
+      "previousProbability": 0.6093109086729744,
+      "candidateProbability": 0.6091869815245241,
+      "experimentalProcedure": "all-200-direct"
+    },
+    {
+      "kind": "spread",
+      "quote": {
+        "id": "2ad1d3f87dc90002d1b73db0093a42e3230e9b64b9f2add2062c8e163dcc7f08",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "spread",
+        "side": "home",
+        "line": -3.5,
+        "americanOdds": -102,
+        "oppositeAmericanOdds": -118,
+        "observedAt": "2026-10-12T18:37:49.099Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "threshold": 3.5,
+      "raw": 0.41827468785471056,
+      "bookProbability": 0.4826358742837298,
+      "previousProbability": 0.480984050080434,
+      "candidateProbability": 0.480984050080434,
+      "experimentalProcedure": "injuries-1000-direct"
+    },
+    {
+      "kind": "total",
+      "quote": {
+        "id": "ee370c400f3b0b988a52e87cdf942852a113c61af82b67a863f6a2fce9795541",
+        "gameId": "2026_05_BUF_LA",
+        "espnId": "401872994",
+        "sportsbook": "DraftKings",
+        "providerId": "100",
+        "kind": "total",
+        "side": "over",
+        "line": 54.5,
+        "americanOdds": -118,
+        "oppositeAmericanOdds": -102,
+        "observedAt": "2026-10-12T18:37:49.099Z",
+        "kickoffAt": "2026-10-13T00:15:00.000Z",
+        "sourceUrl": "https://www.espn.com/nfl/odds/_/gameId/401872994"
+      },
+      "threshold": 54.5,
+      "raw": 0.43530079455164583,
+      "bookProbability": 0.5173641257162701,
+      "previousProbability": 0.5104061213864383,
+      "candidateProbability": 0.5104061213864383,
+      "experimentalProcedure": "injuries-1000-direct"
+    }
+  ],
+  "warnings": [
+    "ESPN-displayed pregame prices; retrieval time is not publisher update time. Confirm the price and settlement rules at the sportsbook.",
+    "Experimental correction failed historical consistency checks and is not enabled in production.",
+    "Current capture is prospective; historical training data publication/revision timing is not verified.",
+    "One game cannot establish an advantage or profit."
+  ]
+}

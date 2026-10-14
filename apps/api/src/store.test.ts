@@ -25,6 +25,64 @@ afterEach(async () => {
 });
 
 describe('local SQLite store', () => {
+  it('persists and restores the prediction ledger independently of advice history, and excludes it from ordinary snapshots', async () => {
+    directory = await mkdtemp(join(tmpdir(), 'sidekick-prediction-store-'));
+    const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
+    await store.load();
+    const prediction = {
+      id: 'paper',
+      adviceId: 'older-advice',
+      recordedAt: '2026-10-07T12:00:00Z',
+      method: 'rolling-residual-v1',
+      kind: 'bet' as const,
+      season: 2026,
+      forecast: 0.6,
+      selected: false,
+      status: 'pending' as const,
+      terms: {
+        kind: 'moneyline' as const,
+        gameId: 'game',
+        side: 'home' as const,
+        americanOdds: -110,
+      },
+      games: [
+        {
+          id: 'game',
+          espnId: '401872994',
+          season: 2026,
+          week: 5,
+          seasonType: 'REG',
+          date: '2026-10-11',
+          kickoffAt: '2026-10-11T17:00:00Z',
+          home: 'BUF',
+          away: 'MIA',
+        },
+      ],
+    };
+    await store.update((s) => {
+      s.predictionRecords = [prediction];
+      s.adviceResults = [];
+    });
+    store.close();
+    await store.load();
+    expect(store.snapshot().predictionRecords).toEqual([prediction]);
+    expect(store.dashboardSnapshot()).not.toHaveProperty('predictionRecords');
+    expect(store.reportSnapshot()).not.toHaveProperty('predictionRecords');
+    const file = join(directory, 'journal-backup.sqlite');
+    await store.backupTo(file);
+    await store.update((s) => {
+      s.predictionRecords = [];
+    });
+    await store.restoreFromBuffer(await readFile(file));
+    expect(store.snapshot().predictionRecords).toEqual([prediction]);
+    const db = new Database(file);
+    db.prepare('UPDATE prediction_records SET payload=?').run(
+      JSON.stringify({ ...prediction, recordedAt: '2026-10-12T12:00:00Z' }),
+    );
+    db.close();
+    await expect(store.restoreFromBuffer(await readFile(file))).rejects.toThrow();
+    expect(store.snapshot().predictionRecords).toEqual([prediction]);
+  });
   it('creates dashboard and report snapshots without cloning private import text', async () => {
     directory = await mkdtemp(join(tmpdir(), 'sidekick-memory-snapshots-'));
     const store = openStore(join(directory, 'state.sqlite'), join(directory, 'missing.json'));
@@ -572,7 +630,7 @@ describe('local SQLite store', () => {
     const database = new Database(file, { readonly: true });
     expect(database.prepare('SELECT MAX(version) AS version FROM schema_migrations').get()).toEqual(
       {
-        version: 5,
+        version: 8,
       },
     );
     expect(database.prepare('SELECT id FROM leagues').all()).toEqual([{ id: 'league-1' }]);
@@ -857,7 +915,7 @@ describe('local SQLite store', () => {
     const upgradedDatabase = new Database(file, { readonly: true });
     expect(
       upgradedDatabase.prepare('SELECT MAX(version) AS version FROM schema_migrations').get(),
-    ).toEqual({ version: 5 });
+    ).toEqual({ version: 8 });
     expect(upgradedDatabase.prepare('SELECT id FROM leagues').all()).toEqual([
       { id: 'league-before-upgrade' },
     ]);

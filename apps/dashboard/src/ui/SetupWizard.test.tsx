@@ -35,10 +35,8 @@ describe('SetupWizard', () => {
     const markup = renderStep(1);
 
     expect(markup).toContain('STEP 2 OF 3');
-    expect(markup).toContain('Choose and test an AI runtime');
-    expect(markup).toContain(
-      'Setup is complete after the selected runtime passes its data-free test.',
-    );
+    expect(markup).toContain('Connect your AI writer');
+    expect(markup).toContain('We’ll check that it works before you continue.');
     expect(markup).toContain('Set up AI');
   });
 });

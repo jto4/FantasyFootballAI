@@ -1,7 +1,7 @@
 import express from 'express';
 import type { AppState, DashboardStateSnapshot } from './store.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createStateRouter } from './state-routes.js';
+import { createStateRouter, type StateRouteDependencies } from './state-routes.js';
 
 describe('state API routes', () => {
   const servers: Array<ReturnType<ReturnType<typeof express>['listen']>> = [];
@@ -20,6 +20,7 @@ describe('state API routes', () => {
   async function startServer(
     state: AppState,
     dashboardSnapshot?: () => DashboardStateSnapshot,
+    reportsPage?: StateRouteDependencies['reportsPage'],
   ): Promise<{ baseUrl: string; snapshot: ReturnType<typeof vi.fn> }> {
     const app = express();
     const snapshot = vi.fn(() => state);
@@ -27,6 +28,7 @@ describe('state API routes', () => {
       createStateRouter({
         snapshot,
         ...(dashboardSnapshot ? { dashboardSnapshot } : {}),
+        ...(reportsPage ? { reportsPage } : {}),
       }),
     );
     const server = app.listen(0, '127.0.0.1');
@@ -118,5 +120,19 @@ describe('state API routes', () => {
     expect((await fetch(`${baseUrl}/api/reports?limit=5`)).status).toBe(200);
     expect((await fetch(`${baseUrl}/api/leagues/missing`)).status).toBe(404);
     expect((await fetch(`${baseUrl}/api/scheduled-runs`)).status).toBe(200);
+  });
+
+  it('bounds report-title search and rejects repeated parameters before querying history', async () => {
+    const reportsPage = vi.fn(() => ({ items: [], total: 0 }));
+    const { baseUrl } = await startServer(makeState(), undefined, reportsPage);
+    expect((await fetch(`${baseUrl}/api/report-history?search=${'x'.repeat(121)}`)).status).toBe(
+      400,
+    );
+    expect((await fetch(`${baseUrl}/api/report-history?search=a&search=b`)).status).toBe(400);
+    expect(reportsPage).not.toHaveBeenCalled();
+    expect((await fetch(`${baseUrl}/api/report-history?search=championship&limit=10`)).status).toBe(
+      200,
+    );
+    expect(reportsPage).toHaveBeenCalledWith(undefined, undefined, undefined, 10, 'championship');
   });
 });

@@ -1,0 +1,406 @@
+.advice-page {
+  max-width: 1120px;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+}
+.advice-performance {
+  margin-block: 22px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  scroll-margin-top: calc(var(--sidekick-nav-height, 70px) + 20px);
+}
+.advice-performance > summary {
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.advice-market-table {
+  overflow-wrap: normal;
+}
+.advice-market-table tbody th {
+  white-space: nowrap;
+}
+.advice-live-prices {
+  padding-block: 12px;
+  border-block: 1px solid var(--line);
+  scroll-margin-top: calc(var(--sidekick-nav-height, 70px) + 20px);
+}
+.advice-page p,
+.advice-page li {
+  line-height: 1.65;
+}
+.advice-page h2 {
+  font-size: 24px;
+  margin-top: 0;
+}
+.advice-page h3 {
+  margin: 28px 0 8px;
+}
+#advice-result-title {
+  scroll-margin-top: calc(var(--sidekick-nav-height, 70px) + 20px);
+}
+.advice-sources a {
+  color: var(--orange);
+}
+.advice-perception-coverage a {
+  color: var(--orange);
+}
+.advice-perception-coverage {
+  border-left: 3px solid var(--line);
+  padding-left: 14px;
+}
+.advice-page button {
+  min-height: 44px;
+}
+.advice-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.advice-choices button {
+  text-align: left;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.advice-choices button.active {
+  border-color: var(--orange);
+  box-shadow: inset 0 0 0 1px var(--orange);
+}
+.advice-choices strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.advice-choices span {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.advice-form,
+.advice-result,
+.advice-empty {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 28px;
+  border-radius: 10px;
+}
+.advice-form fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.advice-form label {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+  font-size: 15px;
+}
+.advice-form input:not([type='checkbox']),
+.advice-form select,
+.advice-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 12px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 6px;
+  font-size: 16px;
+}
+.advice-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.advice-form .primary-button {
+  margin: 12px 12px 12px 0;
+}
+.advice-form fieldset:disabled {
+  opacity: 0.75;
+}
+.advice-picker {
+  margin: 20px 0;
+  padding-block: 14px;
+  border-block: 1px solid var(--line);
+}
+.advice-player-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.advice-player-choices label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  min-height: 52px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.advice-player-choices input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.advice-page small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.55;
+  font-weight: 400;
+}
+.advice-selected {
+  list-style: none;
+  padding: 0;
+}
+.advice-selected li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.advice-selected button {
+  background: transparent;
+  border: 0;
+  color: var(--orange);
+  cursor: pointer;
+}
+.advice-privacy {
+  border-left: 3px solid var(--line);
+  padding-left: 14px;
+  color: var(--muted);
+}
+.advice-error {
+  padding: 16px;
+  border: 1px solid var(--orange);
+  border-radius: 6px;
+  margin: 20px 0;
+}
+.advice-error button {
+  margin-right: 12px;
+}
+.advice-confidence,
+.advice-forecast {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin: 24px 0;
+}
+.advice-confidence strong {
+  font-size: 18px;
+}
+.advice-page summary {
+  min-height: 44px;
+  padding-block: 12px;
+  cursor: pointer;
+}
+.advice-statement p {
+  margin: 8px 0;
+}
+.advice-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.advice-page table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+.advice-page th,
+.advice-page td {
+  border-bottom: 1px solid var(--line);
+  padding: 12px 10px;
+  vertical-align: top;
+}
+.advice-page td:nth-child(2) {
+  min-width: 100px;
+}
+.advice-page th small {
+  margin-top: 6px;
+}
+.advice-metric-cell-label {
+  display: none;
+}
+.advice-player-evidence {
+  margin: 22px 0;
+}
+.advice-player-evidence details {
+  border-block: 1px solid var(--line);
+}
+.advice-warnings,
+.advice-sources {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+}
+.advice-result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.advice-history {
+  margin-top: 36px;
+}
+.advice-history ul {
+  padding: 0;
+  list-style: none;
+}
+.advice-history button:not(.text-button) {
+  display: grid;
+  text-align: left;
+  width: 100%;
+  padding: 16px;
+  gap: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.advice-history span {
+  color: var(--muted);
+  font-size: 14px;
+}
+@media (max-width: 720px) {
+  .advice-metrics,
+  .advice-metrics tbody {
+    display: block;
+  }
+  .advice-metrics thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .advice-metrics tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .advice-page .advice-metrics th,
+  .advice-page .advice-metrics td {
+    min-width: 0;
+    border: 0;
+    padding: 4px 0;
+  }
+  .advice-metric-cell-label {
+    display: inline;
+    font-weight: 600;
+  }
+  .advice-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .advice-choices button {
+    padding: 12px;
+  }
+  .advice-form,
+  .advice-result,
+  .advice-empty {
+    padding: 18px;
+  }
+  .advice-fields,
+  .advice-player-choices {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .advice-page th,
+  .advice-page td {
+    padding-inline: 6px;
+  }
+  .advice-page table {
+    font-size: 13px;
+  }
+  .advice-page .page-title-block {
+    display: block;
+  }
+}
+
+.advice-view-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+.advice-view-nav .active {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+.advice-page [hidden] {
+  display: none;
+}
+.advice-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.advice-choices button {
+  padding: 10px 14px;
+  text-align: center;
+}
+.advice-choices strong {
+  font-size: 13px;
+  margin: 0;
+}
+.betting-brief {
+  font-size: 13px;
+  color: var(--muted);
+}
+.advice-history > ul {
+  padding: 0;
+  list-style: none;
+}
+.advice-connection,
+.advice-model-choice {
+  margin-block: 14px;
+}
+.advice-form .readiness-entry {
+  padding: 14px 16px;
+  margin-block: 16px;
+}
+.advice-form .readiness-entry h3 {
+  margin-top: 0;
+}
+.advice-result .advice-confidence {
+  margin: 12px 0;
+}
+.advice-result .decision-summary h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+.result-disclosure > summary h3 {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+}
+.advice-result > details {
+  padding: 0 12px;
+  margin: 8px 0;
+}
+.advice-result > details > summary {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding-block: 12px;
+}
+.advice-result > details[open] {
+  padding-bottom: 12px;
+}
+.advice-result .advice-confidence {
+  padding: 0 12px;
+}

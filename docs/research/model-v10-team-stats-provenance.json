@@ -1,0 +1,104 @@
+{
+  "capturedAt": "2026-10-13T15:24:58.676Z",
+  "sources": [
+    {
+      "season": 2015,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2015.csv",
+      "capturedAt": "2026-10-13T15:24:56.702Z",
+      "sha256": "d490bbf8817651f083d28b008b75e49714bc6998b0f2495d0df5bca75fc97fb8",
+      "bytes": 215934,
+      "rows": 512
+    },
+    {
+      "season": 2016,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2016.csv",
+      "capturedAt": "2026-10-13T15:24:56.958Z",
+      "sha256": "1a6f704d6eda8d26820ffadba05fbb42e6e60d1dc33dc93bc365c244d25349db",
+      "bytes": 215795,
+      "rows": 512
+    },
+    {
+      "season": 2017,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2017.csv",
+      "capturedAt": "2026-10-13T15:24:57.069Z",
+      "sha256": "c09fa261c37069b1ffc4ee340b8c90458d7453333321e97d13d6fb8a0aab51f4",
+      "bytes": 215661,
+      "rows": 512
+    },
+    {
+      "season": 2018,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2018.csv",
+      "capturedAt": "2026-10-13T15:24:57.205Z",
+      "sha256": "d2df3adf2fbadfb597bc334807f5020aefe2b2ae13d28155f7f01cb981f00555",
+      "bytes": 215509,
+      "rows": 512
+    },
+    {
+      "season": 2019,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2019.csv",
+      "capturedAt": "2026-10-13T15:24:57.374Z",
+      "sha256": "d3311b008de52dd95729d76d225b45f51eb91932e8fa3c38c18548397aa00a06",
+      "bytes": 215441,
+      "rows": 512
+    },
+    {
+      "season": 2020,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2020.csv",
+      "capturedAt": "2026-10-13T15:24:57.552Z",
+      "sha256": "a8f2cc2055404fc293105af25f14ff28593c32961912e752e2e50f4a6ba461ad",
+      "bytes": 216943,
+      "rows": 512
+    },
+    {
+      "season": 2021,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2021.csv",
+      "capturedAt": "2026-10-13T15:24:57.693Z",
+      "sha256": "a094523217f7f351a79f5e667dbe67267e0861a3b76a7a3b62a1cfe49f289673",
+      "bytes": 229707,
+      "rows": 544
+    },
+    {
+      "season": 2022,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2022.csv",
+      "capturedAt": "2026-10-13T15:24:57.838Z",
+      "sha256": "9803875bd0b74aa49230288d45359c75e45910f1cf1953ea0f07b9d3db35e4d1",
+      "bytes": 228947,
+      "rows": 542
+    },
+    {
+      "season": 2023,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2023.csv",
+      "capturedAt": "2026-10-13T15:24:57.964Z",
+      "sha256": "dc5a387daabe8663deaddac492ad7020d47fb1a66048690b355b406cd8e4c454",
+      "bytes": 229582,
+      "rows": 544
+    },
+    {
+      "season": 2024,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2024.csv",
+      "capturedAt": "2026-10-13T15:24:58.143Z",
+      "sha256": "b207a1430c2715d03bbf1844c4eae98695f364851ff6025f422febc2c13f5255",
+      "bytes": 229712,
+      "rows": 544
+    },
+    {
+      "season": 2025,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "capturedAt": "2026-10-13T15:24:58.322Z",
+      "sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "bytes": 229660,
+      "rows": 544
+    },
+    {
+      "season": 2026,
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "capturedAt": "2026-10-13T15:24:58.637Z",
+      "sha256": "16dd6beebe0eb11b77cb29c837a78dd038a3e716dc74c646a2a6cb24bd6c00cf",
+      "bytes": 65213,
+      "rows": 158
+    }
+  ],
+  "snapshotSha256": "7992bfcea9b82609957c950e54e984f0f080b9f50194cf77a0abde38ae6d143f",
+  "rows": 5948,
+  "warning": "Latest revised team stats; historical publication versions are unavailable. No contemporaneous pregame availability claim."
+}

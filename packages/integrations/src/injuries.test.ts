@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { LeagueConnection } from '@sidekick/core';
+import type { LeagueConnection, RosterPlayer } from '@sidekick/core';
 import {
   fetchNFLInjuryReports,
   matchRosterInjuries,
   NFLInjuryReportCache,
   nflInjuryReportUrl,
   parseNFLInjuryReports,
+  adviceInjuryEvidence,
+  type NFLInjuryReportRow,
 } from './injuries.js';
 
 const csv = [
@@ -164,4 +166,119 @@ describe('NFL injury report source', () => {
     const fetcher = vi.fn(async () => new Response('unavailable', { status: 503 }));
     await expect(fetchNFLInjuryReports(2026, fetcher as typeof fetch)).rejects.toThrow('(503)');
   });
+});
+
+const asOf = '2026-10-07T12:00:00Z';
+const injuryPlayer = {
+  id: 'espn-7',
+  gsisId: '00-0000001',
+  name: 'James Cook',
+  position: 'RB',
+  nflTeam: 'BUF',
+};
+const injuryRow = {
+  ...parseNFLInjuryReports(csv, 2026)[0]!,
+  week: 5,
+  updatedAt: '2026-10-07T07:00:00Z',
+};
+const snapshot = (rows: NFLInjuryReportRow[] = [injuryRow], retrievedAt = asOf) => ({
+  rows,
+  retrievedAt,
+  sourceUrl: nflInjuryReportUrl(2026),
+});
+it('retains GSIS, season type and only timezone-qualified update dates in injury CSV', () => {
+  const dated = csv
+    .replace('practice_status\n', 'practice_status,date_modified\n')
+    .replace(
+      'Limited Participation in Practice\n',
+      'Limited Participation in Practice,2026-10-07T07:00:00Z\n',
+    );
+  expect(
+    parseNFLInjuryReports(dated.replace('2026-10-07T07:00:00Z', '2026-02-30T07:00:00Z'), 2026)[0]
+      ?.updatedAt,
+  ).toBeUndefined();
+  expect(parseNFLInjuryReports(dated, 2026)[0]).toMatchObject({
+    gsisId: '00-0000001',
+    seasonType: 'REG',
+    updatedAt: '2026-10-07T07:00:00.000Z',
+  });
+  expect(
+    parseNFLInjuryReports(dated.replace('2026-10-07T07:00:00Z', '2026-10-07T07:00:00'), 2026)[0]
+      ?.updatedAt,
+  ).toBeUndefined();
+});
+it('uses a recent verified injury identity and newest update, independently of CSV order', () => {
+  const old = { ...injuryRow, updatedAt: '2026-10-06T07:00:00Z', reportStatus: 'Out' };
+  for (const rows of [
+    [injuryRow, old],
+    [old, injuryRow],
+  ]) {
+    expect(adviceInjuryEvidence(injuryPlayer, snapshot(rows), 2026, 5, asOf)).toMatchObject({
+      coverage: 'current',
+      status: 'Questionable',
+    });
+  }
+  expect(
+    adviceInjuryEvidence({ ...injuryPlayer, name: 'Spelling changed' }, snapshot(), 2026, 5, asOf)
+      .status,
+  ).toBe('Questionable');
+});
+it('never infers current status from undated, stale, future or missing reports', () => {
+  const undated: NFLInjuryReportRow = { ...injuryRow };
+  delete undated.updatedAt;
+  for (const [row, coverage] of [
+    [undated, 'undated'],
+    [{ ...injuryRow, updatedAt: '2026-10-01T07:00:00Z' }, 'stale'],
+    [{ ...injuryRow, updatedAt: '2026-10-08T07:00:00Z' }, 'stale'],
+  ] as const) {
+    const evidence = adviceInjuryEvidence(injuryPlayer, snapshot([row]), 2026, 5, asOf);
+    expect(evidence.coverage).toBe(coverage);
+    expect(evidence.status).toBeUndefined();
+  }
+  expect(adviceInjuryEvidence(injuryPlayer, snapshot([], asOf), 2026, 5, asOf).coverage).toBe(
+    'unmatched',
+  );
+  expect(
+    adviceInjuryEvidence(injuryPlayer, snapshot([injuryRow], '2026-10-05T07:00:00Z'), 2026, 5, asOf)
+      .coverage,
+  ).toBe('stale');
+  expect(adviceInjuryEvidence(injuryPlayer, undefined, 2026, 5, asOf).coverage).toBe('unavailable');
+});
+it('rejects wrong GSIS/team/position/week/postseason and conflicting latest injury rows', () => {
+  const unknownSeason = { ...injuryRow };
+  delete unknownSeason.seasonType;
+  for (const row of [
+    { ...injuryRow, gsisId: '00-0000009' },
+    { ...injuryRow, team: 'PHI' },
+    { ...injuryRow, position: 'WR' },
+    { ...injuryRow, week: 4 },
+    { ...injuryRow, seasonType: 'POST' as const },
+    unknownSeason,
+  ])
+    expect(adviceInjuryEvidence(injuryPlayer, snapshot([row]), 2026, 5, asOf).coverage).toBe(
+      'unmatched',
+    );
+  expect(
+    adviceInjuryEvidence(
+      injuryPlayer,
+      snapshot([injuryRow, { ...injuryRow, reportStatus: 'Out' }]),
+      2026,
+      5,
+      asOf,
+    ).coverage,
+  ).toBe('ambiguous');
+  expect(
+    adviceInjuryEvidence(injuryPlayer, snapshot([injuryRow, injuryRow]), 2026, 5, asOf).coverage,
+  ).toBe('current');
+  const noGsis: RosterPlayer = { ...injuryPlayer };
+  delete noGsis.gsisId;
+  expect(
+    adviceInjuryEvidence(
+      noGsis,
+      snapshot([injuryRow, { ...injuryRow, gsisId: '00-0000009' }]),
+      2026,
+      5,
+      asOf,
+    ).coverage,
+  ).toBe('ambiguous');
 });

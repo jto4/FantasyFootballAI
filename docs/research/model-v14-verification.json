@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-10-13T21:39:28.931Z",
+  "checks": {
+    "tests": "835 workspace tests plus root suites passed under supported Node 22",
+    "typecheck": "all passed",
+    "lint": "all passed after unused diagnostic argument cleanup before freeze",
+    "format": "all passed",
+    "build": "passed; existing 536.29 kB dashboard chunk warning",
+    "diffWhitespace": "passed"
+  },
+  "offlineReplay": "Freshly decompressed durable context/tape inputs reproduce both policies, every probability, summary and row. Only scoredAt differs.",
+  "preserved": "V13 parent source/settings/audit and v6/v11 numerical forecast seals unchanged. No production dispatch/configuration/provider changes.",
+  "manualReview": "Scoped ordinary code/security review of fixed feature masks, validation before masking, retained eligibility/as-of gates, refitted earlier prequential feedback, no audit-based hyperparameter selection, source bounds and exact non-total dispatch. No automated security scan or live provider/credential/wager/owner-journal action.",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "signalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "diagnosisSha256": "c1de414d8df3dc8ba32f426f88fe96f8a34af34ccacaae957e96e31b26bf6e9a",
+  "frozenSettingsSha256": "fc333dfd9ce5d10fbc25b10fe8ee05f68c0047baaf8a29c5e329886f236b6726",
+  "auditSha256": "0209723c2d1e9725835c80ec0786be54433bcbb111c7fe00da7a889253328086",
+  "nonTotalMaximumProductionDifference": 0,
+  "priceOnlyNonTotalMaximumProductionDifference": 0,
+  "late2025ExcessLossReduction": 0.849638853976464,
+  "priceOnlyLate2025MaxProbabilityDifference": 1.294027736076231e-7,
+  "priceOnlyLate2025MaterialChangesAt1e6": 0
+}

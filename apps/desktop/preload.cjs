@@ -3,6 +3,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('sidekickDesktop', {
+  isVerificationMode: () => ipcRenderer.sendSync('sidekick:is-verification-mode'),
+  getTheme: () => ipcRenderer.sendSync('sidekick:get-theme'),
+  getTeamSelections: () => ipcRenderer.sendSync('sidekick:get-team-selections'),
+  setTeamSelections: (teams) => ipcRenderer.invoke('sidekick:set-team-selections', teams),
+  setTheme: (theme) => ipcRenderer.invoke('sidekick:set-theme', theme),
   getLaunchAtLogin: () => ipcRenderer.invoke('sidekick:get-launch-at-login'),
   setLaunchAtLogin: (enabled) => ipcRenderer.invoke('sidekick:set-launch-at-login', enabled),
   getStartHidden: () => ipcRenderer.invoke('sidekick:get-start-hidden'),

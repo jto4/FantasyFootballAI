@@ -1,13 +1,64 @@
-/* Shared theme values used by the dashboard. */
+/* Semantic surfaces keep every page and dialog in the selected appearance. */
 :root {
-  --ink: #27353d;
-  --muted: #777b78;
-  --orange: #bd7351;
-  --line: #e5dfd6;
-  --navy: #f8f6f1;
-  --surface: #fffdf9;
-  --surface-raised: #f0ece5;
-  --green: #568165;
-  --pink: #bd6876;
-  --violet: #806bb0;
+  color-scheme: light;
+  --canvas: #ffffff;
+  --navy: var(--canvas);
+  --sidebar: #fafbfc;
+  --ink: #202c39;
+  --muted: #5e6a78;
+  --orange: #ad4c27;
+  --accent-hover: #923d1d;
+  --on-accent: #ffffff;
+  --accent-border: #d9ae9b;
+  --line: #e0e6ed;
+  --surface: #ffffff;
+  --surface-raised: #f3f5f8;
+  --green: #28733e;
+  --success-bg: #e8f4ec;
+  --success-border: #b9d9c4;
+  --pink: #a74256;
+  --error-bg: #fbecee;
+  --violet: #7557a0;
+  --warning: #805523;
+  --warning-bg: #fff1e4;
+  --warning-border: #e8cbb1;
+  --scrim: #111720b3;
+  --shadow: #11172026;
+  --hero-overlay: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 96%) 0%,
+    rgb(255 255 255 / 87%) 48%,
+    rgb(255 255 255 / 18%) 100%
+  );
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: #000000;
+  --sidebar: #090909;
+  --ink: #f3f3f3;
+  --muted: #b0b0b0;
+  --orange: #ffb18f;
+  --accent-hover: #ffc7af;
+  --on-accent: #28170f;
+  --accent-border: #765443;
+  --line: #333333;
+  --surface: #121212;
+  --surface-raised: #202020;
+  --green: #96d5ad;
+  --success-bg: #203a2e;
+  --success-border: #3e6451;
+  --pink: #f3a2b2;
+  --error-bg: #402731;
+  --violet: #c3afea;
+  --warning: #f1c498;
+  --warning-bg: #3b3024;
+  --warning-border: #6a5138;
+  --scrim: #000000d9;
+  --shadow: #00000055;
+  --hero-overlay: linear-gradient(
+    90deg,
+    rgb(18 18 18 / 98%) 0%,
+    rgb(18 18 18 / 95%) 48%,
+    rgb(18 18 18 / 90%) 100%
+  );
 }

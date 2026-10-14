@@ -1,0 +1,98 @@
+{
+  "selection": {
+    "moneyline": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "adaptive",
+      "score": {
+        "n": 1541,
+        "brier": 0.2105470678873336,
+        "baseline": 0.21054795340544755
+      }
+    },
+    "spread": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "direct",
+      "score": {
+        "n": 1513,
+        "brier": 0.24956969960791017,
+        "baseline": 0.24970307795949281
+      }
+    },
+    "total": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "direct",
+      "score": {
+        "n": 1535,
+        "brier": 0.24972691232607527,
+        "baseline": 0.2499182559870558
+      }
+    }
+  },
+  "frozenAt": "2026-10-12T09:01:32.577Z",
+  "development": [2016, 2021],
+  "audit": [2022, 2025],
+  "candidateStructures": 9,
+  "candidatePredictionRules": 18,
+  "adaptiveRidge": 1,
+  "productionVerifiedAt": "2026-10-12T09:09:17.601Z",
+  "productionSelection": {
+    "moneyline": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "adaptive",
+      "score": {
+        "n": 1541,
+        "brier": 0.21054705276286995,
+        "baseline": 0.21054795340544755
+      }
+    },
+    "spread": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "direct",
+      "score": {
+        "n": 1513,
+        "brier": 0.24957166935866637,
+        "baseline": 0.24970307795949281
+      }
+    },
+    "total": {
+      "spec": {
+        "name": "context2-200-0",
+        "mode": 2,
+        "ridge": 200,
+        "half": 0
+      },
+      "rule": "direct",
+      "score": {
+        "n": 1535,
+        "brier": 0.24972567599345857,
+        "baseline": 0.2499182559870558
+      }
+    }
+  },
+  "implementationNote": "The prototype context included earlier postseason rows. Production restricts context to validated regular-season rows. Repeating the older-season grid on production context retained the same selected rules; no parameters were chosen from later audit results."
+}

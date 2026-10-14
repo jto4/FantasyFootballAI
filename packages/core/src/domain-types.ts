@@ -22,6 +22,11 @@ export interface RosterPlayer {
   rosterPosition?: string;
   nflTeam?: string;
   status?: string;
+  gsisId?: string;
+  sleeperId?: string;
+  espnId?: string;
+  yahooId?: string;
+  injuryStatus?: string;
 }
 
 export interface Team {
@@ -84,6 +89,12 @@ export interface DraftPick {
   isKeeper?: boolean;
 }
 
+export interface ProjectionPeriod {
+  season: number;
+  fromWeek: number;
+  throughWeek: number;
+}
+
 export interface PlayerProjection {
   id: string;
   leagueId: string;
@@ -100,6 +111,8 @@ export interface PlayerProjection {
   averageDraftPosition?: number;
   /** Omitted for season-total estimates; 1–30 identifies a specific NFL week. */
   week?: number;
+  /** Explicit forecast interval. Legacy weekless rows remain full-season totals. */
+  period?: ProjectionPeriod;
   sourceName: string;
   sourceUrl?: string;
   importedAt: string;
@@ -142,12 +155,26 @@ export interface SavedReport {
   revision?: number;
   editedAt?: string;
   /** Evidence timestamps captured at generation, not the currently connected snapshot. */
-  evidence?: { leagueSyncedAt?: string; newsRefreshedAt?: string; guidance: string };
+  evidence?: {
+    leagueSyncedAt?: string;
+    newsRefreshedAt?: string;
+    guidance: string;
+    visuals?: ReportVisuals;
+  };
   status: 'draft' | 'sent';
   deliveryState?: 'sending' | 'failed' | 'uncertain';
   deliveryUpdatedAt?: string;
   deliveryAttempts?: DeliveryAttempt[];
   deliveryEnvelope?: DeliveryEnvelope;
+}
+
+/** Numeric platform evidence only; no AI-derived numbers or player/member information. */
+export interface ReportVisuals {
+  season?: number;
+  teamCount: number;
+  currentWeek?: number;
+  teams: Array<Pick<Team, 'id' | 'name' | 'wins' | 'losses' | 'pointsFor'>>;
+  matchups: Array<{ week: number; teams: Array<{ teamId: string; points?: number }> }>;
 }
 
 export interface AIUsageSummary {
@@ -270,13 +297,19 @@ export interface AppSettings {
   };
   emailRecipient?: string;
   smsRecipient?: string;
-  /** BlueBubbles chat GUID for the configured iMessage destination. */
+  /** Local imsg is an explicit alternative; legacy settings use BlueBubbles. */
+  imessageProvider?: 'bluebubbles' | 'imsg';
+  /** Optional absolute local executable; omitted uses conventional Homebrew locations. */
+  imsgExecutablePath?: string;
+  /** Native rowid used only for history, verified against the stable chat GUID. */
+  imsgChatId?: number;
+  /** Stable chat GUID for the configured iMessage destination. */
   imessageChatGuid?: string;
   /** Name to use for owner-authored messages in a live iMessage chat. */
   imessageOwnerName?: string;
   /** Poll only the configured group when explicitly enabled by the owner. */
   imessageAutoSyncEnabled: boolean;
-  /** Minutes between automatic BlueBubbles history checks. */
+  /** Minutes between automatic iMessage history checks. */
   imessageSyncIntervalMinutes: 5 | 15 | 30 | 60;
   /** High-water mark for the last explicitly synced BlueBubbles chat. */
   imessageSyncCursor?: {
@@ -324,10 +357,16 @@ export interface LeagueConnector {
 }
 
 export interface AIRequest {
+  /** Local cancellation is never serialized into provider prompts or stored state. */
+  signal?: AbortSignal;
+  /** Bounded per-call budget; the calling workflow still owns its total deadline. */
+  timeoutMs?: number;
   system: string;
   prompt: string;
   temperature?: number;
   maxOutputTokens?: number;
+  /** Advice requests can ask supported reasoning models for deeper analysis. */
+  reasoningEffort?: 'low' | 'medium' | 'high';
 }
 
 export interface AICompletion {

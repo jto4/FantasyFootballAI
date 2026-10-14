@@ -11,19 +11,38 @@ import {
 
 export interface BackupRouteDependencies {
   currentBackup: () => Promise<Buffer>;
+  databaseBackup?: () => Promise<Buffer>;
   listSafetyBackups: () => Promise<Array<{ name: string; createdAt: string; size: number }>>;
   readSafetyBackup: (name: string) => Promise<Buffer | undefined>;
   deleteSafetyBackup: (name: string) => Promise<boolean>;
   restoreBackup: (database: Buffer, images: ImportedLocalImage[]) => Promise<string>;
   afterRestore: () => Promise<AppSettings>;
+  validateBackup?: (
+    database: Buffer,
+  ) => Promise<{ reports: number; leagues: number; profiles: number }>;
 }
 
 /** Backup endpoints are isolated because export and restore have distinct data boundaries. */
 export function createBackupRouter(dependencies: BackupRouteDependencies): Router {
   const router = Router();
 
+  router.get('/api/backup/database', async (_req, res) => {
+    if (!dependencies.databaseBackup)
+      return res.status(503).json({ error: 'Database copy is unavailable.' });
+    try {
+      const contents = await dependencies.databaseBackup();
+      if (contents.length > 50 * 1024 * 1024)
+        return res.status(413).json({ error: 'Database exceeds the 50 MB copy limit.' });
+      res.setHeader('Content-Type', 'application/vnd.sqlite3');
+      res.setHeader('Content-Length', contents.length);
+      res.send(contents);
+    } catch {
+      res.status(500).json({ error: 'Could not create a consistent database copy.' });
+    }
+  });
+
   router.get('/api/backup', async (_req, res) => {
-    // Desktop data-folder migration consumes this local-only archive internally.
+    // Portable archives include generated images; desktop database moves use the raw copy above.
     try {
       const archive = await dependencies.currentBackup();
       res.setHeader('Content-Type', 'application/zip');
@@ -114,6 +133,35 @@ export function createBackupRouter(dependencies: BackupRouteDependencies): Route
               ? `${error.message} Current data was preserved.`
               : 'Backup could not be validated. Current data was preserved.',
         });
+      }
+    },
+  );
+
+  router.post(
+    '/api/backup/validate',
+    express.raw({
+      type: [
+        'application/vnd.sqlite3',
+        'application/vnd.sunday-sidekick.backup',
+        'application/vnd.sunday-sidekick.encrypted-backup',
+        'application/zip',
+      ],
+      limit: '201mb',
+    }),
+    async (req, res) => {
+      if (!Buffer.isBuffer(req.body))
+        return res.status(400).json({ error: 'Choose a valid backup file.' });
+      if (!dependencies.validateBackup)
+        return res.status(503).json({ error: 'Backup validation is unavailable.' });
+      try {
+        const passphrase = decodeURIComponent(req.get('x-sidekick-backup-passphrase') ?? '');
+        const contents = parsePortableBackup(await decryptPortableBackup(req.body, passphrase));
+        const counts = await dependencies.validateBackup(contents.database);
+        res.json({ valid: true, ...counts, images: contents.images.length });
+      } catch {
+        res
+          .status(400)
+          .json({ error: 'Backup could not be validated. Current data was preserved.' });
       }
     },
   );

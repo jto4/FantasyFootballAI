@@ -11,6 +11,7 @@ import {
 
 export interface ProjectionRouteDependencies {
   store: Pick<LocalStore, 'snapshot' | 'update'>;
+  now?: () => number;
 }
 
 /** Keep projection import limits and replacement rules together with their input validation. */
@@ -67,7 +68,7 @@ export function createProjectionRouter(dependencies: ProjectionRouteDependencies
       normalizeProjectionSourceName(projection.sourceName) ===
         normalizeProjectionSourceName(sourceName) &&
       (projection.sourceUrl ?? '') === (sourceUrl ?? '');
-    const importedAt = new Date().toISOString();
+    const importedAt = new Date(dependencies.now?.() ?? Date.now()).toISOString();
     let sourceLimitExceeded = false;
     await store.update((state) => {
       const existingSource = state.playerProjections.find(sameSource);

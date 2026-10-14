@@ -1,0 +1,49 @@
+{
+  "frozenAt": "2026-10-12T18:34:12.919Z",
+  "developmentSeasons": [2018, 2021],
+  "developmentSha256": "c3ee9beae92d7a3cb490d856fa99c5997e0dddc60881cc4e5e84b180aab26f5d",
+  "contextSha256": "ee9bd4108296304bb043db7936545fafdc65dff76452d6c0abde69f66b341c82",
+  "candidateCountPerMarket": 13,
+  "selection": {
+    "moneyline": {
+      "id": "all-200-direct",
+      "spec": {
+        "family": "all",
+        "penalty": 200,
+        "rule": "direct"
+      },
+      "brier": 0.21060374248067007
+    },
+    "spread": {
+      "id": "injuries-1000-direct",
+      "spec": {
+        "family": "injuries",
+        "penalty": 1000,
+        "rule": "direct"
+      },
+      "brier": 0.24905833846375125
+    },
+    "total": {
+      "id": "injuries-1000-direct",
+      "spec": {
+        "family": "injuries",
+        "penalty": 1000,
+        "rule": "direct"
+      },
+      "brier": 0.24965233427376401
+    }
+  },
+  "warning": "Selection is restricted to older data, but later archive audits are reused evidence, not an untouched holdout.",
+  "developmentArtifactSha256": "28036cc677ff2b4fd46f93b51f4689f6257e7d30796257a931cfd08637498916",
+  "laterOutcomesUsedForSelection": false,
+  "initialDevelopmentRebuiltForPartialPracticeAndOutChartValidation": true,
+  "codeHashes": {
+    "packages/core/src/rich-personnel-model.ts": "0021891ca4ca2c167ec42bb062afe58e44ec7db265ac1931d0360d4b0ea00bfb",
+    "packages/core/src/game-rating-model.ts": "0811711625e93755a3c40cbee5c2f534a5fbf2da43cd28b59fb48900701e9cc2",
+    "packages/core/src/game-availability.ts": "e53d614ffdfd46c79cc7bbf450a858d6ff521c1647ee01f0a3a14950554963a6",
+    "packages/integrations/src/game-personnel.ts": "14d2280bc837ef66faf5017d35d6aefe58a85300f6575286af3d6292fc499cfd",
+    "scripts/rich-personnel-evaluation.mjs": "0fa18d0c2dce12a5a660bdebacd79caa7d2ff3922352f1e343f9e07798df7123",
+    "scripts/develop-rich-personnel.mjs": "e190d92c17d8209b2eb06efe9af01e1a1400f1cd3de681738ca3243ea3184a10",
+    "scripts/audit-rich-personnel.mjs": "942722bbee6abdda4b0f36c9ca7019ce29acb8640abe58e72613d5b01f3c6e59"
+  }
+}

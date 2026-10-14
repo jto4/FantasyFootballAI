@@ -1,0 +1,289 @@
+{
+  "scoredAt": "2026-10-12T18:38:38.057Z",
+  "frozenAt": "2026-10-12T18:34:12.919Z",
+  "contextSha256": "ee9bd4108296304bb043db7936545fafdc65dff76452d6c0abde69f66b341c82",
+  "frozenSha256": "28036cc677ff2b4fd46f93b51f4689f6257e7d30796257a931cfd08637498916",
+  "selection": {
+    "moneyline": {
+      "id": "all-200-direct",
+      "spec": {
+        "family": "all",
+        "penalty": 200,
+        "rule": "direct"
+      },
+      "brier": 0.21060374248067007
+    },
+    "spread": {
+      "id": "injuries-1000-direct",
+      "spec": {
+        "family": "injuries",
+        "penalty": 1000,
+        "rule": "direct"
+      },
+      "brier": 0.24905833846375125
+    },
+    "total": {
+      "id": "injuries-1000-direct",
+      "spec": {
+        "family": "injuries",
+        "penalty": 1000,
+        "rule": "direct"
+      },
+      "brier": 0.24965233427376401
+    }
+  },
+  "recent": {
+    "season": 2026,
+    "snapshotSha256": "4cf98d965842625c7242cac204808b5bd8d818eac808b52a4b6768a718721de5",
+    "pooled": {
+      "n": 224,
+      "brier": 0.24101725293236845,
+      "previousBrier": 0.24102045793398977,
+      "bookBrier": 0.24112677302235283,
+      "logLoss": 0.6750784544815848,
+      "previousLogLoss": 0.6750858192269638,
+      "bookLogLoss": 0.6752861725679274,
+      "bookImprovementInterval": [-0.001069655196685809, 0.0012886953766545748],
+      "previousImprovementInterval": [-0.000011444087628031253, 0.00001785409087067188],
+      "simultaneousBookInterval": [-0.0016143018227177093, 0.0018333420026864751]
+    },
+    "markets": [
+      {
+        "kind": "moneyline",
+        "n": 76,
+        "brier": 0.22499556234290205,
+        "previousBrier": 0.22500500866347006,
+        "bookBrier": 0.22494425373182197,
+        "logLoss": 0.6428252989541475,
+        "previousLogLoss": 0.6428470055721068,
+        "bookLogLoss": 0.642697910125553,
+        "bookImprovementInterval": [-0.0002243651748812376, 0.00012174795272108693],
+        "previousImprovementInterval": [-0.000033613308112250765, 0.0000525059492482765],
+        "simultaneousBookInterval": [-0.0003042978826410295, 0.00020168066048087884]
+      },
+      {
+        "kind": "spread",
+        "n": 71,
+        "brier": 0.2482596047630854,
+        "previousBrier": 0.2482596047630854,
+        "bookBrier": 0.24877558512974057,
+        "logLoss": 0.6896629763363943,
+        "previousLogLoss": 0.6896629763363943,
+        "bookLogLoss": 0.6906984012341777,
+        "bookImprovementInterval": [-0.0010632290473432796, 0.002095189780653635],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.0017926465384110364, 0.0028246072717213917]
+      },
+      {
+        "kind": "total",
+        "n": 77,
+        "brier": 0.2501528568910508,
+        "previousBrier": 0.2501528568910508,
+        "bookBrier": 0.25004632895035056,
+        "logLoss": 0.6934646722529307,
+        "previousLogLoss": 0.6934646722529307,
+        "bookLogLoss": 0.6932399350395704,
+        "bookImprovementInterval": [-0.0032463341094243017, 0.003033278228023776],
+        "previousImprovementInterval": [0, 0],
+        "simultaneousBookInterval": [-0.004696572132151787, 0.004483516250751262]
+      }
+    ],
+    "prospective": false,
+    "usedForSelection": false
+  },
+  "pooled": {
+    "n": 3221,
+    "brier": 0.236536427914757,
+    "previousBrier": 0.23658685974056556,
+    "bookBrier": 0.23666634848761453,
+    "logLoss": 0.6642284504961494,
+    "previousLogLoss": 0.6643533423096291,
+    "bookLogLoss": 0.6645047843897712,
+    "bookImprovementInterval": [-0.0004153892196519923, 0.0006752303653670263],
+    "previousImprovementInterval": [-0.00012671253030480342, 0.00022757618192190363],
+    "simultaneousBookInterval": [-0.0006672611355493693, 0.0009271022812644033]
+  },
+  "markets": [
+    {
+      "season": 2022,
+      "kind": "moneyline",
+      "n": 269,
+      "brier": 0.2104874653695071,
+      "previousBrier": 0.21083148660671813,
+      "bookBrier": 0.21082110150076128,
+      "logLoss": 0.6077839488940563,
+      "previousLogLoss": 0.6085971946393567,
+      "bookLogLoss": 0.6085460268644323,
+      "bookImprovementInterval": [-0.0007503849415905035, 0.0014176572040988484],
+      "previousImprovementInterval": [-0.0007292022205069694, 0.0014172446949290264],
+      "simultaneousBookInterval": [-0.0012510810014100368, 0.0019183532639183818]
+    },
+    {
+      "season": 2023,
+      "kind": "moneyline",
+      "n": 272,
+      "brier": 0.21886389834807493,
+      "previousBrier": 0.21871339632507586,
+      "bookBrier": 0.2187095146255924,
+      "logLoss": 0.6278882507555774,
+      "previousLogLoss": 0.627464438283765,
+      "bookLogLoss": 0.6273487972171233,
+      "bookImprovementInterval": [-0.0008878793157565826, 0.0005791118707915302],
+      "previousImprovementInterval": [-0.0008934810426377477, 0.0005924769966396044],
+      "simultaneousBookInterval": [-0.0012266719487111762, 0.0009179045037461238]
+    },
+    {
+      "season": 2024,
+      "kind": "moneyline",
+      "n": 272,
+      "brier": 0.19948545176606178,
+      "previousBrier": 0.20009656252586755,
+      "bookBrier": 0.20016161878885597,
+      "logLoss": 0.5858180306503862,
+      "previousLogLoss": 0.587321397394949,
+      "bookLogLoss": 0.5874888995056523,
+      "bookImprovementInterval": [-0.0003132181761540129, 0.00166555222174239],
+      "previousImprovementInterval": [-0.0003739806537454255, 0.0015962021733569693],
+      "simultaneousBookInterval": [-0.0007702030846273838, 0.0021225371302157608]
+    },
+    {
+      "season": 2025,
+      "kind": "moneyline",
+      "n": 271,
+      "brier": 0.21221298300220467,
+      "previousBrier": 0.21221429694628238,
+      "bookBrier": 0.21213896835079188,
+      "logLoss": 0.6095236943082667,
+      "previousLogLoss": 0.6095302843428569,
+      "bookLogLoss": 0.6093832198972615,
+      "bookImprovementInterval": [-0.0002738867245324467, 0.0001258574217068548],
+      "previousImprovementInterval": [-0.00003771290034457738, 0.00004034078849999275],
+      "simultaneousBookInterval": [-0.0003662051876932731, 0.00021817588486768122]
+    },
+    {
+      "season": 2022,
+      "kind": "spread",
+      "n": 261,
+      "brier": 0.2482101246375812,
+      "previousBrier": 0.24819035213566945,
+      "bookBrier": 0.24853204884571245,
+      "logLoss": 0.6895525827249874,
+      "previousLogLoss": 0.6895119140128516,
+      "bookLogLoss": 0.690206748133678,
+      "bookImprovementInterval": [-0.001193954252085167, 0.001837802668347694],
+      "previousImprovementInterval": [-0.0002441875663557868, 0.0002046425625323155],
+      "simultaneousBookInterval": [-0.0018941199510820726, 0.0025379683673445994]
+    },
+    {
+      "season": 2023,
+      "kind": "spread",
+      "n": 258,
+      "brier": 0.2507592436811869,
+      "previousBrier": 0.2507307155465004,
+      "bookBrier": 0.2500004625992449,
+      "logLoss": 0.6946679858391971,
+      "previousLogLoss": 0.6946105047519431,
+      "bookLogLoss": 0.6931483711346293,
+      "bookImprovementInterval": [-0.002741080622049743, 0.001223518458165753],
+      "previousImprovementInterval": [-0.00015364166875972922, 0.00009658539938670556],
+      "simultaneousBookInterval": [-0.0036566805065699182, 0.0021391183426859284]
+    },
+    {
+      "season": 2024,
+      "kind": "spread",
+      "n": 268,
+      "brier": 0.2507951618775787,
+      "previousBrier": 0.25092003543216984,
+      "bookBrier": 0.25107183948242473,
+      "logLoss": 0.6947390592084002,
+      "previousLogLoss": 0.694988880905053,
+      "bookLogLoss": 0.6952918193457789,
+      "bookImprovementInterval": [-0.000948790941244853, 0.0015021461509368722],
+      "previousImprovementInterval": [-0.000002971639943807441, 0.0002527187491260486],
+      "simultaneousBookInterval": [-0.0015148198569469235, 0.002068175066638943]
+    },
+    {
+      "season": 2025,
+      "kind": "spread",
+      "n": 271,
+      "brier": 0.2500252881532331,
+      "previousBrier": 0.2500252881532331,
+      "bookBrier": 0.24958671312680858,
+      "logLoss": 0.6932015483850972,
+      "previousLogLoss": 0.6932015483850972,
+      "bookLogLoss": 0.6923205180550237,
+      "bookImprovementInterval": [-0.001488990639980556, 0.0006118405871315042],
+      "previousImprovementInterval": [0, 0],
+      "simultaneousBookInterval": [-0.0019741647496500834, 0.0010970146968010317]
+    },
+    {
+      "season": 2022,
+      "kind": "total",
+      "n": 268,
+      "brier": 0.24872490293985677,
+      "previousBrier": 0.24888108341056356,
+      "bookBrier": 0.2502122792134749,
+      "logLoss": 0.690594828942551,
+      "previousLogLoss": 0.6909080066962537,
+      "bookLogLoss": 0.6935710418420938,
+      "bookImprovementInterval": [-0.0002180690376742127, 0.0031928215849104384],
+      "previousImprovementInterval": [-0.00034398855587346557, 0.0006563494972870353],
+      "simultaneousBookInterval": [-0.0010057933439563261, 0.003980545891192552]
+    },
+    {
+      "season": 2023,
+      "kind": "total",
+      "n": 270,
+      "brier": 0.24819908827006762,
+      "previousBrier": 0.24804127883945298,
+      "bookBrier": 0.25006922521405495,
+      "logLoss": 0.6895413174815862,
+      "previousLogLoss": 0.6892258963235339,
+      "bookLogLoss": 0.6932856626453789,
+      "bookImprovementInterval": [-0.001621960538215862, 0.0053622344261905165],
+      "previousImprovementInterval": [-0.0006538882534597023, 0.0003382693922304302],
+      "simultaneousBookInterval": [-0.003234917604868182, 0.006975191492842836]
+    },
+    {
+      "season": 2024,
+      "kind": "total",
+      "n": 269,
+      "brier": 0.2516344822730196,
+      "previousBrier": 0.25135219413954935,
+      "bookBrier": 0.24977944777848365,
+      "logLoss": 0.6964214465259889,
+      "previousLogLoss": 0.6958556966320367,
+      "bookLogLoss": 0.6927062239462438,
+      "bookImprovementInterval": [-0.0047452142980318, 0.0010351453089599096],
+      "previousImprovementInterval": [-0.0007298848455038499, 0.0001653085785633413],
+      "simultaneousBookInterval": [-0.0060801529593097585, 0.0023700839702378677]
+    },
+    {
+      "season": 2025,
+      "kind": "total",
+      "n": 272,
+      "brier": 0.2505572686738165,
+      "previousBrier": 0.2505572686738165,
+      "bookBrier": 0.2504056398371012,
+      "logLoss": 0.6942600595057417,
+      "previousLogLoss": 0.6942600595057417,
+      "bookLogLoss": 0.6939590876085676,
+      "bookImprovementInterval": [-0.0031587537601786824, 0.0028554960867480366],
+      "previousImprovementInterval": [0, 0],
+      "simultaneousBookInterval": [-0.00454770794038857, 0.004244450266957924]
+    }
+  ],
+  "consistency": {
+    "comparisons": 12,
+    "beatsBook": 6,
+    "beatsPrevious": 5,
+    "simultaneousPositive": 0
+  },
+  "eligibleForProduction": false,
+  "warnings": [
+    "2022–2025 is a reused retrospective archive, not fresh independent evidence.",
+    "Brier and log loss measure probability accuracy; no profitability or executable pregame prices are established.",
+    "Intervals cluster by NFL season/week; simultaneous intervals use twelve-comparison Bonferroni normal approximation.",
+    "Publication/revision timing of EPA statistics is not verified. Consistent superiority requires newly recorded outcomes."
+  ]
+}

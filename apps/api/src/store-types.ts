@@ -5,6 +5,8 @@ import {
   type MemberMemory,
   type PlayerProjection,
   type SavedReport,
+  type AdviceResult,
+  type PredictionRecord,
 } from '@sidekick/core';
 export interface AppState {
   settings: AppSettings;
@@ -14,9 +16,14 @@ export interface AppState {
   playerProjections: PlayerProjection[];
   scheduledRuns: ScheduledRun[];
   generationJobs?: GenerationJob[];
+  adviceResults?: AdviceResult[];
+  predictionRecords?: PredictionRecord[];
 }
 
-export type DashboardStateSnapshot = Omit<AppState, 'memories' | 'playerProjections'> & {
+export type DashboardStateSnapshot = Omit<
+  AppState,
+  'memories' | 'playerProjections' | 'adviceResults' | 'predictionRecords'
+> & {
   memories: Array<
     Omit<MemberMemory, 'sourceText' | 'sourceAuthorId'> & {
       sourceLength: number;

@@ -1,0 +1,928 @@
+{
+  "diagnosedAt": "2026-10-13T21:54:42.746Z",
+  "source": "https://docs.kalshi.com/getting_started/order_direction",
+  "contextSha256": "d7d7eafad46a39245193961a5de0ff17d9244c207b0f2260d69312cf8886480f",
+  "originalSignalsSha256": "13915a3758a9f9f6c814e9e0275e2b593ae128361282cc06303936fe69ee2b28",
+  "correctedSignalsSha256": "9006cc0649e3874efb7f22cd130ce4b7fe99f16bccb7b7fb0d4f04ecd0c4fc34",
+  "parentSettingsSha256": "fc333dfd9ce5d10fbc25b10fe8ee05f68c0047baaf8a29c5e329886f236b6726",
+  "parentAuditSha256": "0209723c2d1e9725835c80ec0786be54433bcbb111c7fe00da7a889253328086",
+  "late2025": {
+    "scores": {
+      "n": 151,
+      "brier": 0.2504173480728571,
+      "previousBrier": 0.2501302607032246,
+      "bookBrier": 0.2503610574991748,
+      "logLoss": 0.6939822492693327,
+      "previousLogLoss": 0.6934102417107264,
+      "bookLogLoss": 0.6938695265943464,
+      "bookImprovementInterval": [-0.00018691908210577248, 0.000074337934741207],
+      "previousImprovementInterval": [-0.0018410840691365767, 0.0012669093298715557],
+      "simultaneousBookInterval": [-0.00024725479061382617, 0.0001346736432492607]
+    },
+    "meanLinearExcess": 0.0000559347486382567,
+    "meanQuadraticExcess": 3.5582504406951605e-7,
+    "meanDelta": 0.00023012998617279775,
+    "fixedFitFeedbackAblations": {
+      "kalshiFlow": {
+        "n": 151,
+        "brier": 0.25036569273951814,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6938788149469367,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.000026534105838811992, 0.000017263625152149184],
+        "previousImprovementInterval": [-0.0017261209839684374, 0.001255256911381319],
+        "simultaneousBookInterval": [-0.00003664892366180106, 0.000027378442975138254]
+      },
+      "polymarketFlow": {
+        "n": 151,
+        "brier": 0.25041265074828467,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6939728284631935,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.0001614592888401416, 0.00005827279062042101],
+        "previousImprovementInterval": [-0.0018261272404285877, 0.0012613471503084117],
+        "simultaneousBookInterval": [-0.00021220506729311287, 0.00010901856907339228]
+      },
+      "recent": {
+        "n": 151,
+        "brier": 0.2503799581775743,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6939073702341982,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.00005905373263886515, 0.000021252375839881927],
+        "previousImprovementInterval": [-0.0017527265578950004, 0.0012533316091955617],
+        "simultaneousBookInterval": [-0.00007759993672197988, 0.000039798579922996656]
+      },
+      "large": {
+        "n": 151,
+        "brier": 0.2504011354445389,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6939497750185685,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.00013396529512297163, 0.00005380940439478754],
+        "previousImprovementInterval": [-0.0018032715859710145, 0.001261522103342375],
+        "simultaneousBookInterval": [-0.00017733071233558064, 0.00009717482160739657]
+      },
+      "earlier": {
+        "n": 151,
+        "brier": 0.2504148727072336,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.693977297194207,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.00018229517229304462, 0.00007466475617543458],
+        "previousImprovementInterval": [-0.0018374504982379286, 0.001268226490219863],
+        "simultaneousBookInterval": [-0.00024163849454878806, 0.00013400807843117802]
+      },
+      "wallet": {
+        "n": 151,
+        "brier": 0.2504169307382797,
+        "previousBrier": 0.2501302607032246,
+        "bookBrier": 0.2503610574991748,
+        "logLoss": 0.6939814139789261,
+        "previousLogLoss": 0.6934102417107264,
+        "bookLogLoss": 0.6938695265943464,
+        "bookImprovementInterval": [-0.00018578587094390093, 0.00007403939273412769],
+        "previousImprovementInterval": [-0.0018402036326856076, 0.0012668635625753789],
+        "simultaneousBookInterval": [-0.00024579092482342115, 0.00013404444661364794]
+      }
+    },
+    "flowDistribution": [
+      {
+        "provider": "kalshi",
+        "oldNetMean": -0.36423841059602646,
+        "correctedNetMean": 0.09301248268248391,
+        "saturatedOldNet": 55,
+        "saturatedCorrectedNet": 1,
+        "fewerThanFiveRecentMinutes": 0,
+        "dominantSingleTradeAboveHalf": 4
+      },
+      {
+        "provider": "polymarket",
+        "oldNetMean": 0.04899667688841474,
+        "correctedNetMean": 0.04899667688841474,
+        "saturatedOldNet": 13,
+        "saturatedCorrectedNet": 13,
+        "fewerThanFiveRecentMinutes": 9,
+        "dominantSingleTradeAboveHalf": 58
+      }
+    ]
+  },
+  "current2026": {
+    "scores": {
+      "n": 79,
+      "brier": 0.25026888238468653,
+      "previousBrier": 0.2505126750453308,
+      "bookBrier": 0.25026877174373613,
+      "logLoss": 0.6936852214967762,
+      "previousLogLoss": 0.6941851414805518,
+      "bookLogLoss": 0.6936849996420255,
+      "bookImprovementInterval": [-3.3024222908624395e-7, 1.0896032828329408e-7],
+      "previousImprovementInterval": [-0.0029701928898452907, 0.0034577782111338547],
+      "simultaneousBookInterval": [-4.316733707154895e-7, 2.1039146991253967e-7]
+    },
+    "meanLinearExcess": 1.1061675252225221e-7,
+    "meanQuadraticExcess": 2.4197836709566046e-11,
+    "meanDelta": 0.0000017394946144878029,
+    "fixedFitFeedbackAblations": {
+      "kalshiFlow": {
+        "n": 79,
+        "brier": 0.2502691196527305,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936856965736165,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-0.0000010384422897400352, 3.426243009572143e-7],
+        "previousImprovementInterval": [-0.0029704209366014497, 0.0034575317218020337],
+        "simultaneousBookInterval": [-0.000001357391163351826, 6.615731745690052e-7]
+      },
+      "polymarketFlow": {
+        "n": 79,
+        "brier": 0.25026853608184574,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936845277824402,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-2.3208221612027899e-7, 7.034059969021306e-7],
+        "previousImprovementInterval": [-0.0029698601696748306, 0.0034581380966449793],
+        "simultaneousBookInterval": [-4.481274914389493e-7, 9.194512722208008e-7]
+      },
+      "recent": {
+        "n": 79,
+        "brier": 0.25026875486023825,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936849661285579,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-1.6627039710853875e-8, 5.0394035465934007e-8],
+        "previousImprovementInterval": [-0.002970070350061722, 0.0034579107202468437],
+        "simultaneousBookInterval": [-3.210514668981971e-8, 6.587214244489984e-8]
+      },
+      "large": {
+        "n": 79,
+        "brier": 0.2502689007011316,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936852578745516,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-3.849133398505395e-7, 1.2699854888183434e-7],
+        "previousImprovementInterval": [-0.002970210491975238, 0.003457759180373636],
+        "simultaneousBookInterval": [-5.031362563988604e-7, 2.4522146543015524e-7]
+      },
+      "earlier": {
+        "n": 79,
+        "brier": 0.25026888238468653,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936852214967762,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-3.3024222908624395e-7, 1.0896032828329408e-7],
+        "previousImprovementInterval": [-0.0029701928898452907, 0.0034577782111338547],
+        "simultaneousBookInterval": [-4.316733707154895e-7, 2.1039146991253967e-7]
+      },
+      "wallet": {
+        "n": 79,
+        "brier": 0.250268882610498,
+        "previousBrier": 0.2505126750453308,
+        "bookBrier": 0.25026877174373613,
+        "logLoss": 0.6936852219544498,
+        "previousLogLoss": 0.6941851414805518,
+        "bookLogLoss": 0.6936849996420255,
+        "bookImprovementInterval": [-3.3091623351405513e-7, 1.0918270974985472e-7],
+        "previousImprovementInterval": [-0.0029701931068479427, 0.0034577779765135454],
+        "simultaneousBookInterval": [-4.3255438997752904e-7, 2.1082086621332863e-7]
+      }
+    },
+    "flowDistribution": [
+      {
+        "provider": "kalshi",
+        "oldNetMean": -0.7215189873417721,
+        "correctedNetMean": 0.11169936452206222,
+        "saturatedOldNet": 57,
+        "saturatedCorrectedNet": 0,
+        "fewerThanFiveRecentMinutes": 0,
+        "dominantSingleTradeAboveHalf": 0
+      },
+      {
+        "provider": "polymarket",
+        "oldNetMean": -0.0008257511734487959,
+        "correctedNetMean": -0.0008257511734487959,
+        "saturatedOldNet": 15,
+        "saturatedCorrectedNet": 15,
+        "fewerThanFiveRecentMinutes": 1,
+        "dominantSingleTradeAboveHalf": 25
+      }
+    ]
+  },
+  "largestLosses": [
+    {
+      "id": "2025_10_PHI_GB",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5043297540699689,
+      "previous": 0.4776561789794431,
+      "p": 0.5071086137156035,
+      "delta": 0.0027788596456345127,
+      "linear": 0.0028029232033556298,
+      "quadratic": 0.000007722060930135969,
+      "excess": 0.002810645264285816,
+      "terms": {
+        "prices": -0.00006665649705886051,
+        "kalshiFlow": 0.015186879186551103,
+        "polymarketFlow": 0.007476715826761847,
+        "recent": 0.01307038336141942,
+        "large": 0.00959321165189353,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.1575487905088313, -0.16000000000000014, 1, -1, -1, 1.0867935101740978, 0, 0, 1,
+        -0.09736215687371742, -0.03999954960000007, 1, 0.8894777221277936, 1, 0.7962391295617375, 0,
+        0, 1
+      ],
+      "correctedFeatures": [
+        -0.1575487905088313, -0.16000000000000014, 1, 0.3562403697996918, 1, 1.0867935101740978, 0,
+        0, 1, -0.09736215687371742, -0.03999954960000007, 1, 0.8894777221277936, 1,
+        0.7962391295617375, 0, 0, 1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 36,
+          "minutes": 30,
+          "positive": 24,
+          "largestCappedShare": 0.29861325115562404,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 15,
+          "minutes": 15,
+          "positive": 9,
+          "largestCappedShare": 0.40801229176524534,
+          "wallets": 13
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.505241101008911,
+        "polymarketFlow": 0.506189268092748,
+        "recent": 0.5055013899506231,
+        "large": 0.5059289999579182,
+        "earlier": 0.5071086137156035,
+        "wallet": 0.5071086137156035
+      }
+    },
+    {
+      "id": "2025_12_BUF_HOU",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5122309892805897,
+      "p": 0.513328176419147,
+      "delta": 0.002493940232798031,
+      "linear": 0.002547980107831575,
+      "quadratic": 0.0000062197378847686965,
+      "excess": 0.0025541998457163095,
+      "terms": {
+        "prices": 0.000042196563503851634,
+        "kalshiFlow": 0.013167121025501854,
+        "polymarketFlow": 0.007423498846929169,
+        "recent": 0.011523562306799628,
+        "large": 0.007502836508089391,
+        "earlier": 0.0010895537287251306,
+        "wallet": 0.00047466732881687516
+      },
+      "oldFeatures": [
+        0.036698978457064144, 0.020000000000000018, 1, -1, -1, 2, -1, 0, 1, 0.07680058262559099,
+        0.040000000000000036, 1, 0.7802522928482182, 0.7892962494732406, 2, 0, 0.5012237928041242, 1
+      ],
+      "correctedFeatures": [
+        0.036698978457064144, 0.020000000000000018, 1, 0.21071029082774048, 0.42065388242690976, 2,
+        1, 0, 1, 0.07680058262559099, 0.040000000000000036, 1, 0.7802522928482182,
+        0.7892962494732406, 2, 0, 0.5012237928041242, 1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 340,
+          "minutes": 60,
+          "positive": 177,
+          "largestCappedShare": 0.049936081815276444,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 38,
+          "minutes": 16,
+          "positive": 34,
+          "largestCappedShare": 0.21757198727899185,
+          "wallets": 11
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5117367900418723,
+        "polymarketFlow": 0.5124310413242189,
+        "recent": 0.5119354634581448,
+        "large": 0.5124214522508349,
+        "earlier": 0.5131965158224266,
+        "wallet": 0.5132708186471433
+      }
+    },
+    {
+      "id": "2025_12_NYJ_BAL",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5173641257162701,
+      "previous": 0.5021412972543099,
+      "p": 0.5194957298554042,
+      "delta": 0.0021316041391340468,
+      "linear": 0.0022056310236325373,
+      "quadratic": 0.0000045437362059734,
+      "excess": 0.002210174759838479,
+      "terms": {
+        "prices": -0.00003769257396731933,
+        "kalshiFlow": 0.012077567296776724,
+        "polymarketFlow": 0.005609569664596491,
+        "recent": 0.012756252378702896,
+        "large": 0.004930884582670318,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.029479111179809836, 0.040000000000000036, 1, -1, -1, 2, 0, 0, 1, -0.029479111179809836,
+        0, 1, 1, 0, 1.2597969239660443, 0, 0, 1
+      ],
+      "correctedFeatures": [
+        -0.029479111179809836, 0.040000000000000036, 1, 0.08546908064895369, 0.1111111111111111, 2,
+        0, 0, 1, -0.029479111179809836, 0, 1, 1, 0, 1.2597969239660443, 0, 0, 1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 73,
+          "minutes": 40,
+          "positive": 45,
+          "largestCappedShare": 0.2939101810486715,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 9,
+          "minutes": 5,
+          "positive": 9,
+          "largestCappedShare": 0.35687732342007433,
+          "wallets": 1
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5180372236407312,
+        "polymarketFlow": 0.5188183982483332,
+        "recent": 0.5179552439501472,
+        "large": 0.518900355019376,
+        "earlier": 0.5194957298554042,
+        "wallet": 0.5194957298554042
+      }
+    },
+    {
+      "id": "2025_12_NE_CIN",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5173641257162701,
+      "previous": 0.500396013784267,
+      "p": 0.5192203415605603,
+      "delta": 0.0018562158442901877,
+      "linear": 0.0019206789748437622,
+      "quadratic": 0.0000034455372605939344,
+      "excess": 0.0019241245121043304,
+      "terms": {
+        "prices": -0.00008602647135237521,
+        "kalshiFlow": 0.007146682714106406,
+        "polymarketFlow": 0.008307898866652464,
+        "recent": 0.012196043449942288,
+        "large": 0.003258538130816582,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        0.010558261880027522, 0.1200000000000001, 1, -1, 0, 1.4637433548113366, 0, 0, 1,
+        -0.02657453127801638, 0.12290333169906065, 1, 0.9001333502824221, 1, 1.5938588406483178, 0,
+        0, 1
+      ],
+      "correctedFeatures": [
+        0.010558261880027522, 0.1200000000000001, 1, 0.6586515794436586, 0, 1.4637433548113366, 0,
+        0, 1, -0.02657453127801638, 0.12290333169906065, 1, 0.9001333502824221, 1,
+        1.5938588406483178, 0, 0, 1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 46,
+          "minutes": 30,
+          "positive": 35,
+          "largestCappedShare": 0.17208863743517208,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 29,
+          "minutes": 14,
+          "positive": 16,
+          "largestCappedShare": 0.7168973459410874,
+          "wallets": 12
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5183573015680044,
+        "polymarketFlow": 0.5182170488325358,
+        "recent": 0.5177473903996715,
+        "large": 0.5188268686043616,
+        "earlier": 0.5192203415605603,
+        "wallet": 0.5192203415605603
+      }
+    },
+    {
+      "id": "2025_10_BAL_MIN",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.49344841736968026,
+      "p": 0.5127047250378182,
+      "delta": 0.001870488851469232,
+      "linear": 0.0019110194874707323,
+      "quadratic": 0.0000034987285434706864,
+      "excess": 0.0019145182160141827,
+      "terms": {
+        "prices": 0.00003010233629527139,
+        "kalshiFlow": 0.015186879186551103,
+        "polymarketFlow": 0,
+        "recent": 0.008430062135399336,
+        "large": 0.006756817051151767,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        0.036698978457064144, 0.040000000000000036, 1, -1, -1, 2, 0, 0, 1, 0.036698978457064144,
+        0.040000000000000036, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        0.036698978457064144, 0.040000000000000036, 1, 0.9343928035982009, 1, 2, 0, 0, 1,
+        0.036698978457064144, 0.040000000000000036, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 22,
+          "minutes": 15,
+          "positive": 16,
+          "largestCappedShare": 0.29985007496251875,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 4,
+          "minutes": 4,
+          "positive": 3,
+          "largestCappedShare": 0.6994801107309628,
+          "wallets": 4
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5108379370803373,
+        "polymarketFlow": 0.5127047250378182,
+        "recent": 0.5116685811990853,
+        "large": 0.5118742593066602,
+        "earlier": 0.5127047250378182,
+        "wallet": 0.5127047250378182
+      }
+    },
+    {
+      "id": "2025_10_PIT_LAC",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4891657638136511,
+      "previous": 0.48165741319768546,
+      "p": 0.49103139431242376,
+      "delta": 0.0018656304987726413,
+      "linear": 0.001825205135852324,
+      "quadratic": 0.0000034805771579506545,
+      "excess": 0.0018286857130102863,
+      "terms": {
+        "prices": -0.000014419717441172525,
+        "kalshiFlow": 0.015186879186551103,
+        "polymarketFlow": 0,
+        "recent": 0.008430062135399336,
+        "large": 0.006756817051151767,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.03669897845706428, 0.040000000000000036, 1, -1, -1, 2, 0, 0, 1, -0.03669897445065452,
+        0.08000000399999974, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        -0.03669897845706428, 0.040000000000000036, 1, 0.38852631773558394, 0.3463166088741066, 2,
+        0, 0, 1, -0.03669897445065452, 0.08000000399999974, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 269,
+          "minutes": 56,
+          "positive": 189,
+          "largestCappedShare": 0.046220118693264804,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 68,
+          "minutes": 26,
+          "positive": 63,
+          "largestCappedShare": 0.09935397008666551,
+          "wallets": 14
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.48916399099927094,
+        "polymarketFlow": 0.49103139431242376,
+        "recent": 0.4899947570858875,
+        "large": 0.49020050299280254,
+        "earlier": 0.49103139431242376,
+        "wallet": 0.49103139431242376
+      }
+    },
+    {
+      "id": "2025_12_PHI_DAL",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5217391304347826,
+      "previous": 0.5130948428519535,
+      "p": 0.5231912536656039,
+      "delta": 0.0014521232308213339,
+      "linear": 0.0015152590234657397,
+      "quadratic": 0.000002108661877490989,
+      "excess": 0.0015173676853432183,
+      "terms": {
+        "prices": -0.00004661318136147127,
+        "kalshiFlow": 0.012077567296776724,
+        "polymarketFlow": 0,
+        "recent": 0.007146682714106406,
+        "large": 0.004930884582670318,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.026993367263376734, 0.08000000000000007, 1, -1, -1, 2, 0, 0, 1, -0.006968669316093121,
+        0.08000000000000007, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        -0.026993367263376734, 0.08000000000000007, 1, 0.9603277274687365, 1, 2, 0, 0, 1,
+        -0.006968669316093121, 0.08000000000000007, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 66,
+          "minutes": 41,
+          "positive": 60,
+          "largestCappedShare": 0.22797182693689808,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 8,
+          "minutes": 2,
+          "positive": 8,
+          "largestCappedShare": 0.15376868420898687,
+          "wallets": 2
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.521733502728848,
+        "polymarketFlow": 0.5231912536656039,
+        "recent": 0.5223287542619801,
+        "large": 0.5225961997786532,
+        "earlier": 0.5231912536656039,
+        "wallet": 0.5231912536656039
+      }
+    },
+    {
+      "id": "2025_12_CAR_SF",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5033066252036886,
+      "p": 0.5123018891594981,
+      "delta": 0.0014676529731492138,
+      "linear": 0.0014994547710506054,
+      "quadratic": 0.000002154005249593727,
+      "excess": 0.0015016087763001784,
+      "terms": {
+        "prices": 0.00006319153039799386,
+        "kalshiFlow": 0.012077567296776724,
+        "polymarketFlow": 0,
+        "recent": 0.007146682714106406,
+        "large": 0.004930884582670318,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.0033383946027732148, -0.08000000000000007, 1, -1, -1, 2, 0, 0, 1, 0.036698978457064144,
+        0, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        -0.0033383946027732148, -0.08000000000000007, 1, 0.1782178217821782, 0.20893532381805863, 2,
+        0, 0, 1, 0.036698978457064144, 0, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 580,
+          "minutes": 60,
+          "positive": 334,
+          "largestCappedShare": 0.03313584370485241,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 3,
+          "minutes": 3,
+          "positive": 1,
+          "largestCappedShare": 0.49586776859504134,
+          "wallets": 3
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5108418762781661,
+        "polymarketFlow": 0.5123018891594981,
+        "recent": 0.5114380051138364,
+        "large": 0.5117058656206472,
+        "earlier": 0.5123018891594981,
+        "wallet": 0.5123018891594981
+      }
+    },
+    {
+      "id": "2025_10_NO_CAR",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5108342361863489,
+      "previous": 0.5045655826554039,
+      "p": 0.5118634356331494,
+      "delta": 0.0010291994468004662,
+      "linear": 0.001051500626579458,
+      "quadratic": 0.0000010592515012943856,
+      "excess": 0.0010525598780807277,
+      "terms": {
+        "prices": -0.000057952859405087706,
+        "kalshiFlow": 0.008430062135399336,
+        "polymarketFlow": 0,
+        "recent": 0.008430062135399336,
+        "large": 0,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.06334439592314196, 0, 1, -1, 0, 1.2516786092654384, 0, 0, 1, -0.08334839036078825,
+        6.732000001896665e-7, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        -0.06334439592314196, 0, 1, 0.7097505668934241, 0, 1.2516786092654384, 0, 0, 1,
+        -0.08334839036078825, 6.732000001896665e-7, 1, 0, 0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 9,
+          "minutes": 9,
+          "positive": 5,
+          "largestCappedShare": 0.48072562358276644,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 1,
+          "minutes": 1,
+          "positive": 0,
+          "largestCappedShare": 1,
+          "wallets": 1
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.5108271112379248,
+        "polymarketFlow": 0.5118634356331494,
+        "recent": 0.5108271112379248,
+        "large": 0.5118634356331494,
+        "earlier": 0.5118634356331494,
+        "wallet": 0.5118634356331494
+      }
+    },
+    {
+      "id": "2025_12_IND_KC",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4956702459300312,
+      "previous": 0.4705175389598202,
+      "p": 0.4965910968383364,
+      "delta": 0.0009208509083052374,
+      "linear": 0.0009128767923690992,
+      "quadratic": 8.479663953265808e-7,
+      "excess": 0.0009137247587644171,
+      "terms": {
+        "prices": -0.0000572780836185459,
+        "kalshiFlow": 0.012077567296776724,
+        "polymarketFlow": -0.004407116027086906,
+        "recent": 0.0059981048178360825,
+        "large": 0.0016723464518537362,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.06272325847335608, 0.040000000000000036, 1, -1, -1, 2, 0, 0, 1, -0.06272325847335608,
+        -0.029860695199999787, 1, -0.20475329926274183, -1, 2, 0, 0, 1
+      ],
+      "correctedFeatures": [
+        -0.06272325847335608, 0.040000000000000036, 1, 0.19497907949790794, 0.18508709381684832, 2,
+        0, 0, 1, -0.06272325847335608, -0.029860695199999787, 1, -0.20475329926274183, -1, 2, 0, 0,
+        1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 174,
+          "minutes": 56,
+          "positive": 107,
+          "largestCappedShare": 0.14943215780035865,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 29,
+          "minutes": 16,
+          "positive": 27,
+          "largestCappedShare": 0.580472044333765,
+          "wallets": 4
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.4951302819326543,
+        "polymarketFlow": 0.49712417655468927,
+        "recent": 0.49586559225585286,
+        "large": 0.49638881442723054,
+        "earlier": 0.4965910968383364,
+        "wallet": 0.4965910968383364
+      }
+    },
+    {
+      "id": "2025_10_LV_DEN",
+      "season": 2025,
+      "week": 10,
+      "kind": "total",
+      "y": 0,
+      "book": 0.5,
+      "previous": 0.5011981111533605,
+      "p": 0.5008963215908444,
+      "delta": 0.0008963215908444067,
+      "linear": 0.0008963215908444067,
+      "quadratic": 8.033923942138479e-7,
+      "excess": 0.0008971249832386285,
+      "terms": {
+        "prices": -0.000004888421127094122,
+        "kalshiFlow": 0.015186879186551103,
+        "polymarketFlow": -0.00789488224057292,
+        "recent": 0.003371574495568179,
+        "large": 0.003920422450410004,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        0, -0.040000000000000036, 1, -1, -1, 2, 0, 0, 1, 0, -0.040000000000000036, 1,
+        -0.9696337482109353, -1, 1.8352808983540347, 0, -0.23200740897598263, 1
+      ],
+      "correctedFeatures": [
+        0, -0.040000000000000036, 1, 0.09009562986365853, -0.07396121883656509, 2, 0, 0, 1, 0,
+        -0.040000000000000036, 1, -0.9696337482109353, -1, 1.8352808983540347, 0,
+        -0.23200740897598263, 1
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 168,
+          "minutes": 54,
+          "positive": 103,
+          "largestCappedShare": 0.10601980449948051,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 41,
+          "minutes": 25,
+          "positive": 4,
+          "largestCappedShare": 0.13175446050289588,
+          "wallets": 16
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.4990283211108341,
+        "polymarketFlow": 0.5018673723484399,
+        "recent": 0.5004816160929526,
+        "large": 0.5004141071744744,
+        "earlier": 0.5008963215908444,
+        "wallet": 0.5008963215908444
+      }
+    },
+    {
+      "id": "2025_12_ATL_NO",
+      "season": 2025,
+      "week": 12,
+      "kind": "total",
+      "y": 0,
+      "book": 0.4826358742837298,
+      "previous": 0.4832188333360683,
+      "p": 0.48349716990822483,
+      "delta": 0.0008612956244950509,
+      "linear": 0.0008313843334898399,
+      "quadratic": 7.418301527743198e-7,
+      "excess": 0.0008321261636426158,
+      "terms": {
+        "prices": -0.000018473159719493146,
+        "kalshiFlow": 0.007146682714106406,
+        "polymarketFlow": 0,
+        "recent": 0.007146682714106406,
+        "large": 0,
+        "earlier": 0,
+        "wallet": 0
+      },
+      "oldFeatures": [
+        -0.11100392991878397, 0.06000000000000005, 1, -1, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ],
+      "correctedFeatures": [
+        -0.11100392991878397, 0.06000000000000005, 1, 0.5826235093696763, 0, 2, 0, 0, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 0
+      ],
+      "recentTapeStats": [
+        {
+          "provider": "kalshi",
+          "n": 16,
+          "minutes": 16,
+          "positive": 12,
+          "largestCappedShare": 0.43100511073253833,
+          "wallets": 0
+        },
+        {
+          "provider": "polymarket",
+          "n": 0,
+          "minutes": 0,
+          "positive": 0,
+          "largestCappedShare": 0,
+          "wallets": 0
+        }
+      ],
+      "ablations": {
+        "kalshiFlow": 0.482633642454767,
+        "polymarketFlow": 0.48349716990822483,
+        "recent": 0.482633642454767,
+        "large": 0.48349716990822483,
+        "earlier": 0.48349716990822483,
+        "wallet": 0.48349716990822483
+      }
+    }
+  ],
+  "warnings": [
+    "Old Kalshi direction encoding is defective, so earlier signed-flow attribution and wins cannot be treated as evidence of correctly oriented flow.",
+    "Fixed-fit ablations are descriptive only. Corrected-feature distribution is computed without scoring a new candidate.",
+    "All later samples were previously inspected and remain reused research."
+  ]
+}

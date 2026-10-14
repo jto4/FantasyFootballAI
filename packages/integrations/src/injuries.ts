@@ -1,4 +1,9 @@
-import type { LeagueConnection, RosterPlayer } from '@sidekick/core';
+import {
+  nflTeamKey,
+  playerNameKey,
+  type LeagueConnection,
+  type RosterPlayer,
+} from '@sidekick/core';
 import { readBoundedText } from './http.js';
 
 const nflverseDataUrl = 'https://github.com/nflverse/nflverse-data/releases/download/injuries';
@@ -7,6 +12,10 @@ const requestTimeoutMs = 10_000;
 const defaultCacheMs = 6 * 60 * 60 * 1_000;
 
 export interface NFLInjuryReportRow {
+  gsisId?: string;
+  seasonType?: 'REG' | 'POST';
+  updatedAt?: string;
+  sourceUrl?: string;
   season: number;
   week: number;
   team: string;
@@ -72,6 +81,14 @@ export function parseNFLInjuryReports(csv: string, season: number): NFLInjuryRep
     const team = bounded(rowValue(row, headers, 'team'), 3).toUpperCase();
     const position = bounded(rowValue(row, headers, 'position'), 12).toUpperCase();
     const fullName = bounded(rowValue(row, headers, 'full_name'), 120);
+    const seasonType = (
+      rowValue(row, headers, 'season_type') || rowValue(row, headers, 'game_type')
+    )
+      .trim()
+      .toUpperCase();
+    const gsisId = rowValue(row, headers, 'gsis_id').trim();
+    const modified = rowValue(row, headers, 'date_modified').trim();
+    const updatedAt = parseReportDate(modified);
     if (rowSeason !== season || week === undefined || !team || !position || !fullName) return [];
     return [
       {
@@ -80,6 +97,9 @@ export function parseNFLInjuryReports(csv: string, season: number): NFLInjuryRep
         team,
         position,
         fullName,
+        ...(/^[0-9]{2}-[0-9]{7}$/.test(gsisId) ? { gsisId } : {}),
+        ...(seasonType === 'REG' || seasonType === 'POST' ? { seasonType } : {}),
+        ...(updatedAt ? { updatedAt } : {}),
         reportStatus: bounded(rowValue(row, headers, 'report_status'), 80),
         reportInjury: injuryDescription(
           rowValue(row, headers, 'report_primary_injury'),
@@ -93,6 +113,122 @@ export function parseNFLInjuryReports(csv: string, season: number): NFLInjuryRep
       },
     ];
   });
+}
+
+export interface AdviceInjuryEvidence {
+  updatedAt?: string;
+  coverage: 'current' | 'undated' | 'stale' | 'unmatched' | 'ambiguous' | 'unavailable';
+  /** Only a current, uniquely identified report can override a roster status. */
+  status?: string;
+  warnings: string[];
+}
+
+/** Retrieval is not publication. Missing reports never establish that a player is healthy. */
+export function adviceInjuryEvidence(
+  player: RosterPlayer,
+  snapshot: NFLInjuryReportSnapshot | undefined,
+  season: number,
+  week: number,
+  asOf: string,
+): AdviceInjuryEvidence {
+  const unknown = (
+    coverage: AdviceInjuryEvidence['coverage'],
+    reason: string,
+  ): AdviceInjuryEvidence => ({
+    coverage,
+    warnings: [
+      `Injury availability: ${reason} Confirm the player's current game status before acting.`,
+    ],
+  });
+  if (!snapshot) return unknown('unavailable', 'The injury feed is unavailable.');
+  const now = Date.parse(asOf),
+    retrieved = Date.parse(snapshot.retrievedAt);
+  // This is an advisor freshness policy, not a guarantee of the provider's update schedule.
+  const fresh = (date: number) =>
+    Number.isFinite(date) && date <= now && now - date <= 36 * 3_600_000;
+  if (!fresh(retrieved)) return unknown('stale', 'The injury feed retrieval is stale or invalid.');
+  const matches = snapshot.rows.filter(
+    (row) =>
+      row.season === season &&
+      row.week === week &&
+      row.seasonType === 'REG' &&
+      !!player.nflTeam &&
+      nflTeamKey(row.team) === nflTeamKey(player.nflTeam) &&
+      !!player.position &&
+      row.position.toUpperCase() === player.position.toUpperCase() &&
+      (player.gsisId
+        ? row.gsisId === player.gsisId
+        : playerNameKey(row.fullName) === playerNameKey(player.name)),
+  );
+  if (!matches.length)
+    return unknown(
+      'unmatched',
+      'No uniquely matched regular-season report is available; absence does not mean healthy.',
+    );
+  const identities = new Set(matches.map((row) => row.gsisId ?? playerNameKey(row.fullName)));
+  if (identities.size > 1) return unknown('ambiguous', 'Multiple NFL identities match this name.');
+  const dates = matches.map((row) => parseReportDate(row.updatedAt ?? ''));
+  if (dates.some((date) => !date)) {
+    const statuses = [...new Set(matches.map((row) => row.reportStatus).filter(Boolean))]
+      .join(', ')
+      .slice(0, 160);
+    return unknown(
+      'undated',
+      `The matched report${statuses ? ` lists ${statuses} but` : ''} has no verified update date; a recent download cannot establish current status.`,
+    );
+  }
+  const sorted = [...matches].sort((a, b) => Date.parse(b.updatedAt!) - Date.parse(a.updatedAt!));
+  const latest = sorted[0]!;
+  if (!fresh(Date.parse(latest.updatedAt!)))
+    return unknown('stale', 'The matched report update is stale or in the future.');
+  const latestRows = sorted.filter(
+    (row) => Date.parse(row.updatedAt!) === Date.parse(latest.updatedAt!),
+  );
+  if (
+    new Set(
+      latestRows.map((row) =>
+        JSON.stringify([
+          row.reportStatus,
+          row.reportInjury,
+          row.practiceStatus,
+          row.practiceInjury,
+        ]),
+      ),
+    ).size > 1
+  )
+    return unknown('ambiguous', 'The latest reports conflict at the same update time.');
+  const detail = [
+    latest.reportStatus,
+    latest.reportInjury,
+    latest.practiceStatus,
+    latest.practiceInjury,
+  ]
+    .filter(Boolean)
+    .join('; ')
+    .slice(0, 400);
+  return {
+    coverage: 'current',
+    updatedAt: latest.updatedAt!,
+    ...(latest.reportStatus ? { status: latest.reportStatus } : {}),
+    warnings: [
+      `NFL injury report updated ${latest.updatedAt}: ${detail || 'No game designation recorded'}. Practice participation does not guarantee playing. Source: nflverse injury reports.`,
+    ],
+  };
+}
+
+function parseReportDate(value: string): string | undefined {
+  // Reject timezone-free timestamps instead of interpreting them in the host's local zone.
+  if (
+    value.length > 80 ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) ||
+    !Number.isFinite(Date.parse(value))
+  )
+    return undefined;
+  const month = Number(value.slice(5, 7)),
+    day = Number(value.slice(8, 10));
+  if (day < 1 || day > new Date(Date.UTC(Number(value.slice(0, 4)), month, 0)).getUTCDate())
+    return undefined;
+  return new Date(value).toISOString();
 }
 
 /** Attach only exact player-name/team matches to the current league's roster. */

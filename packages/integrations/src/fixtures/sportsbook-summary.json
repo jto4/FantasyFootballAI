@@ -1,0 +1,122 @@
+{
+  "header": {
+    "id": "401872994",
+    "uid": "s:20~l:28~e:401872994",
+    "season": {
+      "year": 2026,
+      "current": true,
+      "type": 2
+    },
+    "timeValid": true,
+    "competitions": [
+      {
+        "id": "401872994",
+        "date": "2026-10-13T00:15Z",
+        "status": {
+          "type": {
+            "id": "1",
+            "name": "STATUS_SCHEDULED",
+            "state": "pre",
+            "completed": false,
+            "description": "Scheduled",
+            "detail": "Mon, October 12th at 8:15 PM EDT",
+            "shortDetail": "10/12 - 8:15 PM EDT"
+          },
+          "isTBDFlex": false
+        },
+        "competitors": [
+          {
+            "id": "14",
+            "homeAway": "home",
+            "team": {
+              "abbreviation": "LAR"
+            }
+          },
+          {
+            "id": "2",
+            "homeAway": "away",
+            "team": {
+              "abbreviation": "BUF"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "pickcenter": [
+    {
+      "provider": {
+        "id": "100",
+        "name": "DraftKings"
+      },
+      "homeTeamOdds": {
+        "teamId": "14"
+      },
+      "awayTeamOdds": {
+        "teamId": "2"
+      },
+      "moneyline": {
+        "home": {
+          "open": {
+            "odds": "-155"
+          },
+          "close": {
+            "odds": "-180"
+          }
+        },
+        "away": {
+          "open": {
+            "odds": "+130"
+          },
+          "close": {
+            "odds": "+150"
+          }
+        }
+      },
+      "pointSpread": {
+        "home": {
+          "open": {
+            "line": "-3",
+            "odds": "-110"
+          },
+          "close": {
+            "line": "-3.5",
+            "odds": "-105"
+          }
+        },
+        "away": {
+          "open": {
+            "line": "+3",
+            "odds": "-110"
+          },
+          "close": {
+            "line": "+3.5",
+            "odds": "-115"
+          }
+        }
+      },
+      "total": {
+        "over": {
+          "open": {
+            "line": "o53.5",
+            "odds": "-110"
+          },
+          "close": {
+            "line": "o54.5",
+            "odds": "-115"
+          }
+        },
+        "under": {
+          "open": {
+            "line": "u53.5",
+            "odds": "-110"
+          },
+          "close": {
+            "line": "u54.5",
+            "odds": "-105"
+          }
+        }
+      }
+    }
+  ]
+}
