@@ -8,6 +8,8 @@ behavior, not public release readiness. Prior detailed implementation evidence i
 
 ## Real football report and automatic-generation review — October 14, 2026
 
+- [x] Repair PR #12 clean-checkout CI startup: build shared core/integrations before the API credential-store smoke check. Verify the dependency build and credential module import without accessing the local OS vault; retain actual native-store round trips in hosted CI.
+
 - [x] Capture the sanitized public 2018 Sleeper documentation league, 180 real draft picks and six archived matchups; combine a separate current 2026 Week 6 test with real ESPN expected statistics and explicitly constructed PPR rosters.
 - [x] Generate all five default report types with the isolated native model and real clock-driven one-time/weekly scheduler ticks. Review 14 responses; retain eight final cases, with no outbound delivery or owner data changes.
 - [x] Preserve renamed league labels and sync timestamps through scheduled/calendar refresh; recheck schedule scope after awaited sync before AI work. Test duplicate occurrences, completed-season pauses and scope revocation.

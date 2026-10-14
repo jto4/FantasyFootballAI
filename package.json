@@ -22,7 +22,7 @@
     "start": "node scripts/start.mjs",
     "service": "node scripts/service.mjs",
     "db:recover": "node scripts/recover-database.mjs",
-    "credentials:smoke": "npm run build --workspace @sidekick/api && node scripts/credential-store-smoke.mjs",
+    "credentials:smoke": "npm run test:dependencies && npm run build --workspace @sidekick/api && node scripts/credential-store-smoke.mjs",
     "news:smoke": "npm run build --workspace @sidekick/core && npm run build --workspace @sidekick/integrations && node scripts/news-smoke.mjs",
     "betting:evaluate": "npm run test:dependencies && node scripts/evaluate-bet-model.mjs",
     "advice:evaluate": "npm run test:dependencies && npm run build --workspace @sidekick/api && node scripts/evaluate-advice.mjs",
