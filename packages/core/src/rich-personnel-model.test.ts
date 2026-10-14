@@ -45,7 +45,6 @@ function fixture() {
       }
   return games;
 }
-// Four full model fits exceed the default timeout on shared CI runners.
 it('research corrections and learned blend weights cannot read target, same-week or future outcomes', () => {
   const games = fixture(),
     target = games.find((g) => g.season === 2023 && g.week === 10)!;
@@ -66,7 +65,7 @@ it('research corrections and learned blend weights cannot read target, same-week
     expect(p).toBeLessThan(1);
     expect(predict(mutated, rule)).toBeCloseTo(p, 12);
   }
-}, 30_000);
+});
 it('direct research corrections preserve the selected production model when paired richer inputs are unknown', () => {
   const games = fixture(),
     model = prepareGameRatingModel(games),

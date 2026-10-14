@@ -9,7 +9,7 @@ behavior, not public release readiness. Prior detailed implementation evidence i
 ## Real football report and automatic-generation review — October 14, 2026
 
 - [x] Repair PR #12 clean-checkout CI startup: build shared core/integrations before the API credential-store smoke check. Verify the dependency build and credential module import without accessing the local OS vault; retain actual native-store round trips in hosted CI.
-- [x] Give the four-fit rich-personnel leakage regression a bounded 30-second timeout after shared Linux CI exceeded the default five seconds. Preserve all fixture data, model code and assertions; rerun the affected core suite.
+- [x] Use a bounded 30-second core-suite test timeout after shared Linux CI exceeded the default five seconds in both rich-personnel and matchup-totals model regressions. Preserve all fixture data, model code and assertions; rerun all 266 core checks. Performance smoke tests retain their separate budgets.
 
 - [x] Capture the sanitized public 2018 Sleeper documentation league, 180 real draft picks and six archived matchups; combine a separate current 2026 Week 6 test with real ESPN expected statistics and explicitly constructed PPR rosters.
 - [x] Generate all five default report types with the isolated native model and real clock-driven one-time/weekly scheduler ticks. Review 14 responses; retain eight final cases, with no outbound delivery or owner data changes.
