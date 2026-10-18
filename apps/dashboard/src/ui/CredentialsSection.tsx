@@ -118,7 +118,7 @@ export function CredentialsSection({
             {typeof window !== 'undefined' &&
             window.sidekickDesktop?.isVerificationMode?.() === true
               ? 'Test credentials stay in memory for this session and are discarded on restart.'
-              : 'Secret values are stored in the OS credential manager and never returned to the browser.'}
+              : 'Keys are kept in your system keychain and never shown here after saving.'}
           </p>
         </div>
         <ShieldCheck size={18} />

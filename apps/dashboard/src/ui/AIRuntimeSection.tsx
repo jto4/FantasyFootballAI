@@ -47,9 +47,8 @@ export function AIRuntimeSection({
             AI connection
           </h2>
           <p>
-            API mode sends the league report context to your configured provider. A local CLI
-            receives that context and runs with this app’s operating-system permissions; use a tool
-            you trust.
+            Reports send league data to the AI you choose here. A local command-line tool runs with
+            this app’s permissions, so only use one you trust.
           </p>
         </div>
         <KeyRound size={18} />
@@ -268,8 +267,8 @@ export function AIRuntimeSection({
             {apiKeyConfigured === true
               ? 'An API key is saved in the operating-system credential store.'
               : apiKeyConfigured === false
-                ? 'An API key is required for API mode. Add it in credentials before testing this runtime.'
-                : 'API credential status is unavailable. Check the credential store in Credentials before testing.'}
+                ? 'An API key is required for API mode. Add one in Credentials, then test.'
+                : 'Couldn’t read the saved key. Check Credentials, then test.'}
           </p>
           <button type="button" className="small-button" onClick={onOpenCredentials}>
             Manage API credentials <span>→</span>
@@ -277,8 +276,8 @@ export function AIRuntimeSection({
         </div>
       )}
       <small>
-        Model discovery sends an authenticated request to your configured API endpoint and sends no
-        league data. Runtime testing uses a fixed, data-free prompt. Settings are saved first.
+        Discovering models and testing the connection never send league data. Settings are saved
+        first.
       </small>
     </section>
   );

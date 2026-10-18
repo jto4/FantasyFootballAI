@@ -1036,8 +1036,8 @@ export function AdvicePage({
                     )}
                   </details>
                   <p className="advice-privacy">
-                    Two AI passes · provider charges may apply. Only football data and your note are
-                    shared.
+                    Uses two AI calls, which your provider may charge for. Only football data and
+                    your note are sent.
                   </p>
                   <details>
                     <summary>Privacy & analysis details</summary>
@@ -1071,8 +1071,8 @@ export function AdvicePage({
                   <section className="readiness-entry">
                     <h3>Check the evidence first</h3>
                     <p>
-                      Check data coverage before using AI. Unknown availability and estimates stay
-                      unknown.
+                      See which players have estimates and injury reports before spending an AI
+                      call.
                     </p>
                     <button
                       type="button"
