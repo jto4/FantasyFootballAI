@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   isAdviceOptions,
   isAdviceDataReadiness,
@@ -25,7 +25,8 @@ import { LoadingStatus } from './LoadFeedback';
 import { formatDateTime } from './date-format';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
-import { LiveSportsbookPrices } from './LiveSportsbookPrices';
+import { BetFields } from './BetFields';
+import { PlayerPicker } from './PlayerPicker';
 import { AdvicePerformance } from './AdvicePerformance';
 import { AdviceJournal } from './AdviceJournal';
 import { DataReadiness } from './DataReadiness';
@@ -33,24 +34,6 @@ import { DataReadiness } from './DataReadiness';
 const MarketSignalsPanel = lazy(() =>
   import('./MarketSignalsPanel').then((m) => ({ default: m.MarketSignalsPanel })),
 );
-const PlayerPropResearch = lazy(() =>
-  import('./PlayerPropResearch').then((m) => ({ default: m.PlayerPropResearch })),
-);
-
-const propStats: { value: FootballStatKey; label: string }[] = [
-  { value: 'passing_yards', label: 'Passing yards' },
-  { value: 'attempts', label: 'Passing attempts' },
-  { value: 'completions', label: 'Passing completions' },
-  { value: 'passing_tds', label: 'Passing touchdowns' },
-  { value: 'passing_interceptions', label: 'Interceptions thrown' },
-  { value: 'rushing_yards', label: 'Rushing yards' },
-  { value: 'carries', label: 'Rushing attempts' },
-  { value: 'rushing_tds', label: 'Rushing touchdowns' },
-  { value: 'receiving_yards', label: 'Receiving yards' },
-  { value: 'receptions', label: 'Receptions' },
-  { value: 'targets', label: 'Targets' },
-  { value: 'receiving_tds', label: 'Receiving touchdowns' },
-];
 
 export function AdvicePage({
   leagues,
@@ -943,243 +926,33 @@ export function AdvicePage({
                     </>
                   )}
                   {betting && (
-                    <>
-                      <p>
-                        Fetch and choose a sportsbook price, or enter one below. This app provides
-                        analysis and does not place bets.
-                      </p>
-                      <div className="advice-fields">
-                        <label>
-                          Bet type
-                          <select
-                            value={betKind}
-                            onChange={(event) => {
-                              const next = event.target.value as BetTerms['kind'];
-                              if (quote) {
-                                setQuote(undefined);
-                                setOdds('');
-                                setOppositeOdds('');
-                              }
-                              setBetKind(next);
-                              setSide(['player-prop', 'total'].includes(next) ? 'over' : 'home');
-                              setLine('');
-                              changed();
-                            }}
-                          >
-                            <option value="spread">Point spread</option>
-                            <option value="total">Game total</option>
-                            <option value="moneyline">Moneyline (winner)</option>
-                            <option value="player-prop">Player prop</option>
-                          </select>
-                        </label>
-                        <label>
-                          NFL game
-                          <select
-                            required
-                            value={gameId}
-                            onChange={(event) => {
-                              if (quote) {
-                                setQuote(undefined);
-                                setOdds('');
-                                setOppositeOdds('');
-                                setLine('');
-                              }
-                              setGameId(event.target.value);
-                              setPropPlayer([]);
-                              changed();
-                            }}
-                          >
-                            <option value="">Choose an upcoming game</option>
-                            {options?.games.map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.away} at {item.home} · {item.date} · Week {item.week}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      </div>
-                      {options && !options.games.length && (
-                        <p>
-                          No upcoming regular-season games were found. Refresh public data later.
-                        </p>
-                      )}
-                      <div className="research-actions" role="group" aria-label="Betting markets">
-                        <button
-                          type="button"
-                          className="small-button"
-                          aria-pressed={betKind === 'player-prop'}
-                          onClick={() => {
-                            setBetKind('player-prop');
-                            setSide('over');
-                            setLine('');
-                            setQuote(undefined);
-                            changed();
-                          }}
-                        >
-                          Player props
-                        </button>
-                        <button
-                          type="button"
-                          className="small-button"
-                          onClick={() => setView('signals')}
-                        >
-                          Explore market signals
-                        </button>
-                      </div>
-                      {betKind !== 'player-prop' && (
-                        <LiveSportsbookPrices
-                          game={game}
-                          season={options?.season ?? new Date().getFullYear()}
-                          kind={betKind}
-                          side={side}
-                          selected={selectedQuote}
-                          disabled={busy}
-                          onSelect={(q) => {
-                            setQuote(q);
-                            setBetKind(q.kind);
-                            setSide(q.side);
-                            setLine(q.line === undefined ? '' : String(q.line));
-                            setOdds(String(q.americanOdds));
-                            setOppositeOdds(String(q.oppositeAmericanOdds));
-                            changed();
-                          }}
-                        />
-                      )}
-                      {betKind === 'player-prop' && (
-                        <>
-                          <PlayerPicker
-                            label="Player for this prop"
-                            players={gamePlayers}
-                            selected={propPlayer}
-                            maximum={1}
-                            onChange={(ids) => {
-                              setPropPlayer(ids);
-                              changed();
-                            }}
-                          />
-                          <label>
-                            Player statistic
-                            <select
-                              value={stat}
-                              onChange={(event) => {
-                                setStat(event.target.value as FootballStatKey);
-                                changed();
-                              }}
-                            >
-                              {propStats.map((item) => (
-                                <option key={item.value} value={item.value}>
-                                  {item.label}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                        </>
-                      )}
-                      {betKind === 'player-prop' && (
-                        <Suspense fallback={<p>Loading prop research…</p>}>
-                          <PlayerPropResearch
-                            gameId={gameId}
-                            playerId={propPlayer[0] ?? ''}
-                            stat={stat}
-                            line={line}
-                          />
-                        </Suspense>
-                      )}
-                      <div className="advice-fields">
-                        <label>
-                          {['total', 'player-prop'].includes(betKind)
-                            ? 'Over or under'
-                            : 'Team to back'}
-                          <select
-                            value={side}
-                            onChange={(event) => {
-                              if (quote) {
-                                setQuote(undefined);
-                                setOdds('');
-                                setOppositeOdds('');
-                              }
-                              setSide(event.target.value as BetTerms['side']);
-                              if (quote && betKind === 'spread') setLine('');
-                              changed();
-                            }}
-                          >
-                            {['total', 'player-prop'].includes(betKind) ? (
-                              <>
-                                <option value="over">Over</option>
-                                <option value="under">Under</option>
-                              </>
-                            ) : (
-                              <>
-                                <option value="home">
-                                  Home · {game?.home ?? 'Choose game first'}
-                                </option>
-                                <option value="away">
-                                  Away · {game?.away ?? 'Choose game first'}
-                                </option>
-                              </>
-                            )}
-                          </select>
-                        </label>
-                        {betKind !== 'moneyline' && (
-                          <label>
-                            {betKind === 'spread' ? 'Selected team’s handicap' : 'Line'}
-                            <input
-                              type="number"
-                              step="any"
-                              required
-                              value={line}
-                              onChange={(event) => {
-                                setQuote(undefined);
-                                setLine(event.target.value);
-                                changed();
-                              }}
-                              placeholder={betKind === 'spread' ? 'Example: -3.5' : 'Example: 47.5'}
-                            />
-                          </label>
-                        )}
-                      </div>
-                      {betKind === 'spread' && (
-                        <p>
-                          A favorite might be −3.5; an underdog might be +3.5. Enter the handicap
-                          for the team you selected.
-                        </p>
-                      )}
-                      <div className="advice-fields">
-                        <label>
-                          American odds
-                          <input
-                            type="number"
-                            step="1"
-                            required
-                            value={odds}
-                            onChange={(event) => {
-                              setQuote(undefined);
-                              setOdds(event.target.value);
-                              changed();
-                            }}
-                            placeholder="Example: -110 or +150"
-                          />
-                        </label>
-                        <label>
-                          Opposite side’s odds (optional)
-                          <input
-                            type="number"
-                            step="1"
-                            value={oppositeOdds}
-                            onChange={(event) => {
-                              setQuote(undefined);
-                              setOppositeOdds(event.target.value);
-                              changed();
-                            }}
-                            placeholder="Same game, line, and sportsbook"
-                          />
-                        </label>
-                      </div>
-                      <p>
-                        Odds must be −100 or below, or +100 or above. Opposite odds help estimate
-                        the price before the sportsbook’s margin.
-                      </p>
-                    </>
+                    <BetFields
+                      options={options}
+                      game={game}
+                      gamePlayers={gamePlayers}
+                      selectedQuote={selectedQuote}
+                      busy={busy}
+                      betKind={betKind}
+                      setBetKind={setBetKind}
+                      gameId={gameId}
+                      setGameId={setGameId}
+                      propPlayer={propPlayer}
+                      setPropPlayer={setPropPlayer}
+                      stat={stat}
+                      setStat={setStat}
+                      side={side}
+                      setSide={setSide}
+                      line={line}
+                      setLine={setLine}
+                      odds={odds}
+                      setOdds={setOdds}
+                      oppositeOdds={oppositeOdds}
+                      setOppositeOdds={setOppositeOdds}
+                      quote={quote}
+                      setQuote={setQuote}
+                      changed={changed}
+                      onExploreSignals={() => setView('signals')}
+                    />
                   )}
                   <label>
                     Anything else to consider? (optional)
@@ -1431,101 +1204,4 @@ function message(error: unknown): string {
   return error instanceof ApiError || error instanceof Error
     ? error.message
     : 'Advice could not be loaded. Try again.';
-}
-function PlayerPicker({
-  label,
-  hint,
-  players,
-  selected,
-  maximum = 20,
-  onChange,
-}: {
-  label: string;
-  hint?: string;
-  players: AdviceOptions['players'];
-  selected: string[];
-  maximum?: number;
-  onChange: (ids: string[]) => void;
-}) {
-  const [query, setQuery] = useState('');
-  const id = useId();
-  const names = new Map(players.map((player) => [player.id, player]));
-  const normalized = query
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-  const matches = players
-    .filter((player) =>
-      `${player.name} ${player.position} ${player.nflTeam ?? ''}`
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .includes(normalized),
-    )
-    .slice(0, 8);
-  return (
-    <div className="advice-picker">
-      <label htmlFor={id}>
-        {label}
-        <input
-          id={id}
-          type="search"
-          value={query}
-          maxLength={120}
-          placeholder="Search by name, position, or NFL team"
-          onChange={(event) => setQuery(event.target.value)}
-        />
-      </label>
-      {hint && <p>{hint}</p>}
-      {!!selected.length && (
-        <ul className="advice-selected">
-          {selected.map((key) => (
-            <li key={key}>
-              <span>{names.get(key)?.name ?? 'Unavailable player'}</span>
-              <button
-                type="button"
-                aria-label={`Remove ${names.get(key)?.name ?? 'player'}`}
-                onClick={() => onChange(selected.filter((item) => item !== key))}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <div className="advice-player-choices" role="group" aria-label={`${label} choices`}>
-        {matches.map((player) => (
-          <label key={player.id}>
-            <input
-              type="checkbox"
-              checked={selected.includes(player.id)}
-              disabled={!selected.includes(player.id) && selected.length >= maximum}
-              onChange={(event) =>
-                onChange(
-                  event.target.checked
-                    ? maximum === 1
-                      ? [player.id]
-                      : [...selected, player.id]
-                    : selected.filter((item) => item !== player.id),
-                )
-              }
-            />
-            <span>
-              {player.name}
-              <small>
-                {player.position}
-                {player.nflTeam ? ` · ${player.nflTeam}` : ''}
-              </small>
-            </span>
-          </label>
-        ))}
-      </div>
-      <p role="status">
-        {matches.length
-          ? `Showing ${matches.length} matches · ${selected.length} selected`
-          : 'No matching players in this snapshot.'}
-      </p>
-    </div>
-  );
 }
