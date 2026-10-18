@@ -64,6 +64,14 @@ function cloneAppState(state: AppState): AppState {
  */
 export class SettingsRevisionConflict extends Error {}
 
+/**
+ * A data directory without an explicit database file (for example a verification profile)
+ * must keep the database inside it; only a fully unconfigured source run uses ~/.sidekick.
+ */
+export function defaultDataDirectory(): string {
+  return process.env.SIDEKICK_USER_DATA_DIR || join(homedir(), '.sidekick');
+}
+
 export class LocalStore {
   readonly path: string;
   private state: AppState = structuredClone(initialState);
@@ -71,9 +79,9 @@ export class LocalStore {
   private database: DatabaseHandle | undefined;
 
   constructor(
-    path = process.env.SIDEKICK_DATABASE_FILE ?? join(homedir(), '.sidekick', 'state.sqlite'),
+    path = process.env.SIDEKICK_DATABASE_FILE ?? join(defaultDataDirectory(), 'state.sqlite'),
     private readonly legacyPath = process.env.SIDEKICK_DATA_FILE ??
-      join(homedir(), '.sidekick', 'state.json'),
+      join(defaultDataDirectory(), 'state.json'),
   ) {
     this.path = path;
   }
