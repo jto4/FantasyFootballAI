@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { playerPool } from './advice-service.js';
+import { playerPool } from './advice-player-pool.js';
 import type { FootballDataSnapshot, LeagueConnection, RosterPlayer } from '@sidekick/core';
 const player: RosterPlayer = {
   id: 'owner-defense',

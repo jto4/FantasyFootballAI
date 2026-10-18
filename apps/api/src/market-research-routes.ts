@@ -18,7 +18,7 @@ import {
 } from '@sidekick/core';
 import type { FootballNewsSnapshot } from '@sidekick/integrations';
 import type { MarketResearchStore } from './market-research-store.js';
-import { playerPool } from './advice-service.js';
+import { playerPool } from './advice-player-pool.js';
 export interface MarketResearchDependencies {
   data: { get(season: number): Promise<FootballDataSnapshot> };
   markets: {
