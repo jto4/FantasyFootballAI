@@ -16,6 +16,7 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Reference
 
+- [`reviews/2026-10-18-afton-ux-pass.md`](reviews/2026-10-18-afton-ux-pass.md) — real-league walkthrough, store isolation and first-launch fixes, plain copy, gpt-6-luna default.
 - [`reviews/2026-10-18-optimization.md`](reviews/2026-10-18-optimization.md) — lazy pages, dead CSS, research separation, file splits and open-only task list.
 
 - [`reviews/2026-10-15-saved-data-reports.md`](reviews/2026-10-15-saved-data-reports.md) — explicit scheduled drafts from recent saved data, real-clock Afton report and shared readiness checks.
