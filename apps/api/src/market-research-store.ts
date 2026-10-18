@@ -1,11 +1,14 @@
 import Database from 'better-sqlite3';
-import { chmodSync } from 'node:fs';
+import { chmodSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { isMarketResearchRecord, type MarketResearchRecord } from '@sidekick/core';
 
 /** Deliberately separate from app state: never enters advice, reports or prediction ledgers. */
 export class MarketResearchStore {
   private db: Database.Database;
   constructor(path: string) {
+    // Constructed at API startup, before the main store creates the data directory.
+    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     this.db = new Database(path);
     this.db.pragma('journal_mode = WAL');
     this.db.exec(
