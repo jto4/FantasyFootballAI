@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { HistoricalPredictionMarketData } from '../packages/integrations/dist/historical-prediction-market-data.js';
+import { HistoricalPredictionMarketData } from '../packages/integrations/dist/research/historical-prediction-market-data.js';
 const args = process.argv.slice(2);
 if (args.length !== 6 || args[0] !== '--contexts' || args[2] !== '--catalog' || args[4] !== '--out')
   throw new Error('Usage: --contexts <games.json> --catalog <catalog.json> --out <new-directory>');

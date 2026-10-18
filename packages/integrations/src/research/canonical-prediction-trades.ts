@@ -1,5 +1,5 @@
 import type { ExternalTotalTrade } from '@sidekick/core';
-import { parsePredictionTrades, type PredictionContract } from './prediction-market-data.js';
+import { parsePredictionTrades, type PredictionContract } from '../prediction-market-data.js';
 
 export interface CanonicalKalshiDirection {
   direction: -1 | 1;

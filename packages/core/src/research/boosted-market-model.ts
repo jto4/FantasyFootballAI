@@ -1,11 +1,11 @@
-import { priorMarketContext } from './market-context.js';
-import type { FootballGame } from './advice-types.js';
+import { priorMarketContext } from '../market-context.js';
+import type { FootballGame } from '../advice-types.js';
 import {
   availabilityFeatures,
   richPersonnelFeatures,
   usablePregameContext,
-} from './game-availability.js';
-import { earlierGame, type GameRatingModel, type MarketObservation } from './game-rating-model.js';
+} from '../game-availability.js';
+import { earlierGame, type GameRatingModel, type MarketObservation } from '../game-rating-model.js';
 
 type Kind = 'moneyline' | 'spread' | 'total';
 export interface BoostedMarketSpec {

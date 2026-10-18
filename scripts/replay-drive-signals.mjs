@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
-import { parseGameDriveSignals } from '../packages/integrations/dist/game-drive-signals.js';
+import { parseGameDriveSignals } from '../packages/integrations/dist/research/game-drive-signals.js';
 import { json, hash } from './directional-total-evaluation.mjs';
 const [out] = process.argv.slice(2);
 if (!out) throw new Error('Usage: <output-snapshot>');

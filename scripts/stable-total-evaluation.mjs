@@ -10,7 +10,7 @@ import {
 import {
   prepareStableTotalFeedback,
   stableTotalFeedbackParameters,
-} from '../packages/core/dist/stable-total-feedback.js';
+} from '../packages/core/dist/research/stable-total-feedback.js';
 export { json, hash, summarize, writeArtifact, canonicalJson, stableTotalFeedbackParameters };
 export const specs = ['pooled', 'directional'].flatMap((scope) => [
   { method: 'cluster', strength: 0.5, scope },
@@ -19,7 +19,7 @@ export const specs = ['pooled', 'directional'].flatMap((scope) => [
 ]);
 export const specId = (s) => `stable-${s.method}-${s.strength}-${s.scope}`;
 export const newFiles = [
-  'packages/core/src/stable-total-feedback.ts',
+  'packages/core/src/research/stable-total-feedback.ts',
   'scripts/stable-total-evaluation.mjs',
   'scripts/diagnose-older-total-seasons.mjs',
   'scripts/develop-stable-total-feedback.mjs',

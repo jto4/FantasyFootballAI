@@ -1,8 +1,8 @@
 import { expect, it } from 'vitest';
-import { prepareGameRatingModel } from './game-rating-model.js';
+import { prepareGameRatingModel } from '../game-rating-model.js';
 import { prepareMatchupTotalsModel } from './matchup-totals-model.js';
-import type { TeamTotalStats } from './team-total-signals.js';
-import type { FootballGame } from './advice-types.js';
+import type { TeamTotalStats } from '../team-total-signals.js';
+import type { FootballGame } from '../advice-types.js';
 
 function fixture() {
   const teams = 'ARI ATL BAL BUF CAR CHI CIN CLE DAL DEN DET GB HOU IND JAX KC'.split(' ');

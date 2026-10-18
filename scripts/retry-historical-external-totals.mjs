@@ -1,6 +1,6 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { HistoricalPredictionMarketData } from '../packages/integrations/dist/historical-prediction-market-data.js';
-import { normalizeHistoricalTotalCatalog } from '../packages/integrations/dist/historical-total-catalog.js';
+import { HistoricalPredictionMarketData } from '../packages/integrations/dist/research/historical-prediction-market-data.js';
+import { normalizeHistoricalTotalCatalog } from '../packages/integrations/dist/research/historical-total-catalog.js';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 const [contexts, catalogPath, acquisition, out] = process.argv.slice(2);
 if (!contexts || !catalogPath || !acquisition || !out)

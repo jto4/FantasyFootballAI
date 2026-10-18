@@ -12,7 +12,7 @@ if (!contexts || !signals || !parentPath || !out)
 const e = await prepare(contexts, signals, parentPath),
   files = [
     ...Object.keys(e.parent.codeHashes),
-    'packages/core/src/directional-seasonal-totals-model.ts',
+    'packages/core/src/research/directional-seasonal-totals-model.ts',
     'scripts/directional-total-evaluation.mjs',
     'scripts/diagnose-seasonal-total-losses.mjs',
     'scripts/freeze-directional-totals.mjs',

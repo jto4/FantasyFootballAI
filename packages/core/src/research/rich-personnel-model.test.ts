@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
-import { prepareGameRatingModel } from './game-rating-model.js';
+import { prepareGameRatingModel } from '../game-rating-model.js';
 import { prepareRichPersonnelModel } from './rich-personnel-model.js';
-import type { FootballGame } from './advice-types.js';
+import type { FootballGame } from '../advice-types.js';
 function fixture() {
   const games: FootballGame[] = [];
   for (let season = 2018; season <= 2024; season++)

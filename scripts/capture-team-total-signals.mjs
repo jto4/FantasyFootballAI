@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { loadTeamTotalSignals } from '../packages/integrations/dist/team-total-signals.js';
+import { loadTeamTotalSignals } from '../packages/integrations/dist/research/team-total-signals.js';
 const args = process.argv.slice(2);
 if (args.length !== 2 || args[0] !== '--out') throw new Error('Usage: --out <directory>');
 await mkdir(args[1], { recursive: true });

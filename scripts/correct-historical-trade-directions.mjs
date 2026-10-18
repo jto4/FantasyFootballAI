@@ -1,6 +1,6 @@
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { canonicalKalshiDirection } from '../packages/integrations/dist/canonical-prediction-trades.js';
+import { canonicalKalshiDirection } from '../packages/integrations/dist/research/canonical-prediction-trades.js';
 import { validateExpandedTotalTape } from '../packages/core/dist/index.js';
 const [inputPath, out, patchPath, ...roots] = process.argv.slice(2);
 if (!inputPath || !out || !patchPath || !roots.length)

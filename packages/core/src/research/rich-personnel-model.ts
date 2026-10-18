@@ -1,7 +1,7 @@
-import type { FootballGame } from './advice-types.js';
-import { richPersonnelFeatures } from './game-availability.js';
-import { earlierGame, fitOffsetFeatures, type GameRatingModel } from './game-rating-model.js';
-import { correctionWeight } from './market-context.js';
+import type { FootballGame } from '../advice-types.js';
+import { richPersonnelFeatures } from '../game-availability.js';
+import { earlierGame, fitOffsetFeatures, type GameRatingModel } from '../game-rating-model.js';
+import { correctionWeight } from '../market-context.js';
 
 type Kind = 'moneyline' | 'spread' | 'total';
 export interface RichPersonnelSpec {

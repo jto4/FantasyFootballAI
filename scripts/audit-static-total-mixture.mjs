@@ -2,8 +2,8 @@ import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareBoostedMarketModel } from '../packages/core/dist/boosted-market-model.js';
-import { expertTotalsParameters } from '../packages/core/dist/expert-totals-model.js';
+import { prepareBoostedMarketModel } from '../packages/core/dist/research/boosted-market-model.js';
+import { expertTotalsParameters } from '../packages/core/dist/research/expert-totals-model.js';
 import { specs, specId, report } from './expert-totals-evaluation.mjs';
 const args = process.argv.slice(2);
 if (args.length !== 4 || args[0] !== '--contexts' || args[2] !== '--frozen')

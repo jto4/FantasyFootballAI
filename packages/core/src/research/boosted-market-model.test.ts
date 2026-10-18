@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { fitBoostedMarket, prepareBoostedMarketModel } from './boosted-market-model.js';
-import { prepareGameRatingModel } from './game-rating-model.js';
-import type { FootballGame } from './advice-types.js';
+import { prepareGameRatingModel } from '../game-rating-model.js';
+import type { FootballGame } from '../advice-types.js';
 
 it('learns a nonlinear subgroup correction while preserving a balanced book and thin-data fallback', () => {
   const rows = Array.from({ length: 400 }, (_, i) => ({

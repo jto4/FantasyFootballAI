@@ -1,7 +1,7 @@
-import type { FootballGame } from './advice-types.js';
-import { earlierGame, fitOffsetFeatures, type GameRatingModel } from './game-rating-model.js';
-import { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
-import type { ExternalTotalTrade } from './external-total-signals.js';
+import type { FootballGame } from '../advice-types.js';
+import { earlierGame, fitOffsetFeatures, type GameRatingModel } from '../game-rating-model.js';
+import { validateExpandedTotalTape, type ExpandedTotalTape } from '../expanded-total-tape.js';
+import type { ExternalTotalTrade } from '../external-total-signals.js';
 
 export interface ExpandedTotalSpec {
   family: 'prices' | 'flow' | 'positions';

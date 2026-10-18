@@ -11,7 +11,7 @@ for (const [path, h] of Object.entries(prior.codeHashes))
 const e = await inputs(contexts, signals),
   development = overview(e.evaluate(prior.selected, e.development));
 const extraFiles = [
-  'packages/integrations/src/historical-total-catalog.ts',
+  'packages/integrations/src/research/historical-total-catalog.ts',
   'scripts/retry-historical-external-totals.mjs',
   'scripts/prepare-expanded-total-snapshot.mjs',
   'scripts/freeze-expanded-total-revision.mjs',

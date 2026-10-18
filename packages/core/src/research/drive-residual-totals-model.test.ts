@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import type { FootballGame } from './advice-types.js';
-import { prepareGameRatingModel } from './game-rating-model.js';
+import type { FootballGame } from '../advice-types.js';
+import { prepareGameRatingModel } from '../game-rating-model.js';
 import {
   prepareDriveResidualTotalsModel,
   type DriveResidualRow,

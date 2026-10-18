@@ -20,7 +20,7 @@ for (const spec of specs) {
 results.sort((a, b) => a.totals.brier - b.totals.brier || a.id.localeCompare(b.id));
 const files = [
   ...Object.keys(e.prior.codeHashes),
-  'packages/core/src/seasonal-external-totals-model.ts',
+  'packages/core/src/research/seasonal-external-totals-model.ts',
   'scripts/seasonal-external-evaluation.mjs',
   'scripts/develop-seasonal-external-totals.mjs',
   'scripts/audit-seasonal-external-totals.mjs',

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
-import type { FootballGame } from './advice-types.js';
-import { prepareGameRatingModel } from './game-rating-model.js';
-import { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
+import type { FootballGame } from '../advice-types.js';
+import { prepareGameRatingModel } from '../game-rating-model.js';
+import { validateExpandedTotalTape, type ExpandedTotalTape } from '../expanded-total-tape.js';
 import { prepareExpandedExternalTotalsModel } from './expanded-external-totals-model.js';
 function fixture() {
   const games: FootballGame[] = [];

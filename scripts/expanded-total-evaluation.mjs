@@ -5,7 +5,7 @@ import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.
 import {
   prepareExpandedExternalTotalsModel,
   expandedTotalParameters,
-} from '../packages/core/dist/expanded-external-totals-model.js';
+} from '../packages/core/dist/research/expanded-external-totals-model.js';
 import { summarize } from './rich-personnel-evaluation.mjs';
 export { expandedTotalParameters, summarize };
 export const hash = (v) => createHash('sha256').update(v).digest('hex');
@@ -17,12 +17,12 @@ export const specs = ['prices', 'flow', 'positions'].flatMap((family) =>
 export const specId = (s) => `${s.family}-${s.anchor}-${s.penalty}`;
 export const frozenFiles = [
   'packages/core/src/expanded-total-tape.ts',
-  'packages/core/src/expanded-external-totals-model.ts',
+  'packages/core/src/research/expanded-external-totals-model.ts',
   'packages/core/src/external-total-signals.ts',
   'packages/core/src/game-rating-model.ts',
   'packages/core/src/game-availability.ts',
   'packages/core/src/market-context.ts',
-  'packages/integrations/src/historical-prediction-market-data.ts',
+  'packages/integrations/src/research/historical-prediction-market-data.ts',
   'packages/integrations/src/prediction-market-data.ts',
   'scripts/expanded-total-evaluation.mjs',
 ];

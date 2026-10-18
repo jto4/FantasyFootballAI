@@ -3,7 +3,7 @@ import {
   canonicalKalshiDirection,
   parseCanonicalPredictionTrades,
 } from './canonical-prediction-trades.js';
-import type { PredictionContract } from './prediction-market-data.js';
+import type { PredictionContract } from '../prediction-market-data.js';
 it('reads the canonical same-bit exposure and rejects the contradictory legacy test fixture', () => {
   expect(
     canonicalKalshiDirection({

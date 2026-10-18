@@ -15,8 +15,8 @@ if (e.correctedSignals.directionCorrection.patchSha256 !== hash(await readFile(p
   throw new Error('Direction patch mismatch');
 const files = [
   ...Object.keys(e.parent.codeHashes),
-  'packages/core/src/robust-total-trade-flow.ts',
-  'packages/integrations/src/canonical-prediction-trades.ts',
+  'packages/core/src/research/robust-total-trade-flow.ts',
+  'packages/integrations/src/research/canonical-prediction-trades.ts',
   'scripts/correct-historical-trade-directions.mjs',
   'scripts/trade-flow-evaluation.mjs',
   'scripts/diagnose-signed-total-flow.mjs',

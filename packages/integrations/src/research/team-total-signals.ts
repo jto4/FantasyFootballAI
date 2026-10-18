@@ -1,7 +1,7 @@
 import { validateTeamTotalStats, totalSignalTeamKey, type TeamTotalStats } from '@sidekick/core';
-import { csvRecords } from './football-csv.js';
-import { teamStatsUrl } from './team-defense-data.js';
-import { readBoundedText } from './http.js';
+import { csvRecords } from '../football-csv.js';
+import { teamStatsUrl } from '../team-defense-data.js';
+import { readBoundedText } from '../http.js';
 
 export function parseTeamTotalSignals(csv: string, season: number): TeamTotalStats[] {
   teamStatsUrl(season);

@@ -3,9 +3,9 @@ import {
   fitOffsetFeatures,
   type GameRatingModel,
   type MarketObservation,
-} from './game-rating-model.js';
+} from '../game-rating-model.js';
 import { fitBoostedMarket } from './boosted-market-model.js';
-import { prepareTeamTotalSignals, type TeamTotalStats } from './team-total-signals.js';
+import { prepareTeamTotalSignals, type TeamTotalStats } from '../team-total-signals.js';
 
 export interface MatchupTotalsSpec {
   halfLifeDays: 120 | 365;

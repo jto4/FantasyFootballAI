@@ -1,5 +1,5 @@
-import type { FootballGame } from './advice-types.js';
-import type { GameRatingModel } from './game-rating-model.js';
+import type { FootballGame } from '../advice-types.js';
+import type { GameRatingModel } from '../game-rating-model.js';
 import {
   prepareSeasonalExternalTotalsModel,
   type SeasonalExternalRow,

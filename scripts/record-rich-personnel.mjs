@@ -10,7 +10,7 @@ import {
   prepareGameRatingModel,
   residualProbability,
 } from '../packages/core/dist/game-rating-model.js';
-import { prepareRichPersonnelModel } from '../packages/core/dist/rich-personnel-model.js';
+import { prepareRichPersonnelModel } from '../packages/core/dist/research/rich-personnel-model.js';
 import { kinds, specs, specId } from './rich-personnel-evaluation.mjs';
 const args = process.argv.slice(2);
 if (
@@ -114,7 +114,7 @@ const codeHashes = {};
 for (const path of [
   'packages/core/src/game-rating-model.ts',
   'packages/core/src/game-availability.ts',
-  'packages/core/src/rich-personnel-model.ts',
+  'packages/core/src/research/rich-personnel-model.ts',
   'packages/integrations/src/game-personnel.ts',
   'packages/integrations/src/game-pregame.ts',
   'packages/integrations/src/sportsbook-lines.ts',

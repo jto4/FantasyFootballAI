@@ -1,5 +1,5 @@
 import { prepare, json, hash } from './trade-flow-evaluation.mjs';
-import { prepareDirectionalSeasonalTotalsModel } from '../packages/core/dist/directional-seasonal-totals-model.js';
+import { prepareDirectionalSeasonalTotalsModel } from '../packages/core/dist/research/directional-seasonal-totals-model.js';
 import { readFile, writeFile } from 'node:fs/promises';
 const [contexts, oldPath, correctedPath, out] = process.argv.slice(2);
 if (!out) throw new Error('Usage: <contexts> <old-signals> <corrected-signals> <output>');

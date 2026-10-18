@@ -1,6 +1,6 @@
-import type { FootballGame } from './advice-types.js';
-import { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
-import type { ExternalTotalTrade } from './external-total-signals.js';
+import type { FootballGame } from '../advice-types.js';
+import { validateExpandedTotalTape, type ExpandedTotalTape } from '../expanded-total-tape.js';
+import type { ExternalTotalTrade } from '../external-total-signals.js';
 
 export interface RobustFlowTrade extends ExternalTotalTrade {
   isBlockTrade?: boolean;

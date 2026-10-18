@@ -13,8 +13,8 @@ import {
   parseKalshiPrices,
   type PredictionContract,
   type PredictionResponseEvidence,
-} from './prediction-market-data.js';
-import { readBoundedText } from './http.js';
+} from '../prediction-market-data.js';
+import { readBoundedText } from '../http.js';
 const obj = (v: unknown): Record<string, unknown> =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
 const list = (v: unknown, max = 1000): unknown[] => {

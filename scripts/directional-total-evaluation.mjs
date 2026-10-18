@@ -1,15 +1,15 @@
 import { readFile, stat } from 'node:fs/promises';
 import { inputs, hash, summarize } from './expanded-total-evaluation.mjs';
-import { prepareExpandedExternalTotalsModel } from '../packages/core/dist/expanded-external-totals-model.js';
+import { prepareExpandedExternalTotalsModel } from '../packages/core/dist/research/expanded-external-totals-model.js';
 import {
   prepareSeasonalExternalTotalsModel,
   seasonalExternalParameters,
-} from '../packages/core/dist/seasonal-external-totals-model.js';
+} from '../packages/core/dist/research/seasonal-external-totals-model.js';
 import {
   prepareDirectionalSeasonalTotalsModel,
   directionalTotalPolicy,
   priceOnlyTotalPolicy,
-} from '../packages/core/dist/directional-seasonal-totals-model.js';
+} from '../packages/core/dist/research/directional-seasonal-totals-model.js';
 export {
   hash,
   summarize,

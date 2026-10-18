@@ -9,7 +9,7 @@ import {
 import {
   prepareDriveResidualTotalsModel,
   driveResidualParameters,
-} from '../packages/core/dist/drive-residual-totals-model.js';
+} from '../packages/core/dist/research/drive-residual-totals-model.js';
 export { json, hash, summarize, driveSignalParameters, driveResidualParameters };
 export const specs = [25, 100].flatMap((penalty) =>
   [false, true].map((flow) => ({ penalty, flow })),
@@ -18,8 +18,8 @@ export const specId = (s) =>
   `drive-residual-${s.penalty}-${s.flow ? 'with-flow' : 'football-only'}`;
 export const newFiles = [
   'packages/core/src/drive-total-signals.ts',
-  'packages/core/src/drive-residual-totals-model.ts',
-  'packages/integrations/src/game-drive-signals.ts',
+  'packages/core/src/research/drive-residual-totals-model.ts',
+  'packages/integrations/src/research/game-drive-signals.ts',
   'scripts/capture-game-drive-signals.mjs',
   'scripts/retain-drive-sources.mjs',
   'scripts/replay-drive-signals.mjs',
