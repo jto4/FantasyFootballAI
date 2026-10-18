@@ -59,7 +59,7 @@ export const initialAppState: AppState = {
     mcpDeliveryEnabled: false,
     aiRuntime: {
       mode: 'api',
-      model: 'gpt-4o-mini',
+      model: 'gpt-6-luna',
       command: '',
       args: '',
       baseUrl: 'https://api.openai.com/v1',

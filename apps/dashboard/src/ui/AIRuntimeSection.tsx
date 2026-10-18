@@ -63,7 +63,7 @@ export function AIRuntimeSection({
                 data-search-target="ai-model"
                 value={runtime.model}
                 onChange={(event) => onChange('model', event.target.value)}
-                placeholder="gpt-4o-mini"
+                placeholder="gpt-6-luna"
                 list="sidekick-ai-models"
               />
               <datalist id="sidekick-ai-models">
@@ -126,11 +126,11 @@ export function AIRuntimeSection({
                     max={16_384}
                     step={128}
                     data-search-target="ai-output"
-                    value={runtime.maxOutputTokens ?? 1200}
+                    value={runtime.maxOutputTokens ?? 4000}
                     onChange={(event) =>
                       onChange(
                         'maxOutputTokens',
-                        event.target.value === '' ? 1200 : Number(event.target.value),
+                        event.target.value === '' ? 4000 : Number(event.target.value),
                       )
                     }
                   />

@@ -53,7 +53,7 @@ During saved-report review, **Explore the report’s chart snapshot** shows the 
    rejected. **Where do I find my league link?** explains how to copy it.
 2. Connect the AI service. A saved connection can be tested without replacing it.
    For a new OpenAI connection, create a key in your own account and paste it into the
-   password field. Guided setup chooses the existing `gpt-4o-mini` starting model,
+   password field. Guided setup chooses the `gpt-6-luna` starting model,
    saves only the AI section and stores the key in the OS credential manager, then
    runs the existing fixed connection test with no league data. OpenAI API usage has
    [separate billing from ChatGPT](https://help.openai.com/en/articles/9039756-managing-billing-settings-on-chatgpt-web-and-platform).

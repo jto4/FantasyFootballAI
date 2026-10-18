@@ -49,7 +49,7 @@ export class OpenAICompatibleProvider implements AIProvider {
   id = 'api';
   constructor(
     private readonly apiKey: string,
-    private readonly model = 'gpt-4o-mini',
+    private readonly model = 'gpt-6-luna',
     private readonly baseUrl = 'https://api.openai.com/v1',
   ) {}
   async listModels(): Promise<string[]> {

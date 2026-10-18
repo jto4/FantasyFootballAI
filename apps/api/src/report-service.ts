@@ -170,7 +170,7 @@ export function createReportService({
       ...(runtime?.mode === 'api'
         ? {
             temperature: runtime.temperature ?? 0.8,
-            maxOutputTokens: runtime.maxOutputTokens ?? 1200,
+            maxOutputTokens: runtime.maxOutputTokens ?? 4000,
           }
         : {}),
     };
@@ -204,7 +204,7 @@ export function createReportService({
           runtime?.mode === 'codex-cli'
             ? 'gpt-6.1-sol'
             : runtime?.mode === 'api'
-              ? runtime.model || 'gpt-4o-mini'
+              ? runtime.model || 'gpt-6-luna'
               : 'unknown',
           completion.usage,
           runtime?.mode === 'api' ? runtime.inputUsdPerMillionTokens : undefined,

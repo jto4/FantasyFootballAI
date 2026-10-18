@@ -181,12 +181,12 @@ export function SettingsPage({
   const [diagnosticLogsError, setDiagnosticLogsError] = useState('');
   const runtime = form.aiRuntime ?? {
     mode: 'api' as const,
-    model: 'gpt-4o-mini',
+    model: 'gpt-6-luna',
     command: '',
     args: '',
     baseUrl: 'https://api.openai.com/v1',
     temperature: 0.8,
-    maxOutputTokens: 1200,
+    maxOutputTokens: 4000,
   };
   const appleCliPlatform = navigator.platform.toLowerCase().startsWith('mac');
   const blueBubblesConfigured =

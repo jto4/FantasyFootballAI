@@ -1104,5 +1104,5 @@ function modelName(settings: AppSettings): string {
       ? 'Configured local AI'
       : settings.aiRuntime?.mode === 'apple-cli'
         ? 'Apple Foundation Models'
-        : (settings.aiRuntime?.model ?? 'gpt-4o-mini');
+        : (settings.aiRuntime?.model ?? 'gpt-6-luna');
 }

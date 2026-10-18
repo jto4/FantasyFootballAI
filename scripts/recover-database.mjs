@@ -27,7 +27,7 @@ const SQLITE_CLI_CANDIDATES =
     : ['sqlite3', '/usr/bin/sqlite3', '/bin/sqlite3'];
 const DEFAULT_AI_RUNTIME = {
   mode: 'api',
-  model: 'gpt-4o-mini',
+  model: 'gpt-6-luna',
   command: '',
   args: '',
   baseUrl: 'https://api.openai.com/v1',
