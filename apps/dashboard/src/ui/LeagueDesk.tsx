@@ -190,12 +190,6 @@ export function LeagueDesk({
           {status}
         </details>
       )}
-      {league && !aiReady && (
-        <p className="setup-explanation">
-          Report creation becomes available after your league and AI connection are ready. You can
-          still browse your saved reports and league data.
-        </p>
-      )}
       {league && aiReady && (
         <details
           className="home-disclosure"

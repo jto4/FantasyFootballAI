@@ -6,9 +6,7 @@ async function open(page: Page, url: string) {
   await page.goto(`${url}/#/advice?league=browser-league&mode=lineup`);
   await expect(page).toHaveTitle('Sunday Sidekick');
   await expect(page.getByRole('heading', { name: 'Advice', exact: true })).toBeVisible();
-  await expect(
-    page.getByRole('combobox', { name: 'Connection for this analysis', exact: true }),
-  ).toBeEnabled();
+  await expect(page.getByRole('combobox', { name: 'AI connection', exact: true })).toBeEnabled();
 }
 function errors(page: Page) {
   const found: string[] = [];
@@ -29,15 +27,13 @@ test('existing signed-in Claude is explicit, tested without league data, and use
     const settings = workspace.store.settingsSnapshot();
     await open(page, workspace.url);
     expect(workspace.signedInCalls).toHaveLength(0);
-    await expect(
-      page.getByRole('combobox', { name: 'Connection for this analysis', exact: true }),
-    ).toHaveValue('saved');
+    await expect(page.getByRole('combobox', { name: 'AI connection', exact: true })).toHaveValue(
+      'saved',
+    );
     await page
-      .getByRole('combobox', { name: 'Connection for this analysis', exact: true })
+      .getByRole('combobox', { name: 'AI connection', exact: true })
       .selectOption('claude-cli');
-    await expect(
-      page.getByRole('combobox', { name: 'AI for this analysis', exact: true }),
-    ).toHaveValue('opus');
+    await expect(page.getByRole('combobox', { name: 'Model', exact: true })).toHaveValue('opus');
     await expect(
       page.getByRole('button', { name: 'Test signed-in AI', exact: true }),
     ).toBeEnabled();
@@ -46,7 +42,7 @@ test('existing signed-in Claude is explicit, tested without league data, and use
       exact: true,
     });
     await section
-      .getByRole('combobox', { name: 'Connection for this analysis', exact: true })
+      .getByRole('combobox', { name: 'AI connection', exact: true })
       .scrollIntoViewIfNeeded();
     expect(await page.locator('body').evaluate((el) => el.scrollWidth <= window.innerWidth)).toBe(
       true,
@@ -93,13 +89,13 @@ test('unavailable sign-ins explain recovery and reload without generating or swi
     await seedAdvice(workspace.store);
     await open(page, workspace.url);
     await page
-      .getByRole('combobox', { name: 'Connection for this analysis', exact: true })
+      .getByRole('combobox', { name: 'AI connection', exact: true })
       .selectOption('claude-cli');
     for (const state of ['not-installed', 'signed-out', 'unavailable'] as const) {
       workspace.setSignedInStatus(state);
       await page.getByRole('button', { name: 'Reload connections', exact: true }).click();
       await expect(
-        page.getByRole('combobox', { name: 'Connection for this analysis', exact: true }),
+        page.getByRole('combobox', { name: 'AI connection', exact: true }),
       ).toBeEnabled();
       await expect(
         page.getByRole('button', { name: 'Test signed-in AI', exact: true }),
@@ -132,7 +128,7 @@ test('failed generation keeps inputs and a blocked connection test can be cancel
     await seedAdvice(workspace.store);
     await open(page, workspace.url);
     await page
-      .getByRole('combobox', { name: 'Connection for this analysis', exact: true })
+      .getByRole('combobox', { name: 'AI connection', exact: true })
       .selectOption('claude-cli');
     await expect(
       page.getByRole('button', { name: 'Analyze my choices', exact: true }),
@@ -160,9 +156,9 @@ test('failed generation keeps inputs and a blocked connection test can be cancel
     await expect(
       page.getByRole('alert').filter({ hasText: 'No unverified result was saved' }),
     ).toBeVisible();
-    await expect(
-      page.getByRole('combobox', { name: 'Connection for this analysis', exact: true }),
-    ).toHaveValue('claude-cli');
+    await expect(page.getByRole('combobox', { name: 'AI connection', exact: true })).toHaveValue(
+      'claude-cli',
+    );
     expect(workspace.store.snapshot().adviceResults).toEqual([]);
     workspace.reportSignedInLimit();
     await page.getByRole('button', { name: 'Test signed-in AI', exact: true }).click();

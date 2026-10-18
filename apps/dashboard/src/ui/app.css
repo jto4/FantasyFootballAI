@@ -2131,6 +2131,7 @@ body {
 }
 
 .top-actions .date-label {
+  white-space: nowrap;
   color: var(--ink);
   font-size: 10px;
   letter-spacing: 0;

@@ -38,9 +38,9 @@ it('keeps unknown availability and deadlines explicit and refuses a removed save
       onSavedAdvice: vi.fn(),
     }),
   );
-  expect(markup).toContain('Roster freshness is unverified');
-  expect(markup).toContain('does not establish that everyone is healthy');
-  expect(markup).toContain('No verified deadline');
+  expect(markup).toContain('Last roster update unknown');
+  expect(markup).toContain('No injury flags on this roster');
+  expect(markup).toContain('Check your waiver priority and FAAB');
   expect(markup).toContain('Saved decisions to revisit');
 });
 

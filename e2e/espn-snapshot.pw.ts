@@ -61,7 +61,7 @@ test('ESPN browser import is reachable, explicit about manual updates and does n
     expect(w.store.snapshot().leagues[0]?.lastSyncedAt).toBeUndefined();
     expect(w.credentialWrites).toEqual([]);
     expect(w.sends).toEqual([]);
-    await expect(page.getByText(/Provider update time is unverified/).first()).toBeVisible();
+    await expect(page.getByText(/re-import to update/i).first()).toBeVisible();
     await page.screenshot({ path: info.outputPath('imported-browser-league.png'), fullPage: true });
     await page.getByRole('button', { name: 'Import updated roster', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -129,14 +129,14 @@ test('authorized real ESPN import preserves roster identities and verified weekl
     await page.goto(`${w.url}/#/desk?league=${raw.id}`);
     await expect(page.getByRole('combobox', { name: 'Active league' })).toHaveValue(String(raw.id));
     await page.getByRole('combobox', { name: 'Your team', exact: true }).selectOption(teamId);
-    await expect(page.getByText('Imported browser snapshot', { exact: false })).toBeVisible();
+    await expect(page.getByText('Imported from ESPN', { exact: false })).toBeVisible();
     await page.screenshot({ path: info.outputPath('real-afton-home.png'), fullPage: true });
     await page.getByRole('button', { name: 'Reports', exact: true }).click();
     await expect(
       page.getByRole('button', { name: 'Set up weekly drafts', exact: true }),
     ).toBeEnabled();
     await expect(
-      page.getByRole('note').filter({ hasText: 'manual browser snapshot' }),
+      page.getByRole('note').filter({ hasText: 'imported from a saved ESPN page' }),
     ).toBeVisible();
     expect(w.credentialWrites).toEqual([]);
     expect(w.sends).toEqual([]);

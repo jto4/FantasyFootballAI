@@ -62,7 +62,7 @@ export function HomeStatus({
         <p>
           {league
             ? league.connectionMode === 'snapshot'
-              ? `Browser snapshot imported ${formatDateTime(league.snapshotImportedAt ?? league.connectedAt)}. Provider update time is unverified.`
+              ? `Imported ${formatDateTime(league.snapshotImportedAt ?? league.connectedAt)}. Re-import to update.`
               : `League data last updated ${formatDateTime(league.lastSyncedAt ?? league.connectedAt)}.`
             : 'No league connected yet.'}
         </p>

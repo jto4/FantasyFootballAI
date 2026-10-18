@@ -455,10 +455,6 @@
 .next-action-card .text-button {
   margin-left: 16px;
 }
-.setup-explanation {
-  color: var(--muted);
-  line-height: 1.5;
-}
 .guided-ai-setup {
   margin: 20px 0;
   display: grid;
