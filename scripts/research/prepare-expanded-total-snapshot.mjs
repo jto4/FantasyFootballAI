@@ -1,6 +1,6 @@
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { validateExpandedTotalTape } from '../packages/core/dist/index.js';
+import { validateExpandedTotalTape } from '../../packages/core/dist/index.js';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 const [contexts, expandedPath, legacyPath, out] = process.argv.slice(2);
 if (!contexts || !expandedPath || !legacyPath || !out)

@@ -12,11 +12,11 @@ const e = await inputs(contexts, signals),
   development = overview(e.evaluate(prior.selected, e.development));
 const extraFiles = [
   'packages/integrations/src/research/historical-total-catalog.ts',
-  'scripts/retry-historical-external-totals.mjs',
-  'scripts/prepare-expanded-total-snapshot.mjs',
-  'scripts/freeze-expanded-total-revision.mjs',
-  'scripts/audit-expanded-totals.mjs',
-  'scripts/develop-expanded-totals.mjs',
+  'scripts/research/retry-historical-external-totals.mjs',
+  'scripts/research/prepare-expanded-total-snapshot.mjs',
+  'scripts/research/freeze-expanded-total-revision.mjs',
+  'scripts/research/audit-expanded-totals.mjs',
+  'scripts/research/develop-expanded-totals.mjs',
 ];
 const revised = {
   ...prior,

@@ -1,9 +1,9 @@
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareRichPersonnelModel } from '../packages/core/dist/research/rich-personnel-model.js';
-import { usablePregameContext } from '../packages/core/dist/game-availability.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
+import { prepareRichPersonnelModel } from '../../packages/core/dist/research/rich-personnel-model.js';
+import { usablePregameContext } from '../../packages/core/dist/game-availability.js';
 const args = process.argv.slice(2);
 if (args.length !== 4 || args[0] !== '--contexts' || args[2] !== '--frozen-v6')
   throw new Error('Usage: --contexts <games.json> --frozen-v6 <development.json>');

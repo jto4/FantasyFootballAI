@@ -17,11 +17,11 @@ const files = [
   ...Object.keys(e.parent.codeHashes),
   'packages/core/src/research/robust-total-trade-flow.ts',
   'packages/integrations/src/research/canonical-prediction-trades.ts',
-  'scripts/correct-historical-trade-directions.mjs',
-  'scripts/trade-flow-evaluation.mjs',
-  'scripts/diagnose-signed-total-flow.mjs',
-  'scripts/freeze-robust-total-flow.mjs',
-  'scripts/audit-robust-total-flow.mjs',
+  'scripts/research/correct-historical-trade-directions.mjs',
+  'scripts/research/trade-flow-evaluation.mjs',
+  'scripts/research/diagnose-signed-total-flow.mjs',
+  'scripts/research/freeze-robust-total-flow.mjs',
+  'scripts/research/audit-robust-total-flow.mjs',
 ];
 const f = {
   version: 1,

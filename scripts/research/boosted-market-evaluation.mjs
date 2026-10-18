@@ -1,10 +1,10 @@
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 import {
   prepareBoostedMarketModel,
   boostedMarketParameters,
-} from '../packages/core/dist/research/boosted-market-model.js';
-import { earlierGame } from '../packages/core/dist/game-rating-model.js';
-import { prepareRichPersonnelModel } from '../packages/core/dist/research/rich-personnel-model.js';
+} from '../../packages/core/dist/research/boosted-market-model.js';
+import { earlierGame } from '../../packages/core/dist/game-rating-model.js';
+import { prepareRichPersonnelModel } from '../../packages/core/dist/research/rich-personnel-model.js';
 import { summarize, kinds } from './rich-personnel-evaluation.mjs';
 export { summarize, kinds, boostedMarketParameters };
 export const structures = [1, 2].flatMap((depth) =>

@@ -155,8 +155,8 @@ shared v11 contexts, original v12 r2 signals and v15 corrected signals into a fr
 directory. Then run:
 
 ```sh
-node scripts/replay-drive-signals.mjs /path/to/drive-stats.json
-node scripts/audit-drive-totals.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v16-frozen-settings.json
+node scripts/research/replay-drive-signals.mjs /path/to/drive-stats.json
+node scripts/research/audit-drive-totals.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v16-frozen-settings.json
 ```
 
 The eight retained selected-field CSV archives reconstruct every normalized

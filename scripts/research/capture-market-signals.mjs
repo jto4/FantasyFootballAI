@@ -7,14 +7,14 @@ import {
   PublicPredictionMarketData,
   FootballNewsCache,
   SleeperPlayerCatalog,
-} from '../packages/integrations/dist/index.js';
+} from '../../packages/integrations/dist/index.js';
 import {
   buildMarketSignals,
   freezeMarketResearch,
   buildPropGameLog,
   propHistoryIdentityResolver,
   isUpcomingFootballGame,
-} from '../packages/core/dist/index.js';
+} from '../../packages/core/dist/index.js';
 // Explicit opt-in public-data capture. No owner profile, credentials, AI, messages or wagers.
 const directory = process.argv[2];
 if (!directory) throw Error('Provide an output directory outside the repository.');

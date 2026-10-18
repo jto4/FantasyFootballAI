@@ -13,10 +13,10 @@ const e = await prepare(contexts, signals, parentPath),
   files = [
     ...Object.keys(e.parent.codeHashes),
     'packages/core/src/research/directional-seasonal-totals-model.ts',
-    'scripts/directional-total-evaluation.mjs',
-    'scripts/diagnose-seasonal-total-losses.mjs',
-    'scripts/freeze-directional-totals.mjs',
-    'scripts/audit-directional-totals.mjs',
+    'scripts/research/directional-total-evaluation.mjs',
+    'scripts/research/diagnose-seasonal-total-losses.mjs',
+    'scripts/research/freeze-directional-totals.mjs',
+    'scripts/research/audit-directional-totals.mjs',
   ];
 const f = {
   version: 1,

@@ -1,7 +1,7 @@
 import { readFile, stat, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { PublicSportsbookLines } from '../packages/integrations/dist/sportsbook-lines.js';
+import { PublicSportsbookLines } from '../../packages/integrations/dist/sportsbook-lines.js';
 import { summarize } from './rich-personnel-evaluation.mjs';
 const args = process.argv.slice(2);
 if (

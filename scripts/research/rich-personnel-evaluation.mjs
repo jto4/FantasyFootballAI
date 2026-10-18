@@ -1,5 +1,5 @@
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareRichPersonnelModel } from '../packages/core/dist/research/rich-personnel-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
+import { prepareRichPersonnelModel } from '../../packages/core/dist/research/rich-personnel-model.js';
 export const kinds = ['moneyline', 'spread', 'total'];
 export const specs = ['all', 'quarterback', 'injuries'].flatMap((family) =>
   [200, 1000].flatMap((penalty) =>

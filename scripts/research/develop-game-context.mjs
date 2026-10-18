@@ -1,4 +1,4 @@
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 
 const args = process.argv.slice(2);

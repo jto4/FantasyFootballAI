@@ -1,6 +1,6 @@
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 const args = process.argv.slice(2);
 if (args.length !== 2 || args[0] !== '--contexts')
   throw new Error('Usage: node scripts/develop-personnel-model.mjs --contexts <public-games.json>');

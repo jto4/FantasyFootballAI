@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { prepare, hash, summarize } from './trade-flow-evaluation.mjs';
-import { prepareDirectionalSeasonalTotalsModel } from '../packages/core/dist/research/directional-seasonal-totals-model.js';
+import { prepareDirectionalSeasonalTotalsModel } from '../../packages/core/dist/research/directional-seasonal-totals-model.js';
 const [contexts, oldPath, correctedPath, parentPath] = process.argv.slice(2);
 if (!contexts || !oldPath || !correctedPath || !parentPath)
   throw new Error('Usage: <contexts> <original-signals> <corrected-signals> <v14-settings>');

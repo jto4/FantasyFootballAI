@@ -178,11 +178,11 @@ are excluded. They contain no provider secrets or wallet profile text.
 ```sh
 gzip -dc docs/research/model-v11-contexts.json.gz > /tmp/v11-contexts.json
 gzip -dc docs/research/model-v11-external-signals.json.gz > /tmp/v11-signals.json
-node scripts/audit-external-totals.mjs --contexts /tmp/v11-contexts.json --signals /tmp/v11-signals.json --frozen docs/research/model-v11-external-frozen.json
-node scripts/score-external-totals-forward.mjs --contexts /tmp/v11-contexts.json --record docs/research/2026-10-13-v11-pregame-numeric-record.json --seal docs/research/2026-10-13-v11-pregame-seal.json --out /tmp/v11-new-forward-result.json
+node scripts/research/audit-external-totals.mjs --contexts /tmp/v11-contexts.json --signals /tmp/v11-signals.json --frozen docs/research/model-v11-external-frozen.json
+node scripts/research/score-external-totals-forward.mjs --contexts /tmp/v11-contexts.json --record docs/research/2026-10-13-v11-pregame-numeric-record.json --seal docs/research/2026-10-13-v11-pregame-seal.json --out /tmp/v11-new-forward-result.json
 ```
 
-Capture new snapshots explicitly with `scripts/capture-external-totals.mjs`;
+Capture new snapshots explicitly with `scripts/research/capture-external-totals.mjs`;
 `--mode history` uses the thirty-minute cutoff, and `--mode pregame` verifies
 fresh paired sportsbook prices and captures current media. Use a new output
 directory. New issued predictions require the unchanged historical training

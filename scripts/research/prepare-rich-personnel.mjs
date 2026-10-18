@@ -8,8 +8,8 @@ import {
   parseNFLInjuryReports,
   preparePersonnelEvidence,
   addPregamePersonnel,
-} from '../packages/integrations/dist/index.js';
-import { usablePregameContext, nflTeamKey } from '../packages/core/dist/index.js';
+} from '../../packages/integrations/dist/index.js';
+import { usablePregameContext, nflTeamKey } from '../../packages/core/dist/index.js';
 const args = process.argv.slice(2);
 if (
   args.length !== 6 ||

@@ -4,9 +4,9 @@ import {
   PublicFootballData,
   PublicPregameEvidence,
   parseFootballGames,
-} from '../packages/integrations/dist/index.js';
+} from '../../packages/integrations/dist/index.js';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 const args = process.argv.slice(2);
 if (args.length && !(args.length === 2 && ['--snapshot', '--contexts'].includes(args[0])))
   throw new Error(

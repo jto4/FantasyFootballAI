@@ -1,9 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { PublicPredictionMarketData } from '../packages/integrations/dist/prediction-market-data.js';
-import { PublicSportsbookLines } from '../packages/integrations/dist/sportsbook-lines.js';
-import { fetchFootballNewsWithStatus } from '../packages/integrations/dist/news.js';
+import { PublicPredictionMarketData } from '../../packages/integrations/dist/prediction-market-data.js';
+import { PublicSportsbookLines } from '../../packages/integrations/dist/sportsbook-lines.js';
+import { fetchFootballNewsWithStatus } from '../../packages/integrations/dist/news.js';
 const args = process.argv.slice(2);
 if (
   args.length !== 6 ||

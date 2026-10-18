@@ -1,11 +1,11 @@
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 import {
   prepareExpandedExternalTotalsModel,
   expandedTotalParameters,
-} from '../packages/core/dist/research/expanded-external-totals-model.js';
+} from '../../packages/core/dist/research/expanded-external-totals-model.js';
 import { summarize } from './rich-personnel-evaluation.mjs';
 export { expandedTotalParameters, summarize };
 export const hash = (v) => createHash('sha256').update(v).digest('hex');
@@ -24,7 +24,7 @@ export const frozenFiles = [
   'packages/core/src/market-context.ts',
   'packages/integrations/src/research/historical-prediction-market-data.ts',
   'packages/integrations/src/prediction-market-data.ts',
-  'scripts/expanded-total-evaluation.mjs',
+  'scripts/research/expanded-total-evaluation.mjs',
 ];
 export async function inputs(contextPath, signalPath) {
   if ((await stat(signalPath)).size > 200000000) throw new Error('Expanded input too large.');

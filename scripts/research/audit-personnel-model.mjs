@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { readGameContextSnapshot } from './game-context-snapshot.mjs';
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
 const args = process.argv.slice(2);
 if (args.length !== 4 || args[0] !== '--contexts' || args[2] !== '--reference')
   throw new Error(
@@ -8,7 +8,7 @@ if (args.length !== 4 || args[0] !== '--contexts' || args[2] !== '--reference')
   );
 const frozen = JSON.parse(
     await readFile(
-      new URL('../docs/research/model-v5-personnel-frozen.json', import.meta.url),
+      new URL('../../docs/research/model-v5-personnel-frozen.json', import.meta.url),
       'utf8',
     ),
   ),

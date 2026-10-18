@@ -1,10 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import { inputs, hash, summarize } from './expanded-total-evaluation.mjs';
-import { prepareExpandedExternalTotalsModel } from '../packages/core/dist/research/expanded-external-totals-model.js';
+import { prepareExpandedExternalTotalsModel } from '../../packages/core/dist/research/expanded-external-totals-model.js';
 import {
   prepareSeasonalExternalTotalsModel,
   seasonalExternalParameters,
-} from '../packages/core/dist/research/seasonal-external-totals-model.js';
+} from '../../packages/core/dist/research/seasonal-external-totals-model.js';
 export { hash, summarize, seasonalExternalParameters };
 export const specs = ['directional', 'all'].flatMap((features) =>
   [4, 8].flatMap((halfLifeWeeks) =>

@@ -1,5 +1,5 @@
-import { PublicFootballData } from '../packages/integrations/dist/index.js';
-import { buildBetForecast, betForecastQualified } from '../packages/core/dist/index.js';
+import { PublicFootballData } from '../../packages/integrations/dist/index.js';
+import { buildBetForecast, betForecastQualified } from '../../packages/core/dist/index.js';
 
 // Opt-in public-data evaluation only: no settings, credentials, AI generation or bets.
 const now = new Date();

@@ -1,5 +1,5 @@
-import { parseFootballGames } from '../packages/integrations/dist/index.js';
-import { prepareGameRatingModel, earlierGame } from '../packages/core/dist/game-rating-model.js';
+import { parseFootballGames } from '../../packages/integrations/dist/index.js';
+import { prepareGameRatingModel, earlierGame } from '../../packages/core/dist/game-rating-model.js';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 // Development is deliberately limited to older outcomes. No betting-profit objective or HTTP tuning inputs.

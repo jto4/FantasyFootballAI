@@ -1,9 +1,9 @@
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareBoostedMarketModel } from '../packages/core/dist/research/boosted-market-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
+import { prepareBoostedMarketModel } from '../../packages/core/dist/research/boosted-market-model.js';
 import {
   prepareExpertTotalsAdapter,
   expertTotalsParameters,
-} from '../packages/core/dist/research/expert-totals-model.js';
+} from '../../packages/core/dist/research/expert-totals-model.js';
 import { report } from './seasonal-hybrid-evaluation.mjs';
 export { report, expertTotalsParameters };
 export const specs = [16, 64].flatMap((learningRate) =>

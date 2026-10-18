@@ -159,8 +159,8 @@ Decompress the shared v11 contexts, original v12 r2 signals and corrected v15
 signals into a new directory, build dependencies under Node 22, then run:
 
 ```sh
-node scripts/replay-drive-signals.mjs /path/to/drive-stats.json
-node scripts/audit-stable-total-feedback.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v18-frozen-settings.json
+node scripts/research/replay-drive-signals.mjs /path/to/drive-stats.json
+node scripts/research/audit-stable-total-feedback.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v18-frozen-settings.json
 ```
 
 Retained selected PBP fields reconstruct all 3,822 normalized team-game rows

@@ -4,11 +4,11 @@ import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 import {
   prepareGameRatingModel,
   canonicalBookProbability,
-} from '../packages/core/dist/game-rating-model.js';
+} from '../../packages/core/dist/game-rating-model.js';
 import {
   prepareExternalTotalsModel,
   externalTotalParameters,
-} from '../packages/core/dist/external-total-signals.js';
+} from '../../packages/core/dist/external-total-signals.js';
 import { report } from './seasonal-hybrid-evaluation.mjs';
 const args = process.argv.slice(2);
 if (
@@ -109,7 +109,7 @@ if (snapshot.mode === 'pregame')
     const point = model.point(g),
       errors = model.residuals(g, 'total');
     if (!point || errors.length < 100) continue;
-    const { residualProbability } = await import('../packages/core/dist/game-rating-model.js');
+    const { residualProbability } = await import('../../packages/core/dist/game-rating-model.js');
     const raw = residualProbability(point.total, errors, g.totalLine).probability;
     const probabilities = {};
     for (const family of families)

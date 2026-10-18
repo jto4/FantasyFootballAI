@@ -1,11 +1,11 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { format, resolveConfig } from 'prettier';
 import { prepare as drivePrepare, json, hash, summarize } from './drive-total-evaluation.mjs';
-import { prepareDriveResidualTotalsModel } from '../packages/core/dist/research/drive-residual-totals-model.js';
+import { prepareDriveResidualTotalsModel } from '../../packages/core/dist/research/drive-residual-totals-model.js';
 import {
   prepareRecentTotalFeedback,
   recentTotalFeedbackParameters,
-} from '../packages/core/dist/research/recent-total-feedback.js';
+} from '../../packages/core/dist/research/recent-total-feedback.js';
 export { json, hash, summarize, recentTotalFeedbackParameters };
 export const specs = [2, 4].flatMap((halfLifeWeeks) =>
   [0.5, 1].flatMap((maxWeight) =>
@@ -16,10 +16,10 @@ export const specId = (s) =>
   `feedback-${s.halfLifeWeeks}-${s.maxWeight}-${s.priorSeed ? 'seed' : 'reset'}`;
 export const newFiles = [
   'packages/core/src/research/recent-total-feedback.ts',
-  'scripts/recent-total-evaluation.mjs',
-  'scripts/diagnose-drive-feedback.mjs',
-  'scripts/develop-recent-total-feedback.mjs',
-  'scripts/audit-recent-total-feedback.mjs',
+  'scripts/research/recent-total-evaluation.mjs',
+  'scripts/research/diagnose-drive-feedback.mjs',
+  'scripts/research/develop-recent-total-feedback.mjs',
+  'scripts/research/audit-recent-total-feedback.mjs',
 ];
 export async function canonicalJson(value) {
   return format(JSON.stringify(value), {

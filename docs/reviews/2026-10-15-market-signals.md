@@ -31,7 +31,7 @@ there is no verified live two-sided prop quote feed and no wager placement.
 
 ## Real data
 
-Opt-in capture: `node scripts/capture-market-signals.mjs /tmp/sidekick-market-live`
+Opt-in capture: `node scripts/research/capture-market-signals.mjs /tmp/sidekick-market-live`
 after building shared packages. Only public provider data is read. No owner profile,
 credentials, AI inference, sends or bets. Captures/raw evidence are outside Git.
 
@@ -105,7 +105,7 @@ research-isolation cases passed again in both viewports after the last identity
 validation change (4/4). The final focused core checks passed (6/6).
 
 The rebuilt macOS ARM DMG and ZIP passed API/dashboard, MCP and headless lifecycle
-smokes. `scripts/verify-market-desktop.mjs` then launched the exact packaged
+smokes. `scripts/research/verify-market-desktop.mjs` then launched the exact packaged
 application with a disposable verification profile/mock credentials, captured
 actual current public signals, froze an eligible prospective test record, opened
 the player-prop entry and confirmed an empty production prediction ledger. No

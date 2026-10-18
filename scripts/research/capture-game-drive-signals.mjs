@@ -3,7 +3,7 @@ import {
   loadGameDriveSource,
   decodeDriveCsv,
   parseGameDriveSignals,
-} from '../packages/integrations/dist/research/game-drive-signals.js';
+} from '../../packages/integrations/dist/research/game-drive-signals.js';
 import { hash } from './expanded-total-evaluation.mjs';
 const [out] = process.argv.slice(2);
 if (!out) throw new Error('Usage: <output-directory>');

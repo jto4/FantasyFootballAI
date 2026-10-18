@@ -10,7 +10,7 @@ import {
   preparePersonnelEvidence,
   buildPregameAvailability,
   addPregamePersonnel,
-} from '../packages/integrations/dist/index.js';
+} from '../../packages/integrations/dist/index.js';
 const args = process.argv.slice(2);
 if (
   args.length !== 10 ||

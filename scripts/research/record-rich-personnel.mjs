@@ -4,13 +4,13 @@ import { readGameContextSnapshot } from './game-context-snapshot.mjs';
 import {
   PublicPregameEvidence,
   PublicSportsbookLines,
-} from '../packages/integrations/dist/index.js';
-import { americanOdds } from '../packages/core/dist/index.js';
+} from '../../packages/integrations/dist/index.js';
+import { americanOdds } from '../../packages/core/dist/index.js';
 import {
   prepareGameRatingModel,
   residualProbability,
-} from '../packages/core/dist/game-rating-model.js';
-import { prepareRichPersonnelModel } from '../packages/core/dist/research/rich-personnel-model.js';
+} from '../../packages/core/dist/game-rating-model.js';
+import { prepareRichPersonnelModel } from '../../packages/core/dist/research/rich-personnel-model.js';
 import { kinds, specs, specId } from './rich-personnel-evaluation.mjs';
 const args = process.argv.slice(2);
 if (
@@ -118,7 +118,7 @@ for (const path of [
   'packages/integrations/src/game-personnel.ts',
   'packages/integrations/src/game-pregame.ts',
   'packages/integrations/src/sportsbook-lines.ts',
-  'scripts/record-rich-personnel.mjs',
+  'scripts/research/record-rich-personnel.mjs',
 ])
   codeHashes[path] = hash(await readFile(path));
 const record = {

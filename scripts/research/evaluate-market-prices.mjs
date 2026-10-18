@@ -1,6 +1,9 @@
 import { createHash } from 'node:crypto';
-import { PublicFootballData, PublicPregameEvidence } from '../packages/integrations/dist/index.js';
-import { evaluateArchivedMarkets } from '../packages/core/dist/index.js';
+import {
+  PublicFootballData,
+  PublicPregameEvidence,
+} from '../../packages/integrations/dist/index.js';
+import { evaluateArchivedMarkets } from '../../packages/core/dist/index.js';
 const compare = process.argv.slice(2).length === 1 && process.argv[2] === '--compare';
 if (process.argv.slice(2).length && !compare) throw new Error('Supported option: --compare');
 const now = new Date(),

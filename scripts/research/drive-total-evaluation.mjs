@@ -5,11 +5,11 @@ import {
   prepareDriveTotalSignals,
   validateDriveTotalStats,
   driveSignalParameters,
-} from '../packages/core/dist/drive-total-signals.js';
+} from '../../packages/core/dist/drive-total-signals.js';
 import {
   prepareDriveResidualTotalsModel,
   driveResidualParameters,
-} from '../packages/core/dist/research/drive-residual-totals-model.js';
+} from '../../packages/core/dist/research/drive-residual-totals-model.js';
 export { json, hash, summarize, driveSignalParameters, driveResidualParameters };
 export const specs = [25, 100].flatMap((penalty) =>
   [false, true].map((flow) => ({ penalty, flow })),
@@ -20,13 +20,13 @@ export const newFiles = [
   'packages/core/src/drive-total-signals.ts',
   'packages/core/src/research/drive-residual-totals-model.ts',
   'packages/integrations/src/research/game-drive-signals.ts',
-  'scripts/capture-game-drive-signals.mjs',
-  'scripts/retain-drive-sources.mjs',
-  'scripts/replay-drive-signals.mjs',
-  'scripts/diagnose-robust-flow-value.mjs',
-  'scripts/drive-total-evaluation.mjs',
-  'scripts/develop-drive-totals.mjs',
-  'scripts/audit-drive-totals.mjs',
+  'scripts/research/capture-game-drive-signals.mjs',
+  'scripts/research/retain-drive-sources.mjs',
+  'scripts/research/replay-drive-signals.mjs',
+  'scripts/research/diagnose-robust-flow-value.mjs',
+  'scripts/research/drive-total-evaluation.mjs',
+  'scripts/research/develop-drive-totals.mjs',
+  'scripts/research/audit-drive-totals.mjs',
 ];
 export async function prepare(contexts, oldPath, correctedPath, statsPath) {
   const parentPath = 'docs/research/2026-10-13-v15-frozen-settings.json',

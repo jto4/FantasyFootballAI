@@ -21,9 +21,9 @@ results.sort((a, b) => a.totals.brier - b.totals.brier || a.id.localeCompare(b.i
 const files = [
   ...Object.keys(e.prior.codeHashes),
   'packages/core/src/research/seasonal-external-totals-model.ts',
-  'scripts/seasonal-external-evaluation.mjs',
-  'scripts/develop-seasonal-external-totals.mjs',
-  'scripts/audit-seasonal-external-totals.mjs',
+  'scripts/research/seasonal-external-evaluation.mjs',
+  'scripts/research/develop-seasonal-external-totals.mjs',
+  'scripts/research/audit-seasonal-external-totals.mjs',
 ];
 const frozen = {
   version: 1,

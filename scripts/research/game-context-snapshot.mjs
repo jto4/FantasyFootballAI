@@ -1,5 +1,5 @@
 import { readFile, stat } from 'node:fs/promises';
-import { usablePregameContext } from '../packages/core/dist/index.js';
+import { usablePregameContext } from '../../packages/core/dist/index.js';
 const object = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
 const number = (x, lo, hi) => typeof x === 'number' && Number.isFinite(x) && x >= lo && x <= hi;
 const text = (x, max) =>

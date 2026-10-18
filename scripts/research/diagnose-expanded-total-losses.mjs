@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { inputs, summarize, hash } from './expanded-total-evaluation.mjs';
-import { prepareExpandedExternalTotalsModel } from '../packages/core/dist/research/expanded-external-totals-model.js';
+import { prepareExpandedExternalTotalsModel } from '../../packages/core/dist/research/expanded-external-totals-model.js';
 const [contexts, signals, frozenPath] = process.argv.slice(2);
 if (!contexts || !signals || !frozenPath)
   throw new Error('Usage: <contexts> <signals> <v12-settings>');

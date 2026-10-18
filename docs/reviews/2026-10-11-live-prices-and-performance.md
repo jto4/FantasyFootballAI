@@ -42,7 +42,7 @@ prediction or paper selection.
 
 ## Fixed archived-price evaluation
 
-Run `node scripts/evaluate-market-prices.mjs` after building shared packages, or
+Run `node scripts/research/evaluate-market-prices.mjs` after building shared packages, or
 `npm run betting:market-evaluate`. Public schedules were retrieved at
 03:17:04 UTC from the nflverse schedules release. The unchanged rolling method
 and conservative selection thresholds were fixed before this evaluation. Each

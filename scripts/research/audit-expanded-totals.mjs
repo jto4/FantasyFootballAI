@@ -6,7 +6,7 @@ import {
   expandedTotalParameters,
   summarize,
 } from './expanded-total-evaluation.mjs';
-import { prepareExternalTotalsModel } from '../packages/core/dist/external-total-signals.js';
+import { prepareExternalTotalsModel } from '../../packages/core/dist/external-total-signals.js';
 const [context, signals, frozenPath] = process.argv.slice(2);
 if (!context || !signals || !frozenPath)
   throw new Error('Usage: <contexts> <signals> <frozen-settings.json>');

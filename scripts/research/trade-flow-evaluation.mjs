@@ -5,13 +5,13 @@ import {
   hash,
   summarize,
 } from './directional-total-evaluation.mjs';
-import { prepareExpandedExternalTotalsModel } from '../packages/core/dist/research/expanded-external-totals-model.js';
-import { prepareDirectionalSeasonalTotalsModel } from '../packages/core/dist/research/directional-seasonal-totals-model.js';
+import { prepareExpandedExternalTotalsModel } from '../../packages/core/dist/research/expanded-external-totals-model.js';
+import { prepareDirectionalSeasonalTotalsModel } from '../../packages/core/dist/research/directional-seasonal-totals-model.js';
 import {
   prepareRobustTotalFlowFeatures,
   robustFlowParameters,
-} from '../packages/core/dist/research/robust-total-trade-flow.js';
-import { seasonalExternalParameters } from '../packages/core/dist/research/seasonal-external-totals-model.js';
+} from '../../packages/core/dist/research/robust-total-trade-flow.js';
+import { seasonalExternalParameters } from '../../packages/core/dist/research/seasonal-external-totals-model.js';
 export { json, hash, summarize, robustFlowParameters, seasonalExternalParameters };
 export async function prepare(contexts, originalPath, correctedPath, parentPath) {
   const parent = await json(parentPath);

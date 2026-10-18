@@ -1,9 +1,9 @@
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareBoostedMarketModel } from '../packages/core/dist/research/boosted-market-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
+import { prepareBoostedMarketModel } from '../../packages/core/dist/research/boosted-market-model.js';
 import {
   prepareSeasonalTotalAdapter,
   seasonalHybridParameters,
-} from '../packages/core/dist/research/seasonal-hybrid-model.js';
+} from '../../packages/core/dist/research/seasonal-hybrid-model.js';
 import { summarize, kinds } from './rich-personnel-evaluation.mjs';
 export { summarize, kinds, seasonalHybridParameters };
 export const specs = [4, 8].flatMap((halfLifeWeeks) =>

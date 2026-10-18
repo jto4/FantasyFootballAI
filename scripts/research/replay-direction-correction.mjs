@@ -1,6 +1,6 @@
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { canonicalKalshiDirection } from '../packages/integrations/dist/research/canonical-prediction-trades.js';
+import { canonicalKalshiDirection } from '../../packages/integrations/dist/research/canonical-prediction-trades.js';
 const [oldPath, patchPath, out] = process.argv.slice(2);
 if (!oldPath || !patchPath || !out)
   throw new Error('Usage: <original-signals> <saved-direction-patch> <new-reconstructed-signals>');

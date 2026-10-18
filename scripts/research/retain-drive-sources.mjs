@@ -4,7 +4,7 @@ import {
   decodeDriveCsv,
   projectDriveSourceCsv,
   parseGameDriveSignals,
-} from '../packages/integrations/dist/research/game-drive-signals.js';
+} from '../../packages/integrations/dist/research/game-drive-signals.js';
 import { json, hash } from './directional-total-evaluation.mjs';
 const [directory] = process.argv.slice(2);
 if (!directory) throw new Error('Usage: <captured-source-directory>');

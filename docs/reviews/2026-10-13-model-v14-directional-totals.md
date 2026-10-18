@@ -139,8 +139,8 @@ No production model is promoted.
 With supported Node 22, decompress the retained inputs into a fresh directory:
 
 ```sh
-node scripts/diagnose-seasonal-total-losses.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v13-frozen-settings.json
-node scripts/audit-directional-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v14-frozen-settings.json
+node scripts/research/diagnose-seasonal-total-losses.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v13-frozen-settings.json
+node scripts/research/audit-directional-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v14-frozen-settings.json
 ```
 
 The new adapter is research-only. Tests verify adversarial changes to removed

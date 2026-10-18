@@ -109,7 +109,7 @@ Commands (public raw snapshots remain outside the repository):
 npm run betting:rich-prepare -- --contexts <v5-games.json> --data-dir <public-csv-directory> --output <rich-games.json>
 npm --silent run betting:rich-develop -- --contexts <rich-games.json> > development.json
 npm run betting:rich-audit -- --contexts <rich-games.json> --frozen development.json --recent-contexts <recent-games.json>
-node scripts/prepare-recent-personnel.mjs --contexts <rich-games.json> --data-dir <public-csv-directory> --season 2026 --as-of 2026-10-12T18:32:36Z --output <recent-games.json>
+node scripts/research/prepare-recent-personnel.mjs --contexts <rich-games.json> --data-dir <public-csv-directory> --season 2026 --as-of 2026-10-12T18:32:36Z --output <recent-games.json>
 ```
 
 Raw names are `statsYYYY.txt`, `snapsYYYY.txt`, `injuriesYYYY.csv`; recent preparation
@@ -137,7 +137,7 @@ owner Advice entry. The earlier 12:57 p.m. production record remains unchanged.
 The reproduction entry point is:
 
 ```sh
-node scripts/record-rich-personnel.mjs --contexts <rich-games.json> --frozen development.json --game-id <upcoming-id> --output <new-record.json>
+node scripts/research/record-rich-personnel.mjs --contexts <rich-games.json> --frozen development.json --game-id <upcoming-id> --output <new-record.json>
 ```
 
 ## Verification and manual review

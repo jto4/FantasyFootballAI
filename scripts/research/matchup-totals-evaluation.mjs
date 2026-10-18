@@ -1,17 +1,17 @@
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { prepareGameRatingModel } from '../packages/core/dist/game-rating-model.js';
-import { prepareBoostedMarketModel } from '../packages/core/dist/research/boosted-market-model.js';
-import { expertTotalsParameters } from '../packages/core/dist/research/expert-totals-model.js';
+import { prepareGameRatingModel } from '../../packages/core/dist/game-rating-model.js';
+import { prepareBoostedMarketModel } from '../../packages/core/dist/research/boosted-market-model.js';
+import { expertTotalsParameters } from '../../packages/core/dist/research/expert-totals-model.js';
 import {
   prepareMatchupTotalsModel,
   matchupTotalsParameters,
-} from '../packages/core/dist/research/matchup-totals-model.js';
+} from '../../packages/core/dist/research/matchup-totals-model.js';
 import {
   validateTeamTotalStats,
   totalSignalParameters,
-} from '../packages/core/dist/team-total-signals.js';
-import { boostedMarketParameters } from '../packages/core/dist/research/boosted-market-model.js';
+} from '../../packages/core/dist/team-total-signals.js';
+import { boostedMarketParameters } from '../../packages/core/dist/research/boosted-market-model.js';
 import { report } from './seasonal-hybrid-evaluation.mjs';
 export { report };
 export const hash = (v) => createHash('sha256').update(v).digest('hex');
