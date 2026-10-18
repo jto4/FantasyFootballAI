@@ -21,6 +21,7 @@ import { prepareFantasyForecast } from './fantasy-forecast.js';
 import { prepareNFLDraftEvidence } from './nfl-draft-evidence.js';
 import { preparePublicPlayerForecast } from './public-player-forecast.js';
 import { isInactiveFootballStatus } from './player-availability.js';
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 
 export interface PlayerEvidenceInput {
   league: LeagueConnection;
@@ -650,9 +651,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
         upcoming.length &&
         (upcoming.length !== 1 || !isUpcomingFootballGame(upcoming[0]!, input.asOf))
       ) {
-        evidence.warnings.push(
-          'The selected week has no unique upcoming unplayed game for this team; an active-lineup estimate was withheld.',
-        );
+        evidence.warnings.push(weeklyGameWithheldWarning);
         delete evidence.projectedPoints;
       }
       if (
