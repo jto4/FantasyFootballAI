@@ -298,6 +298,8 @@ test('manual imports offer explicit saved-data drafts and Home explains expired 
       page.getByText(/Import or refresh league data saved within the last 24 hours/).first(),
     ).toBeVisible();
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+    // Schedule is lazy-loaded; wait for its first card before reading the heading order.
+    await expect(page.getByRole('heading', { level: 2, name: 'Power rankings' })).toBeVisible();
     expect((await page.getByRole('heading', { level: 2 }).allTextContents()).slice(0, 2)).toEqual([
       'Power rankings',
       'Matchup preview',

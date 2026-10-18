@@ -14,7 +14,7 @@ import { Dialog } from './Dialog';
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
-import { WorkspaceSearch } from './WorkspaceSearch';
+import { AppSidebar, AppTopbar, capitalize, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
 import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
@@ -27,27 +27,13 @@ import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import type { SendPreview } from './ReportsPage';
 
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import {
-  CalendarDays,
-  ChevronDown,
-  CircleHelp,
-  FileText,
-  Home,
-  MessageCircle,
-  Power,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Users,
-  Zap,
-} from 'lucide-react';
+import { Zap } from 'lucide-react';
 import {
   espnSeasonBounds,
   parseLeagueInput,
   detectLeagueLink,
   type Platform,
 } from '@sidekick/core';
-import { ThemeSwitch } from './Appearance';
 import { SetupWizard } from './SetupWizard';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
@@ -64,9 +50,19 @@ import {
   type CredentialProvider,
   type NewsSnapshot,
 } from './app-state';
+// Main pages load on demand to keep the startup bundle small, then prefetch while idle
+// so later navigation does not wait on the network.
+const pageLoaders = {
+  settings: () => import('./SettingsPage'),
+  leagues: () => import('./LeaguesPage'),
+  reports: () => import('./ReportsPage'),
+  schedule: () => import('./SchedulePage'),
+  memory: () => import('./MemoryPage'),
+  advice: () => import('./AdvicePage'),
+};
 const HelpPage = lazy(() => import('./HelpPage').then((module) => ({ default: module.HelpPage })));
 const AdvicePage = lazy(() =>
-  import('./AdvicePage').then((module) => ({ default: module.AdvicePage })),
+  pageLoaders.advice().then((module) => ({ default: module.AdvicePage })),
 );
 const SampleExperience = lazy(() =>
   import('./SampleExperience').then((module) => ({ default: module.SampleExperience })),
@@ -75,36 +71,23 @@ const ScheduleEditor = lazy(() =>
   import('./ScheduleEditor').then((module) => ({ default: module.ScheduleEditor })),
 );
 const SettingsPage = lazy(() =>
-  import('./SettingsPage').then((module) => ({ default: module.SettingsPage })),
+  pageLoaders.settings().then((module) => ({ default: module.SettingsPage })),
 );
 const LeaguesPage = lazy(() =>
-  import('./LeaguesPage').then((module) => ({ default: module.LeaguesPage })),
+  pageLoaders.leagues().then((module) => ({ default: module.LeaguesPage })),
 );
 const ReportsPage = lazy(() =>
-  import('./ReportsPage').then((module) => ({ default: module.ReportsPage })),
+  pageLoaders.reports().then((module) => ({ default: module.ReportsPage })),
 );
 const SchedulePage = lazy(() =>
-  import('./SchedulePage').then((module) => ({ default: module.SchedulePage })),
+  pageLoaders.schedule().then((module) => ({ default: module.SchedulePage })),
 );
 const MemoryPage = lazy(() =>
-  import('./MemoryPage').then((module) => ({ default: module.MemoryPage })),
+  pageLoaders.memory().then((module) => ({ default: module.MemoryPage })),
 );
 const DeliveryTask = lazy(() =>
   import('./DeliveryTask').then((module) => ({ default: module.DeliveryTask })),
 );
-const menu = [
-  { section: 'League desk', label: 'Home', icon: Home },
-  { section: 'Advice', label: 'Advice', icon: Sparkles },
-  { section: 'Reports', label: 'Reports', icon: FileText },
-  { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
-  { section: 'Settings', label: 'Settings', icon: Settings },
-];
-const tools = [
-  { section: 'Leagues', label: 'Leagues', icon: Users },
-  { section: 'Members & memory', label: 'League members', icon: MessageCircle },
-  { section: 'Imports', label: 'Imports', icon: FileText },
-  { section: 'Help', label: 'Help', icon: CircleHelp },
-];
 
 export function App() {
   const [verificationMode] = useState(
@@ -161,7 +144,7 @@ export function App() {
   });
   const { section, leagueId: activeLeagueId, reportId: initialReviewId } = route;
   useEffect(() => {
-    if (tools.some((tool) => tool.section === section)) setShowTools(true);
+    if (isToolSection(section)) setShowTools(true);
   }, [section]);
   const setSection = (section: string) => updateRoute({ section });
   const setActiveLeagueId = (leagueId: string) => updateRoute({ leagueId, reportId: '' });
@@ -270,6 +253,18 @@ export function App() {
     });
   }
   const [stateLoaded, setStateLoaded] = useState(false);
+  useEffect(() => {
+    if (!stateLoaded) return;
+    const prefetch = () => {
+      for (const load of Object.values(pageLoaders)) void load().catch(() => undefined);
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(prefetch);
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = window.setTimeout(prefetch, 1_000);
+    return () => window.clearTimeout(timer);
+  }, [stateLoaded]);
   const [stateLoading, setStateLoading] = useState(true);
   const [stateLoadError, setStateLoadError] = useState('');
   const [serviceStatus, setServiceStatus] = useState<
@@ -838,146 +833,27 @@ export function App() {
   }).format(new Date());
   return (
     <div className="app-shell">
-      <aside ref={sidebarRef} className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">
-            <Zap size={19} fill="currentColor" />
-          </div>
-          <span>
-            Sunday<span className="brand-light">Sidekick</span>
-          </span>
-        </div>
-        <nav className="nav-list">
-          {menu.map(({ section: destination, label, icon: Icon }) => (
-            <button
-              key={label}
-              aria-current={section === destination ? 'page' : undefined}
-              onClick={() => navigate(destination)}
-              className={`nav-item ${section === destination ? 'active' : ''}`}
-            >
-              <Icon size={17} strokeWidth={1.8} />
-              <span>{label}</span>
-              {label === 'Home' && <i className="nav-dot" />}
-            </button>
-          ))}
-          <details
-            className="more-tools"
-            open={showTools}
-            onToggle={(event) => setShowTools(event.currentTarget.open)}
-          >
-            <summary>More tools</summary>
-            {tools.map(({ section: destination, label, icon: Icon }) => (
-              <button
-                type="button"
-                key={destination}
-                className={`nav-item ${section === destination ? 'active' : ''}`}
-                onClick={() => navigate(destination)}
-              >
-                <Icon size={17} />
-                <span>{label}</span>
-              </button>
-            ))}
-          </details>
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="service-status">
-            <span className={`status-pulse ${serviceStatus !== 'running' ? 'offline' : ''}`} />
-            <span>
-              {serviceStatus === 'checking' && 'Checking local service'}
-              {serviceStatus === 'running' && 'Local service running'}
-              {serviceStatus === 'stopping' && 'Stopping local service'}
-              {serviceStatus === 'stopped' && 'Local service stopped'}
-              {serviceStatus === 'unavailable' && 'Local service unavailable'}
-            </span>
-            {serviceStatus === 'running' && <ShieldCheck size={14} />}
-          </div>
-          <button
-            className="stop-service-button"
-            onClick={() => void stopApplication()}
-            disabled={serviceStatus !== 'running'}
-            title="Stop Sunday Sidekick"
-            aria-label="Stop Sunday Sidekick"
-          >
-            <Power size={15} /> <span>Stop app</span>
-          </button>
-          <button type="button" className="help-link" onClick={() => navigate('Help')}>
-            <CircleHelp size={16} /> Help & FAQ
-          </button>
-          <div className="user-chip">
-            <div className="user-avatar">C</div>
-            <div>
-              <strong>Commissioner</strong>
-              <small>Local workspace</small>
-            </div>
-            <button
-              type="button"
-              className="workspace-settings-button"
-              aria-label="Open settings"
-              onClick={() => navigate('Settings')}
-            >
-              <Settings size={16} />
-            </button>
-          </div>
-        </div>
-      </aside>
+      <AppSidebar
+        asideRef={sidebarRef}
+        section={section}
+        showTools={showTools}
+        onShowToolsChange={setShowTools}
+        serviceStatus={serviceStatus}
+        onNavigate={navigate}
+        onStop={() => void stopApplication()}
+      />
 
       <main className="main-area">
-        <header className="topbar">
-          <div className="topbar-context">
-            <span className="topbar-label">ACTIVE LEAGUE</span>
-            <div className="league-select">
-              <div className="league-avatar">{league?.displayName?.slice(0, 1) ?? 'S'}</div>
-              <div className="league-details">
-                <label className="visually-hidden" htmlFor="active-league-select">
-                  Active league
-                </label>
-                <select
-                  id="active-league-select"
-                  aria-label="Active league"
-                  value={league?.id ?? ''}
-                  disabled={state.leagues.length === 0}
-                  onChange={(event) => setActiveLeagueId(event.target.value)}
-                >
-                  {state.leagues.length === 0 ? (
-                    <option value="">Your league</option>
-                  ) : (
-                    state.leagues.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.displayName}
-                      </option>
-                    ))
-                  )}
-                </select>
-                <span>
-                  {league
-                    ? `${capitalize(league.platform)} · ${league.teamCount} teams`
-                    : 'Connect to get started'}
-                </span>
-              </div>
-              <ChevronDown size={15} aria-hidden="true" />
-            </div>
-          </div>
-          <WorkspaceSearch
-            leagues={state.leagues}
-            reports={state.reports}
-            onNavigate={searchNavigate}
-          />
-          <div className="top-actions">
-            <span className="date-label">{dateLabel}</span>
-            <ThemeSwitch />
-            <span className={`status-pulse ${serviceStatus !== 'running' ? 'offline' : ''}`} />
-            <span
-              className="date-label"
-              title={serviceStatus === 'running' ? 'Local service running' : 'Local service'}
-            >
-              {serviceStatus === 'running'
-                ? verificationMode
-                  ? 'Test profile'
-                  : 'Running'
-                : 'Service'}
-            </span>
-          </div>
-        </header>
+        <AppTopbar
+          league={league}
+          leagues={state.leagues}
+          reports={state.reports}
+          dateLabel={dateLabel}
+          serviceStatus={serviceStatus}
+          verificationMode={verificationMode}
+          onLeagueChange={setActiveLeagueId}
+          onSearchNavigate={searchNavigate}
+        />
 
         <div className="page-content">
           {notice && noticeInfo.detail ? (
@@ -1677,8 +1553,4 @@ export function App() {
       )}
     </div>
   );
-}
-
-function capitalize(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
