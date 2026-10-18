@@ -113,11 +113,6 @@ export function LeagueDesk({
           </button>
         </section>
       )}
-      {!league && onSample && (
-        <button type="button" className="small-button sample-entry" onClick={onSample}>
-          Try a sample league
-        </button>
-      )}
       <section
         className={`next-action-card ${league && aiReady && !draftCount && !generatingKind ? 'next-action-compact' : ''}`}
         aria-labelledby="next-action-title"
@@ -179,6 +174,11 @@ export function LeagueDesk({
             Manage leagues
           </button>
         )}
+        {!league && onSample && (
+          <button type="button" className="text-button sample-entry" onClick={onSample}>
+            Try a sample league
+          </button>
+        )}
       </section>
       {status && (
         <details
@@ -190,7 +190,7 @@ export function LeagueDesk({
           {status}
         </details>
       )}
-      {!aiReady && (
+      {league && !aiReady && (
         <p className="setup-explanation">
           Report creation becomes available after your league and AI connection are ready. You can
           still browse your saved reports and league data.
@@ -219,16 +219,6 @@ export function LeagueDesk({
             onRefresh={() => league && void refreshLeague(league.id)}
           />
         </details>
-      )}
-      {!league && (
-        <section className="first-report-explainer">
-          <h2>Your first report in three steps</h2>
-          <ol>
-            <li>Connect your league.</li>
-            <li>Connect the AI service that writes your reports.</li>
-            <li>Create a draft, review it, and choose whether to send it.</li>
-          </ol>
-        </section>
       )}
       {league && (
         <details
