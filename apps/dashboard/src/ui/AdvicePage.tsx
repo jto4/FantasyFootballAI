@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
 import {
   isAdviceOptions,
   isAdviceDataReadiness,
@@ -30,8 +30,17 @@ import { AdvicePerformance } from './AdvicePerformance';
 import { AdviceJournal } from './AdviceJournal';
 import { DataReadiness } from './DataReadiness';
 
+const MarketSignalsPanel = lazy(() =>
+  import('./MarketSignalsPanel').then((m) => ({ default: m.MarketSignalsPanel })),
+);
+const PlayerPropResearch = lazy(() =>
+  import('./PlayerPropResearch').then((m) => ({ default: m.PlayerPropResearch })),
+);
+
 const propStats: { value: FootballStatKey; label: string }[] = [
   { value: 'passing_yards', label: 'Passing yards' },
+  { value: 'attempts', label: 'Passing attempts' },
+  { value: 'completions', label: 'Passing completions' },
   { value: 'passing_tds', label: 'Passing touchdowns' },
   { value: 'passing_interceptions', label: 'Interceptions thrown' },
   { value: 'rushing_yards', label: 'Rushing yards' },
@@ -67,7 +76,7 @@ export function AdvicePage({
   const [tradeTeamId, setTradeTeamId] = useState(league?.teams[1]?.id ?? '');
   const [week, setWeek] = useState('');
   const [tradeThroughWeek, setTradeThroughWeek] = useState('18');
-  const [view, setView] = useState<'decision' | 'history' | 'research'>('decision');
+  const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>('decision');
   const [historyLimit, setHistoryLimit] = useState(5);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [dropPlayerId, setDropPlayerId] = useState('');
@@ -90,6 +99,9 @@ export function AdvicePage({
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionFeedback, setConnectionFeedback] = useState('');
   const connectionTest = useRef<AbortController | null>(null);
+  const usesCodex =
+    connection === 'codex-cli' ||
+    (connection === 'saved' && options?.tokenBudgetSupported === false);
   const [outputLimit, setOutputLimit] = useState('16384');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [optionsRevision, setOptionsRevision] = useState(0);
@@ -234,7 +246,7 @@ export function AdvicePage({
   const request: AdviceRequest = {
     mode,
     ...(connection !== 'saved' ? { connection } : {}),
-    ...(connection !== 'codex-cli' ? { maxOutputTokens: Number(outputLimit) } : {}),
+    ...(!usesCodex ? { maxOutputTokens: Number(outputLimit) } : {}),
     ...(model && options?.models?.length ? { model } : {}),
     ...(options ? { season: options.season } : {}),
     ...(week
@@ -502,6 +514,7 @@ export function AdvicePage({
             ['decision', result ? 'Your decision' : 'New decision'],
             ['history', `Saved advice${history.length ? ` (${history.length})` : ''}`],
             ['research', 'Track results'],
+            ['signals', 'Market signals'],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -990,23 +1003,48 @@ export function AdvicePage({
                           No upcoming regular-season games were found. Refresh public data later.
                         </p>
                       )}
-                      <LiveSportsbookPrices
-                        game={game}
-                        season={options?.season ?? new Date().getFullYear()}
-                        kind={betKind}
-                        side={side}
-                        selected={selectedQuote}
-                        disabled={busy}
-                        onSelect={(q) => {
-                          setQuote(q);
-                          setBetKind(q.kind);
-                          setSide(q.side);
-                          setLine(q.line === undefined ? '' : String(q.line));
-                          setOdds(String(q.americanOdds));
-                          setOppositeOdds(String(q.oppositeAmericanOdds));
-                          changed();
-                        }}
-                      />
+                      <div className="research-actions" role="group" aria-label="Betting markets">
+                        <button
+                          type="button"
+                          className="small-button"
+                          aria-pressed={betKind === 'player-prop'}
+                          onClick={() => {
+                            setBetKind('player-prop');
+                            setSide('over');
+                            setLine('');
+                            setQuote(undefined);
+                            changed();
+                          }}
+                        >
+                          Player props
+                        </button>
+                        <button
+                          type="button"
+                          className="small-button"
+                          onClick={() => setView('signals')}
+                        >
+                          Explore market signals
+                        </button>
+                      </div>
+                      {betKind !== 'player-prop' && (
+                        <LiveSportsbookPrices
+                          game={game}
+                          season={options?.season ?? new Date().getFullYear()}
+                          kind={betKind}
+                          side={side}
+                          selected={selectedQuote}
+                          disabled={busy}
+                          onSelect={(q) => {
+                            setQuote(q);
+                            setBetKind(q.kind);
+                            setSide(q.side);
+                            setLine(q.line === undefined ? '' : String(q.line));
+                            setOdds(String(q.americanOdds));
+                            setOppositeOdds(String(q.oppositeAmericanOdds));
+                            changed();
+                          }}
+                        />
+                      )}
                       {betKind === 'player-prop' && (
                         <>
                           <PlayerPicker
@@ -1036,6 +1074,16 @@ export function AdvicePage({
                             </select>
                           </label>
                         </>
+                      )}
+                      {betKind === 'player-prop' && (
+                        <Suspense fallback={<p>Loading prop research…</p>}>
+                          <PlayerPropResearch
+                            gameId={gameId}
+                            playerId={propPlayer[0] ?? ''}
+                            stat={stat}
+                            line={line}
+                          />
+                        </Suspense>
                       )}
                       <div className="advice-fields">
                         <label>
@@ -1186,7 +1234,7 @@ export function AdvicePage({
                   )}
                   <details>
                     <summary>Advanced analysis limits</summary>
-                    {connection === 'codex-cli' ? (
+                    {usesCodex ? (
                       <p>
                         Codex subscription limits apply. This connection does not support a token
                         budget per pass. Analysis still has a time and response-size limit, and you
@@ -1308,6 +1356,11 @@ export function AdvicePage({
           </>
         ) : null}
       </div>
+      {view === 'signals' && (
+        <Suspense fallback={<p>Loading Market Signals…</p>}>
+          <MarketSignalsPanel />
+        </Suspense>
+      )}
       {view === 'research' && (
         <section className="advice-research">
           <h2>Track results</h2>

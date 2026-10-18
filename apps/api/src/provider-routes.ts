@@ -152,15 +152,18 @@ export function createProviderRouter(dependencies: ProviderRouteDependencies): R
         system: 'Reply with exactly OK and no other text.',
         prompt: 'This is a connection test. Reply OK.',
         temperature: 0,
+        ...(settings.aiRuntime?.mode === 'codex-cli' ? { timeoutMs: 25_000 } : {}),
       });
       res.json({ ok: true });
     } catch {
       // Provider and CLI error details may contain local paths or credentials.
       res.status(502).json({
         error:
-          settings.aiRuntime?.mode === 'apple-cli'
-            ? 'The Apple Foundation Models test failed. Confirm macOS 27 or later is installed, Apple Intelligence is available, and the fm command works in Terminal.'
-            : 'The AI runtime test failed. Check the API key, model, endpoint, or CLI command.',
+          settings.aiRuntime?.mode === 'codex-cli'
+            ? 'Codex could not complete the test. Check the supported CLI version, ChatGPT sign-in and account limits.'
+            : settings.aiRuntime?.mode === 'apple-cli'
+              ? 'The Apple Foundation Models test failed. Confirm macOS 27 or later is installed, Apple Intelligence is available, and the fm command works in Terminal.'
+              : 'The AI runtime test failed. Check the API key, model, endpoint, or CLI command.',
       });
     }
   });

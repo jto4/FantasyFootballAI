@@ -1,4 +1,10 @@
-import type { AppSettings, ScheduledRun } from '@sidekick/core';
+import {
+  reportDataProblemAt,
+  nextSchedule,
+  type AppSettings,
+  type ScheduledRun,
+  type LeagueConnection,
+} from '@sidekick/core';
 import { reportName } from './beginner-flow';
 import { formatTime } from './date-format';
 import { SchedulePlan } from './SchedulePlan';
@@ -14,6 +20,8 @@ export function SchedulePage({
   generatingKind = '',
   onEditSchedule,
   leagueName,
+  manualSnapshot = false,
+  league,
   onRetry,
   settings,
   onEditAction,
@@ -25,10 +33,19 @@ export function SchedulePage({
   generatingKind?: string;
   onEditSchedule?: () => void;
   leagueName?: string | undefined;
+  manualSnapshot?: boolean;
+  league?: LeagueConnection | undefined;
   onRetry: (run: ScheduledRun) => void;
   settings?: AppSettings;
   onEditAction?: (kind: AppSettings['actions'][number]['kind']) => void;
 }) {
+  const orderedActions = [...actions].sort(
+    (a, b) =>
+      Number(isActiveSchedule(b)) - Number(isActiveSchedule(a)) ||
+      (isActiveSchedule(a)
+        ? (nextSchedule(a.schedule).at ?? Infinity) - (nextSchedule(b.schedule).at ?? Infinity) || 0
+        : 0),
+  );
   return (
     <>
       <div className="page-title-block">
@@ -44,6 +61,12 @@ export function SchedulePage({
               Selected league: <strong>{leagueName}</strong>
             </p>
           )}
+          {manualSnapshot && (
+            <p role="note">
+              This selected league uses a manual snapshot. Schedule saved-data drafts from a recent
+              import, or connect provider access for refreshed reports.
+            </p>
+          )}
         </div>
         {onEditSchedule && (
           <button type="button" className="primary-button" onClick={onEditSchedule}>
@@ -52,64 +75,79 @@ export function SchedulePage({
         )}
       </div>
       <div className="schedule-grid">
-        {actions.map((action) => (
-          <article className="schedule-card" key={action.kind}>
-            <span className="panel-kicker">{action.channel.toUpperCase()}</span>
-            <h2>{reportName(action.kind)}</h2>
-            <SchedulePlan action={action} />
-            {settings && (
-              <p>
-                Destination:{' '}
-                {action.channel === 'dashboard'
-                  ? 'Saved draft in Reports'
-                  : `${action.channel} · ${action.channel === 'email' ? settings.emailRecipient || 'No recipient chosen' : action.channel === 'sms' ? settings.smsRecipient || 'No recipient chosen' : settings.imessageChatGuid || 'No conversation chosen'}`}
-              </p>
-            )}
-            <p>
-              {!action.enabled
-                ? 'Action disabled'
-                : action.schedule.enabled
-                  ? action.schedule.frequency === 'once'
-                    ? `Runs once on ${formatScheduleDate(action.schedule.date)} at ${action.schedule.time} · ${timezoneLabel(action.schedule.timezone)}${action.schedule.completedAt ? ' · completed' : ''}`
-                    : `Runs ${action.schedule.frequency === 'daily' ? 'daily' : action.schedule.frequency === 'monthly' ? `monthly on day ${action.schedule.dayOfMonth}` : `every ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][action.schedule.weekday]}`} at ${action.schedule.time} · ${timezoneLabel(action.schedule.timezone)}`
-                  : action.mode === 'automatic'
-                    ? 'No schedule · manual generation saves a draft'
-                    : 'No automatic schedule · save as a draft'}
-            </p>
-            <small>
-              {action.enabled
-                ? action.mode === 'automatic'
-                  ? 'Configured channel may send reports automatically.'
-                  : 'Scheduled reports wait in the review queue.'
-                : 'Enable this action in Settings to schedule it.'}
-            </small>
-            {(action.kind === 'offseason-update' ||
-              action.kind === 'power-rankings' ||
-              action.kind === 'matchup-preview') && (
-              <small>
-                {action.kind === 'offseason-update'
-                  ? 'Recurring updates pause while fresh league data shows an active season.'
-                  : 'Recurring weekly reports pause when fresh league data marks the season complete.'}
-              </small>
-            )}
-            <button
-              className="text-button"
-              disabled={Boolean(generatingKind)}
-              onClick={() => onGenerate(action.kind)}
-            >
-              {generatingKind === action.kind ? 'Generating…' : 'Generate draft'} <span>→</span>
-            </button>
-            {onEditAction && (
+        {orderedActions.map((action) => {
+          const scheduled = isActiveSchedule(action);
+          const automaticSend =
+            scheduled && action.mode === 'automatic' && action.channel !== 'dashboard';
+          const problem =
+            scheduled && league && (!action.leagueIds || action.leagueIds.includes(league.id))
+              ? reportDataProblemAt(
+                  league,
+                  action,
+                  settings?.leagueStaleAfterHours,
+                  nextSchedule(action.schedule).at,
+                )
+              : undefined;
+          return (
+            <article className="schedule-card" key={action.kind}>
+              <span className="panel-kicker">
+                {scheduled ? (automaticSend ? 'AUTO-SEND' : 'DRAFT SCHEDULE') : 'ON DEMAND'}
+              </span>
+              <h2>{reportName(action.kind)}</h2>
+              <SchedulePlan action={action} />
+              {scheduled && timezoneLabel(action.schedule.timezone).startsWith('Local time') && (
+                <small>{timezoneLabel(action.schedule.timezone)}</small>
+              )}
+              {scheduled && (
+                <p>
+                  {action.dataMode === 'saved'
+                    ? `Uses saved league data · draft only${problem ? '' : ` · up to ${settings?.leagueStaleAfterHours ?? 24} hours old`}`
+                    : automaticSend
+                      ? 'Refreshes the platform and sends automatically.'
+                      : 'Refreshes the platform and saves a draft in Reports.'}
+                </p>
+              )}
+              {problem && <p role="status">{problem}</p>}
+              {scheduled && settings && action.channel !== 'dashboard' && (
+                <p>
+                  Destination: {action.channel} ·{' '}
+                  {action.channel === 'email'
+                    ? settings.emailRecipient || 'No recipient chosen'
+                    : action.channel === 'sms'
+                      ? settings.smsRecipient || 'No recipient chosen'
+                      : settings.imessageChatGuid || 'No conversation chosen'}
+                </p>
+              )}
+              {scheduled &&
+                ['offseason-update', 'power-rankings', 'matchup-preview'].includes(action.kind) && (
+                  <details className="schedule-rules">
+                    <summary>Season rules</summary>
+                    <p>
+                      {action.kind === 'offseason-update'
+                        ? 'Recurring updates pause while the saved league data shows an active season.'
+                        : 'Recurring weekly reports pause when the saved league data marks the season complete.'}
+                    </p>
+                  </details>
+                )}
               <button
-                type="button"
-                className="small-button"
-                onClick={() => onEditAction(action.kind)}
+                className="text-button"
+                disabled={Boolean(generatingKind)}
+                onClick={() => onGenerate(action.kind)}
               >
-                Edit {reportName(action.kind).toLowerCase()} schedule
+                {generatingKind === action.kind ? 'Generating…' : 'Generate draft'} <span>→</span>
               </button>
-            )}
-          </article>
-        ))}
+              {onEditAction && (
+                <button
+                  type="button"
+                  className="small-button"
+                  onClick={() => onEditAction(action.kind)}
+                >
+                  Edit {reportName(action.kind).toLowerCase()} schedule
+                </button>
+              )}
+            </article>
+          );
+        })}
       </div>
       <p>
         The next run is a planned time. Keep the local service running and your computer awake.
@@ -170,10 +208,6 @@ export function SchedulePage({
   );
 }
 
-function formatScheduleDate(value?: string): string {
-  if (!value) return 'an unset date';
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'long',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T12:00:00.000Z`));
+function isActiveSchedule(action: AppSettings['actions'][number]): boolean {
+  return action.enabled && action.schedule.enabled && !action.schedule.completedAt;
 }

@@ -1,3 +1,4 @@
+import { isValidReportDataMode } from './report-data-policy.js';
 import { isValidLeagueCalendarEvent, isValidTimezone } from './schedules.js';
 import { isValidWritingStylePresets } from './index.js';
 import type { AppSettings, LeagueConnection, ReportKind, SavedReport } from './index.js';
@@ -310,6 +311,7 @@ export function isAppSettings(value: unknown): value is AppSettings {
         typeof action.enabled === 'boolean' &&
         ['draft', 'automatic'].includes(String(action.mode)) &&
         ['dashboard', 'email', 'sms', 'imessage'].includes(String(action.channel)) &&
+        isValidReportDataMode(action) &&
         record(action.schedule) &&
         typeof action.schedule.enabled === 'boolean' &&
         ['daily', 'weekly', 'monthly', 'once'].includes(String(action.schedule.frequency)) &&
@@ -329,7 +331,11 @@ export function isAppSettings(value: unknown): value is AppSettings {
   if (
     value.aiRuntime !== undefined &&
     (!record(value.aiRuntime) ||
-      !['api', 'cli', 'apple-cli'].includes(String(value.aiRuntime.mode)) ||
+      !['api', 'cli', 'apple-cli', 'codex-cli'].includes(String(value.aiRuntime.mode)) ||
+      (value.aiRuntime.mode === 'codex-cli' &&
+        (value.aiRuntime.model !== 'gpt-6.1-sol' ||
+          value.aiRuntime.command !== '' ||
+          value.aiRuntime.args !== '')) ||
       !['model', 'command', 'args', 'baseUrl'].every((key) =>
         text((value.aiRuntime as Record<string, unknown>)[key], 2048, true),
       ))
@@ -480,6 +486,13 @@ export function isLeagueConnection(value: unknown): value is LeagueConnection {
   if (
     !optionalText(value.lastSyncError, 2000) ||
     (value.status !== undefined && !['connected', 'limited'].includes(String(value.status)))
+  )
+    return false;
+  if (
+    (value.connectionMode !== undefined &&
+      (value.connectionMode !== 'snapshot' || value.platform !== 'espn')) ||
+    (value.snapshotImportedAt !== undefined &&
+      (!date(value.snapshotImportedAt) || value.connectionMode !== 'snapshot'))
   )
     return false;
   if (value.draftScheduledAt !== undefined && !date(value.draftScheduledAt)) return false;

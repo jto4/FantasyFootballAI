@@ -49,5 +49,5 @@ export function scheduleSummary(action: ActionSetting, leagueNames: string[]) {
       : leagueNames.length
         ? leagueNames.join(', ')
         : 'no leagues (choose a league below)';
-  return `${reportName(action.kind)} ${cadence} at ${schedule.time} (${timezoneLabel(schedule.timezone)}) for ${scope}. ${action.mode === 'automatic' && action.channel !== 'dashboard' ? `Sends automatically by ${action.channel === 'sms' ? 'text message' : action.channel}.` : 'Saves a draft for you to review; nothing is sent.'}${schedule.completedAt ? ' This one-time schedule has finished.' : ''} The app must be running at the scheduled time.`;
+  return `${reportName(action.kind)} ${cadence} at ${schedule.time} (${timezoneLabel(schedule.timezone)}) for ${scope}. ${action.mode === 'automatic' && action.channel !== 'dashboard' ? `Sends automatically by ${action.channel === 'sms' ? 'text message' : action.channel}.` : 'Saves a draft for you to review; nothing is sent.'}${schedule.completedAt ? ' This one-time schedule has finished.' : ''} ${action.dataMode === 'saved' ? 'Uses recent saved league data without a live refresh.' : 'Refreshes the platform before generating.'} The app must be running at the scheduled time.`;
 }

@@ -1,5 +1,6 @@
 import {
   addCalendarDays,
+  reportDataProblemAt,
   localDateTimeInstants,
   leagueSyncFreshness,
   leaguesForAction,
@@ -100,6 +101,10 @@ export function ActionInbox({
               time: action.schedule.time,
               timezone: action.schedule.timezone,
               mode: action.mode,
+              dataProblem: league
+                ? reportDataProblemAt(league, action, settings.leagueStaleAfterHours, next.instant)
+                : undefined,
+              savedData: action.dataMode === 'saved',
             },
           ]
         : [];
@@ -119,6 +124,11 @@ export function ActionInbox({
             time: event.time,
             timezone: event.timezone,
             mode: 'draft',
+            dataProblem:
+              league?.connectionMode === 'snapshot'
+                ? 'Calendar events need provider access. Use a saved-data report schedule for this manual import.'
+                : undefined,
+            savedData: false,
           });
       }
     }
@@ -145,12 +155,21 @@ export function ActionInbox({
       </article>
       <article>
         <p className="section-overline">NEXT REPORT</p>
-        <h3>{next?.title ?? 'No upcoming report'}</h3>
+        <h3>
+          {next?.dataProblem ? 'Report needs league data' : (next?.title ?? 'No upcoming report')}
+        </h3>
         <p>
-          {next
-            ? `${next.date} at ${next.time} · ${next.timezone} · ${next.mode === 'automatic' ? 'Automatic delivery' : 'Draft for review'}`
-            : 'Choose a schedule or generate a draft when needed.'}
+          {next?.dataProblem
+            ? next.dataProblem
+            : next
+              ? `${next.date} at ${next.time} · ${next.timezone} · ${next.savedData ? 'Saved-data draft' : next.mode === 'automatic' ? 'Automatic delivery' : 'Draft for review'}`
+              : 'Choose a schedule or generate a draft when needed.'}
         </p>
+        {next?.dataProblem && (
+          <small>
+            {next.title} · {next.date} at {next.time} · {next.timezone}
+          </small>
+        )}
         {lastRun?.status === 'failed' && <p role="status">Latest job needs attention.</p>}
         <button type="button" className="text-button" onClick={onSchedule}>
           Review schedule →
@@ -159,17 +178,23 @@ export function ActionInbox({
       <article>
         <p className="section-overline">LEAGUE DATA</p>
         <h3>
-          {!league
-            ? 'Connect your league'
-            : freshness === 'fresh'
-              ? 'League data is up to date'
-              : freshness === 'stale'
-                ? 'Refresh recommended'
-                : 'Last update unknown'}
+          {league?.connectionMode === 'snapshot'
+            ? 'Manual league snapshot'
+            : !league
+              ? 'Connect your league'
+              : freshness === 'fresh'
+                ? 'League data is up to date'
+                : freshness === 'stale'
+                  ? 'Refresh recommended'
+                  : 'Last update unknown'}
         </h3>
-        <p>{league?.lastSyncError ?? 'Reports use the latest saved league data.'}</p>
+        <p>
+          {league?.connectionMode === 'snapshot'
+            ? 'Reimport to update this league. Import time does not verify the provider’s update time.'
+            : (league?.lastSyncError ?? 'Reports use the latest saved league data.')}
+        </p>
         <button type="button" className="text-button" disabled={!league} onClick={onRefresh}>
-          Refresh league →
+          {league?.connectionMode === 'snapshot' ? 'Import updated roster →' : 'Refresh league →'}
         </button>
       </article>
       <article>

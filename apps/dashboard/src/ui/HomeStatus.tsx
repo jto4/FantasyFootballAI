@@ -1,4 +1,9 @@
-import { nextSchedule, type AppSettings, type LeagueConnection } from '@sidekick/core';
+import {
+  nextSchedule,
+  reportDataProblemAt,
+  type AppSettings,
+  type LeagueConnection,
+} from '@sidekick/core';
 import { reportName } from './beginner-flow';
 import { schedulePlanLabel } from './SchedulePlan';
 import { formatDateTime } from './date-format';
@@ -46,13 +51,19 @@ export function HomeStatus({
       action.channel !== 'dashboard' &&
       action.leagueIds?.length !== 0,
   );
+  const dataProblem =
+    next && league
+      ? reportDataProblemAt(league, next.action, settings.leagueStaleAfterHours, next.plan.at)
+      : undefined;
   return (
     <section className="home-status" aria-label="Your league at a glance">
       <h2>Your league at a glance</h2>
       <div>
         <p>
           {league
-            ? `League data last updated ${formatDateTime(league.lastSyncedAt ?? league.connectedAt)}.`
+            ? league.connectionMode === 'snapshot'
+              ? `Browser snapshot imported ${formatDateTime(league.snapshotImportedAt ?? league.connectedAt)}. Provider update time is unverified.`
+              : `League data last updated ${formatDateTime(league.lastSyncedAt ?? league.connectedAt)}.`
             : 'No league connected yet.'}
         </p>
         <button type="button" className="text-button" onClick={onLeagues}>
@@ -76,9 +87,10 @@ export function HomeStatus({
       <div>
         <p>
           {next
-            ? `${reportName(next.action.kind)} · ${schedulePlanLabel(next.action)}`
+            ? `${reportName(next.action.kind)} · ${next.action.dataMode === 'saved' ? 'Saved-data draft · ' : ''}${schedulePlanLabel(next.action)}`
             : 'No upcoming report schedule for this league.'}
         </p>
+        {dataProblem && <p role="status">{dataProblem}</p>}
         <button type="button" className="text-button" onClick={onSchedules}>
           Manage schedules
         </button>

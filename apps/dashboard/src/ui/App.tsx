@@ -1,3 +1,4 @@
+import { EspnSnapshotImport } from './EspnSnapshotImport';
 import { useWorkspaceRoute } from './hooks/useWorkspaceRoute';
 import { useLiveDashboard } from './hooks/useLiveDashboard';
 import { requestJson } from './api-client';
@@ -22,7 +23,7 @@ import type { SearchTask } from './search-tasks';
 import type { SearchDestination } from './search-catalog';
 import { readSetupProgress, saveSetupProgress } from './setup-progress';
 import type { ActionSetting } from '@sidekick/core';
-import { LeagueDesk } from './LeagueDesk';
+import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import { ReportsPage, type SendPreview } from './ReportsPage';
 
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
@@ -99,6 +100,7 @@ export function App() {
   );
   const [setupProgress] = useState(readSetupProgress);
   const [sampleOpen, setSampleOpen] = useState(false);
+  const [homeDisclosures, setHomeDisclosures] = useState<HomeDisclosures>({});
   const [scheduleEditor, setScheduleEditor] = useState<{
     kind: ActionSetting['kind'];
     prefill?: SchedulePrefill;
@@ -582,6 +584,16 @@ export function App() {
   }
 
   async function refreshLeague(id: string) {
+    const saved = state.leagues.find((l) => l.id === id);
+    if (saved?.connectionMode === 'snapshot') {
+      setPlatform('espn');
+      setLeagueId(id);
+      setEspnSeason(saved.season ?? new Date().getFullYear());
+      setConnectionError('');
+      setNotice('Import a new browser snapshot to update this league.');
+      setModal(true);
+      return;
+    }
     setRefreshingLeagueId(id);
     try {
       const response = await fetch(`/api/leagues/${encodeURIComponent(id)}/refresh`, {
@@ -737,7 +749,9 @@ export function App() {
       { method: 'POST', signal: abort.signal },
       60000,
     )
-      .then(() => setTestedRuntimeSignature(signature))
+      .then(() => {
+        if (!abort.signal.aborted) setTestedRuntimeSignature(signature);
+      })
       .catch((error) => {
         if (!abort.signal.aborted)
           setAiCheckError(
@@ -749,6 +763,7 @@ export function App() {
       });
     return () => {
       abort.abort();
+      if (lastCheckedRuntime.current === signature) lastCheckedRuntime.current = '';
       setAiChecking(false);
     };
   }, [
@@ -756,7 +771,11 @@ export function App() {
     setupBusy,
     aiCredentialRevision,
     runtime && JSON.stringify(runtime),
-    credentialProviders.map((provider) => `${provider.provider}:${provider.configured}`).join('|'),
+    runtime?.mode === 'api'
+      ? credentialProviders
+          .map((provider) => `${provider.provider}:${provider.configured}`)
+          .join('|')
+      : '',
   ]);
   function openSetupWizard() {
     setSetupWizardStep(league && !homeTeamId ? 1 : suggestedSetupStep(Boolean(league), aiReady));
@@ -1172,6 +1191,8 @@ export function App() {
                 updateRoute({ section: 'Settings', settingId: 'automatic-actions' })
               }
               leagueName={league?.displayName}
+              manualSnapshot={league?.connectionMode === 'snapshot'}
+              league={league}
               settings={state.settings}
               onEditAction={(kind) => setScheduleEditor({ kind })}
               onRetry={(run) => void retryScheduledRun(run)}
@@ -1212,6 +1233,12 @@ export function App() {
           ) : (
             <>
               <LeagueDesk
+                disclosures={homeDisclosures}
+                onDisclosureChange={(key, open) =>
+                  setHomeDisclosures((current) =>
+                    current[key] === open ? current : { ...current, [key]: open },
+                  )
+                }
                 weekly={
                   <WeeklyHome
                     league={league}
@@ -1227,7 +1254,12 @@ export function App() {
                     onRefresh={() => {
                       if (league) void refreshLeague(league.id);
                     }}
-                    onSetup={openSetupWizard}
+                    onSetup={() => {
+                      setSetupInProgress(true);
+                      setSetupWizardStep(0);
+                      setSetupWizardOpen(false);
+                      setModal(true);
+                    }}
                   />
                 }
                 state={state}
@@ -1439,6 +1471,27 @@ export function App() {
                   Select the league year to load; refreshes continue using this season.
                 </small>
               </label>
+            )}
+            {platform === 'espn' && (
+              <EspnSnapshotImport
+                leagueInput={leagueId}
+                season={espnSeason}
+                disabled={busy}
+                onBusy={setBusy}
+                onImported={async (result) => {
+                  setModal(false);
+                  setLeagueId('');
+                  setNotice(
+                    `Imported ${result.displayName}. Provider update time is unverified; automatic refresh is unavailable.`,
+                  );
+                  await refresh();
+                  setActiveLeagueId(result.id);
+                  if (setupInProgress) {
+                    setSetupWizardStep(1);
+                    setSetupWizardOpen(true);
+                  }
+                }}
+              />
             )}
             <small className="modal-hint">
               Public leagues can connect directly. Private leagues need permission from your own

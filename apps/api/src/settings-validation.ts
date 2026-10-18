@@ -2,6 +2,7 @@ import { isAbsolute } from 'node:path';
 import type { LocalStore } from './store.js';
 import {
   isLeagueStaleAfterHours,
+  isValidReportDataMode,
   isValidChannelBoundaries,
   isValidLeagueCalendarEvent,
   isValidNewsSources,
@@ -17,7 +18,9 @@ export function isValidRuntime(value: unknown): value is NonNullable<Settings['a
   if (!value || typeof value !== 'object') return false;
   const runtime = value as Record<string, unknown>;
   return (
-    (runtime.mode === 'api' || runtime.mode === 'cli' || runtime.mode === 'apple-cli') &&
+    ['api', 'cli', 'apple-cli', 'codex-cli'].includes(String(runtime.mode)) &&
+    (runtime.mode !== 'codex-cli' ||
+      (runtime.model === 'gpt-6.1-sol' && runtime.command === '' && runtime.args === '')) &&
     typeof runtime.model === 'string' &&
     runtime.model.length <= 120 &&
     typeof runtime.command === 'string' &&
@@ -72,6 +75,7 @@ export function isValidAction(value: unknown): value is NonNullable<Settings['ac
           (leagueId) =>
             typeof leagueId === 'string' && leagueId.length > 0 && leagueId.length <= 200,
         ))) &&
+    isValidReportDataMode(action) &&
     isValidReportSchedule(action.schedule)
   );
 }

@@ -16,6 +16,12 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Reference
 
+- [`reviews/2026-10-15-saved-data-reports.md`](reviews/2026-10-15-saved-data-reports.md) — explicit scheduled drafts from recent saved data, real-clock Afton report and shared readiness checks.
+
+- [`reviews/2026-10-15-owner-verification.md`](reviews/2026-10-15-owner-verification.md) — active private ESPN import, weekly forecast arithmetic, native imsg and owner usability verification.
+
+- [`reviews/2026-10-15-market-signals.md`](reviews/2026-10-15-market-signals.md) — separate market research charts/ledger, real public-data checks, player-prop game logs and remaining limits.
+
 - [`reviews/2026-10-14-quiet-verification.md`](reviews/2026-10-14-quiet-verification.md) — test-only memory credentials, Chromium mock Keychain and popup-free teardown; ordinary protections retained.
 
 - [`reviews/2026-10-14-compact-workflows.md`](reviews/2026-10-14-compact-workflows.md) — shorter Home, separate Advice views, expandable result evidence and focused Settings; rendered review and regression coverage.

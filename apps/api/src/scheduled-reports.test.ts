@@ -105,3 +105,100 @@ it('uses fresh complete-season status to pause recurring weekly reports while al
   expect(generate).toHaveBeenCalledTimes(1);
   expect(store.settingsSnapshot().actions[0]!.schedule.completedAt).toBeDefined();
 });
+it('creates an opted-in saved-data draft exactly once without provider refresh or invented sync time', async () => {
+  const { store, league, action, generate } = await setup();
+  const saved = {
+    ...action,
+    dataMode: 'saved' as const,
+    mode: 'draft' as const,
+    channel: 'dashboard' as const,
+  };
+  const imported = {
+    ...league,
+    platform: 'espn' as const,
+    connectionMode: 'snapshot' as const,
+    snapshotImportedAt: new Date().toISOString(),
+  };
+  await store.update((s) => {
+    s.settings.actions = [saved];
+    s.leagues = [imported];
+  });
+  const fetchLeague = vi.fn(async () => {
+    throw Error('Must not read provider credentials or fetch');
+  });
+  const run = createScheduledReportRunner({ store, fetchLeague, generateAndSaveReport: generate });
+  await run(saved, 'saved-occurrence');
+  await run(saved, 'saved-occurrence');
+  expect(fetchLeague).not.toHaveBeenCalled();
+  expect(generate).toHaveBeenCalledTimes(1);
+  expect(generate.mock.calls[0]).toEqual([
+    imported,
+    expect.anything(),
+    saved.kind,
+    false,
+    'dashboard',
+    undefined,
+    undefined,
+    'saved',
+  ]);
+  expect(store.snapshot().leagues[0]!.lastSyncedAt).toBeUndefined();
+  expect(store.snapshot().scheduledRuns[0]).toMatchObject({
+    status: 'succeeded',
+    leagueResults: [
+      { status: 'succeeded', detail: expect.stringContaining('no refresh or delivery') },
+    ],
+  });
+  store.close();
+  await store.load();
+  expect(store.settingsSnapshot().actions.find((a) => a.kind === saved.kind)?.dataMode).toBe(
+    'saved',
+  );
+});
+it('rejects expired or default-refresh manual imports before any provider or model work', async () => {
+  const { store, league, action, generate } = await setup();
+  const fetchLeague = vi.fn(async () => league),
+    run = createScheduledReportRunner({ store, fetchLeague, generateAndSaveReport: generate });
+  for (const dataMode of [undefined, 'saved' as const]) {
+    const current = { ...action, dataMode, mode: 'draft' as const, channel: 'dashboard' as const };
+    await store.update((s) => {
+      s.settings.actions = [current];
+      s.leagues = [
+        {
+          ...league,
+          platform: 'espn',
+          connectionMode: 'snapshot',
+          snapshotImportedAt: '2020-01-01T00:00:00Z',
+        },
+      ];
+    });
+    await expect(run(current, 'blocked-' + String(dataMode))).rejects.toThrow();
+    expect(store.snapshot().scheduledRuns[0]!.leagueResults?.[0]?.detail).toMatch(
+      dataMode ? /within the last/ : /Choose saved data/,
+    );
+  }
+  expect(fetchLeague).not.toHaveBeenCalled();
+  expect(generate).not.toHaveBeenCalled();
+});
+it('does not overwrite an import that replaces a provider connection during awaited refresh', async () => {
+  const { store, league, action, generate } = await setup();
+  const imported = {
+    ...league,
+    platform: 'espn' as const,
+    connectionMode: 'snapshot' as const,
+    snapshotImportedAt: new Date().toISOString(),
+  };
+  const run = createScheduledReportRunner({
+    store,
+    generateAndSaveReport: generate,
+    fetchLeague: async () => {
+      await store.update((s) => {
+        s.leagues = [imported];
+      });
+      return league;
+    },
+  });
+  await run(action, 'source-changed');
+  expect(generate).not.toHaveBeenCalled();
+  expect(store.snapshot().leagues[0]).toEqual(imported);
+  expect(store.snapshot().scheduledRuns[0]!.leagueResults?.[0]?.status).toBe('skipped');
+});

@@ -922,6 +922,7 @@ export function SettingsPage({
               <summary>Report schedules</summary>
               <AutomaticActionsSection
                 actions={form.actions}
+                maximumSavedAgeHours={form.leagueStaleAfterHours ?? 24}
                 leagues={leagues}
                 onApplySuggestions={applyScheduleSuggestions}
                 onActionChange={(kind, patch) =>

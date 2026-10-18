@@ -3,9 +3,19 @@ import type { ReportVisuals } from '@sidekick/core';
 import { formatDateTime } from './date-format';
 
 type Row = { id: string; label: string; value: number };
-function Bars({ rows, label, precision = 2 }: { rows: Row[]; label: string; precision?: 0 | 2 }) {
-  const min = Math.min(0, ...rows.map((row) => row.value));
-  const max = Math.max(1, ...rows.map((row) => row.value));
+function Bars({
+  rows,
+  label,
+  precision = 2,
+  domain,
+}: {
+  rows: Row[];
+  label: string;
+  precision?: 0 | 2;
+  domain?: [number, number];
+}) {
+  const min = domain?.[0] ?? Math.min(0, ...rows.map((row) => row.value));
+  const max = domain?.[1] ?? Math.max(1, ...rows.map((row) => row.value));
   const x = (value: number) => ((value - min) / (max - min)) * 300;
   const zero = x(0);
   return (
@@ -63,6 +73,13 @@ export function LeagueVisuals({
     : [];
   const week = data.currentWeek ?? Math.max(0, ...data.matchups.map((matchup) => matchup.week));
   const matchups = data.matchups.filter((matchup) => matchup.week === week);
+  const matchupPoints = matchups.flatMap((m) =>
+    m.teams.flatMap((t) => (Number.isFinite(t.points) ? [t.points!] : [])),
+  );
+  const matchupDomain: [number, number] = [
+    Math.min(0, ...matchupPoints),
+    Math.max(1, ...matchupPoints),
+  ];
   const names = new Map(data.teams.map((team) => [team.id, team.name]));
   const shown = showAllTeams ? rows : rows.slice(0, 6);
   return (
@@ -135,6 +152,7 @@ export function LeagueVisuals({
                 <div className="matchup-visual" key={`${week}:${index}`}>
                   {valid ? (
                     <Bars
+                      domain={matchupDomain}
                       label={`Week ${week} matchup ${index + 1}`}
                       rows={sides.map((side, sideIndex) => ({
                         id: `${side.teamId}:${sideIndex}`,

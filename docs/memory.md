@@ -626,3 +626,41 @@ newest decisions after restart or backup restore without replaying the provider.
 - Optional publisher name suffixes can match only unique identities with consistent position/team; conflicting explicit IDs or different explicit suffixes remain blocked. General GSIS historical matching stays strict.
 - Model context includes saved starters for the selected week/team, with platform slot assignment/transaction eligibility still unverified. Compliant Hold decisions may retain specific validated headlines.
 - Real-data quality tests use public captures and explicitly synthetic small PPR rosters, independently checking point/roster/price arithmetic. They do not establish future outcome accuracy, draft-time grading or betting profit.
+
+### October 15, 2026 — saved Codex connection
+
+App-wide `codex-cli` uses the existing isolated GPT-6.1-Sol/high subscription adapter. Reuse native sign-in, never extract/copy tokens or fall back to API credentials. Model/arguments are pinned and validated; backup restores require review. Per-pass API budgets/prices do not apply. Prediction-market/whale research remains outside production probability dispatch; this setting changes text inference only.
+
+Market Signals has a separate read-only provider/capture API and private research
+ledger, outside advice/report/state snapshots and betting prediction dispatch.
+Freeze only server-captured exact pregame total matches, with fresh paired book
+prices and complete pagination; preserve the first game/provider record. The
+fixed external-price-v1 policy compares Over contract price with no-vig sportsbook
+probability, while flow and headlines remain descriptive covariates. Never infer
+skill/identity from anonymous large trades or sentiment from headline volume.
+Research JSON export is separate from ordinary app backups. Player-prop game logs
+may recover missing catalog GSIS IDs only through a unique name/position identity
+and matching current-season team; preserve explicit conflicting IDs and missing stats.
+
+- Authorized browser-saved ESPN snapshots are a manual data source, distinct from
+  provider credentials. Store normalized league/football evidence only, preserve
+  imported provenance, never set provider freshness from import time, and prevent
+  silent scheduled refresh. Publisher weekly forecasts require exact identity,
+  period and two independent scoring arithmetic checks; they do not make numeric
+  ESPN scoring rules supported by the historical estimator. Reopen storage in
+  regression tests before claiming imports persist.
+- Native imsg `any;` GUIDs require an exact unique current iMessage-service match
+  before send. Receipt acceptance plus outgoing-history matching does not prove
+  device delivery when the CLI omits delivery status.
+
+- A saved native AI runtime's startup readiness probe must not depend on unrelated
+  API credential-list loading. Cancellation releases its checked signature so a
+  valid retry can run; aborted results cannot mark a runtime ready.
+- League matchup bars share the complete week's numeric domain, including negative
+  scores, so proportions remain comparable across games and stable on expansion.
+
+- Saved-data report schedules require explicit league IDs, dashboard drafts and a
+  recent import/sync under the existing stale threshold. They are opt-in, never a
+  refresh-error fallback. Skip provider credentials, retain provenance, never set a
+  new sync timestamp and never auto-deliver. Restores pause them. Calendar events
+  keep their provider-refresh contract. Home and Schedule share the API data policy.

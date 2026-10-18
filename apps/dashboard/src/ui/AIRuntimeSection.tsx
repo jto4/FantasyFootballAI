@@ -31,6 +31,14 @@ export function AIRuntimeSection({
   onDiscoverModels,
   onTestRuntime,
 }: AIRuntimeSectionProps) {
+  function changeMode(mode: AIRuntime['mode']) {
+    if (mode === 'codex-cli') {
+      onChange('model', 'gpt-6.1-sol');
+      onChange('command', '');
+      onChange('args', '');
+    }
+    onChange('mode', mode);
+  }
   return (
     <section className="settings-card">
       <div className="settings-card-title">
@@ -73,9 +81,10 @@ export function AIRuntimeSection({
                   <select
                     data-search-target="ai-runtime"
                     value={runtime.mode}
-                    onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+                    onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
                   >
                     <option value="api">AI service (OpenAI or compatible)</option>
+                    <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                     <option value="cli">Local AI tool (advanced)</option>
                     <option value="apple-cli" disabled={!appleCliPlatform}>
                       Apple Foundation Models CLI (macOS 27+)
@@ -178,9 +187,10 @@ export function AIRuntimeSection({
               <select
                 data-search-target="ai-runtime"
                 value={runtime.mode}
-                onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+                onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
               >
                 <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                 <option value="cli">Local AI tool (advanced)</option>
                 <option value="apple-cli" disabled={!appleCliPlatform}>
                   Apple Foundation Models CLI (macOS 27+)
@@ -215,21 +225,30 @@ export function AIRuntimeSection({
               <select
                 data-search-target="ai-runtime"
                 value={runtime.mode}
-                onChange={(event) => onChange('mode', event.target.value as AIRuntime['mode'])}
+                onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
               >
                 <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                 <option value="cli">Local AI tool (advanced)</option>
                 <option value="apple-cli" disabled={!appleCliPlatform}>
                   Apple Foundation Models CLI (macOS 27+)
                 </option>
               </select>
             </label>
-            <p className="schedule-explainer">
-              Uses Apple’s `fm respond` command with the on-device Foundation Model. Requires a
-              supported Mac running macOS 27 or later. The CLI receives report content in its
-              process arguments, which may be visible to local process-inspection tools while it
-              runs. Test runtime verifies that `fm` is available.
-            </p>
+            {runtime.mode === 'codex-cli' ? (
+              <p className="schedule-explainer">
+                Uses your existing Codex ChatGPT sign-in with GPT-6.1-Sol and high reasoning for
+                reports and advice. No API key is needed. Account limits apply. Only supplied
+                context is sent; tools and local instructions remain isolated.
+              </p>
+            ) : (
+              <p className="schedule-explainer">
+                Uses Apple’s `fm respond` command with the on-device Foundation Model. Requires a
+                supported Mac running macOS 27 or later. The CLI receives report content in its
+                process arguments, which may be visible to local process-inspection tools while it
+                runs. Test runtime verifies that `fm` is available.
+              </p>
+            )}
           </>
         )}
       </div>

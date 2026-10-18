@@ -184,3 +184,33 @@ describe.skipIf(process.platform === 'win32')('imsg subprocess', () => {
     });
   }, 6000);
 });
+
+it('supports unified macOS GUIDs only after matching their current iMessage service, never SMS', async () => {
+  const target = 'any;-;+15555550123';
+  const command = vi.fn(async (_exe: string, args: string[]) =>
+    args[0] === '--version'
+      ? '0.15.10'
+      : args[0] === 'chats'
+        ? JSON.stringify({ ...metadata, guid: target })
+        : JSON.stringify({ status: 'sent', guid: 'receipt' }),
+  );
+  const client = new ImsgClient('/fixture/imsg', command);
+  expect((await client.chats())[0]?.guid).toBe(target);
+  const channel = new ImsgChannel('/fixture/imsg', command);
+  expect(await channel.send({ to: target, body: 'Fictional explicit test' })).toEqual({
+    providerMessageId: 'imsg:receipt',
+  });
+  const sent = command.mock.calls.find((c) => c[1][0] === 'send')![1];
+  expect(sent).toContain('--no-sms-fallback');
+  expect(sent.slice(-4)).toContain('imessage');
+  command.mockImplementation(async (_exe, args) =>
+    args[0] === '--version'
+      ? '0.15.10'
+      : JSON.stringify({ ...metadata, guid: target, service: 'SMS' }),
+  );
+  const count = command.mock.calls.filter((c) => c[1][0] === 'send').length;
+  await expect(channel.send({ to: target, body: 'Should not send' })).rejects.toThrow(
+    'not a uniquely verified',
+  );
+  expect(command.mock.calls.filter((c) => c[1][0] === 'send')).toHaveLength(count);
+});

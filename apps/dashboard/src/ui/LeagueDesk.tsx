@@ -7,7 +7,10 @@ import { seasonKicker } from './season-copy';
 import { formatTime } from './date-format';
 import { reportStatus } from './report-status';
 import { ActionInbox } from './ActionInbox';
+export type HomeDisclosures = Partial<Record<'connections' | 'activity' | 'news', boolean>>;
 type Props = {
+  disclosures?: HomeDisclosures;
+  onDisclosureChange?: (key: keyof HomeDisclosures, open: boolean) => void;
   state: AppState;
   league: LeagueConnection | undefined;
   aiReady: boolean;
@@ -33,6 +36,8 @@ type Props = {
 };
 export function LeagueDesk({
   state,
+  disclosures = {},
+  onDisclosureChange,
   league,
   aiReady,
   aiChecking = false,
@@ -176,7 +181,11 @@ export function LeagueDesk({
         )}
       </section>
       {status && (
-        <details className="home-disclosure">
+        <details
+          className="home-disclosure"
+          open={disclosures.connections ?? false}
+          onToggle={(event) => onDisclosureChange?.('connections', event.currentTarget.open)}
+        >
           <summary>Connections & scheduled reports</summary>
           {status}
         </details>
@@ -190,7 +199,10 @@ export function LeagueDesk({
       {league && aiReady && (
         <details
           className="home-disclosure"
-          open={draftCount > 0 || deliveryIssues > 0 || !!generatingKind}
+          open={
+            !!generatingKind || (disclosures.activity ?? (draftCount > 0 || deliveryIssues > 0))
+          }
+          onToggle={(event) => onDisclosureChange?.('activity', event.currentTarget.open)}
         >
           <summary>
             Report activity{draftCount ? ` · ${draftCount} drafts` : ''}
@@ -219,7 +231,11 @@ export function LeagueDesk({
         </section>
       )}
       {league && (
-        <details className="home-disclosure league-extra">
+        <details
+          className="home-disclosure league-extra"
+          open={disclosures.news ?? false}
+          onToggle={(event) => onDisclosureChange?.('news', event.currentTarget.open)}
+        >
           <summary>League standings & news</summary>
           <LeagueVisuals data={reportVisuals(league)} syncedAt={league.lastSyncedAt} />
           <div className="section-heading">

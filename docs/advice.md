@@ -4,7 +4,7 @@ The requested feature covers pre-draft planning, post-draft review, start/sit an
 matchup decisions, trades, waivers, and football game/player-prop betting analysis.
 Every decision needs numerical support, a confidence score, sources, and a concise
 explanation of risks and alternatives. Reuse the saved API or local CLI connection,
-or explicitly select installed signed-in Claude or Codex subscription access for advice;
+save the Codex GPT-6.1-Sol account preset for reports and advice, or explicitly select installed signed-in Claude or Codex subscription access for an individual analysis;
 do not introduce new provider credentials. Public sentiment is supplementary
 context, never a substitute for football evidence.
 
@@ -521,9 +521,7 @@ require fresh data. They do not provide in-play betting support.
   connection. Capability routing, per-analysis selection and initial abstention
   guards are implemented; metadata discovery and dummy providers do not establish
   live access, latency, answer quality or a football prediction advantage.
-- Verify live generation and decision quality using the new explicit signed-in CLI
-  choice. It is wired into current source, but the owner's running app has not been
-  restarted or its saved report connection changed. The Claude fixed probe reports a limit. The Codex adapter passes a fixed live probe; football quality evaluation is separate.
+- The October 15 app-wide Codex preset is saved in the running owner app and passes its live data-free probe. Existing football-quality evidence is separate from connection access; prospective prediction accuracy remains unestablished. Earlier Claude limit observations remain historical, not a current availability check.
 - Evaluate prospective season accuracy, missed-appearance/role forecasts, rookie estimates and future injury changes. Automatic interval estimates now handle scheduled games, byes, verified kickoff times and championship horizons; these conditional estimates are not availability forecasts.
 - Expand grounding/abstention evaluation and context budgeting for unusual/deeper leagues.
 - Forecasting: use the implemented descriptive opponent/workload evidence in evaluated
@@ -1136,3 +1134,31 @@ to exercise the six workflows with actual public sources and isolated PPR scenar
 through the existing signed-in Codex connection. `--prepare` checks readiness without
 model generation. See the [real-data review](reviews/2026-10-13-real-advice-quality.md)
 for observed recommendations, independent checks, fixes and prospective limitations.
+
+## Market Signals and player prop research
+
+Open **Advice → Market signals**, choose an upcoming NFL game/provider and enter
+the sportsbook's exact half-point total. Load signals to view 24-hour contract
+price movement, hourly executed cash in trades ≥$500 and relevant recent NFL
+headline coverage. Expand Chart data or Sources for exact values and limitations.
+Kalshi has anonymous trades; neither the large-trade chart nor selected publisher
+coverage establishes informed whale activity or representative public sentiment.
+Polymarket availability depends on an exact public contract match. Missing data
+stays unavailable. The panel never supplies inputs to betting predictions.
+
+**Freeze prospective record** saves the first eligible game/provider capture with
+the fixed `external-price-v1` comparison: latest Over price versus the matched
+sportsbook no-vig probability. Subsequent captures cannot replace the first line,
+probabilities or covariates. **Check final scores** resolves completed games only;
+provider/season Brier scores compare the same outcomes. These manually selected
+cohorts have no automatic promotion gate or profitability claim. Export research
+separately: its private SQLite ledger is not in ordinary app backups. Collection
+is manual; no new background polling or scheduled AI calls are enabled.
+
+In **Analyze a bet → Player props**, choose the game/player/statistic and enter
+line/odds. Passing attempts/completions, yards, touchdowns, interceptions, rushing
+attempts, receptions and targets are supported. Recent-game charts show up to 12
+completed games, average and Over/Under/Push counts at that exact line. Counts are
+historical descriptions, not calibrated winning probabilities. This uses public
+nflverse stats with identity/team/opponent checks and excludes missing values.
+The app still requires manually verified sportsbook prop prices; it places no bets.

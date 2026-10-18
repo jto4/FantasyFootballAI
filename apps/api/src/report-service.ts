@@ -52,6 +52,7 @@ export function createReportService({
     channel: ActionSetting['channel'] = 'dashboard',
     generationJobId?: string,
     signal?: AbortSignal,
+    dataMode?: 'saved',
   ): Promise<{ report: SavedReport; deliveryError?: string }> {
     signal?.throwIfAborted();
     const generatedAt = new Date();
@@ -107,6 +108,8 @@ export function createReportService({
     ];
     const reportData = promptDataBlock('untrusted_report_data', {
       generatedAt: generatedAt.toISOString(),
+      reportDataMode:
+        dataMode ?? (league.connectionMode === 'snapshot' ? 'saved' : 'connected-snapshot'),
       periodContext: historical
         ? 'This league season differs from the current NFL season window. Treat its numbers and picks as an archive or future-season setup, not live events. Current catalog availability/team labels cannot establish historical or future player availability.'
         : 'Use the supplied season and snapshot timestamps; publication/sync times do not establish final game status.',
@@ -114,6 +117,8 @@ export function createReportService({
         name: league.displayName,
         season: league.season ?? null,
         lastSyncedAt: league.lastSyncedAt ?? null,
+        connectionMode: league.connectionMode ?? 'provider',
+        snapshotImportedAt: league.snapshotImportedAt ?? null,
         platform: league.platform,
         teamCount: league.teamCount,
         scoring: league.scoring,
@@ -129,7 +134,7 @@ export function createReportService({
         draft: league.draft ?? null,
         matchups: league.matchups ?? [],
       },
-      evidenceLimits: reportEvidenceGuidance(league, kind, leagueProjections),
+      evidenceLimits: `${league.connectionMode === 'snapshot' ? 'This is an owner-imported manual snapshot. Attribute all scores, standings, roster and week labels to this saved data; do not claim it reflects live/current platform state or final scores. Import time is not provider-update time. ' : ''}${reportEvidenceGuidance(league, kind, leagueProjections)}`,
       injuryEvidence: injuryEvidence.text,
       memberNotes: memberContext,
       newsFreshness,
@@ -184,12 +189,23 @@ export function createReportService({
       completion.text.length > 100_000
     )
       throw new Error('The AI response must contain report text up to 100,000 characters.');
-    const body = completion.text;
+    const snapshotLabel =
+      league.connectionMode === 'snapshot'
+        ? `Saved browser snapshot · imported ${league.snapshotImportedAt ?? 'date unknown'}. Provider update time is unverified; this report describes the saved league data.\n\n`
+        : dataMode === 'saved'
+          ? `Saved league snapshot · last synced ${league.lastSyncedAt ?? 'date unknown'}. No live provider refresh was performed for this report.\n\n`
+          : '';
+    const body = snapshotLabel + completion.text;
+    if (body.length > 100_000) throw new Error('Report text exceeds the supported size.');
     report = { ...report, body, citations: citedNews(body, news, citationSources) };
 
     const aiUsage = completion.usage
       ? summarizeAIUsage(
-          runtime?.mode === 'api' ? runtime.model || 'gpt-4o-mini' : 'unknown',
+          runtime?.mode === 'codex-cli'
+            ? 'gpt-6.1-sol'
+            : runtime?.mode === 'api'
+              ? runtime.model || 'gpt-4o-mini'
+              : 'unknown',
           completion.usage,
           runtime?.mode === 'api' ? runtime.inputUsdPerMillionTokens : undefined,
           runtime?.mode === 'api' ? runtime.outputUsdPerMillionTokens : undefined,
@@ -210,7 +226,10 @@ export function createReportService({
       evidence: {
         ...(league.lastSyncedAt ? { leagueSyncedAt: league.lastSyncedAt } : {}),
         ...(newsRefreshedAt ? { newsRefreshedAt } : {}),
-        guidance: reportEvidenceGuidance(league, kind, leagueProjections).slice(0, 6000),
+        guidance: (snapshotLabel + reportEvidenceGuidance(league, kind, leagueProjections)).slice(
+          0,
+          6000,
+        ),
         visuals,
       },
     };

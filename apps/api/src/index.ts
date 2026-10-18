@@ -1,3 +1,9 @@
+import { dirname as researchDirname, join as researchJoin } from 'node:path';
+import { MarketResearchStore } from './market-research-store.js';
+import { createMarketResearchRouter } from './market-research-routes.js';
+import { PublicPredictionMarketData } from '@sidekick/integrations';
+import { reportDataProblem } from '@sidekick/core';
+import { resolveConfiguredAI } from './ai-runtime.js';
 import { createImsgRouter } from './imsg-routes.js';
 import { RoutineBackups } from './routine-backups.js';
 import { createOperationsRouter } from './operations-routes.js';
@@ -22,7 +28,6 @@ import {
   type ActionSetting,
   type LeagueConnection,
   type LeagueCalendarEvent,
-  type AIProvider,
 } from '@sidekick/core';
 import {
   connectorFor,
@@ -31,9 +36,6 @@ import {
   ImsgClient,
   resolveImsgExecutable,
   isBlueBubblesConfigured,
-  createLocalCLIProvider,
-  AppleFoundationModelCLIProvider,
-  parseCLIArguments,
   OpenAICompatibleProvider,
   sendResendTestEmail,
   verifyTwilioCredentials,
@@ -403,39 +405,72 @@ app.post('/api/scheduled-runs/:id/retry', async (req, res) => {
         await persistRetryOutcomes();
         continue;
       }
+      const dataProblem = reportDataProblem(
+        league,
+        retryAction,
+        store.settingsSnapshot().leagueStaleAfterHours,
+      );
+      if (dataProblem) {
+        const detail = dataProblem;
+        outcomes[index] = { ...failed, detail };
+        failures.push(`${failed.displayName}: ${detail}`);
+        await persistRetryOutcomes();
+        continue;
+      }
       let refreshed: LeagueConnection;
       try {
-        const credential =
-          league.platform === 'espn'
-            ? ((await readCredential('espn')) ?? undefined)
-            : league.platform === 'yahoo'
-              ? ((await getYahooAccessToken(
-                  { readCredential, saveCredential },
-                  yahooRedirectUri(),
-                )) ?? undefined)
-              : undefined;
-        refreshed = await connectorFor(league.platform, credential, league.season).fetchLeague(
-          league.id,
-        );
-        await store.update((state) => {
-          state.leagues = state.leagues.map((item) =>
-            item.id === refreshed.id
-              ? {
-                  ...refreshed,
-                  displayName: item.displayName,
-                  connectedAt: item.connectedAt,
-                  lastSyncedAt: new Date().toISOString(),
-                }
-              : item,
-          );
-        });
+        if (retryAction.dataMode === 'saved') {
+          refreshed = structuredClone(league);
+        } else {
+          const credential =
+            league.platform === 'espn'
+              ? ((await readCredential('espn')) ?? undefined)
+              : league.platform === 'yahoo'
+                ? ((await getYahooAccessToken(
+                    { readCredential, saveCredential },
+                    yahooRedirectUri(),
+                  )) ?? undefined)
+                : undefined;
+          const fetched = await connectorFor(
+            league.platform,
+            credential,
+            league.season,
+          ).fetchLeague(league.id);
+          const latest = store.snapshot().leagues.find((l) => l.id === league.id);
+          if (
+            latest?.connectionMode !== league.connectionMode ||
+            latest?.snapshotImportedAt !== league.snapshotImportedAt
+          )
+            throw new Error('Data source changed.');
+          const synced = await saveSyncedLeague(store, fetched);
+          if (!synced) throw new Error('League disconnected.');
+          refreshed = synced;
+        }
+        const currentAction = store
+          .settingsSnapshot()
+          .actions.find((a) => a.kind === retryAction.kind);
+        if (
+          retryAction.dataMode === 'saved' &&
+          (!currentAction ||
+            currentAction.dataMode !== 'saved' ||
+            reportDataProblem(
+              refreshed,
+              currentAction,
+              store.settingsSnapshot().leagueStaleAfterHours,
+            ))
+        )
+          throw new Error('Saved data policy changed.');
         await generateAndSaveReport(
           refreshed,
           store.reportSnapshot(),
           retryAction.kind,
           false,
-          retryAction.channel,
+          retryAction.dataMode === 'saved' ? 'dashboard' : retryAction.channel,
+          undefined,
+          undefined,
+          retryAction.dataMode,
         );
+
         outcomes[index] = {
           leagueId: league.id,
           displayName: league.displayName,
@@ -532,6 +567,19 @@ app.use(
   }),
 );
 app.use(createMemoryImportRouter({ store, configuredAI }));
+const marketResearch = new MarketResearchStore(
+  researchJoin(researchDirname(store.path), 'market-research.sqlite'),
+);
+app.use(
+  createMarketResearchRouter({
+    data: publicFootballData,
+    markets: new PublicPredictionMarketData(),
+    odds: publicSportsbookLines,
+    news: footballNewsCache,
+    catalog: getSleeperPlayerCatalog,
+    research: marketResearch,
+  }),
+);
 app.use(
   createAdviceRouter({
     store,
@@ -618,16 +666,8 @@ app.use(
     generationQueue,
   }),
 );
-async function configuredAI(
-  settings: ReturnType<LocalStore['snapshot']>['settings'],
-): Promise<AIProvider | null> {
-  const runtime = settings.aiRuntime;
-  if (runtime?.mode === 'apple-cli')
-    return process.platform === 'darwin' ? new AppleFoundationModelCLIProvider() : null;
-  if (runtime?.mode === 'cli')
-    return createLocalCLIProvider(runtime.command, parseCLIArguments(runtime.args));
-  const key = await readCredential('openai');
-  return key ? new OpenAICompatibleProvider(key, runtime?.model, runtime?.baseUrl) : null;
+async function configuredAI(settings: ReturnType<LocalStore['snapshot']>['settings']) {
+  return resolveConfiguredAI(settings, () => readCredential('openai'));
 }
 
 function yahooRedirectUri(): string {
@@ -642,6 +682,10 @@ async function runScheduledAction(action: ActionSetting, occurrenceKey?: string)
 }
 
 async function fetchScheduledLeague(league: LeagueConnection): Promise<LeagueConnection> {
+  if (league.connectionMode === 'snapshot')
+    throw new Error(
+      'Provider refresh is unavailable for this manual import. Choose saved data in a report schedule to create drafts from a recent import.',
+    );
   const credential =
     league.platform === 'espn'
       ? ((await readCredential('espn')) ?? undefined)
@@ -732,6 +776,11 @@ async function runLeagueCalendarEvent(event: LeagueCalendarEvent): Promise<void>
     const league = store.snapshot().leagues.find((candidate) => candidate.id === event.leagueId);
     if (!league) {
       failureDetail = 'This league is no longer connected.';
+      throw new Error(failureDetail);
+    }
+    if (league.connectionMode === 'snapshot') {
+      failureDetail =
+        'Calendar reports need provider refresh. For this manual import, use a saved-data report schedule instead.';
       throw new Error(failureDetail);
     }
     const credential =
@@ -1064,4 +1113,7 @@ stopApplication = createShutdownAction(
 );
 process.once('SIGINT', stopApplication);
 process.once('SIGTERM', stopApplication);
-process.once('beforeExit', () => store.close());
+process.once('beforeExit', () => {
+  marketResearch.close();
+  store.close();
+});

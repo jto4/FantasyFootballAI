@@ -144,3 +144,11 @@ export {
 } from './game-availability.js';
 
 export { validateDriveTotalStats, type DriveTotalStats } from './drive-total-signals.js';
+export * from './market-research.js';
+export * from './player-prop-research.js';
+
+export {
+  isValidReportDataMode,
+  reportDataProblem,
+  reportDataProblemAt,
+} from './report-data-policy.js';

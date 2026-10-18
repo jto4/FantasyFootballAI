@@ -177,3 +177,35 @@ test('Home keeps pending work visible while settings and league details expand o
     await workspace.close();
   }
 });
+
+test('primary navigation starts the new page at the top after a long Home view', async ({
+  page,
+}, info) => {
+  const w = await apiWorkspace();
+  try {
+    await page.goto(w.url + '/#/desk');
+    await page.getByText('League standings & news', { exact: true }).click();
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+    await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Schedule', exact: true })).toBeInViewport();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    if (info.project.name === 'mobile')
+      expect(
+        await page
+          .getByRole('heading', { name: 'Schedule', exact: true })
+          .evaluate(
+            (el) =>
+              el.getBoundingClientRect().top >=
+              document.querySelector('.sidebar')!.getBoundingClientRect().bottom,
+          ),
+      ).toBe(true);
+    await page.screenshot({ path: info.outputPath('navigation-top.png') });
+    await page.goBack();
+    await expect(page).toHaveURL(/#\/desk/);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+    expect(w.sends).toEqual([]);
+  } finally {
+    await w.close();
+  }
+});

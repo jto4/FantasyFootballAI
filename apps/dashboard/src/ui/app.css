@@ -1077,6 +1077,14 @@ p {
   padding: 29px;
   box-shadow: 0 20px 80px var(--shadow);
 }
+.connect-modal,
+.setup-wizard-modal {
+  box-sizing: border-box;
+  min-height: 0;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .setup-wizard-modal {
   position: relative;
   width: min(460px, 100%);

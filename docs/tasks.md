@@ -6,6 +6,35 @@ Use [release status](release-status.md) for readiness and release gates,
 behavior, not public release readiness. Prior detailed implementation evidence is retained in
 [the archived task record](reviews/2026-09-28-task-history.md).
 
+## Saved-data draft schedules — October 15, 2026
+
+- [x] Add explicit scoped dashboard-only saved-data drafts without changing default provider refresh or allowing silent fallback.
+- [x] Enforce timestamp/age bounds, prevent fabricated sync times, pause restored schedules and recheck policy/source across awaited work. Preserve once-per-occurrence behavior and draft-only retries.
+- [x] Show shared data readiness on Home/Schedule, offer explicit opt-in from the report library/editor, and improve notice/control legibility on phones.
+- [x] Generate a real-clock Afton report with isolated GPT-6.1-Sol: one model call, no league refresh/send, persisted draft, duplicate/expired attempts stopped. [Evidence](reviews/2026-10-15-saved-data-reports.md).
+- [x] Finish 1,058 source checks, all 258 desktop/mobile browser cases with real-data opt-ins, exact installer/native verification and owner saved-data schedule setup. Preserve missing provider/OS authorization as explicit setup dependencies. [Final receipts](reviews/2026-10-15-saved-data-reports.md).
+
+## Owner Afton verification and usability — October 15, 2026 (local batch verified)
+
+- [x] Capture the owner-authorized signed-in Safari ESPN response without copying cookies. Add an explicit manual browser-snapshot import with bounded normalization, account/member-field exclusion, provenance, no false sync timestamp and scheduled-refresh guards.
+- [x] Verify weekly publisher forecasts against both applied components and exact league/position scoring. Preserve current scoring-week starter identities and NFL teams; withhold incompatible/missing estimates. Test persistence/restart as well as initial import.
+- [x] Fix the connection/setup dialogs clipping expanded controls on phones. Home opens the league form directly, imported leagues offer reimport, and neutral ESPN status no longer becomes an availability alert.
+- [x] Support native imsg `any;` GUIDs only after exact current iMessage-service verification. Send one explicitly authorized owner test and match its outgoing receipt in scoped history; device delivery and packaged-app permission remain unverified.
+- [x] Review all six Afton advice workflows and five default reports with the isolated native model; preserve insufficient-evidence outcomes, verify report arithmetic and create one genuine owner-app draft without delivery.
+- [x] Fix misleading per-matchup chart scales and saved Codex startup readiness cancellation; reproduce the startup race on desktop/mobile before correcting it. Keep manual snapshot automations explicit in Reports/Schedule.
+- [x] Finish the superseding startup-fix installer/native closeout, compare 193 compiled files, validate both archives and verify owner Home shows the writer ready. Preserve the selected team and real short draft across restart; leave it unsent.
+- [ ] Owner setup dependencies: authorize ESPN provider refresh, grant packaged Messages Full Disk Access if desired, and configure an email provider. No OS grants or missing credentials are fabricated. Prospective predictive usefulness remains unestablished.
+
+Current evidence and outstanding work: [owner verification](reviews/2026-10-15-owner-verification.md).
+
+## Saved Codex account connection — October 15, 2026
+
+- [x] Add an app-wide Codex connection using the existing isolated GPT-6.1-Sol/high adapter for reports, advice and other configured text generation. Preserve native sign-in; never read an API key or fall back to API mode.
+- [x] Validate the fixed model and managed arguments at HTTP, state and dashboard boundaries. Reset subscription access on backup restore for owner review.
+- [x] Advertise subscription token-budget limits, preserve high reasoning, and exclude API pricing from saved Codex usage. Keep football probabilities and research signals unchanged.
+- [x] Pass 1,035 source checks (two platform skips), typecheck, lint, formatting/build and whitespace checks; verify 30 distinct desktop/mobile cases including the saved subscription flow. Rebuild the macOS ARM package; API/dashboard/MCP/headless smokes pass. Switch the running app through the revision-checked AI route and confirm a successful live Codex probe in its Settings UI. Existing non-AI preferences are preserved; legacy optional fields receive normal defaults.
+- [x] Complete scoped manual code/security and React reviews: fixed model/managed arguments, native login and isolation unchanged, no API fallback/pricing, restore reset, no new dependency or outbound messaging, and no numerical football-model changes. No automated security scan.
+
 ## Real football report and automatic-generation review — October 14, 2026
 
 - [x] Repair PR #12 clean-checkout CI startup: build shared core/integrations before the API credential-store smoke check. Verify the dependency build and credential module import without accessing the local OS vault; retain actual native-store round trips in hosted CI.
@@ -1484,3 +1513,13 @@ Two pool regressions cover the fallback and cross-platform alias paths.
 - [x] Independently check 190 scoring/roster/price calculations; retain public capture and scoped evidence without owner settings/history or credentials.
 - [x] Pass 906 workspace tests/root suites, 78 desktop/mobile regression journeys and 48 final affected journeys; finish source and actual-result rendering checks in the [review](reviews/2026-10-13-real-advice-quality.md).
 - [ ] Establish prospective prediction accuracy and executable sportsbook edge; retain missing dated injury/full-season evidence and supported-format limits.
+
+## Market Signals and player props — October 15, 2026
+
+- [x] Add an isolated Market Signals tab with exact-line price, large-trade cash and dated headline charts, accessible raw values and source/coverage details.
+- [x] Add immutable pregame research freezing, first game/provider deduplication, matched sportsbook probability, final-score resolution, provider/season Brier summaries and export; keep signals out of production predictions/AI context.
+- [x] Make player props discoverable; add passing attempts/completions and recent stat charts with exact-line Over/Under/Push counts. Repair safely recoverable missing catalog GSIS IDs without changing forecast formulas.
+- [x] Test with live SEA–DEN 40.5 prices/trades, two actual relevant headlines, Bo Nix's 12-game passing log and an independently verified completed-game final. Preserve a genuinely pregame record only in an isolated research store; browser replays do not count as new prospective evidence.
+- [x] Validate source suites and desktop/mobile browser flows, including all six advice workflows, missing-provider behavior, black/white appearance, no research-to-advice side effects and prop arithmetic. See the [review](reviews/2026-10-15-market-signals.md) for exact results and limits.
+- [ ] Gather independent multi-week/season prospective outcomes before considering promotion. Owner: model research; no current sportsbook-edge claim.
+- [ ] Optional future work: connect a licensed exact-identity/two-sided prop-price provider. Current prop prices remain manual; no subscription or API key was purchased/provisioned.

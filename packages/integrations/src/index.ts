@@ -126,3 +126,7 @@ export {
 
 export { ImsgClient, ImsgChannel, isImsgChatGuid, resolveImsgExecutable } from './imsg.js';
 export { resolveVerificationProfile } from './verification-profile.js';
+export { PublicPredictionMarketData } from './prediction-market-data.js';
+
+export { normalizeEspnLeague } from './platforms/espn.js';
+export { espnSnapshotWeeklyProjections } from './espn-snapshot-projections.js';

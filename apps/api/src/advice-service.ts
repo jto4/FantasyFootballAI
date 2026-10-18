@@ -1,3 +1,4 @@
+import { propHistoryIdentityResolver } from '@sidekick/core';
 import { freezeForecastProtocol } from './forecast-protocol.js';
 import { randomUUID } from 'node:crypto';
 import {
@@ -198,6 +199,12 @@ export function createAdviceService(deps: AdviceDependencies) {
     return {
       season: loaded.season,
       week: loaded.week,
+      tokenBudgetSupported:
+        request.connection !== 'codex-cli' &&
+        !(
+          (!request.connection || request.connection === 'saved') &&
+          deps.store.settingsSnapshot().aiRuntime?.mode === 'codex-cli'
+        ),
       model:
         request.connection && request.connection !== 'saved'
           ? signedModel(request.connection)
@@ -342,7 +349,11 @@ export function createAdviceService(deps: AdviceDependencies) {
   ): Promise<AdviceResult> {
     const savedSettings = deps.store.settingsSnapshot();
     let settings = savedSettings;
-    if (request.connection === 'codex-cli' && request.maxOutputTokens !== undefined)
+    const usesCodex =
+      request.connection === 'codex-cli' ||
+      ((!request.connection || request.connection === 'saved') &&
+        savedSettings.aiRuntime?.mode === 'codex-cli');
+    if (usesCodex && request.maxOutputTokens !== undefined)
       throw new Error('Signed-in Codex does not support a token budget per pass.');
     const signedIn = request.connection !== undefined && request.connection !== 'saved';
     if (
@@ -835,9 +846,7 @@ export function createAdviceService(deps: AdviceDependencies) {
         prompt,
         reasoningEffort: 'high' as const,
         temperature: 0.2,
-        ...(request.connection !== 'codex-cli'
-          ? { maxOutputTokens: request.maxOutputTokens ?? 16_384 }
-          : {}),
+        ...(!usesCodex ? { maxOutputTokens: request.maxOutputTokens ?? 16_384 } : {}),
         timeoutMs: 120_000,
         ...(signal ? { signal } : {}),
       };
@@ -1046,7 +1055,7 @@ export function createAdviceService(deps: AdviceDependencies) {
         'The betting probability and hypothetical return are uncalibrated AI judgments, not measured stats or a proven betting edge.',
       );
     }
-    const rates = signedIn ? undefined : settings.aiRuntime;
+    const rates = signedIn || usesCodex ? undefined : settings.aiRuntime;
     const cost =
       usage &&
       rates?.inputUsdPerMillionTokens !== undefined &&
@@ -1221,7 +1230,10 @@ export function createAdviceService(deps: AdviceDependencies) {
   async function models(settings: AppSettings) {
     const saved = modelName(settings);
     if (settings.aiRuntime?.mode && settings.aiRuntime.mode !== 'api')
-      return { selection: { models: [{ id: saved, reasoning: false }] }, warnings: [] as string[] };
+      return {
+        selection: { models: [{ id: saved, reasoning: settings.aiRuntime?.mode === 'codex-cli' }] },
+        warnings: [] as string[],
+      };
     const warnings: string[] = [];
     let available: string[] = [];
     if (deps.discoverModels) {
@@ -1250,11 +1262,13 @@ function parseAnswer(value: string): unknown {
   return JSON.parse(value.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, ''));
 }
 function modelName(settings: AppSettings): string {
-  return settings.aiRuntime?.mode === 'cli'
-    ? 'Configured local AI'
-    : settings.aiRuntime?.mode === 'apple-cli'
-      ? 'Apple Foundation Models'
-      : (settings.aiRuntime?.model ?? 'gpt-4o-mini');
+  return settings.aiRuntime?.mode === 'codex-cli'
+    ? signedInCodexModel
+    : settings.aiRuntime?.mode === 'cli'
+      ? 'Configured local AI'
+      : settings.aiRuntime?.mode === 'apple-cli'
+        ? 'Apple Foundation Models'
+        : (settings.aiRuntime?.model ?? 'gpt-4o-mini');
 }
 function metricForecast(
   metrics: AdviceMetric[],
@@ -1292,6 +1306,7 @@ export function playerPool(
   betting: boolean,
 ): RosterPlayer[] {
   const pool = new Map<string, RosterPlayer>();
+  const resolvePropIdentity = betting ? propHistoryIdentityResolver(data) : undefined;
   const roster = betting ? [] : (league?.teams.flatMap((team) => team.roster ?? []) ?? []);
   for (const [sleeperId, player] of catalog) {
     if (
@@ -1299,8 +1314,9 @@ export function playerPool(
       !['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'DST'].includes(player.position ?? '')
     )
       continue;
+    const propIdentity = resolvePropIdentity?.(player);
     const platformId = betting
-      ? player.gsisId
+      ? propIdentity
       : league?.platform === 'sleeper'
         ? sleeperId
         : league?.platform === 'espn'
@@ -1309,6 +1325,7 @@ export function playerPool(
     const id = platformId ?? (player.gsisId ? `nfl:${player.gsisId}` : `sleeper:${sleeperId}`);
     pool.set(id, {
       ...player,
+      ...(propIdentity ? { gsisId: propIdentity } : {}),
       id,
       sleeperId,
       ...(player.injuryStatus ? { status: player.injuryStatus } : {}),

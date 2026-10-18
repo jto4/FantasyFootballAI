@@ -53,11 +53,7 @@ export function WeeklyHome({
   const freshness = league
     ? leagueSyncFreshness(league, Date.now(), (settings.leagueStaleAfterHours ?? 24) * 3600000)
     : 'unknown';
-  const alerts =
-    team?.roster?.filter(
-      (p) =>
-        p.injuryStatus || (p.status && !['active', 'healthy'].includes(p.status.toLowerCase())),
-    ) ?? [];
+  const alerts = team?.roster?.filter((p) => availabilityFlag(p.injuryStatus, p.status)) ?? [];
   const week =
     typeof league?.settings.currentWeek === 'number' ? league.settings.currentWeek : undefined;
   const starters =
@@ -99,14 +95,16 @@ export function WeeklyHome({
       ) : (
         <>
           <p className={freshness === 'fresh' ? 'connection-success' : 'field-warning'}>
-            {freshness === 'fresh'
-              ? 'Roster snapshot is recent.'
-              : freshness === 'stale'
-                ? 'Roster snapshot needs a refresh.'
-                : 'Roster freshness is unverified.'}
+            {league.connectionMode === 'snapshot'
+              ? `Imported browser snapshot${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}. Provider update time is unverified.`
+              : freshness === 'fresh'
+                ? 'Roster snapshot is recent.'
+                : freshness === 'stale'
+                  ? 'Roster snapshot needs a refresh.'
+                  : 'Roster freshness is unverified.'}
             {league.lastSyncedAt ? ` Last synced ${formatDateTime(league.lastSyncedAt)}.` : ''}{' '}
             <button className="text-button" onClick={onRefresh}>
-              Refresh roster
+              {league.connectionMode === 'snapshot' ? 'Import updated roster' : 'Refresh roster'}
             </button>
           </p>
           {!team ? (
@@ -133,7 +131,7 @@ export function WeeklyHome({
                     <ul>
                       {alerts.slice(0, 5).map((p) => (
                         <li key={p.id}>
-                          {p.name}: {p.injuryStatus || p.status}
+                          {p.name}: {availabilityFlag(p.injuryStatus, p.status)}
                         </li>
                       ))}
                     </ul>
@@ -141,6 +139,12 @@ export function WeeklyHome({
                     <p>
                       No availability flags are recorded in this roster. This does not establish
                       that everyone is healthy.
+                    </p>
+                  )}
+                  {alerts.length > 5 && (
+                    <p>
+                      {alerts.length - 5} more saved flags. Open the lineup check to review all
+                      players.
                     </p>
                   )}
                   <p>Saved flags · verify playing status in Advice.</p>
@@ -184,6 +188,12 @@ export function WeeklyHome({
         </>
       )}
     </section>
+  );
+}
+
+function availabilityFlag(...statuses: (string | undefined)[]) {
+  return statuses.find(
+    (s) => s?.trim() && !['active', 'healthy', 'normal'].includes(s.trim().toLowerCase()),
   );
 }
 

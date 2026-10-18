@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   leaguesForAction,
+  reportDataProblem,
   leagueSeasonPhase,
   scheduledReportPhaseSkipReason,
   type ActionSetting,
@@ -95,29 +96,61 @@ export function createScheduledReportRunner({
         if (!latestAction?.enabled || !latestAction.schedule.enabled) break;
 
         let refreshed: LeagueConnection;
-        try {
-          refreshed = await retryLeagueFetch(
-            () => fetchLeague(league),
-            store.settingsSnapshot().scheduledSyncRetries ?? 0,
-          );
-          const synced = await saveSyncedLeague(store, refreshed);
-          if (!synced) continue;
-          refreshed = synced;
-        } catch (error) {
-          const detail = leagueSyncErrorMessage(error);
-          await store.update((state) => {
-            state.leagues = state.leagues.map((item) =>
-              item.id === league.id ? { ...item, lastSyncError: detail } : item,
-            );
-          });
-          failures.push(`${league.displayName}: ${detail}`);
+        const dataProblem = reportDataProblem(
+          league,
+          latestAction,
+          latestState.settings.leagueStaleAfterHours,
+        );
+        if (dataProblem) {
+          failures.push(`${league.displayName}: ${dataProblem}`);
           leagueResults.push({
             leagueId: league.id,
             displayName: league.displayName,
             status: 'failed',
-            detail,
+            detail: dataProblem,
           });
           continue;
+        }
+        if (latestAction.dataMode === 'saved') {
+          refreshed = structuredClone(league);
+        } else {
+          try {
+            refreshed = await retryLeagueFetch(
+              () => fetchLeague(league),
+              store.settingsSnapshot().scheduledSyncRetries ?? 0,
+            );
+            const latest = store.snapshot().leagues.find((l) => l.id === league.id);
+            if (
+              latest?.connectionMode !== league.connectionMode ||
+              latest?.snapshotImportedAt !== league.snapshotImportedAt
+            ) {
+              leagueResults.push({
+                leagueId: league.id,
+                displayName: league.displayName,
+                status: 'skipped',
+                detail: 'The league data source changed during refresh; no report was generated.',
+              });
+              continue;
+            }
+            const synced = await saveSyncedLeague(store, refreshed);
+            if (!synced) continue;
+            refreshed = synced;
+          } catch (error) {
+            const detail = leagueSyncErrorMessage(error);
+            await store.update((state) => {
+              state.leagues = state.leagues.map((item) =>
+                item.id === league.id ? { ...item, lastSyncError: detail } : item,
+              );
+            });
+            failures.push(`${league.displayName}: ${detail}`);
+            leagueResults.push({
+              leagueId: league.id,
+              displayName: league.displayName,
+              status: 'failed',
+              detail,
+            });
+            continue;
+          }
         }
 
         const current = store.settingsSnapshot().actions.find((item) => item.kind === action.kind);
@@ -136,6 +169,28 @@ export function createScheduledReportRunner({
           continue;
         }
 
+        if (current.dataMode === 'saved') {
+          const latest = store.snapshot().leagues.find((l) => l.id === league.id);
+          const issue = latest
+            ? reportDataProblem(latest, current, store.settingsSnapshot().leagueStaleAfterHours)
+            : 'The league was disconnected.';
+          if (
+            issue ||
+            latest?.snapshotImportedAt !== refreshed.snapshotImportedAt ||
+            latest?.lastSyncedAt !== refreshed.lastSyncedAt
+          ) {
+            leagueResults.push({
+              leagueId: league.id,
+              displayName: league.displayName,
+              status: 'skipped',
+              detail:
+                issue ??
+                'Saved league data changed; wait for the next occurrence or generate a new draft manually.',
+            });
+            continue;
+          }
+        }
+
         const phaseSkip = scheduledReportPhaseSkipReason(
           action.kind,
           leagueSeasonPhase(refreshed),
@@ -152,13 +207,25 @@ export function createScheduledReportRunner({
         }
 
         try {
-          const result = await generateAndSaveReport(
-            refreshed,
-            store.reportSnapshot(),
-            action.kind,
-            true,
-            action.channel,
-          );
+          const result =
+            current.dataMode === 'saved'
+              ? await generateAndSaveReport(
+                  refreshed,
+                  store.reportSnapshot(),
+                  action.kind,
+                  false,
+                  'dashboard',
+                  undefined,
+                  undefined,
+                  'saved',
+                )
+              : await generateAndSaveReport(
+                  refreshed,
+                  store.reportSnapshot(),
+                  action.kind,
+                  true,
+                  action.channel,
+                );
           if (result.deliveryError) {
             failures.push(`${league.displayName}: automatic delivery failed; report remains saved`);
             leagueResults.push({
@@ -172,6 +239,12 @@ export function createScheduledReportRunner({
               leagueId: league.id,
               displayName: league.displayName,
               status: 'succeeded',
+              ...(current.dataMode === 'saved'
+                ? {
+                    detail:
+                      'Draft created from saved league data; no refresh or delivery was attempted.',
+                  }
+                : {}),
             });
           }
         } catch {
@@ -206,6 +279,7 @@ function sameScheduleOccurrence(current: ActionSetting, scheduled: ActionSetting
   const left = current.schedule;
   const right = scheduled.schedule;
   return (
+    current.dataMode === scheduled.dataMode &&
     left.frequency === right.frequency &&
     left.weekday === right.weekday &&
     left.dayOfMonth === right.dayOfMonth &&

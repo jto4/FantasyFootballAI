@@ -1,4 +1,6 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
+import { normalizeEspnLeague, espnSnapshotWeeklyProjections } from '@sidekick/integrations';
+import { isLeagueConnection } from '@sidekick/core';
 import {
   isValidEspnSeason,
   parseLeagueInput,
@@ -20,6 +22,95 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
   const router = Router();
   const { store } = dependencies;
 
+  router.post(
+    '/api/leagues/import/espn',
+    express.raw({ type: 'application/octet-stream', limit: '6mb' }),
+    async (req, res) => {
+      const id = req.query.league,
+        season = Number(req.query.season);
+      if (
+        Object.keys(req.query).some((k) => !['league', 'season'].includes(k)) ||
+        typeof id !== 'string' ||
+        !/^\d{1,16}$/.test(id) ||
+        typeof req.query.season !== 'string' ||
+        !isValidEspnSeason(season) ||
+        !Buffer.isBuffer(req.body)
+      )
+        return res
+          .status(400)
+          .json({ error: 'Choose the ESPN league ID, season and saved JSON file.' });
+      try {
+        const raw: unknown = JSON.parse(req.body.toString('utf8'));
+        if (
+          !raw ||
+          typeof raw !== 'object' ||
+          Array.isArray(raw) ||
+          String((raw as { id?: unknown }).id) !== id ||
+          (raw as { seasonId?: unknown }).seasonId !== season
+        )
+          return res
+            .status(400)
+            .json({ error: 'The file does not match this ESPN league and season.' });
+        const source = raw as { teams?: unknown; draftDetail?: { picks?: unknown } };
+        if (
+          !Array.isArray(source.teams) ||
+          source.teams.length > 32 ||
+          source.teams.some(
+            (t) =>
+              t &&
+              typeof t === 'object' &&
+              Array.isArray(t.roster?.entries) &&
+              t.roster.entries.length > 100,
+          ) ||
+          (Array.isArray(source.draftDetail?.picks) && source.draftDetail.picks.length > 2000)
+        )
+          return res
+            .status(400)
+            .json({ error: 'The ESPN file exceeds supported roster or draft limits.' });
+        const at = new Date().toISOString();
+        const league: LeagueConnection = {
+          ...normalizeEspnLeague(raw, id, season, raw),
+          connectionMode: 'snapshot',
+          snapshotImportedAt: at,
+          connectedAt: at,
+          status: 'limited',
+        };
+        if (
+          !isLeagueConnection(league) ||
+          league.teams.length !== league.teamCount ||
+          new Set(league.teams.map((t) => t.id)).size !== league.teamCount
+        )
+          return res
+            .status(400)
+            .json({ error: 'This file does not contain a complete, valid ESPN league snapshot.' });
+        const owned = league.teams.flatMap((t) => t.roster?.map((p) => p.id) ?? []);
+        if (new Set(owned).size !== owned.length)
+          return res.status(400).json({
+            error:
+              'The snapshot contains duplicate player ownership. Save a complete current ESPN response.',
+          });
+        const forecasts = espnSnapshotWeeklyProjections(raw, league, at);
+        await store.update((state) => {
+          const previous = state.leagues.find((l) => l.id === id);
+          league.connectedAt = previous?.connectedAt ?? at;
+          league.displayName = previous?.displayName ?? league.displayName;
+          state.leagues = [...state.leagues.filter((l) => l.id !== id), league];
+          state.playerProjections = [
+            ...state.playerProjections.filter(
+              (p) => p.leagueId !== id || !p.sourceId?.startsWith('espn-browser:'),
+            ),
+            ...forecasts,
+          ];
+        });
+        return res.status(201).json(league);
+      } catch {
+        return res.status(400).json({
+          error:
+            'The ESPN snapshot could not be verified. Save the JSON source from the authorized browser and try again.',
+        });
+      }
+    },
+  );
   router.post('/api/leagues', async (req, res) => {
     if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body))
       return res.status(400).json({ error: 'Enter valid league connection details.' });
@@ -83,6 +174,11 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
   router.post('/api/leagues/:id/refresh', async (req, res) => {
     const current = store.snapshot().leagues.find((item) => item.id === req.params.id);
     if (!current) return res.status(404).json({ error: 'League not found.' });
+    if (current.connectionMode === 'snapshot')
+      return res.status(409).json({
+        error:
+          'This league uses a browser snapshot. Import a new ESPN file to update it, or connect a provider session for automatic refresh.',
+      });
     try {
       const refreshed = await dependencies.fetchLeague(
         current.platform,

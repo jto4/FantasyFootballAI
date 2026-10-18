@@ -320,7 +320,8 @@ export class PublicPredictionMarketData {
     private now: () => number = Date.now,
     private saveResponse?: (e: PredictionResponseEvidence, text: string) => Promise<void>,
   ) {}
-  private async get(url: string) {
+  private async get(url: string, signal?: AbortSignal) {
+    signal?.throwIfAborted();
     if (url.startsWith('https://external-api.kalshi.com/')) {
       const turn = this.kalshiQueue.then(
         () => new Promise<void>((resolve) => setTimeout(resolve, 300)),
@@ -329,9 +330,12 @@ export class PublicPredictionMarketData {
       await turn;
     }
     for (let attempt = 0; attempt < 3; attempt++) {
+      signal?.throwIfAborted();
       const response = await this.fetcher(url, {
         redirect: 'error',
-        signal: AbortSignal.timeout(15000),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(15000)])
+          : AbortSignal.timeout(15000),
         headers: { accept: 'application/json' },
       });
       const text = await readBoundedText(response, 2000000),
@@ -365,6 +369,7 @@ export class PublicPredictionMarketData {
     g: FootballGame,
     provider: 'kalshi' | 'polymarket',
     cutoff: string,
+    signal?: AbortSignal,
   ): Promise<ExternalTotalTape | undefined> {
     eligible(g, cutoff);
     if (Date.parse(cutoff) > this.now()) throw new Error('Future cutoff unavailable.');
@@ -379,8 +384,8 @@ export class PublicPredictionMarketData {
         : `https://gamma-api.polymarket.com/events?slug=${keys.polymarket}`;
     const c =
       provider === 'kalshi'
-        ? parseKalshiTotalContract(await this.get(discover), g, cutoff)
-        : parsePolymarketTotalContract(await this.get(discover), g, cutoff);
+        ? parseKalshiTotalContract(await this.get(discover, signal), g, cutoff)
+        : parsePolymarketTotalContract(await this.get(discover, signal), g, cutoff);
     if (!c) return;
     const from = new Date(Date.parse(cutoff) - 86400000).toISOString(),
       start = Math.floor(Date.parse(from) / 1000),
@@ -391,8 +396,8 @@ export class PublicPredictionMarketData {
         : `${root}/prices-history?token_id=${c.tokens![0]}&start=${start}&end=${end}&bucket_seconds=300&limit=1000`;
     const prices =
       provider === 'kalshi'
-        ? parseKalshiPrices(await this.get(priceURL), from, cutoff)
-        : parsePolymarketPrices(await this.get(priceURL), from, cutoff);
+        ? parseKalshiPrices(await this.get(priceURL, signal), from, cutoff)
+        : parsePolymarketPrices(await this.get(priceURL, signal), from, cutoff);
     let cursor = '',
       complete = false;
     const trades: ExternalTotalTrade[] = [],
@@ -406,7 +411,7 @@ export class PublicPredictionMarketData {
         tradeURL.searchParams.set('max_ts', String(end));
       } else tradeURL.searchParams.set('taker_only', 'true');
       if (cursor) tradeURL.searchParams.set('cursor', cursor);
-      const result = parsePredictionTrades(await this.get(tradeURL.href), c, from, cutoff);
+      const result = parsePredictionTrades(await this.get(tradeURL.href, signal), c, from, cutoff);
       trades.push(...result.trades);
       if (!result.cursor) {
         complete = true;

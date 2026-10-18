@@ -464,6 +464,8 @@ export interface AdviceOptions {
   model: string;
   models?: { id: string; reasoning: boolean }[];
   recommendedModel?: string;
+  /** False for signed-in connections that cannot enforce API token budgets. */
+  tokenBudgetSupported?: boolean;
   connection?: AdviceConnection;
   connections?: { id: AdviceConnection; label: string; status: 'saved' | SignedInAIStatus }[];
 }
