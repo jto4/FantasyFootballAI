@@ -152,3 +152,5 @@ export {
   reportDataProblem,
   reportDataProblemAt,
 } from './report-data-policy.js';
+export { isInactiveFootballStatus } from './player-availability.js';
+export { weeklyGameWithheldWarning } from './advice-warnings.js';

@@ -1926,3 +1926,21 @@ it('saved Codex advice advertises its fixed model, omits unsupported budgets and
     w.calls.every((call) => call.maxOutputTokens === undefined && call.reasoningEffort === 'high'),
   ).toBe(true);
 });
+
+it('builds the weekly briefing deterministically without any AI configuration or call', async () => {
+  const w = await workspace();
+  const response = await fetch(`${w.url}/api/advice/briefing?league=league&team=mine`);
+  expect(response.status).toBe(200);
+  const briefing = await response.json();
+  expect(briefing).toMatchObject({ leagueId: 'league', teamId: 'mine', week: 5 });
+  expect(briefing.coverage.total).toBe(2);
+  expect(Array.isArray(briefing.lineup.changes)).toBe(true);
+  expect(Array.isArray(briefing.waivers)).toBe(true);
+  expect(w.calls).toEqual([]);
+  expect(w.configurations).toEqual([]);
+  expect((await fetch(`${w.url}/api/advice/briefing?league=league&team=nobody`)).status).toBe(404);
+  expect((await fetch(`${w.url}/api/advice/briefing?league=league`)).status).toBe(400);
+  expect((await fetch(`${w.url}/api/advice/briefing?league=league&team=mine&extra=1`)).status).toBe(
+    400,
+  );
+});

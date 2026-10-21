@@ -166,3 +166,19 @@
     padding: 10px 12px;
   }
 }
+
+.weekly-answer {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+p.weekly-answer {
+  padding-left: 0;
+}
+.weekly-notes {
+  margin: 0 0 14px;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

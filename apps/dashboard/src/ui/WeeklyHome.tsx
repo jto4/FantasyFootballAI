@@ -8,6 +8,7 @@ import {
   type LeagueConnection,
 } from '@sidekick/core';
 import { formatDateTime } from './date-format';
+import { isWeeklyBriefing, points, type WeeklyBriefing } from './weekly-briefing';
 export function WeeklyHome({
   league,
   settings,
@@ -31,6 +32,23 @@ export function WeeklyHome({
     { id: string; mode: AdviceMode; headline: string; createdAt: string }[]
   >([]);
   const [decisionError, setDecisionError] = useState('');
+  const [briefing, setBriefing] = useState<WeeklyBriefing>();
+  useEffect(() => {
+    const controller = new AbortController();
+    setBriefing(undefined);
+    // Deterministic and AI-free; a failure simply leaves the roster-based cards below.
+    if (league && teamId)
+      void requestJson(
+        `/api/advice/briefing?${new URLSearchParams({ league: league.id, team: teamId })}`,
+        isWeeklyBriefing,
+        { signal: controller.signal },
+      )
+        .then((data) => {
+          if (!controller.signal.aborted) setBriefing(data);
+        })
+        .catch(() => undefined);
+    return () => controller.abort();
+  }, [league?.id, league?.lastSyncedAt, teamId]);
   useEffect(() => {
     const controller = new AbortController();
     setDecisions([]);
@@ -55,11 +73,12 @@ export function WeeklyHome({
     ? leagueSyncFreshness(league, Date.now(), (settings.leagueStaleAfterHours ?? 24) * 3600000)
     : 'unknown';
   const alerts = team?.roster?.filter((p) => availabilityFlag(p.injuryStatus, p.status)) ?? [];
-  const week =
+  const leagueWeek =
     typeof league?.settings.currentWeek === 'number' ? league.settings.currentWeek : undefined;
+  const week = briefing?.week ?? leagueWeek;
   const starters =
     league?.matchups
-      ?.filter((m) => m.week === week)
+      ?.filter((m) => m.week === leagueWeek)
       .flatMap((m) =>
         m.teams.filter((t) => t.teamId === teamId).flatMap((t) => t.starters ?? []),
       ) ?? [];
@@ -112,23 +131,59 @@ export function WeeklyHome({
             <p>Choose your team to get started.</p>
           ) : (
             <>
+              {briefing?.notes.length ? (
+                <ul className="weekly-notes">
+                  {briefing.notes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              ) : null}
               <div className="weekly-home-grid">
                 <article>
                   <h3>Lineup check</h3>
-                  <p>
-                    {incomplete
-                      ? 'Roster incomplete · refresh first.'
-                      : starters.length
-                        ? `${starters.length} recorded starters.`
-                        : 'Starter assignments unknown.'}
-                  </p>
+                  {briefing?.lineup.changes.length ? (
+                    <ul className="weekly-answer">
+                      {briefing.lineup.changes.map((change) => (
+                        <li key={change.start.id}>
+                          <strong>Start {change.start.name}</strong> ({points(change.start.points)})
+                          {change.bench
+                            ? ` over ${change.bench.name}${change.bench.points !== undefined ? ` (${points(change.bench.points)})` : ''}`
+                            : ''}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : briefing?.lineup.complete ? (
+                    <p className="weekly-answer">
+                      <strong>Your lineup looks set.</strong>
+                      {briefing.lineup.points !== undefined
+                        ? ` ${points(briefing.lineup.points)} projected points.`
+                        : ''}
+                    </p>
+                  ) : (
+                    <p>
+                      {incomplete
+                        ? 'Roster incomplete · refresh first.'
+                        : starters.length
+                          ? `${starters.length} recorded starters.`
+                          : 'Starter assignments unknown.'}
+                    </p>
+                  )}
                   <button className="primary-button" onClick={() => onAdvice('lineup')}>
                     Check my lineup
                   </button>
                 </article>
                 <article>
                   <h3>Availability to review</h3>
-                  {alerts.length ? (
+                  {briefing?.availability.length ? (
+                    <ul>
+                      {briefing.availability.slice(0, 5).map((p) => (
+                        <li key={p.id}>
+                          {p.name}: {p.status}
+                          {p.basis === 'this-week-report' ? ' · this week’s report' : ''}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : alerts.length ? (
                     <ul>
                       {alerts.slice(0, 5).map((p) => (
                         <li key={p.id}>
@@ -148,6 +203,15 @@ export function WeeklyHome({
                 </article>
                 <article>
                   <h3>Waivers and trades</h3>
+                  {briefing?.waivers.length ? (
+                    <ul className="weekly-answer">
+                      {briefing.waivers.map((w) => (
+                        <li key={w.id}>
+                          <strong>{w.name}</strong> ({w.position}) · +{points(w.gain)} pts if added
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                   <p>Check your waiver priority and FAAB in {platformName(league.platform)}.</p>
                   <button className="small-button" onClick={() => onAdvice('waivers')}>
                     Find waiver pickups
