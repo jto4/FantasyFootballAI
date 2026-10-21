@@ -1,4 +1,5 @@
 import { ReadyDrafts } from './ReadyDrafts';
+import { LeagueTrends } from './LeagueTrends';
 import type { RefObject, ReactNode } from 'react';
 import { Activity, CalendarDays, FileText, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import { leagueSeasonPhase, rankTeams, reportVisuals, type LeagueConnection } from '@sidekick/core';
@@ -235,6 +236,7 @@ export function LeagueDesk({
         >
           <summary>League standings & news</summary>
           <LeagueVisuals data={reportVisuals(league)} syncedAt={league.lastSyncedAt} />
+          <LeagueTrends league={league} />
           <div className="section-heading">
             <div>
               <p className="section-overline">THE EARLY READ</p>

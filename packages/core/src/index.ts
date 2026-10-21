@@ -154,3 +154,4 @@ export {
 } from './report-data-policy.js';
 export { isInactiveFootballStatus } from './player-availability.js';
 export { weeklyGameWithheldWarning } from './advice-warnings.js';
+export * from './league-insights.js';

@@ -248,3 +248,211 @@
   font-weight: 600;
   margin-bottom: 12px;
 }
+
+/* Season trends: thin marks, recessive grid, color only on marks (never on text). */
+.league-trends {
+  margin-top: 20px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.league-trends h2 {
+  margin: 4px 0 2px;
+}
+.trend-team-picker {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.trend-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.trend-stats li {
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border-radius: 8px;
+}
+.trend-stats strong {
+  display: block;
+  font-size: 22px;
+  color: var(--ink);
+}
+.trend-stats span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.trend-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.trend-panel-wide {
+  grid-column: 1 / -1;
+}
+.trend-caption {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.trend-chart {
+  position: relative;
+}
+.trend-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.trend-grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+.trend-crosshair {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+.trend-axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.trend-label {
+  fill: var(--muted);
+  font-size: 12px;
+}
+.trend-label-strong {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+.trend-band {
+  fill: var(--chart-band);
+}
+.trend-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.trend-line-highlight {
+  stroke: var(--chart-highlight);
+}
+.trend-line-context {
+  stroke: var(--chart-context);
+}
+.trend-dot {
+  fill: var(--chart-highlight);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.trend-hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+.luck-connector {
+  stroke: var(--chart-context);
+  stroke-width: 2;
+}
+.luck-expected {
+  fill: var(--surface);
+  stroke: var(--chart-context);
+  stroke-width: 2;
+}
+.luck-actual {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.luck-lucky {
+  fill: var(--chart-lucky);
+}
+.luck-unlucky {
+  fill: var(--chart-unlucky);
+}
+.scatter-dot {
+  fill: var(--chart-context);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.scatter-highlight {
+  fill: var(--chart-highlight);
+}
+.trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--muted);
+}
+.trend-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.key-line {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+}
+.key-highlight {
+  background: var(--chart-highlight);
+}
+.key-context {
+  background: var(--chart-context);
+}
+.key-band {
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--chart-band);
+}
+.key-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.key-dot.luck-expected {
+  border: 2px solid var(--chart-context);
+  background: var(--surface);
+}
+.key-dot.luck-lucky {
+  background: var(--chart-lucky);
+}
+.key-dot.luck-unlucky {
+  background: var(--chart-unlucky);
+}
+.trend-tooltip {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 2px;
+  min-width: 160px;
+  padding: 8px 10px;
+  transform: translate(-50%, calc(-100% - 10px));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px var(--shadow);
+  color: var(--ink);
+  font-size: 12px;
+  pointer-events: none;
+}
+.league-trends tr[aria-current='true'] {
+  background: var(--surface-raised);
+}
+@media (max-width: 760px) {
+  .league-trends {
+    padding: 16px;
+  }
+  .trend-panels {
+    grid-template-columns: 1fr;
+  }
+}

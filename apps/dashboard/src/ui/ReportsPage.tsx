@@ -22,6 +22,7 @@ import { Dialog } from './Dialog';
 import { formatDateTime } from './date-format';
 import { FriendlyError } from './FriendlyError';
 import { ReportSharing } from './ReportSharing';
+import { LeagueTrends } from './LeagueTrends';
 import { ReportLibrary } from './ReportLibrary';
 import { LeagueVisuals } from './LeagueVisuals';
 
@@ -297,11 +298,14 @@ export function ReportsPage({
         </nav>
       )}
       {view === 'charts' && league && (
-        <LeagueVisuals
-          key={league.id}
-          data={reportVisuals(league)}
-          syncedAt={league.lastSyncedAt}
-        />
+        <>
+          <LeagueVisuals
+            key={league.id}
+            data={reportVisuals(league)}
+            syncedAt={league.lastSyncedAt}
+          />
+          <LeagueTrends key={`trends:${league.id}`} league={league} />
+        </>
       )}
       <div hidden={view !== 'reports'}>
         {league && onCreateKind && onSchedule && (

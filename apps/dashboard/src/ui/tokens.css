@@ -1,5 +1,12 @@
 /* Semantic surfaces keep every page and dialog in the selected appearance. */
 :root {
+  /* Charts: validated pairs (scripts in the dataviz skill); text never uses these. */
+  --chart-highlight: #ad4c27;
+  --chart-context: #8b95a1;
+  --chart-band: rgb(139 149 161 / 16%);
+  --chart-lucky: #2a78d6;
+  --chart-unlucky: #eb6834;
+  --chart-grid: #e0e6ed;
   color-scheme: light;
   --canvas: #ffffff;
   --navy: var(--canvas);
@@ -32,6 +39,12 @@
   );
 }
 :root[data-theme='dark'] {
+  --chart-highlight: #d9714a;
+  --chart-context: #6b7480;
+  --chart-band: rgb(107 116 128 / 22%);
+  --chart-lucky: #3987e5;
+  --chart-unlucky: #d95926;
+  --chart-grid: #2a2a2a;
   color-scheme: dark;
   --canvas: #000000;
   --sidebar: #090909;
