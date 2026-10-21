@@ -636,6 +636,8 @@ test('an unavailable model stays selected until the user chooses a replacement',
       (response) =>
         response.url().includes('/api/advice/') &&
         !response.url().endsWith('/readiness') &&
+        // Home's background warm-up also POSTs under /api/advice/.
+        !response.url().endsWith('/warm') &&
         response.request().method() === 'POST',
     );
     await page.getByRole('button', { name: 'Analyze my choices', exact: true }).click();
@@ -755,6 +757,8 @@ test('unverified model output stays out of the UI and leaves a recoverable error
       (response) =>
         response.url().includes('/api/advice/') &&
         !response.url().endsWith('/readiness') &&
+        // Home's background warm-up also POSTs under /api/advice/.
+        !response.url().endsWith('/warm') &&
         response.request().method() === 'POST',
     );
     await page.getByRole('button', { name: 'Analyze my choices', exact: true }).click();
