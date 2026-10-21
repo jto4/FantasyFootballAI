@@ -1279,10 +1279,12 @@ export function createAdviceService(deps: AdviceDependencies) {
         .filter((season): season is number => typeof season === 'number'),
     );
     if (!seasons.size) return;
+    // Wrap each loader so a synchronous throw cannot escape allSettled.
+    const attempt = (load: () => Promise<unknown>) => Promise.resolve().then(load);
     await Promise.allSettled([
-      ...[...seasons].map((season) => deps.data.get(season)),
-      ...[...seasons].map((season) => deps.injuries.get(season)),
-      deps.catalog(),
+      ...[...seasons].map((season) => attempt(() => deps.data.get(season))),
+      ...[...seasons].map((season) => attempt(() => deps.injuries.get(season))),
+      attempt(() => deps.catalog()),
     ]);
   }
   return { readiness, options, analyze, testConnection, warm, briefing };

@@ -250,9 +250,12 @@ export function createAdviceRouter(
   router.post('/api/advice/warm', (_req, res) => {
     if (!warming) {
       warming = true;
-      void service.warm().finally(() => {
-        warming = false;
-      });
+      void service
+        .warm()
+        .catch(() => undefined)
+        .finally(() => {
+          warming = false;
+        });
     }
     res.status(202).json({ warming: true });
   });
