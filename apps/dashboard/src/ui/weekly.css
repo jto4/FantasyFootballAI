@@ -182,3 +182,41 @@ p.weekly-answer {
   font-size: 13px;
   line-height: 1.5;
 }
+
+.ready-drafts {
+  margin: 20px 0;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.ready-drafts h2 {
+  margin: 4px 0 12px;
+}
+.ready-drafts ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ready-drafts li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.ready-drafts li small {
+  display: block;
+  color: var(--muted);
+}
+.ready-draft-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ready-drafts li p {
+  flex-basis: 100%;
+  margin: 0;
+}
