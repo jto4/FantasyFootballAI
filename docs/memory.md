@@ -60,6 +60,7 @@ for evidence-backed platform/provider support.
 - Checkouts may live in iCloud Drive. Generated folders carry the `com.apple.fileprovider.ignore#P` attribute (set by `scripts/icloud-safe.mjs` on install and build), conflict copies (`name 2.ext`) are gitignored, and code that enumerates build output must accept only real module filenames.
 - Provider-connected leagues refresh automatically (older than 12 hours, 90 minutes before a kickoff, or after a game ends since the last sync); snapshot imports never refresh silently.
 - Home's weekly answer (`/api/advice/briefing`) is deterministic and AI-free, built from the same lineup and waiver plans as Advice; it never saves, sends or changes rosters.
+- `matchups` always means the current week. Completed regular-season results live separately in `weeklyScores` (ESPN from its schedule, Sleeper one request per week, Yahoo not yet) and feed only the live Season trends charts, never saved report evidence.
 - Source development uses the pinned Node 22 LTS runtime; native SQLite mismatch is a runtime setup failure, never grounds for database restoration. Current readiness belongs to `docs/release-status.md`; historical evidence belongs to dated reviews and the support matrix.
 
 - Manual generation uses durable request IDs and queued/running/completed/failed/interrupted jobs. A completed job and draft commit together; unfinished work never replays automatically after stop, restart, or restore. Legacy report clients share the same queue; scheduled work shares the provider concurrency bound.

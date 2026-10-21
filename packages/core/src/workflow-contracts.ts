@@ -518,6 +518,28 @@ export function isLeagueConnection(value: unknown): value is LeagueConnection {
       ))
   )
     return false;
+  if (
+    value.weeklyScores !== undefined &&
+    !(
+      Array.isArray(value.weeklyScores) &&
+      // Up to 30 weeks of head-to-head pairs for leagues of at most 64 teams.
+      value.weeklyScores.length <= 30 * 32 &&
+      value.weeklyScores.every(
+        (score) =>
+          record(score) &&
+          boundedNumber(score.week, 1, 30, true) &&
+          Array.isArray(score.teams) &&
+          score.teams.length === 2 &&
+          score.teams.every(
+            (team) =>
+              record(team) &&
+              text(team.teamId, 256) &&
+              boundedNumber(team.points, -1_000_000, 1_000_000),
+          ),
+      )
+    )
+  )
+    return false;
   return (
     value.matchups === undefined ||
     (Array.isArray(value.matchups) &&

@@ -160,6 +160,13 @@ export class SleeperConnector implements LeagueConnector {
         playerCatalogPromise,
       ),
     ]);
+    const weeklyScores = weeklyMatchups
+      ? await sleeperWeeklyScores(
+          id,
+          weeklyMatchups.week,
+          boundedInteger(rawSettings.playoff_week_start, 1, 30),
+        )
+      : [];
     const teams = rosterRows.map((team) => ({
       ...team,
       ...(playerCatalog && team.rosterPlayerIds
@@ -194,6 +201,7 @@ export class SleeperConnector implements LeagueConnector {
       teams,
       ...(draft ? { draft } : {}),
       ...(weeklyMatchups ? { matchups: weeklyMatchups.matchups } : {}),
+      ...(weeklyScores.length ? { weeklyScores } : {}),
       connectedAt: new Date().toISOString(),
     };
   }
@@ -355,4 +363,51 @@ async function sleeperCurrentWeekMatchups(
     // Matchup data is supplemental; retain the league connection when this endpoint is unavailable.
     return undefined;
   }
+}
+
+/**
+ * Final scores for regular-season weeks before the current one, for history charts. Weeks
+ * load in parallel (at most 17 requests); a failed week is skipped rather than failing sync.
+ */
+async function sleeperWeeklyScores(
+  leagueId: string,
+  currentWeek: number,
+  playoffStartWeek: number | undefined,
+): Promise<NonNullable<LeagueConnection['weeklyScores']>> {
+  const lastWeek = Math.min(currentWeek - 1, (playoffStartWeek ?? 19) - 1, 17);
+  const weeks = Array.from({ length: Math.max(0, lastWeek) }, (_, index) => index + 1);
+  const results = await Promise.all(
+    weeks.map(async (week) => {
+      try {
+        const raw = await fetchJson(
+          `https://api.sleeper.app/v1/league/${encodeURIComponent(leagueId)}/matchups/${week}`,
+        );
+        if (!Array.isArray(raw)) return [];
+        const pairs = new Map<string, Array<{ teamId: string; points: number }>>();
+        for (const entry of raw.slice(0, 200)) {
+          const row = asRecord(entry);
+          const rosterId = numberOrUndefined(row?.roster_id);
+          // Commissioner-entered scores override the calculated total, including zero.
+          const points = numberOrUndefined(row?.custom_points) ?? numberOrUndefined(row?.points);
+          if (
+            !row ||
+            row.matchup_id === null ||
+            row.matchup_id === undefined ||
+            rosterId === undefined ||
+            points === undefined ||
+            Math.abs(points) > 1_000_000
+          )
+            continue;
+          const key = String(row.matchup_id);
+          pairs.set(key, [...(pairs.get(key) ?? []), { teamId: String(rosterId), points }]);
+        }
+        return [...pairs.values()]
+          .filter((teams) => teams.length === 2)
+          .map((teams) => ({ week, teams }));
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return results.flat();
 }

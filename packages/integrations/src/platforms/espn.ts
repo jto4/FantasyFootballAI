@@ -181,6 +181,7 @@ export function normalizeEspnLeague(
   espnApplyRosters(teams, rosterTeams);
   const draft = espnDraft(supplemental?.draftDetail, season, id, teams);
   const draftScheduledAt = espnDraftScheduledAt(asRecord(settings.draftSettings)?.date);
+  const weeklyScores = espnWeeklyScores(data.schedule, matchupPeriod, regularMatchupPeriods);
   const matchups = espnCurrentWeekMatchups(data.schedule, matchupPeriod)?.map((m) => ({
     ...m,
     week: currentWeek ?? m.week,
@@ -222,6 +223,7 @@ export function normalizeEspnLeague(
     ...(draft ? { draft } : {}),
     ...(draftScheduledAt ? { draftScheduledAt } : {}),
     ...(matchups ? { matchups } : {}),
+    ...(weeklyScores.length ? { weeklyScores } : {}),
     connectedAt: new Date().toISOString(),
   };
 }
@@ -277,6 +279,56 @@ async function espnSupplementalData(
     // Roster and draft detail are supplemental; core league access remains useful without them.
     return undefined;
   }
+}
+
+/**
+ * Final scores for regular-season matchup periods before the current one. Only decided games
+ * count (ESPN marks unplayed ones UNDECIDED), and live totals are never used.
+ */
+function espnWeeklyScores(
+  rawSchedule: unknown,
+  currentPeriod: number | undefined,
+  regularPeriods: number | undefined,
+): NonNullable<LeagueConnection['weeklyScores']> {
+  if (!Array.isArray(rawSchedule) || currentPeriod === undefined) return [];
+  return rawSchedule.slice(0, 1000).flatMap((entry) => {
+    const row = asRecord(entry);
+    const period = numberOrUndefined(row?.matchupPeriodId);
+    if (
+      !row ||
+      period === undefined ||
+      !Number.isInteger(period) ||
+      period < 1 ||
+      period >= currentPeriod ||
+      (regularPeriods !== undefined && period > regularPeriods) ||
+      !['HOME', 'AWAY', 'TIE'].includes(String(row.winner))
+    )
+      return [];
+    const home = asRecord(row.home);
+    const away = asRecord(row.away);
+    const homeId = numberOrUndefined(home?.teamId);
+    const awayId = numberOrUndefined(away?.teamId);
+    const homePoints = numberOrUndefined(home?.totalPoints);
+    const awayPoints = numberOrUndefined(away?.totalPoints);
+    if (
+      homeId === undefined ||
+      awayId === undefined ||
+      homePoints === undefined ||
+      awayPoints === undefined ||
+      Math.abs(homePoints) > 1_000_000 ||
+      Math.abs(awayPoints) > 1_000_000
+    )
+      return [];
+    return [
+      {
+        week: period,
+        teams: [
+          { teamId: String(homeId), points: homePoints },
+          { teamId: String(awayId), points: awayPoints },
+        ],
+      },
+    ];
+  });
 }
 
 function espnCurrentWeekMatchups(

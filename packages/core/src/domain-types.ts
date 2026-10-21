@@ -55,6 +55,11 @@ export interface LeagueConnection {
   /** Absolute platform-reported draft start time when exposed outside draft metadata. */
   draftScheduledAt?: string;
   matchups?: WeeklyMatchup[];
+  /**
+   * Final head-to-head scores for completed regular-season weeks, for history charts only.
+   * Kept separate from `matchups`, which always describes the current week.
+   */
+  weeklyScores?: WeeklyScore[];
   connectedAt: string;
   lastSyncedAt?: string;
   lastSyncError?: string;
@@ -129,6 +134,11 @@ export interface WeeklyMatchup {
     playerIds?: string[];
     starters?: string[];
   }>;
+}
+
+export interface WeeklyScore {
+  week: number;
+  teams: Array<{ teamId: string; points: number }>;
 }
 
 export interface NewsItem {

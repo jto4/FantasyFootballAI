@@ -399,6 +399,12 @@ describe('connector selection', () => {
         { user_id: 'manager-2', display_name: 'Second Manager' },
       ],
       '/state/nfl': { season: '2026', display_week: 3 },
+      '/league/league-1/matchups/1': [
+        { matchup_id: 1, roster_id: 1, points: 110.5 },
+        { matchup_id: 1, roster_id: 2, points: 95, custom_points: 101 },
+      ],
+      // An unpaired row is incomplete history and is skipped.
+      '/league/league-1/matchups/2': [{ matchup_id: 1, roster_id: 1, points: 88 }],
       '/league/league-1/matchups/3': [
         {
           matchup_id: 7,
@@ -464,6 +470,15 @@ describe('connector selection', () => {
         { id: 'p1', name: 'Avery Runner', position: 'RB', nflTeam: 'BUF', status: 'Active' },
       ],
     });
+    expect(league.weeklyScores).toEqual([
+      {
+        week: 1,
+        teams: [
+          { teamId: '1', points: 110.5 },
+          { teamId: '2', points: 101 },
+        ],
+      },
+    ]);
     expect(league.teams[1]?.pointsFor).toBe(298);
     expect(league.draft).toMatchObject({
       id: 'draft-1',
@@ -497,7 +512,7 @@ describe('connector selection', () => {
       playoff_week_start: 15,
       seasonStatus: 'in_season',
     });
-    expect(fetch).toHaveBeenCalledTimes(8);
+    expect(fetch).toHaveBeenCalledTimes(10);
   });
 
   it('keeps Sleeper draft start metadata available before any picks are made', async () => {
@@ -669,8 +684,15 @@ describe('connector selection', () => {
         },
         {
           matchupPeriodId: 2,
+          winner: 'HOME',
           home: { teamId: 1, totalPoints: 80 },
           away: { teamId: 2, totalPoints: 70 },
+        },
+        {
+          matchupPeriodId: 1,
+          winner: 'UNDECIDED',
+          home: { teamId: 1, totalPoints: 0 },
+          away: { teamId: 2, totalPoints: 0 },
         },
       ],
     };
@@ -680,6 +702,16 @@ describe('connector selection', () => {
     vi.stubGlobal('fetch', fetch);
 
     const league = await new EspnConnector('owner-authorized-cookie', 2026).fetchLeague('12345');
+    // Only decided earlier periods become history; the current week stays in matchups.
+    expect(league.weeklyScores).toEqual([
+      {
+        week: 2,
+        teams: [
+          { teamId: '1', points: 80 },
+          { teamId: '2', points: 70 },
+        ],
+      },
+    ]);
 
     expect(league).toMatchObject({
       platform: 'espn',
