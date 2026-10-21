@@ -23,8 +23,8 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
             : 'Limited evidence'}
       </h3>
       <p>
-        Checked {formatDateTime(report.checkedAt)}. This describes evidence coverage, not a
-        probability of success.
+        Checked {formatDateTime(report.checkedAt)}. This shows what data is available, not the odds
+        of success.
       </p>
       {report.projectionTotal > 0 && (
         <p>
@@ -45,7 +45,7 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
           .filter((i) => i.state !== 'current')
           .map((i, index) => (
             <li key={index}>
-              <strong>{i.name}:</strong> {i.detail}
+              <strong>{i.name}:</strong> {readableTimes(i.detail)}
             </li>
           ))}
       </ul>
@@ -57,7 +57,7 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
               <strong>
                 {i.name} · {i.state}:
               </strong>{' '}
-              {i.detail}
+              {readableTimes(i.detail)}
             </li>
           ))}
         </ul>
@@ -73,5 +73,13 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
         ))}
       </details>
     </section>
+  );
+}
+
+/** Readiness details carry ISO timestamps; show them as ordinary local dates. */
+function readableTimes(text: string): string {
+  return text.replace(
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})/g,
+    (value) => formatDateTime(value),
   );
 }

@@ -391,8 +391,8 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
                     {player.draftProfile.college ? ` · ${player.draftProfile.college}` : ''}
                   </p>
                   <p>
-                    Draft position describes NFL investment. It does not establish this player’s
-                    current role, playing time, or fantasy draft value.
+                    NFL draft slot shows how much a team invested, not this player’s current role or
+                    fantasy value.
                   </p>
                 </section>
               )}
@@ -494,10 +494,7 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           </section>
         )}
         <Statement statement={result.assessment.perception} metrics={metrics} sources={sources} />
-        <p>
-          Headlines and Sleeper add/drop activity are limited proxies. They do not represent
-          everyone’s opinion or prove future performance.
-        </p>
+        <p>Headlines and Sleeper add/drop trends are a rough read on buzz, not a forecast.</p>
       </details>
       {!!result.warnings.length && (
         <details className="advice-warnings">

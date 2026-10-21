@@ -109,14 +109,14 @@ export function buildAdviceReadiness({
       name: 'Roster snapshot',
       state: freshness === 'fresh' ? 'current' : freshness,
       detail: league?.lastSyncedAt
-        ? `Snapshot ${league.lastSyncedAt}. Refresh after roster moves; a recent snapshot is not live ownership.`
-        : 'No verified roster sync timestamp. Refresh your league.',
+        ? `Last updated ${league.lastSyncedAt}. Refresh after roster moves.`
+        : 'No update time recorded. Refresh your league.',
     });
   if (request.mode !== 'betting')
     items.push({
       name: 'Projection coverage',
       state: known === considered.length && known > 0 ? 'current' : 'missing',
-      detail: `${known} of ${considered.length} considered active players have a scoring-matched ${scope} estimate.${alreadyPlayed ? ` ${alreadyPlayed} ${alreadyPlayed === 1 ? 'player’s game has' : 'players’ games have'} already started or finished this week, so no pregame estimate applies.` : ''} Missing estimates remain unknown.`,
+      detail: `${known} of ${considered.length} active players have a ${scope} estimate under your league’s scoring.${alreadyPlayed ? ` ${alreadyPlayed} ${alreadyPlayed === 1 ? 'player’s game has' : 'players’ games have'} already started or finished this week.` : ''} Players without one are left out of the math.`,
     });
   const current = injuries.filter((r) => r.coverage === 'current').length;
   const weekly = injuries.filter((r) => r.coverage === 'week-window').length;
@@ -124,7 +124,7 @@ export function buildAdviceReadiness({
     items.push({
       name: 'Injury report coverage',
       state: current + weekly === injuries.length ? 'current' : 'unknown',
-      detail: `${current} of ${injuries.length} players have a dated recent report.${weekly ? ` ${weekly} ${weekly === 1 ? 'has' : 'have'} this week’s report without an update time from the source, treated as current until their team kicks off.` : ''} Missing, undated or conflicting reports do not establish health. Practice participation is not a playing guarantee.`,
+      detail: `${current} of ${injuries.length} players have a dated injury report.${weekly ? ` ${weekly} ${weekly === 1 ? 'has' : 'have'} this week’s report without an update time from the source, treated as current until their team kicks off.` : ''} No report doesn’t mean healthy, and practicing doesn’t guarantee playing.`,
     });
   // Many sources differ only by season, week or game; group them so coverage stays readable.
   const rank = { missing: 3, stale: 2, unknown: 1, current: 0 } as const;
@@ -154,7 +154,7 @@ export function buildAdviceReadiness({
     items.push({
       name: `${group.name}${group.count > 1 ? ` (${group.count} files)` : ''}`.slice(0, 180),
       state: group.state,
-      detail: `${group.latest ? `${group.count > 1 ? 'Latest retrieved' : 'Retrieved'} ${group.latest}.` : 'Retrieval timestamp is unknown.'}${group.unknownTime && group.latest ? ' Some retrieval times are unknown.' : ''} Retrieval is not the source’s publication or injury-report update time.`,
+      detail: `${group.latest ? `Downloaded ${group.latest}` : 'Download time unknown'}${group.unknownTime && group.latest ? ' (some times unknown)' : ''}. That’s when the app fetched it, not when the source last changed.`,
     });
   return {
     checkedAt: asOf,
