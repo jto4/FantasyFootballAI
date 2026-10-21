@@ -1,6 +1,7 @@
 import type { AdviceRequest, FootballDataSource, PlayerAdviceEvidence } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
 import { leagueSyncFreshness } from './league-status.js';
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 export interface AdviceDataReadiness {
   checkedAt: string;
   status: 'ready' | 'limited' | 'blocked';
@@ -81,6 +82,12 @@ export function buildAdviceReadiness({
   const known = considered.filter(
     (p) => p.projectedPoints !== undefined && p.projectionScope === scope,
   ).length;
+  const alreadyPlayed =
+    scope === 'week'
+      ? considered.filter(
+          (p) => p.projectedPoints === undefined && p.warnings.includes(weeklyGameWithheldWarning),
+        ).length
+      : 0;
   const freshness = league
     ? leagueSyncFreshness(league, Date.parse(asOf), staleHours * 3600000)
     : 'unknown';
@@ -97,7 +104,7 @@ export function buildAdviceReadiness({
     items.push({
       name: 'Projection coverage',
       state: known === considered.length && known > 0 ? 'current' : 'missing',
-      detail: `${known} of ${considered.length} considered active players have a scoring-matched ${scope} estimate. Missing estimates remain unknown.`,
+      detail: `${known} of ${considered.length} considered active players have a scoring-matched ${scope} estimate.${alreadyPlayed ? ` ${alreadyPlayed} ${alreadyPlayed === 1 ? 'player’s game has' : 'players’ games have'} already started or finished this week, so no pregame estimate applies.` : ''} Missing estimates remain unknown.`,
     });
   const current = injuries.filter((r) => r.coverage === 'current').length;
   if (injuries.length)

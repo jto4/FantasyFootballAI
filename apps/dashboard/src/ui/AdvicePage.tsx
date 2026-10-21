@@ -680,7 +680,7 @@ export function AdvicePage({
                   {!!options?.connections?.length && (
                     <section aria-label="AI connection for this analysis">
                       <label>
-                        Connection for this analysis
+                        AI connection
                         <select
                           value={connection}
                           onChange={(event) => {
@@ -704,7 +704,7 @@ export function AdvicePage({
                           ))}
                         </select>
                       </label>
-                      <p>Used for advice only. Report and schedule settings stay as saved.</p>
+                      <p>Applies to this analysis only; your saved settings don’t change.</p>
                       {connection !== 'saved' && (
                         <>
                           <p>
@@ -970,7 +970,7 @@ export function AdvicePage({
                   {!!options?.models?.length && (
                     <div className="advice-model-choice">
                       <label>
-                        AI for this analysis
+                        Model
                         <select
                           value={model}
                           onChange={(event) => {
@@ -997,11 +997,10 @@ export function AdvicePage({
                         </select>
                       </label>
                       <p>
-                        Used for this analysis and review only. Saved settings stay unchanged.
                         {connection !== 'saved'
-                          ? ' Your saved API prices do not apply to subscription usage.'
+                          ? 'Your saved API prices do not apply to subscription usage.'
                           : model !== options.model &&
-                            ' Your saved model’s prices do not apply, so a cost estimate will be unavailable.'}
+                            'Your saved model’s prices do not apply, so a cost estimate will be unavailable.'}
                       </p>
                     </div>
                   )}
@@ -1037,8 +1036,8 @@ export function AdvicePage({
                     )}
                   </details>
                   <p className="advice-privacy">
-                    Two AI passes · provider charges may apply. Only football data and your note are
-                    shared.
+                    Uses two AI calls, which your provider may charge for. Only football data and
+                    your note are sent.
                   </p>
                   <details>
                     <summary>Privacy & analysis details</summary>
@@ -1072,8 +1071,8 @@ export function AdvicePage({
                   <section className="readiness-entry">
                     <h3>Check the evidence first</h3>
                     <p>
-                      Check data coverage before using AI. Unknown availability and estimates stay
-                      unknown.
+                      See which players have estimates and injury reports before spending an AI
+                      call.
                     </p>
                     <button
                       type="button"

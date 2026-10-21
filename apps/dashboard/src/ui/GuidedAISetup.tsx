@@ -63,12 +63,12 @@ export function GuidedAISetup({
           );
         const runtime: NonNullable<AppSettings['aiRuntime']> = {
           mode: 'api',
-          model: 'gpt-4o-mini',
+          model: 'gpt-6-luna',
           baseUrl: 'https://api.openai.com/v1',
           command: '',
           args: '',
           temperature: 0.8,
-          maxOutputTokens: 1200,
+          maxOutputTokens: 4000,
         };
         saved = await requestJson('/api/settings/ai', isAppSettings, {
           method: 'PATCH',

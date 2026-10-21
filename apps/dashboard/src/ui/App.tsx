@@ -14,7 +14,8 @@ import { Dialog } from './Dialog';
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
-import { AppSidebar, AppTopbar, capitalize, isToolSection } from './AppChrome';
+import { AppSidebar, AppTopbar, isToolSection } from './AppChrome';
+import { platformName } from './platform-name';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
 import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
@@ -1328,8 +1329,8 @@ export function App() {
             </label>
             {detectLeagueLink(leagueId) && (
               <p role="status">
-                ✓ {capitalize(detectLeagueLink(leagueId)!.platform)} league recognized. We’ll check
-                access when you connect.
+                ✓ {platformName(detectLeagueLink(leagueId)!.platform)} league recognized. We’ll
+                check access when you connect.
               </p>
             )}
             <details className="connection-help">
@@ -1380,7 +1381,7 @@ export function App() {
                   setModal(false);
                   setLeagueId('');
                   setNotice(
-                    `Imported ${result.displayName}. Provider update time is unverified; automatic refresh is unavailable.`,
+                    `Imported ${result.displayName}. Automatic refresh isn’t available for imports; re-import to update.`,
                   );
                   await refresh();
                   setActiveLeagueId(result.id);

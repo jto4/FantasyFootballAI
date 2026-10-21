@@ -37,6 +37,22 @@ benchmark does not measure live league refresh duration, real-provider inference
 browser paint/interaction responsiveness, or long-running scheduler resource use; those
 require a configured provider account and a separate recorded manual exercise before release.
 
+## Sample recorded on 2026-10-18
+
+Local macOS ARM, Node.js 22.23.3, same synthetic fixture, after lazy-loading the main
+dashboard pages. "Dashboard assets" now counts only what loads at startup; page chunks load
+on first visit and are prefetched while idle.
+
+| Measurement                                      |           Result |
+| ------------------------------------------------ | ---------------: |
+| Cold API startup to healthy                      |           175 ms |
+| Health endpoint p50 / p95 (30 samples)           |   0.33 / 0.77 ms |
+| Full local state p50 / p95 (30 samples)          |   2.18 / 3.84 ms |
+| Full state response                              |        465.3 KiB |
+| Synthetic report pipeline p50 / p95 (10 samples) | 38.17 / 46.09 ms |
+| Dashboard JavaScript and CSS at startup          |        456.6 KiB |
+| API process working set                          |        136.8 MiB |
+
 ## Repeat sample recorded on 2026-09-27
 
 A fresh macOS ARM run under Node.js 25.9.0 with the same synthetic fixture completed after

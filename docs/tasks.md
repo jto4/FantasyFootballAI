@@ -10,6 +10,11 @@ Completed work and its evidence live in the archived task records and dated revi
 
 ## Open work
 
+### Afton walkthrough and polish — October 18, 2026
+
+- [ ] Rebuild the macOS installer with `npm run desktop:make` while the desktop app is closed (it replaces `apps/desktop/out/`), then relaunch and confirm the Afton league, selected team and drafts survive.
+- [ ] Generate one report and one advice result with the new `gpt-6-luna` default and a real API key; confirm the 4,000-token budget produces complete text. [Review](reviews/2026-10-18-afton-ux-pass.md).
+
 ### Owner Afton verification and usability — October 15, 2026 (local batch verified)
 
 - [ ] Owner setup dependencies: authorize ESPN provider refresh, grant packaged Messages Full Disk Access if desired, and configure an email provider. No OS grants or missing credentials are fabricated. Prospective predictive usefulness remains unestablished.

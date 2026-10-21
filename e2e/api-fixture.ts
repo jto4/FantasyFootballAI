@@ -411,7 +411,7 @@ export async function apiWorkspace(
       configuredAI,
       verifyTwilioCredentials: async () => ({ valid: true }),
       sendResendTestEmail: async () => {},
-      discoverModels: async () => ['gpt-4o-mini'],
+      discoverModels: async () => ['gpt-6-luna'],
     }),
   );
   app.use(createGenerationRouter(store, queue));

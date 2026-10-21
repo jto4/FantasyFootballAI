@@ -1,3 +1,4 @@
+import { platformName } from './platform-name';
 import { useState } from 'react';
 import {
   isAppSettings,
@@ -100,12 +101,14 @@ export function ReportLibrary({
           <h3>{item.title}</h3>
           <p>{item.description}</p>
           <small>
-            {scheduled && action && (manualSnapshot || action.dataMode === 'saved')
-              ? (reportDataProblem(league, action, settings.leagueStaleAfterHours) ??
-                `Saved-data drafts · ${schedulePlanLabel(action)}`)
-              : scheduled && action
-                ? `${action.mode === 'automatic' && action.channel !== 'dashboard' ? 'Auto-send' : 'Auto-draft'} · ${schedulePlanLabel(action)}`
-                : 'Create when you need it'}
+            {scheduled && action && manualSnapshot && action.dataMode !== 'saved'
+              ? `Automation paused · switch it to saved data`
+              : scheduled && action && action.dataMode === 'saved'
+                ? (reportDataProblem(league, action, settings.leagueStaleAfterHours) ??
+                  `Saved-data drafts · ${schedulePlanLabel(action)}`)
+                : scheduled && action
+                  ? `${action.mode === 'automatic' && action.channel !== 'dashboard' ? 'Auto-send' : 'Auto-draft'} · ${schedulePlanLabel(action)}`
+                  : 'Create when you need it'}
           </small>
         </div>
         <div className="template-actions">
@@ -146,8 +149,8 @@ export function ReportLibrary({
       </p>
       {manualSnapshot && (
         <p role="note">
-          This league uses a manual browser snapshot. Create reports now, or schedule saved-data
-          drafts from a recent import.
+          This league was imported from a saved {platformName(league.platform)} page, so it can’t
+          refresh on its own. Create reports now, or set automations to use the saved data.
         </p>
       )}
       {choice('power-rankings')}

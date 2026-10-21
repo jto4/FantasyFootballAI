@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ThemeSwitch } from './Appearance';
 import { WorkspaceSearch } from './WorkspaceSearch';
+import { platformName } from './platform-name';
 import type { SearchDestination } from './search-catalog';
 
 export type ServiceStatus = 'checking' | 'running' | 'stopping' | 'stopped' | 'unavailable';
@@ -189,7 +190,7 @@ export function AppTopbar({
             </select>
             <span>
               {league
-                ? `${capitalize(league.platform)} · ${league.teamCount} teams`
+                ? `${platformName(league.platform)} · ${league.teamCount} teams`
                 : 'Connect to get started'}
             </span>
           </div>
@@ -214,8 +215,4 @@ export function AppTopbar({
       </div>
     </header>
   );
-}
-
-export function capitalize(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

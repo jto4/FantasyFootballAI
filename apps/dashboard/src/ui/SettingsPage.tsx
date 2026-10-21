@@ -3,6 +3,10 @@ import { AppearanceSettings } from './Appearance';
 import { settingTarget } from './search-catalog';
 import { DiagnosticsSection } from './DiagnosticsSection';
 import { useImageLibrary } from './hooks/useImageLibrary';
+import { useAutoSyncStatus } from './hooks/useAutoSyncStatus';
+import { useBlueBubblesWebhook } from './hooks/useBlueBubblesWebhook';
+import { useCredentialTests } from './hooks/useCredentialTests';
+import { useDiagnosticLogs } from './hooks/useDiagnosticLogs';
 import { useYahooConnection } from './hooks/useYahooConnection';
 import { useSettingsForm } from './hooks/useSettingsForm';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -34,20 +38,6 @@ import {
   type LeagueConnection,
 } from '@sidekick/core';
 
-type DiagnosticLogEntry = {
-  timestamp: string;
-  level: 'info' | 'warn' | 'error';
-  event: string;
-  fields: Record<string, string | number>;
-};
-type DiagnosticLogSnapshot = { available: boolean; entries: DiagnosticLogEntry[] };
-type IMessageAutoSyncStatus = {
-  enabled: boolean;
-  intervalMinutes: number;
-  lastCheckedAt?: string;
-  lastAddedMessages?: number;
-  lastError?: string;
-};
 type SettingsPageProps = {
   settings: AppSettings;
   leagues: LeagueConnection[];
@@ -146,17 +136,6 @@ export function SettingsPage({
     refreshImages,
     removeLocalImage,
   } = useImageLibrary(secretState, setMessage);
-  const [credentialTestBusy, setCredentialTestBusy] = useState(false);
-  const [resendTestRecipient, setResendTestRecipient] = useState('');
-  const [imessageAutoSyncStatus, setImessageAutoSyncStatus] =
-    useState<IMessageAutoSyncStatus | null>(null);
-  const [twilioAutoSyncStatus, setTwilioAutoSyncStatus] = useState<IMessageAutoSyncStatus | null>(
-    null,
-  );
-  const [blueBubblesWebhookConfigured, setBlueBubblesWebhookConfigured] = useState(false);
-  const [blueBubblesWebhookLoading, setBlueBubblesWebhookLoading] = useState(true);
-  const [blueBubblesWebhookError, setBlueBubblesWebhookError] = useState('');
-  const [blueBubblesWebhookUrl, setBlueBubblesWebhookUrl] = useState('');
   const {
     yahooClientId,
     setYahooClientId,
@@ -175,46 +154,32 @@ export function SettingsPage({
     disconnectYahoo,
   } = useYahooConnection(setMessage, onCredentialsChanged);
   const [runtimeBusy, setRuntimeBusy] = useState(false);
+  const blueBubblesWebhook = useBlueBubblesWebhook(setMessage);
+  const imessageAutoSyncStatus = useAutoSyncStatus(
+    form.imessageAutoSyncEnabled,
+    '/api/memory/imessage-sync/status',
+  );
+  const twilioAutoSyncStatus = useAutoSyncStatus(
+    form.twilioConversationAutoSyncEnabled,
+    '/api/memory/twilio-conversation-sync/status',
+  );
+  const diagnostics = useDiagnosticLogs();
+  const credentialTests = useCredentialTests(setMessage);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
-  const [diagnosticLogs, setDiagnosticLogs] = useState<DiagnosticLogSnapshot | null>(null);
-  const [diagnosticLogsBusy, setDiagnosticLogsBusy] = useState(false);
-  const [diagnosticLogsError, setDiagnosticLogsError] = useState('');
   const runtime = form.aiRuntime ?? {
     mode: 'api' as const,
-    model: 'gpt-4o-mini',
+    model: 'gpt-6-luna',
     command: '',
     args: '',
     baseUrl: 'https://api.openai.com/v1',
     temperature: 0.8,
-    maxOutputTokens: 1200,
+    maxOutputTokens: 4000,
   };
   const appleCliPlatform = navigator.platform.toLowerCase().startsWith('mac');
   const blueBubblesConfigured =
     secretState.find((item) => item.provider === 'bluebubbles')?.configured === true;
   const twilioConfigured =
     secretState.find((item) => item.provider === 'twilio')?.configured === true;
-  async function refreshBlueBubblesWebhookStatus() {
-    setBlueBubblesWebhookLoading(true);
-    setBlueBubblesWebhookError('');
-    try {
-      const response = await fetch('/api/bluebubbles/webhook');
-      const result: unknown = await response.json();
-      if (
-        !response.ok ||
-        !result ||
-        typeof result !== 'object' ||
-        typeof (result as { configured?: unknown }).configured !== 'boolean'
-      )
-        throw new Error('Could not read BlueBubbles webhook status.');
-      setBlueBubblesWebhookConfigured((result as { configured: boolean }).configured);
-    } catch (error) {
-      setBlueBubblesWebhookError(
-        error instanceof Error ? error.message : 'Could not read BlueBubbles webhook status.',
-      );
-    } finally {
-      setBlueBubblesWebhookLoading(false);
-    }
-  }
 
   useEffect(() => {
     void fetch('/api/credentials')
@@ -232,66 +197,10 @@ export function SettingsPage({
           'OS credential store is unavailable. On Linux, make a Secret Service such as GNOME Keyring or KWallet available on this user’s D-Bus session.',
         );
       });
-    void refreshBlueBubblesWebhookStatus();
+    void blueBubblesWebhook.refresh();
     void refreshImages();
     void refreshYahooOAuthStatus();
   }, []);
-
-  async function refreshDiagnosticLogs() {
-    if (diagnosticLogsBusy) return;
-    setDiagnosticLogsBusy(true);
-    setDiagnosticLogsError('');
-    try {
-      const response = await fetch('/api/diagnostics/logs');
-      const result = (await response.json()) as DiagnosticLogSnapshot & { error?: string };
-      if (!response.ok) throw new Error(result.error ?? 'Could not read local runtime logs.');
-      setDiagnosticLogs(result);
-    } catch (error) {
-      setDiagnosticLogsError(
-        error instanceof Error ? error.message : 'Could not read local runtime logs.',
-      );
-    } finally {
-      setDiagnosticLogsBusy(false);
-    }
-  }
-
-  useEffect(() => {
-    if (!form.imessageAutoSyncEnabled) return;
-    let active = true;
-    const refresh = () => {
-      void fetch('/api/memory/imessage-sync/status')
-        .then((response) => (response.ok ? response.json() : null))
-        .then((status: IMessageAutoSyncStatus | null) => {
-          if (active && status) setImessageAutoSyncStatus(status);
-        })
-        .catch(() => undefined);
-    };
-    refresh();
-    const timer = window.setInterval(refresh, 30_000);
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-    };
-  }, [form.imessageAutoSyncEnabled]);
-
-  useEffect(() => {
-    if (!form.twilioConversationAutoSyncEnabled) return;
-    let active = true;
-    const refresh = () => {
-      void fetch('/api/memory/twilio-conversation-sync/status')
-        .then((response) => (response.ok ? response.json() : null))
-        .then((status: IMessageAutoSyncStatus | null) => {
-          if (active && status) setTwilioAutoSyncStatus(status);
-        })
-        .catch(() => undefined);
-    };
-    refresh();
-    const timer = window.setInterval(refresh, 30_000);
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-    };
-  }, [form.twilioConversationAutoSyncEnabled]);
 
   useEffect(() => {
     if (!focusTarget) return;
@@ -473,100 +382,9 @@ export function SettingsPage({
     setSecretState((current) =>
       current.map((item) => (item.provider === provider ? { ...item, configured: false } : item)),
     );
-    if (provider === 'bluebubbles') {
-      setBlueBubblesWebhookConfigured(false);
-      setBlueBubblesWebhookError('');
-      setBlueBubblesWebhookLoading(false);
-      setBlueBubblesWebhookUrl('');
-    }
+    if (provider === 'bluebubbles') blueBubblesWebhook.reset();
     onCredentialsChanged(provider);
     setMessage('Credential removed.');
-  }
-
-  async function createBlueBubblesWebhook() {
-    const response = await fetch('/api/bluebubbles/webhook', { method: 'POST' });
-    const result = (await response.json()) as { url?: string; error?: string };
-    if (!response.ok || !result.url) {
-      setMessage(result.error ?? 'Could not create a BlueBubbles webhook URL.');
-      return;
-    }
-    setBlueBubblesWebhookConfigured(true);
-    setBlueBubblesWebhookError('');
-    setBlueBubblesWebhookLoading(false);
-    setBlueBubblesWebhookUrl(result.url);
-    setMessage('Webhook URL created. Copy it into BlueBubbles now; it is shown only once.');
-  }
-
-  async function revokeBlueBubblesWebhook() {
-    const response = await fetch('/api/bluebubbles/webhook', { method: 'DELETE' });
-    if (!response.ok) {
-      setMessage('Could not revoke the BlueBubbles webhook URL.');
-      return;
-    }
-    setBlueBubblesWebhookConfigured(false);
-    setBlueBubblesWebhookError('');
-    setBlueBubblesWebhookLoading(false);
-    setBlueBubblesWebhookUrl('');
-    setMessage('Webhook URL revoked.');
-  }
-
-  async function testTwilioCredentials() {
-    setCredentialTestBusy(true);
-    setMessage('Checking Twilio credentials without sending a message…');
-    try {
-      const response = await fetch('/api/credentials/twilio/test', { method: 'POST' });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(result.error ?? 'Twilio credential check failed.');
-      setMessage('Twilio credentials are valid. No SMS was sent.');
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Twilio credential check failed.');
-    } finally {
-      setCredentialTestBusy(false);
-    }
-  }
-
-  async function testEspnCredentials() {
-    setCredentialTestBusy(true);
-    setMessage('Checking the saved ESPN session with a connected league…');
-    try {
-      const response = await fetch('/api/credentials/espn/test', { method: 'POST' });
-      const result = (await response.json()) as {
-        connected?: boolean;
-        league?: string;
-        season?: number;
-        error?: string;
-      };
-      if (!response.ok || result.connected !== true)
-        throw new Error(result.error ?? 'ESPN session check failed.');
-      setMessage(
-        `ESPN access verified for ${result.league ?? 'the connected league'}${result.season ? ` (${result.season})` : ''}. No league data was changed.`,
-      );
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'ESPN session check failed.');
-    } finally {
-      setCredentialTestBusy(false);
-    }
-  }
-
-  async function testResendCredentials() {
-    const recipient = resendTestRecipient.trim();
-    if (!recipient || !window.confirm(`Send a data-free test email to ${recipient}?`)) return;
-    setCredentialTestBusy(true);
-    setMessage('Sending the confirmed test email…');
-    try {
-      const response = await fetch('/api/credentials/resend/test', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ recipient, confirmation: 'SEND_TEST' }),
-      });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(result.error ?? 'Resend test email failed.');
-      setMessage(`Resend sent a data-free test email to ${recipient}.`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Resend test email failed.');
-    } finally {
-      setCredentialTestBusy(false);
-    }
   }
 
   function handleRestoredSettings(restoredSettings: AppSettings) {
@@ -1145,13 +963,13 @@ export function SettingsPage({
             twilioAutoSyncStatus={twilioAutoSyncStatus}
             blueBubblesConfigured={blueBubblesConfigured}
             imessageAutoSyncStatus={imessageAutoSyncStatus}
-            blueBubblesWebhookConfigured={blueBubblesWebhookConfigured}
-            blueBubblesWebhookLoading={blueBubblesWebhookLoading}
-            blueBubblesWebhookError={blueBubblesWebhookError}
-            blueBubblesWebhookUrl={blueBubblesWebhookUrl}
-            onCreateWebhook={() => void createBlueBubblesWebhook()}
-            onRevokeWebhook={() => void revokeBlueBubblesWebhook()}
-            onRetryWebhookStatus={() => void refreshBlueBubblesWebhookStatus()}
+            blueBubblesWebhookConfigured={blueBubblesWebhook.configured}
+            blueBubblesWebhookLoading={blueBubblesWebhook.loading}
+            blueBubblesWebhookError={blueBubblesWebhook.error}
+            blueBubblesWebhookUrl={blueBubblesWebhook.url}
+            onCreateWebhook={() => void blueBubblesWebhook.create()}
+            onRevokeWebhook={() => void blueBubblesWebhook.revoke()}
+            onRetryWebhookStatus={() => void blueBubblesWebhook.refresh()}
             onNotice={setMessage}
           />
         </section>
@@ -1176,12 +994,12 @@ export function SettingsPage({
           onSaveSecret={(provider) => void saveSecret(provider)}
           onRemoveSecret={(provider) => void removeSecret(provider)}
           espnTestAvailable={leagues.some((league) => league.platform === 'espn')}
-          credentialTestBusy={credentialTestBusy}
-          onTestEspn={() => void testEspnCredentials()}
-          resendTestRecipient={resendTestRecipient}
-          onResendTestRecipientChange={setResendTestRecipient}
-          onTestTwilio={() => void testTwilioCredentials()}
-          onTestResend={() => void testResendCredentials()}
+          credentialTestBusy={credentialTests.busy}
+          onTestEspn={() => void credentialTests.testEspn()}
+          resendTestRecipient={credentialTests.resendRecipient}
+          onResendTestRecipientChange={credentialTests.setResendRecipient}
+          onTestTwilio={() => void credentialTests.testTwilio()}
+          onTestResend={() => void credentialTests.testResend()}
           imageGenerationConfigured={imageGenerationConfigured}
           imageProvider={imageProvider}
           onImageProviderChange={(provider) => {
@@ -1215,36 +1033,36 @@ export function SettingsPage({
               <button
                 type="button"
                 className="small-button"
-                onClick={() => void refreshDiagnosticLogs()}
-                disabled={diagnosticLogsBusy}
+                onClick={() => void diagnostics.refresh()}
+                disabled={diagnostics.busy}
               >
-                <RefreshCw size={14} className={diagnosticLogsBusy ? 'spinning' : ''} />
-                {diagnosticLogsBusy ? 'Loading…' : 'Refresh logs'}
+                <RefreshCw size={14} className={diagnostics.busy ? 'spinning' : ''} />
+                {diagnostics.busy ? 'Loading…' : 'Refresh logs'}
               </button>
             </div>
             <small>
               Only structured operational events and reviewed metadata are shown. Request bodies,
               conversation text, provider output, and credentials are omitted.
             </small>
-            {diagnosticLogsError && (
+            {diagnostics.error && (
               <p className="schedule-explainer" role="alert">
-                {diagnosticLogsError}
+                {diagnostics.error}
               </p>
             )}
-            {diagnosticLogs && !diagnosticLogs.available && (
+            {diagnostics.logs && !diagnostics.logs.available && (
               <p className="schedule-explainer">
                 File-based diagnostics are available in the packaged app and installed source
                 service. A service started directly from a terminal writes logs there instead.
               </p>
             )}
-            {diagnosticLogs?.available && diagnosticLogs.entries.length === 0 && (
+            {diagnostics.logs?.available && diagnostics.logs.entries.length === 0 && (
               <p className="schedule-explainer">
                 No structured log entries have been captured yet.
               </p>
             )}
-            {diagnosticLogs?.entries.length ? (
+            {diagnostics.logs?.entries.length ? (
               <ol className="diagnostic-log-list" aria-label="Recent local runtime events">
-                {diagnosticLogs.entries.map((entry, index) => (
+                {diagnostics.logs.entries.map((entry, index) => (
                   <li
                     className={`diagnostic-log-row ${entry.level}`}
                     key={`${entry.timestamp}-${index}`}

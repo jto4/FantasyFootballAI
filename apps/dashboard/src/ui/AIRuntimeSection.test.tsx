@@ -71,7 +71,7 @@ describe('AI runtime section', () => {
       }),
     );
 
-    expect(markup).toContain('API credential status is unavailable.');
+    expect(markup).toContain('Couldn’t read the saved key.');
     expect(markup).not.toContain('An API key is required for API mode.');
   });
 

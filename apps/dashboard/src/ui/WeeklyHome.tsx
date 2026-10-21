@@ -1,3 +1,4 @@
+import { platformName } from './platform-name';
 import { useEffect, useState } from 'react';
 import { requestJson } from './api-client';
 import {
@@ -96,12 +97,12 @@ export function WeeklyHome({
         <>
           <p className={freshness === 'fresh' ? 'connection-success' : 'field-warning'}>
             {league.connectionMode === 'snapshot'
-              ? `Imported browser snapshot${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}. Provider update time is unverified.`
+              ? `Imported from ${platformName(league.platform)}${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}.`
               : freshness === 'fresh'
                 ? 'Roster snapshot is recent.'
                 : freshness === 'stale'
                   ? 'Roster snapshot needs a refresh.'
-                  : 'Roster freshness is unverified.'}
+                  : 'Last roster update unknown.'}
             {league.lastSyncedAt ? ` Last synced ${formatDateTime(league.lastSyncedAt)}.` : ''}{' '}
             <button className="text-button" onClick={onRefresh}>
               {league.connectionMode === 'snapshot' ? 'Import updated roster' : 'Refresh roster'}
@@ -136,22 +137,18 @@ export function WeeklyHome({
                       ))}
                     </ul>
                   ) : (
-                    <p>
-                      No availability flags are recorded in this roster. This does not establish
-                      that everyone is healthy.
-                    </p>
+                    <p>No injury flags on this roster.</p>
                   )}
                   {alerts.length > 5 && (
                     <p>
-                      {alerts.length - 5} more saved flags. Open the lineup check to review all
-                      players.
+                      {alerts.length - 5} more flagged players. Open the lineup check to see all.
                     </p>
                   )}
-                  <p>Saved flags · verify playing status in Advice.</p>
+                  <small>From your last roster update. Check game-day status before kickoff.</small>
                 </article>
                 <article>
                   <h3>Waivers and trades</h3>
-                  <p>No verified deadline. Check priority and FAAB on your platform.</p>
+                  <p>Check your waiver priority and FAAB in {platformName(league.platform)}.</p>
                   <button className="small-button" onClick={() => onAdvice('waivers')}>
                     Find waiver pickups
                   </button>{' '}

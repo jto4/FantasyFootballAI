@@ -274,7 +274,7 @@ export function ReportsPage({
         <div>
           <p className="section-overline">REVIEW & DELIVERY</p>
           <h1>Reports</h1>
-          <p>Read, edit, and review the exact destination before sending.</p>
+          <p>Review and edit drafts. Nothing is sent until you confirm where it goes.</p>
         </div>
         {onCreate && (
           <button type="button" className="primary-button" onClick={onCreate}>

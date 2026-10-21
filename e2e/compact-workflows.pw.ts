@@ -24,9 +24,7 @@ test('advice views preserve a draft and keep the lineup visible before optional 
       'Review my draft',
       'Analyze a bet',
     ]);
-    await expect(
-      page.getByRole('combobox', { name: 'AI for this analysis', exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Model', exact: true })).toBeVisible();
     const note = page.getByLabel('Anything else to consider? (optional)');
     await note.fill('Retain this note while I review saved advice.');
     await nav.getByRole('button', { name: /^Saved advice/ }).click();

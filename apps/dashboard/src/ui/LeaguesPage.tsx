@@ -1,3 +1,4 @@
+import { platformName } from './platform-name';
 import { Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import {
   defaultLeagueStaleAfterHours,
@@ -51,7 +52,7 @@ export function LeaguesPage({
               <div className="management-copy">
                 <strong>{league.displayName}</strong>
                 <span>
-                  {capitalize(league.platform)} · {league.teamCount} teams ·{' '}
+                  {platformName(league.platform)} · {league.teamCount} teams ·{' '}
                   {Object.keys(league.scoring).length
                     ? `${Object.keys(league.scoring).length} scoring rules`
                     : 'scoring details unavailable'}
@@ -62,7 +63,7 @@ export function LeaguesPage({
                     {league.snapshotImportedAt
                       ? new Date(league.snapshotImportedAt).toLocaleString()
                       : 'at an unknown time'}
-                    . Provider update time is unverified; automatic refresh is unavailable.
+                    . Automatic refresh isn’t available for imports; re-import to update.
                   </small>
                 )}
                 {league.lastSyncError && <small>Last refresh failed: {league.lastSyncError}</small>}
@@ -131,8 +132,4 @@ export function LeaguesPage({
       </div>
     </>
   );
-}
-
-function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

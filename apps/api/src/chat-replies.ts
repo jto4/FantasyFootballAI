@@ -114,7 +114,7 @@ export async function buildMentionReplyDrafts(
           runtime?.mode === 'codex-cli'
             ? 'gpt-6.1-sol'
             : runtime?.mode === 'api'
-              ? runtime.model || 'gpt-4o-mini'
+              ? runtime.model || 'gpt-6-luna'
               : 'unknown',
           completion.usage,
           runtime?.mode === 'api' ? runtime.inputUsdPerMillionTokens : undefined,

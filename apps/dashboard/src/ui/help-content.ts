@@ -125,7 +125,7 @@ export const helpArticles = [
     category: 'Advice',
     aliases: 'claude opus subscription signed in login existing ai no new api key connection test',
     answer:
-      'Yes, if the Claude CLI is already installed and signed in with your Claude subscription on this computer. In Advice, choose Signed-in Claude · Opus under Connection for this analysis. Reload connections checks sign-in without generating an answer. Test signed-in AI sends only a fixed connection check, with no league data. Analyze sends the decision and its evidence to Claude for an analysis and review using Opus. Subscription limits and model availability still apply; a successful sign-in check alone does not prove generation will work. This choice does not change report or schedule settings, create a key, or switch to another provider after a failure. You can cancel the test or analysis. Saved advice shows the connection used.',
+      'Yes, if the Claude CLI is already installed and signed in with your Claude subscription on this computer. In Advice, choose Signed-in Claude · Opus under AI connection. Reload connections checks sign-in without generating an answer. Test signed-in AI sends only a fixed connection check, with no league data. Analyze sends the decision and its evidence to Claude for an analysis and review using Opus. Subscription limits and model availability still apply; a successful sign-in check alone does not prove generation will work. This choice does not change report or schedule settings, create a key, or switch to another provider after a failure. You can cancel the test or analysis. Saved advice shows the connection used.',
     action: { label: 'Open Advice', section: 'Advice' },
   },
   {
