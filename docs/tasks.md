@@ -13,7 +13,6 @@ Completed work and its evidence live in the archived task records and dated revi
 ### Advice data and setup pass — October 21, 2026
 
 - [ ] Owner: add ESPN `espn_s2`/`SWID` access in Settings → Credentials, then use Afton's "Import updated roster" → Connect league to switch it from snapshot to automatic refresh.
-- [ ] Owner: move the checkout out of iCloud Drive (or exclude it) to stop sync conflict copies in source, build output and `.git`.
 
 ### Afton walkthrough and polish — October 18, 2026
 

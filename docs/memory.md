@@ -57,6 +57,7 @@ for evidence-backed platform/provider support.
 
 - Manual dashboard generation always requests a draft. Reports support revision-checked edits only before any delivery attempt, followed by an explicit recipient/channel/message review. Scheduled automatic policy remains independent.
 - Settings uses shared section allowlists; AI testing/discovery saves only AI fields. API and CLI onboarding readiness requires a successful test of the saved runtime, then first-draft review.
+- Checkouts may live in iCloud Drive. Generated folders carry the `com.apple.fileprovider.ignore#P` attribute (set by `scripts/icloud-safe.mjs` on install and build), conflict copies (`name 2.ext`) are gitignored, and code that enumerates build output must accept only real module filenames.
 - Source development uses the pinned Node 22 LTS runtime; native SQLite mismatch is a runtime setup failure, never grounds for database restoration. Current readiness belongs to `docs/release-status.md`; historical evidence belongs to dated reviews and the support matrix.
 
 - Manual generation uses durable request IDs and queued/running/completed/failed/interrupted jobs. A completed job and draft commit together; unfinished work never replays automatically after stop, restart, or restore. Legacy report clients share the same queue; scheduled work shares the provider concurrency bound.

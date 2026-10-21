@@ -1,4 +1,5 @@
-import { rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
+import { markLocalOnly, removeConflictCopies } from './icloud-safe.mjs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,7 +16,11 @@ const builds = ['@sidekick/core', '@sidekick/integrations', '@sidekick/api', '@s
 
 for (const output of outputs) {
   await rm(join(rootPath, output), { recursive: true, force: true });
+  // Recreate and mark before compiling so iCloud never syncs a half-written build.
+  await mkdir(join(rootPath, output), { recursive: true });
 }
+markLocalOnly(outputs);
+await removeConflictCopies();
 
 for (const workspace of builds) {
   const result = spawnSync(npmCommand, ['--workspace', workspace, 'run', 'build'], {

@@ -10,3 +10,6 @@ coverage/
 out/
 apps/desktop/out/
 .DS_Store
+# iCloud Drive conflict copies such as "file 2.ts"; see scripts/icloud-safe.mjs.
+* [2-9]
+* [2-9].*
