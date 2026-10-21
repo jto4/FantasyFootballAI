@@ -1,4 +1,4 @@
-import { mkdir, rm } from 'node:fs/promises';
+import { mkdir, readdir, rm } from 'node:fs/promises';
 import { markLocalOnly, removeConflictCopies } from './icloud-safe.mjs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -15,9 +15,12 @@ const outputs = [
 const builds = ['@sidekick/core', '@sidekick/integrations', '@sidekick/api', '@sidekick/dashboard'];
 
 for (const output of outputs) {
-  await rm(join(rootPath, output), { recursive: true, force: true });
-  // Recreate and mark before compiling so iCloud never syncs a half-written build.
-  await mkdir(join(rootPath, output), { recursive: true });
+  // Empty the folder in place: deleting and recreating it makes iCloud Drive keep the old
+  // one as a "dist 2" conflict copy. The folder keeps its local-only marker this way.
+  const directory = join(rootPath, output);
+  await mkdir(directory, { recursive: true });
+  for (const entry of await readdir(directory))
+    await rm(join(directory, entry), { recursive: true, force: true });
 }
 markLocalOnly(outputs);
 await removeConflictCopies();

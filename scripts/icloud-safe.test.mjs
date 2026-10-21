@@ -10,6 +10,7 @@ test('removes generated and identical conflict copies and keeps differing ones',
   const root = await mkdtemp(join(tmpdir(), 'sidekick-icloud-'));
   try {
     await mkdir(join(root, 'packages/core/dist/research 2'), { recursive: true });
+    await mkdir(join(root, 'apps/api/dist 2/nested'), { recursive: true });
     await mkdir(join(root, 'src'), { recursive: true });
     await mkdir(join(root, '.git'), { recursive: true });
     await writeFile(join(root, 'packages/core/dist/index 2.js'), 'old build');
@@ -25,13 +26,14 @@ test('removes generated and identical conflict copies and keeps differing ones',
 
     assert.ok(!existsSync(join(root, 'packages/core/dist/index 2.js')));
     assert.ok(!existsSync(join(root, 'packages/core/dist/research 2')));
+    assert.ok(!existsSync(join(root, 'apps/api/dist 2')));
     assert.ok(!existsSync(join(root, 'src/a 2.ts')));
     assert.ok(!existsSync(join(root, '.git/index 2')));
     assert.ok(existsSync(join(root, 'src/b 2.ts')));
     assert.ok(existsSync(join(root, 'src/version 10.ts')));
     assert.ok(existsSync(join(root, '.git/index')));
     assert.deepEqual(kept, [join('src', 'b 2.ts')]);
-    assert.equal(removed.length, 4);
+    assert.equal(removed.length, 5);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

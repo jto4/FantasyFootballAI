@@ -69,6 +69,14 @@ export async function removeConflictCopies(root = rootPath) {
   const removed = [];
   const kept = [];
   const generated = generatedPaths.map((path) => join(root, path));
+  // Conflict copies of a whole generated folder ("dist 2") sit beside it.
+  for (const path of generatedPaths)
+    for (let copy = 2; copy <= 9; copy += 1) {
+      const target = join(root, `${path} ${copy}`);
+      if (!existsSync(target)) continue;
+      await rm(target, { recursive: true, force: true });
+      removed.push(relative(root, target));
+    }
   // node_modules copies are build/install output; dist and out are rebuilt on every build.
   for (const target of generated) {
     if (!existsSync(target) || target.endsWith('node_modules')) continue;

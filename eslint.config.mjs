@@ -1,7 +1,17 @@
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/node_modules/**', '**/.bundle/**', '**/out/**', 'coverage/**'] },
+  {
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.bundle/**',
+      '**/out/**',
+      'coverage/**',
+      // iCloud Drive conflict copies of generated folders, e.g. "dist 2".
+      '**/* [2-9]/**',
+    ],
+  },
   ...tseslint.configs.recommended,
   {
     rules: {
