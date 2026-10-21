@@ -62,7 +62,7 @@ it('explains weekly estimates withheld because a game already started', () => {
     asOf,
   });
   expect(report.items.find((i) => i.name === 'Projection coverage')?.detail).toContain(
-    '1 of 3 considered active players',
+    '1 of 3 active players',
   );
   expect(report.items.find((i) => i.name === 'Projection coverage')?.detail).toContain(
     '2 players’ games have already started or finished',

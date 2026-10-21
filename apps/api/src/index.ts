@@ -11,6 +11,7 @@ import { createGenerationQueue, createGenerationRouter } from './generation-jobs
 import { storageStartupFailure } from './storage-startup.js';
 import { createReportRouter } from './report-routes.js';
 import { createScheduledRunRetryRouter } from './scheduled-run-retry-routes.js';
+import { startLeagueAutoRefresh } from './league-auto-refresh.js';
 import { createSettingsRouter } from './settings-routes.js';
 import { createDeliveryService } from './delivery-service.js';
 import { createReportService } from './report-service.js';
@@ -946,6 +947,18 @@ configureTwilioConversationAutoSync(
   store.settingsSnapshot().twilioConversationAutoSyncEnabled === true,
   store.settingsSnapshot().twilioConversationSyncIntervalMinutes ?? 15,
 );
+// Provider-connected leagues refresh before kickoffs and after games; snapshots never do.
+const leagueAutoRefresh = startLeagueAutoRefresh({
+  leagues: () => store.snapshot().leagues,
+  games: async (season) => (await publicFootballData.get(season)).games,
+  refresh: async (league) => {
+    const fetched = await retryLeagueFetch(() => fetchScheduledLeague(league), 1);
+    const latest = store.snapshot().leagues.find((item) => item.id === league.id);
+    // Skip if the owner disconnected or switched the league to an import while fetching.
+    if (!latest || latest.connectionMode === 'snapshot') return;
+    await saveSyncedLeague(store, fetched);
+  },
+});
 stopApplication = createShutdownAction(
   server,
   [
@@ -966,6 +979,7 @@ stopApplication = createShutdownAction(
     conversationRetentionTask,
     blueBubblesAutoSyncTask,
     twilioConversationAutoSyncTask,
+    leagueAutoRefresh,
   ],
   () => logEvent('info', 'api.stopping', { component: 'api', reason: 'shutdown_requested' }),
 );

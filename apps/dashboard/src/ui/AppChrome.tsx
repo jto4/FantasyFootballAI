@@ -1,4 +1,4 @@
-import type { RefObject } from 'react';
+import { Fragment, type RefObject } from 'react';
 import type { LeagueConnection, ReportSummary } from '@sidekick/core';
 import {
   CalendarDays,
@@ -28,11 +28,12 @@ const menu = [
   { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
   { section: 'Settings', label: 'Settings', icon: Settings },
 ];
+// Labs tools (chat memory and imports) sit after the everyday tools under their own label.
 const tools = [
-  { section: 'Leagues', label: 'Leagues', icon: Users },
-  { section: 'Members & memory', label: 'League members', icon: MessageCircle },
-  { section: 'Imports', label: 'Imports', icon: FileText },
-  { section: 'Help', label: 'Help', icon: CircleHelp },
+  { section: 'Leagues', label: 'Leagues', icon: Users, labs: false },
+  { section: 'Help', label: 'Help', icon: CircleHelp, labs: false },
+  { section: 'Members & memory', label: 'League members', icon: MessageCircle, labs: true },
+  { section: 'Imports', label: 'Imports', icon: FileText, labs: true },
 ];
 
 export function isToolSection(section: string) {
@@ -85,16 +86,22 @@ export function AppSidebar({
           onToggle={(event) => onShowToolsChange(event.currentTarget.open)}
         >
           <summary>More tools</summary>
-          {tools.map(({ section: destination, label, icon: Icon }) => (
-            <button
-              type="button"
-              key={destination}
-              className={`nav-item ${section === destination ? 'active' : ''}`}
-              onClick={() => navigate(destination)}
-            >
-              <Icon size={17} />
-              <span>{label}</span>
-            </button>
+          {tools.map(({ section: destination, label, icon: Icon, labs }, index) => (
+            <Fragment key={destination}>
+              {labs && !tools[index - 1]?.labs && (
+                <span className="nav-group-label" aria-hidden="true">
+                  Labs
+                </span>
+              )}
+              <button
+                type="button"
+                className={`nav-item ${section === destination ? 'active' : ''}`}
+                onClick={() => navigate(destination)}
+              >
+                <Icon size={17} />
+                <span>{label}</span>
+              </button>
+            </Fragment>
           ))}
         </details>
       </nav>
@@ -190,7 +197,7 @@ export function AppTopbar({
             </select>
             <span>
               {league
-                ? `${platformName(league.platform)} · ${league.teamCount} teams`
+                ? `${platformName(league.platform)} · ${league.teamCount} teams${updatedLabel(league)}`
                 : 'Connect to get started'}
             </span>
           </div>
@@ -215,4 +222,20 @@ export function AppTopbar({
       </div>
     </header>
   );
+}
+
+/** One freshness phrase shared by the header: when league data last arrived, in plain words. */
+export function updatedLabel(
+  league: Pick<LeagueConnection, 'lastSyncedAt' | 'snapshotImportedAt'>,
+  now = Date.now(),
+): string {
+  const at = Date.parse(league.lastSyncedAt ?? league.snapshotImportedAt ?? '');
+  if (!Number.isFinite(at) || at > now + 60_000) return '';
+  const minutes = Math.floor((now - at) / 60_000);
+  if (minutes < 2) return ' · updated just now';
+  if (minutes < 60) return ` · updated ${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return ` · updated ${hours} hr ago`;
+  const days = Math.floor(hours / 24);
+  return ` · updated ${days} day${days === 1 ? '' : 's'} ago`;
 }

@@ -403,3 +403,13 @@
 .advice-result .advice-confidence {
   padding: 0 12px;
 }
+
+/* Labs: power features stay one click away but sit after the everyday fantasy choices. */
+.labs-label {
+  align-self: center;
+  margin: 0 2px 0 10px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

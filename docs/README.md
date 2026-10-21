@@ -95,15 +95,16 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Keeping project context current
 
-- Update `tasks.md` when implementation changes. It lists open work only: add a short item
-  for a known gap, and when an item is done, record its evidence in a dated review and
-  delete the item. Completed history lives in `reviews/*-task-history.md`.
-- Update `support-matrix.md` only from recorded tests, live checks, or native platform
-  verification. A mocked test is not evidence of live-provider or OS behavior.
-- Update `implementation-plan.md` when product scope changes; update `release-status.md` when
-  readiness or release gates change.
-- Record durable architecture changes in `decisions.md`; keep `memory.md` for stable
-  constraints and behaviors, not dates, temporary investigations, or pending tasks.
-- Put dated review evidence in `reviews/` and benchmark results in `performance.md`.
-- If documentation and the current code disagree, inspect the code and its tests, then fix
-  the inaccurate documentation rather than treating the stale statement as behavior.
+Keep documentation proportional to the change. Most changes need only a code comment where
+behavior is non-obvious and, when they close or open work, an edit to `tasks.md`.
+
+- `tasks.md` lists open work only. Add a short item for a known gap and delete it when done.
+- `decisions.md` records durable architecture choices and why; `memory.md` keeps stable
+  invariants (privacy, evidence and safety rules) in a line or two each, never dated status.
+- `support-matrix.md` changes only from recorded tests, live checks or native platform runs; a
+  mocked test is not evidence of live-provider or OS behavior.
+- Add a dated file in `reviews/` only for a release candidate, a live provider/model check, or
+  a model-quality evaluation; ordinary features and fixes do not need one.
+- Update `implementation-plan.md` when product scope changes and `release-status.md` when
+  release gates change.
+- If documentation and the code disagree, trust the code and its tests and fix the document.

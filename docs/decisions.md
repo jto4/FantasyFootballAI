@@ -358,3 +358,27 @@ research limits in Advice/Help. Avoid bulk historical downloads for disabled
 features; capture only relevant current-season/previous-season descriptive roles.
 Keep explicit research replay separate from HTTP/live dispatch, and preserve
 future pre-kickoff numerical records unchanged for later grading.
+
+## Where Sunday Sidekick runs (proposed, owner decision pending)
+
+The app is local-first: scheduled reports, game-day league refresh and Advice warm-up run only
+while the desktop app (or source service) is running on the owner's computer, and the
+dashboard is reachable only from that computer. That protects league data and credentials but
+means a sleeping laptop misses Tuesday drafts and the owner cannot check Home from a phone on
+Sunday.
+
+Options, smallest first:
+
+1. **Stay local, lean in (current).** Launch at sign-in, start hidden in the tray, refresh
+   around games, and record missed scheduled runs so the owner can re-run them after
+   waking. No new exposure.
+2. **Read-only view on the home network.** Serve Home and saved reports to a phone on the same
+   Wi-Fi. Requires, per `AGENTS.md`, a written threat model and authentication design first:
+   pairing with a one-time code, per-device tokens stored in the OS credential store, TLS or a
+   pinned local certificate, read-only routes only, no credential or delivery endpoints, and
+   an owner switch that defaults off.
+3. **Managed service.** Move scheduling and AI calls to the hosted design sketched in
+   `managed-ai-design.md`. Largest change; needs accounts, billing and a data policy.
+
+Recommendation: keep option 1 now and decide on option 2 only with that threat model written
+and reviewed. Do not add any non-loopback listener until then.

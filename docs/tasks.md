@@ -10,6 +10,12 @@ Completed work and its evidence live in the archived task records and dated revi
 
 ## Open work
 
+### Product pass — October 21, 2026
+
+- [ ] Owner: choose where the app runs (stay local, read-only home-network view with a threat model, or managed service). See `decisions.md`.
+- [ ] Owner: provide an Apple Developer ID and notarization credentials so macOS builds can be signed; until then installers show an unidentified-developer warning.
+- [ ] Track league storylines and running jokes week to week in reports, building on member memory (needs AI and owner-approved chat history).
+
 ### Advice data and setup pass — October 21, 2026
 
 - [ ] Owner: add ESPN `espn_s2`/`SWID` access in Settings → Credentials, then use Afton's "Import updated roster" → Connect league to switch it from snapshot to automatic refresh.

@@ -18,6 +18,8 @@ import {
   isAdviceResult,
   nflTeamKey,
   isUpcomingFootballGame,
+  isInactiveFootballStatus,
+  weeklyGameWithheldWarning,
   validateAdviceAssessment,
   type AdviceAssessment,
   type AdviceConnection,
@@ -69,6 +71,34 @@ export interface AdviceDependencies {
   signedInCodex?: SignedInAIConnection;
   odds?: Pick<PublicSportsbookLines, 'get' | 'verify' | 'result'>;
   now?: () => number;
+}
+
+/** Deterministic Home summary; contains no AI output and no private league members' data. */
+export interface WeeklyBriefing {
+  leagueId: string;
+  teamId: string;
+  week: number;
+  asOf: string;
+  coverage: { known: number; total: number; alreadyPlayed: number };
+  lineup: {
+    complete: boolean;
+    points?: number;
+    comparedWeek?: number;
+    changes: {
+      slot: string;
+      start: { id: string; name: string; points: number };
+      bench?: { id: string; name: string; points?: number };
+    }[];
+  };
+  availability: {
+    id: string;
+    name: string;
+    status: string;
+    basis: 'dated-report' | 'this-week-report' | 'roster';
+    validUntil?: string;
+  }[];
+  waivers: { id: string; name: string; position: string; gain: number }[];
+  notes: string[];
 }
 
 export class AdviceGameTimingError extends Error {
@@ -1071,6 +1101,175 @@ export function createAdviceService(deps: AdviceDependencies) {
     )
       throw new Error('The signed-in AI connection test could not be verified.');
   }
+  /**
+   * The Home weekly answer: deterministic lineup and waiver plans plus availability, with no AI
+   * call. It uses the NFL's upcoming week from the schedule when the league snapshot lags.
+   */
+  async function briefing(leagueId: string, teamId: string): Promise<WeeklyBriefing> {
+    const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
+    if (!leagueRow?.teams.some((team) => team.id === teamId))
+      throw new Error('That team is not in the connected league.');
+    const probe = await load({ mode: 'lineup', leagueId });
+    const asOf = new Date(now()).toISOString();
+    const upcoming = probe.data.games
+      .filter((game) => game.season === probe.season && isUpcomingFootballGame(game, asOf))
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    const leagueWeek = probe.week;
+    const week = upcoming && upcoming.week > leagueWeek ? upcoming.week : leagueWeek;
+    const loaded = week === leagueWeek ? probe : await load({ mode: 'lineup', leagueId, week });
+    const league = loaded.league!;
+    const injury = await deps.injuries.get(loaded.season).catch(() => undefined);
+    const injuryEvidence = new Map(
+      loaded.players.map((player) => {
+        const evidence = adviceInjuryEvidence(
+          player,
+          injury,
+          loaded.season,
+          week,
+          asOf,
+          loaded.data.games,
+        );
+        if (evidence.status) player.status = evidence.status;
+        return [player.id, evidence] as const;
+      }),
+    );
+    const evidence = buildPlayerEvidence({
+      league,
+      players: loaded.players,
+      projections: deps.store
+        .snapshot()
+        .playerProjections.filter((row) => row.leagueId === league.id)
+        .map((row) => ({ ...row, sourceId: projectionSourceId(row) })),
+      data: loaded.data,
+      season: loaded.season,
+      week,
+      scope: 'week',
+      asOf,
+    });
+    const byId = new Map(evidence.map((player) => [player.id, player]));
+    const plan = (mode: 'lineup' | 'waivers') => {
+      try {
+        return buildFantasyAdvicePlan(
+          league,
+          { mode, teamId, week, season: loaded.season },
+          evidence,
+          asOf,
+        );
+      } catch {
+        return undefined;
+      }
+    };
+    const lineupPlan = plan('lineup');
+    const waiverPlan = plan('waivers');
+    const roster = league.teams.find((team) => team.id === teamId)?.roster ?? [];
+    const recordedWeeks = (league.matchups ?? [])
+      .filter(
+        (m) => m.week <= week && m.teams.some((t) => t.teamId === teamId && t.starters?.length),
+      )
+      .map((m) => m.week);
+    const startersWeek = recordedWeeks.length ? Math.max(...recordedWeeks) : undefined;
+    const starters = new Set(
+      (league.matchups ?? [])
+        .filter((m) => m.week === startersWeek)
+        .flatMap((m) =>
+          m.teams.filter((t) => t.teamId === teamId).flatMap((t) => t.starters ?? []),
+        ),
+    );
+    const name = (id: string) => byId.get(id)?.name ?? roster.find((p) => p.id === id)?.name ?? id;
+    const optimal = lineupPlan?.lineup;
+    const changes =
+      optimal?.complete && starters.size
+        ? (() => {
+            const ins = optimal.assignments.filter((row) => !starters.has(row.playerId));
+            const chosen = new Set(optimal.assignments.map((row) => row.playerId));
+            const outs = [...starters]
+              .filter((id) => !chosen.has(id))
+              .map((id) => ({ id, points: byId.get(id)?.projectedPoints }));
+            return ins.map((row, index) => ({
+              slot: row.slot,
+              start: { id: row.playerId, name: name(row.playerId), points: row.points },
+              ...(outs[index]
+                ? {
+                    bench: {
+                      id: outs[index]!.id,
+                      name: name(outs[index]!.id),
+                      ...(outs[index]!.points !== undefined ? { points: outs[index]!.points } : {}),
+                    },
+                  }
+                : {}),
+            }));
+          })()
+        : [];
+    const considered = roster.filter((p) => !isInactiveFootballStatus(byId.get(p.id)?.status));
+    const known = considered.filter((p) => byId.get(p.id)?.projectedPoints !== undefined).length;
+    const played = considered.filter((p) =>
+      byId.get(p.id)?.warnings.includes(weeklyGameWithheldWarning),
+    ).length;
+    const availability = roster
+      .map((p) => ({
+        player: p,
+        evidence: injuryEvidence.get(p.id),
+        status: byId.get(p.id)?.status,
+      }))
+      .filter(({ status }) => status && !/^(active|normal|healthy)$/i.test(status))
+      .slice(0, 8)
+      .map(({ player, evidence, status }) => ({
+        id: player.id,
+        name: player.name,
+        // A this-week report without a designation supersedes the older roster flag.
+        status:
+          evidence?.coverage === 'week-window' && !evidence.status
+            ? 'No game designation'
+            : status!,
+        basis:
+          evidence?.coverage === 'current'
+            ? ('dated-report' as const)
+            : evidence?.coverage === 'week-window'
+              ? ('this-week-report' as const)
+              : ('roster' as const),
+        ...(evidence?.validUntil ? { validUntil: evidence.validUntil } : {}),
+      }));
+    const waivers = (waiverPlan?.candidates ?? [])
+      .filter((candidate) => (candidate.value ?? 0) > 0)
+      .slice(0, 3)
+      .map((candidate) => ({
+        id: candidate.playerId,
+        name: name(candidate.playerId),
+        position: byId.get(candidate.playerId)?.position ?? '',
+        gain: candidate.value!,
+      }));
+    const notes: string[] = [];
+    if (week !== leagueWeek)
+      notes.push(
+        `League data is from week ${leagueWeek}; the NFL is on week ${week}. Update the league to see this week’s roster moves.`,
+      );
+    if (startersWeek !== undefined && startersWeek !== week)
+      notes.push(`Compared with your week ${startersWeek} starters.`);
+    if (!known && considered.length)
+      notes.push(
+        league.connectionMode === 'snapshot'
+          ? `No week ${week} point estimates yet. Import an updated ESPN page, or connect ESPN access for automatic refresh, to load this week’s projections.`
+          : `No week ${week} point estimates yet. Refresh the league or import projections to compare starters.`,
+      );
+    else if (!optimal?.complete)
+      notes.push('Some starting spots have no estimate yet, so the lineup suggestion is partial.');
+    return {
+      leagueId,
+      teamId,
+      week,
+      asOf,
+      coverage: { known, total: considered.length, alreadyPlayed: played },
+      lineup: {
+        complete: optimal?.complete === true,
+        ...(optimal?.points !== undefined ? { points: optimal.points } : {}),
+        changes,
+        ...(startersWeek !== undefined ? { comparedWeek: startersWeek } : {}),
+      },
+      availability,
+      waivers,
+      notes,
+    };
+  }
   /** Preloads public stats and the player catalog so Advice opens without a cold download. */
   async function warm(): Promise<void> {
     const seasons = new Set(
@@ -1080,12 +1279,15 @@ export function createAdviceService(deps: AdviceDependencies) {
         .filter((season): season is number => typeof season === 'number'),
     );
     if (!seasons.size) return;
+    // Wrap each loader so a synchronous throw cannot escape allSettled.
+    const attempt = (load: () => Promise<unknown>) => Promise.resolve().then(load);
     await Promise.allSettled([
-      ...[...seasons].map((season) => deps.data.get(season)),
-      deps.catalog(),
+      ...[...seasons].map((season) => attempt(() => deps.data.get(season))),
+      ...[...seasons].map((season) => attempt(() => deps.injuries.get(season))),
+      attempt(() => deps.catalog()),
     ]);
   }
-  return { readiness, options, analyze, testConnection, warm };
+  return { readiness, options, analyze, testConnection, warm, briefing };
 
   async function models(settings: AppSettings) {
     const saved = modelName(settings);

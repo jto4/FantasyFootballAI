@@ -1,3 +1,4 @@
+import { ReadyDrafts } from './ReadyDrafts';
 import type { RefObject, ReactNode } from 'react';
 import { Activity, CalendarDays, FileText, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import { leagueSeasonPhase, rankTeams, reportVisuals, type LeagueConnection } from '@sidekick/core';
@@ -99,6 +100,18 @@ export function LeagueDesk({
         </div>
       </section>
       {weekly}
+      {league && (
+        <ReadyDrafts
+          drafts={state.reports.filter(
+            (report) =>
+              report.leagueId === league.id && report.status === 'draft' && !report.deliveryState,
+          )}
+          onReview={(id) => {
+            setInitialReviewId(id);
+            navigate('Reports');
+          }}
+        />
+      )}
       {!weekly && (
         <section className="advice-home-entry">
           <div>
