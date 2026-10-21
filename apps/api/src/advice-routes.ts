@@ -224,6 +224,17 @@ export function createAdviceRouter(
       refreshingPerformance = false;
     }
   });
+  let warming = false;
+  // Read-only and data-free: fetches only public stats and the player catalog, never AI.
+  router.post('/api/advice/warm', (_req, res) => {
+    if (!warming) {
+      warming = true;
+      void service.warm().finally(() => {
+        warming = false;
+      });
+    }
+    res.status(202).json({ warming: true });
+  });
   router.post('/api/advice/readiness', async (req, res) => {
     if (!isAdviceRequest(req.body))
       return res

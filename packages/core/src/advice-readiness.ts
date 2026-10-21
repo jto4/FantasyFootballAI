@@ -9,7 +9,7 @@ export interface AdviceDataReadiness {
   projectionTotal: number;
   currentInjuryReports: number;
   injuryPlayers: number;
-  injuryReports: { playerId: string; updatedAt?: string; coverage: string }[];
+  injuryReports: { playerId: string; updatedAt?: string; validUntil?: string; coverage: string }[];
   items: { name: string; state: 'current' | 'stale' | 'unknown' | 'missing'; detail: string }[];
 }
 const object = (x: unknown): x is Record<string, unknown> =>
@@ -37,10 +37,22 @@ export function isAdviceDataReadiness(x: unknown): x is AdviceDataReadiness {
       (r) =>
         object(r) &&
         text(r.playerId, 256) &&
-        ['current', 'undated', 'stale', 'unmatched', 'ambiguous', 'unavailable'].includes(
-          String(r.coverage),
-        ) &&
+        [
+          'current',
+          'week-window',
+          'undated',
+          'stale',
+          'unmatched',
+          'ambiguous',
+          'unavailable',
+        ].includes(String(r.coverage)) &&
         (r.coverage !== 'current' || timestamp(r.updatedAt)) &&
+        // A week-window report has no publication time and is valid only until kickoff.
+        (r.coverage !== 'week-window' ||
+          (r.updatedAt === undefined &&
+            timestamp(r.validUntil) &&
+            Date.parse(r.validUntil) > Date.parse(String(x.checkedAt)))) &&
+        (r.validUntil === undefined || r.coverage === 'week-window') &&
         (r.updatedAt === undefined ||
           (timestamp(r.updatedAt) && Date.parse(r.updatedAt) <= Date.parse(String(x.checkedAt)))),
     ) &&
@@ -107,15 +119,22 @@ export function buildAdviceReadiness({
       detail: `${known} of ${considered.length} considered active players have a scoring-matched ${scope} estimate.${alreadyPlayed ? ` ${alreadyPlayed} ${alreadyPlayed === 1 ? 'player’s game has' : 'players’ games have'} already started or finished this week, so no pregame estimate applies.` : ''} Missing estimates remain unknown.`,
     });
   const current = injuries.filter((r) => r.coverage === 'current').length;
+  const weekly = injuries.filter((r) => r.coverage === 'week-window').length;
   if (injuries.length)
     items.push({
-      name: 'Dated injury coverage',
-      state: current === injuries.length ? 'current' : 'unknown',
-      detail: `${current} of ${injuries.length} players have a uniquely matched recent report. Missing, undated or conflicting reports do not establish health. Practice participation is not a playing guarantee.`,
+      name: 'Injury report coverage',
+      state: current + weekly === injuries.length ? 'current' : 'unknown',
+      detail: `${current} of ${injuries.length} players have a dated recent report.${weekly ? ` ${weekly} ${weekly === 1 ? 'has' : 'have'} this week’s report without an update time from the source, treated as current until their team kicks off.` : ''} Missing, undated or conflicting reports do not establish health. Practice participation is not a playing guarantee.`,
     });
-  for (const source of sources.slice(0, 30)) {
+  // Many sources differ only by season, week or game; group them so coverage stays readable.
+  const rank = { missing: 3, stale: 2, unknown: 1, current: 0 } as const;
+  const groups = new Map<
+    string,
+    { name: string; state: keyof typeof rank; count: number; latest?: string; unknownTime: boolean }
+  >();
+  for (const source of sources) {
     const retrieved = source.retrievedAt ? Date.parse(source.retrievedAt) : NaN;
-    const state =
+    const state: keyof typeof rank =
       source.status !== 'available'
         ? 'missing'
         : !Number.isFinite(retrieved) || retrieved > Date.parse(asOf)
@@ -123,12 +142,20 @@ export function buildAdviceReadiness({
           : Date.parse(asOf) - retrieved > 36 * 3600000
             ? 'stale'
             : 'current';
-    items.push({
-      name: source.name.slice(0, 180),
-      state,
-      detail: `${source.retrievedAt ? `Retrieved ${source.retrievedAt}.` : 'Retrieval timestamp is unknown.'} Retrieval is not the source’s publication or injury-report update time.`,
-    });
+    const name = sourceGroupName(source.name);
+    const group = groups.get(name) ?? { name, state, count: 0, unknownTime: false };
+    group.count += 1;
+    if (rank[state] > rank[group.state]) group.state = state;
+    if (!source.retrievedAt) group.unknownTime = true;
+    else if (!group.latest || source.retrievedAt > group.latest) group.latest = source.retrievedAt;
+    groups.set(name, group);
   }
+  for (const group of [...groups.values()].slice(0, 30))
+    items.push({
+      name: `${group.name}${group.count > 1 ? ` (${group.count} files)` : ''}`.slice(0, 180),
+      state: group.state,
+      detail: `${group.latest ? `${group.count > 1 ? 'Latest retrieved' : 'Retrieved'} ${group.latest}.` : 'Retrieval timestamp is unknown.'}${group.unknownTime && group.latest ? ' Some retrieval times are unknown.' : ''} Retrieval is not the source’s publication or injury-report update time.`,
+    });
   return {
     checkedAt: asOf,
     status: items.some((i) => i.state !== 'current') ? 'limited' : 'ready',
@@ -139,4 +166,19 @@ export function buildAdviceReadiness({
     injuryReports: injuries,
     items,
   };
+}
+
+/** Drops season, week, page and single-game qualifiers so per-file sources share one readiness row. */
+function sourceGroupName(name: string): string {
+  return (
+    name
+      .replace(/\bESPN [A-Z]{2,3} at [A-Z]{2,3}, \d{4}-\d{2}-\d{2}/g, 'ESPN game summaries')
+      .replace(/\b(?:19|20)\d{2}\b/g, '')
+      .replace(/\bweek \d{1,2}\b/gi, '')
+      .replace(/\s*·\s*page \d+\b/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s+([),:])/g, '$1')
+      .replace(/\(\s*\)/g, '')
+      .trim() || name
+  );
 }

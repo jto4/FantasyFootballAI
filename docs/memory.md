@@ -161,7 +161,7 @@ dedicated documents. Update `docs/decisions.md` when a durable architectural cho
 - Injury feed retrieval is not the report's update time. Require matched regular-
   season week/team/position and verified GSIS or unique name identity before joining.
   Only a recent explicitly dated, unambiguous report can override recorded status;
-  missing/undated/conflicting reports cannot establish health. Preserve practice
+  missing/undated/conflicting reports cannot establish health. Owner-approved exception: an undated report for the requested regular-season week counts as `week-window` between the previous week's last verified kickoff and the team's own verified kickoff, labeled as lacking a source update time. Preserve practice
   context as descriptive evidence and limit uncertain weekly recommendations.
 - Betting probabilities from the rolling statistical model are separate from AI
   probabilities and descriptive historical hit rates. Fit and calibrate every

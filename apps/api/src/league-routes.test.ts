@@ -107,6 +107,32 @@ describe('league API routes', () => {
     expect(state.leagues.map(({ id }) => id)).toEqual(['league-a', 'league-b']);
   });
 
+  it('keeps the owner label and connection date when a snapshot reconnects live', async () => {
+    const state = stateWithLeague();
+    state.leagues[0] = league('league-a', {
+      displayName: 'Owner league',
+      connectedAt: '2026-09-01T00:00:00.000Z',
+      connectionMode: 'snapshot',
+      snapshotImportedAt: '2026-10-15T00:00:00.000Z',
+    });
+    const baseUrl = await startServer(state, async (_platform, id) =>
+      league(id, { name: 'Provider name', displayName: 'Provider name' }),
+    );
+    const response = await fetch(`${baseUrl}/api/leagues`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ platform: 'sleeper', leagueId: 'league-a' }),
+    });
+    expect(response.status).toBe(201);
+    expect(state.leagues).toHaveLength(1);
+    expect(state.leagues[0]).toMatchObject({
+      displayName: 'Owner league',
+      connectedAt: '2026-09-01T00:00:00.000Z',
+    });
+    expect(state.leagues[0]?.connectionMode).toBeUndefined();
+    expect(state.leagues[0]?.lastSyncedAt).toBeDefined();
+  });
+
   it('keeps known league details on refresh failure and replaces them after recovery', async () => {
     const state = stateWithLeague();
     const fetchLeague = vi

@@ -1,6 +1,7 @@
 import {
   nflTeamKey,
   playerNameKey,
+  type FootballGame,
   type LeagueConnection,
   type RosterPlayer,
 } from '@sidekick/core';
@@ -117,7 +118,13 @@ export function parseNFLInjuryReports(csv: string, season: number): NFLInjuryRep
 
 export interface AdviceInjuryEvidence {
   updatedAt?: string;
-  coverage: 'current' | 'undated' | 'stale' | 'unmatched' | 'ambiguous' | 'unavailable';
+  /**
+   * `week-window`: an undated report for the requested week, used only between the previous
+   * week's last kickoff and this team's verified kickoff (`validUntil`).
+   */
+  coverage:
+    'current' | 'week-window' | 'undated' | 'stale' | 'unmatched' | 'ambiguous' | 'unavailable';
+  validUntil?: string;
   /** Only a current, uniquely identified report can override a roster status. */
   status?: string;
   warnings: string[];
@@ -130,6 +137,7 @@ export function adviceInjuryEvidence(
   season: number,
   week: number,
   asOf: string,
+  games: FootballGame[] = [],
 ): AdviceInjuryEvidence {
   const unknown = (
     coverage: AdviceInjuryEvidence['coverage'],
@@ -172,6 +180,40 @@ export function adviceInjuryEvidence(
     const statuses = [...new Set(matches.map((row) => row.reportStatus).filter(Boolean))]
       .join(', ')
       .slice(0, 160);
+    const window = weekReportWindow(games, season, week, player.nflTeam!);
+    if (window) {
+      const kickoff = Date.parse(window.kickoffAt);
+      if (now >= kickoff)
+        return unknown('stale', `The week ${week} report expired when this team kicked off.`);
+      if (now > window.opensAt) {
+        if (
+          new Set(
+            matches.map((row) =>
+              JSON.stringify([
+                row.reportStatus,
+                row.reportInjury,
+                row.practiceStatus,
+                row.practiceInjury,
+              ]),
+            ),
+          ).size > 1
+        )
+          return unknown('ambiguous', 'This week’s reports conflict and have no update times.');
+        const row = matches[0]!;
+        const detail = [row.reportStatus, row.reportInjury, row.practiceStatus, row.practiceInjury]
+          .filter(Boolean)
+          .join('; ')
+          .slice(0, 400);
+        return {
+          coverage: 'week-window',
+          validUntil: window.kickoffAt,
+          ...(row.reportStatus ? { status: row.reportStatus } : {}),
+          warnings: [
+            `Week ${week} NFL injury report: ${detail || 'No game designation recorded'}. The source gives no update time, so this is treated as this week’s report until kickoff (${window.kickoffAt}). Practice participation does not guarantee playing. Source: nflverse injury reports.`,
+          ],
+        };
+      }
+    }
     return unknown(
       'undated',
       `The matched report${statuses ? ` lists ${statuses} but` : ''} has no verified update date; a recent download cannot establish current status.`,
@@ -214,6 +256,35 @@ export function adviceInjuryEvidence(
       `NFL injury report updated ${latest.updatedAt}: ${detail || 'No game designation recorded'}. Practice participation does not guarantee playing. Source: nflverse injury reports.`,
     ],
   };
+}
+
+/**
+ * An undated weekly report is usable after the previous week's final kickoff and before the
+ * team's own verified kickoff. Week 1 opens seven days before kickoff. Unverified or
+ * ambiguous schedules return undefined so the report stays undated.
+ */
+function weekReportWindow(
+  games: FootballGame[],
+  season: number,
+  week: number,
+  team: string,
+): { opensAt: number; kickoffAt: string } | undefined {
+  const regular = games.filter((game) => game.season === season && game.seasonType === 'REG');
+  const own = regular.filter(
+    (game) =>
+      game.week === week &&
+      [game.home, game.away].some((side) => nflTeamKey(side) === nflTeamKey(team)),
+  );
+  if (own.length !== 1 || !own[0]!.kickoffAt || !Number.isFinite(Date.parse(own[0]!.kickoffAt)))
+    return;
+  const kickoff = Date.parse(own[0]!.kickoffAt);
+  if (week === 1) return { opensAt: kickoff - 7 * 86_400_000, kickoffAt: own[0]!.kickoffAt };
+  const previous = regular
+    .filter((game) => game.week === week - 1)
+    .map((game) => (game.kickoffAt ? Date.parse(game.kickoffAt) : NaN));
+  if (!previous.length || previous.some((value) => !Number.isFinite(value))) return;
+  const opensAt = Math.max(...previous);
+  return opensAt < kickoff ? { opensAt, kickoffAt: own[0]!.kickoffAt } : undefined;
 }
 
 function parseReportDate(value: string): string | undefined {

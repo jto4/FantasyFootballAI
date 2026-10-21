@@ -1,4 +1,4 @@
-import { EspnSnapshotImport } from './EspnSnapshotImport';
+import { ConnectLeagueDialog } from './ConnectLeagueDialog';
 import { useWorkspaceRoute } from './hooks/useWorkspaceRoute';
 import { useLiveDashboard } from './hooks/useLiveDashboard';
 import { requestJson } from './api-client';
@@ -10,12 +10,10 @@ import {
   type GenerationRequest,
   type ReportKind,
 } from '@sidekick/core';
-import { Dialog } from './Dialog';
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
 import { AppSidebar, AppTopbar, isToolSection } from './AppChrome';
-import { platformName } from './platform-name';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
 import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
@@ -28,13 +26,7 @@ import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import type { SendPreview } from './ReportsPage';
 
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Zap } from 'lucide-react';
-import {
-  espnSeasonBounds,
-  parseLeagueInput,
-  detectLeagueLink,
-  type Platform,
-} from '@sidekick/core';
+import { parseLeagueInput, detectLeagueLink, type Platform } from '@sidekick/core';
 import { SetupWizard } from './SetupWizard';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
@@ -254,6 +246,23 @@ export function App() {
     });
   }
   const [stateLoaded, setStateLoaded] = useState(false);
+  const hasLeagues = state.leagues.length > 0;
+  useEffect(() => {
+    if (!stateLoaded || !hasLeagues) return;
+    // Public NFL data takes seconds to download cold; warm it before Advice is opened.
+    // The server cache lasts six hours, so refresh it while the dashboard stays open.
+    const warm = () => void fetch('/api/advice/warm', { method: 'POST' }).catch(() => undefined);
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(warm)
+        : window.setTimeout(warm, 1_000);
+    const timer = window.setInterval(warm, 5 * 60 * 60 * 1_000);
+    return () => {
+      if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+      window.clearInterval(timer);
+    };
+  }, [stateLoaded, hasLeagues]);
   useEffect(() => {
     if (!stateLoaded) return;
     const prefetch = () => {
@@ -598,7 +607,11 @@ export function App() {
       setLeagueId(id);
       setEspnSeason(saved.season ?? new Date().getFullYear());
       setConnectionError('');
-      setNotice('Import a new browser snapshot to update this league.');
+      setNotice(
+        credentialProviders.some((item) => item.provider === 'espn' && item.configured)
+          ? 'Your ESPN access is saved. Choose Connect league to switch to automatic refresh, or import a new snapshot.'
+          : 'Import a new browser snapshot to update this league, or add ESPN access in Settings for automatic refresh.',
+      );
       setModal(true);
       return;
     }
@@ -1269,193 +1282,44 @@ export function App() {
         />
       )}
       {modal && (
-        <Dialog
-          titleId="connect-league-title"
-          className="connect-modal"
-          onClose={() => {
-            if (!busy) setModal(false);
+        <ConnectLeagueDialog
+          busy={busy}
+          platform={platform}
+          onPlatformChange={setPlatform}
+          leagueId={leagueId}
+          onLeagueIdChange={setLeagueId}
+          espnSeason={espnSeason}
+          onEspnSeasonChange={setEspnSeason}
+          connectionError={connectionError}
+          onConnectionErrorChange={setConnectionError}
+          yahooConfigured={credentialProviders.some(
+            (credential) => credential.provider === 'yahoo' && credential.configured,
+          )}
+          espnConfigured={credentialProviders.some(
+            (credential) => credential.provider === 'espn' && credential.configured,
+          )}
+          onSubmit={connectLeague}
+          onClose={() => setModal(false)}
+          onBusy={setBusy}
+          onSetupAccess={(target) => {
+            setModal(false);
+            setSettingsFocusTarget(target);
+            navigate('Settings');
           }}
-        >
-          <form onSubmit={connectLeague}>
-            <button
-              type="button"
-              className="modal-close"
-              aria-label="Close league connection"
-              onClick={() => setModal(false)}
-            >
-              ×
-            </button>
-            <div className="modal-mark">
-              <Zap size={18} />
-            </div>
-            <h2 id="connect-league-title">Bring your league in.</h2>
-            <p>
-              Paste your league URL or ID. Your settings and scoring format come along for the ride.
-            </p>
-            <label>
-              Fantasy platform
-              <select
-                disabled={busy}
-                value={platform}
-                onChange={(event) => {
-                  setPlatform(event.target.value as Platform);
-                  setConnectionError('');
-                }}
-              >
-                <option value="sleeper">Sleeper</option>
-                <option value="espn">ESPN</option>
-                <option value="yahoo">Yahoo</option>
-              </select>
-            </label>
-            <label>
-              LEAGUE ID OR URL
-              <input
-                required
-                value={leagueId}
-                disabled={busy}
-                maxLength={2048}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  setLeagueId(value);
-                  setConnectionError('');
-                  const detected = detectLeagueLink(value);
-                  if (detected) {
-                    setPlatform(detected.platform);
-                    if (detected.season) setEspnSeason(detected.season);
-                  }
-                }}
-                placeholder="Paste a league URL or ID"
-              />
-            </label>
-            {detectLeagueLink(leagueId) && (
-              <p role="status">
-                ✓ {platformName(detectLeagueLink(leagueId)!.platform)} league recognized. We’ll
-                check access when you connect.
-              </p>
-            )}
-            <details className="connection-help">
-              <summary>Where do I find my league link?</summary>
-              <p>
-                Open your league in a web browser, then copy the address from the address bar. Paste
-                it above.
-              </p>
-              <p>
-                {platform === 'sleeper'
-                  ? 'Sleeper: open your league on sleeper.com. Use the league page, rather than an invite link.'
-                  : platform === 'espn'
-                    ? 'ESPN: open Fantasy Football, select your league, and copy the League home address. The link may include the season year.'
-                    : 'Yahoo: open Fantasy Football, select your league, and copy its home-page address.'}
-              </p>
-              <p>If you only have a league ID, select your platform and enter the ID instead.</p>
-            </details>
-            {connectionError && (
-              <FriendlyError
-                message="We couldn’t connect your league. Check the link and any private-league access below, then try Connect league again."
-                detail={connectionError}
-              />
-            )}
-            {platform === 'espn' && (
-              <label>
-                ESPN SEASON
-                <input
-                  required
-                  type="number"
-                  min={espnSeasonBounds.min}
-                  max={espnSeasonBounds.max}
-                  step={1}
-                  value={espnSeason}
-                  onChange={(event) => setEspnSeason(Number(event.target.value))}
-                />
-                <small className="modal-hint">
-                  Select the league year to load; refreshes continue using this season.
-                </small>
-              </label>
-            )}
-            {platform === 'espn' && (
-              <EspnSnapshotImport
-                leagueInput={leagueId}
-                season={espnSeason}
-                disabled={busy}
-                onBusy={setBusy}
-                onImported={async (result) => {
-                  setModal(false);
-                  setLeagueId('');
-                  setNotice(
-                    `Imported ${result.displayName}. Automatic refresh isn’t available for imports; re-import to update.`,
-                  );
-                  await refresh();
-                  setActiveLeagueId(result.id);
-                  if (setupInProgress) {
-                    setSetupWizardStep(1);
-                    setSetupWizardOpen(true);
-                  }
-                }}
-              />
-            )}
-            <small className="modal-hint">
-              Public leagues can connect directly. Private leagues need permission from your own
-              account.
-            </small>
-            {platform === 'yahoo' &&
-              !credentialProviders.some(
-                (credential) => credential.provider === 'yahoo' && credential.configured,
-              ) && (
-                <div className="provider-setup-callout" role="note">
-                  <p>
-                    Sign in to Yahoo and authorize league access before connecting. If account
-                    connection has not been set up, the Yahoo settings include the required steps.
-                  </p>
-                  <button
-                    type="button"
-                    className="text-button"
-                    onClick={() => {
-                      setModal(false);
-                      setSettingsFocusTarget('yahoo');
-                      navigate('Settings');
-                    }}
-                  >
-                    Set up Yahoo access <span>→</span>
-                  </button>
-                </div>
-              )}
-            {platform === 'espn' &&
-              !credentialProviders.some(
-                (credential) => credential.provider === 'espn' && credential.configured,
-              ) && (
-                <div className="provider-setup-callout" role="note">
-                  <p>
-                    For a private ESPN league, add your own ESPN access details first. The ESPN
-                    access card explains how to find them. Public leagues can connect without this
-                    step.
-                  </p>
-                  <button
-                    type="button"
-                    className="text-button"
-                    onClick={() => {
-                      setModal(false);
-                      setSettingsFocusTarget('credentials');
-                      navigate('Settings');
-                    }}
-                  >
-                    Add ESPN access <span>→</span>
-                  </button>
-                </div>
-              )}
-            <button
-              className="primary-button full"
-              type="submit"
-              disabled={
-                busy ||
-                (platform === 'yahoo' &&
-                  !credentialProviders.some(
-                    (credential) => credential.provider === 'yahoo' && credential.configured,
-                  ))
-              }
-            >
-              {busy ? 'Connecting…' : 'Connect league'} <span>→</span>
-            </button>
-          </form>
-        </Dialog>
+          onImported={async (result) => {
+            setModal(false);
+            setLeagueId('');
+            setNotice(
+              `Imported ${result.displayName}. Automatic refresh isn’t available for imports; re-import to update.`,
+            );
+            await refresh();
+            setActiveLeagueId(result.id);
+            if (setupInProgress) {
+              setSetupWizardStep(1);
+              setSetupWizardOpen(true);
+            }
+          }}
+        />
       )}
       {setupWizardOpen && (
         <SetupWizard

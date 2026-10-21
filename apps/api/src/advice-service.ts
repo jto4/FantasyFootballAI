@@ -241,13 +241,21 @@ export function createAdviceService(deps: AdviceDependencies) {
     const injury = await deps.injuries.get(loaded.season).catch(() => undefined);
     const asOf = new Date(now()).toISOString();
     const injuryRows = players.map((player) => {
-      const evidence = adviceInjuryEvidence(player, injury, loaded.season, loaded.week, asOf);
+      const evidence = adviceInjuryEvidence(
+        player,
+        injury,
+        loaded.season,
+        loaded.week,
+        asOf,
+        loaded.data.games,
+      );
       if (evidence.status) player.status = evidence.status;
       const updatedAt = evidence.updatedAt;
       return {
         playerId: player.id,
         coverage: evidence.coverage,
         ...(updatedAt ? { updatedAt } : {}),
+        ...(evidence.validUntil ? { validUntil: evidence.validUntil } : {}),
       };
     });
     const sources = [
@@ -520,6 +528,7 @@ export function createAdviceService(deps: AdviceDependencies) {
           season,
           week,
           asOf,
+          data.games,
         );
         if (injury.status) player.status = injury.status;
         return [player.id, injury] as const;
@@ -930,6 +939,7 @@ export function createAdviceService(deps: AdviceDependencies) {
           playerId,
           coverage: evidence.coverage,
           ...(evidence.updatedAt ? { updatedAt: evidence.updatedAt } : {}),
+          ...(evidence.validUntil ? { validUntil: evidence.validUntil } : {}),
         })),
       asOf,
       staleHours: savedSettings.leagueStaleAfterHours ?? 24,
@@ -1061,7 +1071,21 @@ export function createAdviceService(deps: AdviceDependencies) {
     )
       throw new Error('The signed-in AI connection test could not be verified.');
   }
-  return { readiness, options, analyze, testConnection };
+  /** Preloads public stats and the player catalog so Advice opens without a cold download. */
+  async function warm(): Promise<void> {
+    const seasons = new Set(
+      deps.store
+        .snapshot()
+        .leagues.map((league) => league.season)
+        .filter((season): season is number => typeof season === 'number'),
+    );
+    if (!seasons.size) return;
+    await Promise.allSettled([
+      ...[...seasons].map((season) => deps.data.get(season)),
+      deps.catalog(),
+    ]);
+  }
+  return { readiness, options, analyze, testConnection, warm };
 
   async function models(settings: AppSettings) {
     const saved = modelName(settings);

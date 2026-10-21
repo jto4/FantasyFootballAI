@@ -282,3 +282,81 @@ it('rejects wrong GSIS/team/position/week/postseason and conflicting latest inju
     ).coverage,
   ).toBe('ambiguous');
 });
+
+it('treats an undated weekly report as current only between last week’s final kickoff and the team’s kickoff', () => {
+  const undated: NFLInjuryReportRow = { ...injuryRow };
+  delete undated.updatedAt;
+  const game = (week: number, home: string, away: string, kickoffAt?: string) => ({
+    id: `${week}-${home}`,
+    season: 2026,
+    week,
+    seasonType: 'REG',
+    date: (kickoffAt ?? '2026-10-01').slice(0, 10),
+    home,
+    away,
+    ...(kickoffAt ? { kickoffAt } : {}),
+  });
+  const schedule = [
+    game(4, 'BUF', 'MIA', '2026-10-04T17:00:00Z'),
+    game(4, 'KC', 'DEN', '2026-10-06T00:15:00Z'),
+    game(5, 'BUF', 'NE', '2026-10-11T17:00:00Z'),
+  ];
+  const at = (time: string) =>
+    adviceInjuryEvidence(injuryPlayer, snapshot([undated], time), 2026, 5, time, schedule);
+
+  const open = at('2026-10-09T12:00:00Z');
+  expect(open).toMatchObject({
+    coverage: 'week-window',
+    validUntil: '2026-10-11T17:00:00Z',
+    status: 'Questionable',
+  });
+  expect(open.updatedAt).toBeUndefined();
+  expect(open.warnings[0]).toContain('treated as this week’s report until kickoff');
+  expect(at('2026-10-11T17:00:00Z').coverage).toBe('stale');
+  expect(at('2026-10-05T12:00:00Z').coverage).toBe('undated');
+
+  // An unverified kickoff anywhere in the previous week leaves the report undated.
+  const unverified = [...schedule.slice(0, 1), game(4, 'KC', 'DEN'), schedule[2]!];
+  expect(
+    adviceInjuryEvidence(
+      injuryPlayer,
+      snapshot([undated], '2026-10-09T12:00:00Z'),
+      2026,
+      5,
+      '2026-10-09T12:00:00Z',
+      unverified,
+    ).coverage,
+  ).toBe('undated');
+  // Conflicting undated rows for the same week stay ambiguous.
+  expect(
+    adviceInjuryEvidence(
+      injuryPlayer,
+      snapshot([undated, { ...undated, reportStatus: 'Out' }], '2026-10-09T12:00:00Z'),
+      2026,
+      5,
+      '2026-10-09T12:00:00Z',
+      schedule,
+    ).coverage,
+  ).toBe('ambiguous');
+});
+
+it('opens the week-one injury window seven days before kickoff', () => {
+  const undated: NFLInjuryReportRow = { ...injuryRow, week: 1 };
+  delete undated.updatedAt;
+  const schedule = [
+    {
+      id: 'w1',
+      season: 2026,
+      week: 1,
+      seasonType: 'REG',
+      date: '2026-09-13',
+      home: 'BUF',
+      away: 'NYJ',
+      kickoffAt: '2026-09-13T17:00:00Z',
+    },
+  ];
+  const evidence = (time: string) =>
+    adviceInjuryEvidence(injuryPlayer, snapshot([undated], time), 2026, 1, time, schedule).coverage;
+  expect(evidence('2026-09-11T12:00:00Z')).toBe('week-window');
+  expect(evidence('2026-09-05T12:00:00Z')).toBe('undated');
+});
