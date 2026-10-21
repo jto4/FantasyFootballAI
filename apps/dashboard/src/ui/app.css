@@ -2904,3 +2904,12 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+.nav-group-label {
+  display: block;
+  margin: 10px 0 2px 12px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   isAdviceOptions,
   isAdviceDataReadiness,
@@ -496,20 +496,26 @@ export function AdvicePage({
           [
             ['decision', result ? 'Your decision' : 'New decision'],
             ['history', `Saved advice${history.length ? ` (${history.length})` : ''}`],
-            ['research', 'Track results'],
-            ['signals', 'Market signals'],
+            ['research', 'Track results', 'labs'],
+            ['signals', 'Market signals', 'labs'],
           ] as const
-        ).map(([key, label]) => (
-          <button
-            type="button"
-            key={key}
-            aria-current={view === key ? 'page' : undefined}
-            className={view === key ? 'small-button active' : 'small-button'}
-            disabled={busy || testingConnection || checkingReadiness}
-            onClick={() => setView(key)}
-          >
-            {label}
-          </button>
+        ).map(([key, label, group]) => (
+          <Fragment key={key}>
+            {group && key === 'research' && (
+              <span className="labs-label" aria-hidden="true">
+                Labs
+              </span>
+            )}
+            <button
+              type="button"
+              aria-current={view === key ? 'page' : undefined}
+              className={view === key ? 'small-button active' : 'small-button'}
+              disabled={busy || testingConnection || checkingReadiness}
+              onClick={() => setView(key)}
+            >
+              {label}
+            </button>
+          </Fragment>
         ))}
       </nav>
       <div hidden={view !== 'decision'}>
@@ -527,17 +533,23 @@ export function AdvicePage({
                     ),
                 )
                 .map((choice) => (
-                  <button
-                    type="button"
-                    key={choice.mode}
-                    className={mode === choice.mode ? 'active' : ''}
-                    aria-pressed={mode === choice.mode}
-                    onClick={() =>
-                      onNavigate({ section: 'Advice', adviceMode: choice.mode, adviceId: '' })
-                    }
-                  >
-                    <strong>{choice.title}</strong>
-                  </button>
+                  <Fragment key={choice.mode}>
+                    {choice.mode === 'betting' && (
+                      <span className="labs-label" aria-hidden="true">
+                        Labs
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      className={mode === choice.mode ? 'active' : ''}
+                      aria-pressed={mode === choice.mode}
+                      onClick={() =>
+                        onNavigate({ section: 'Advice', adviceMode: choice.mode, adviceId: '' })
+                      }
+                    >
+                      <strong>{choice.title}</strong>
+                    </button>
+                  </Fragment>
                 ))}
             </div>
             {betting && (
