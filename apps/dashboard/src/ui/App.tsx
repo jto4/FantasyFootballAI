@@ -254,6 +254,23 @@ export function App() {
     });
   }
   const [stateLoaded, setStateLoaded] = useState(false);
+  const hasLeagues = state.leagues.length > 0;
+  useEffect(() => {
+    if (!stateLoaded || !hasLeagues) return;
+    // Public NFL data takes seconds to download cold; warm it before Advice is opened.
+    // The server cache lasts six hours, so refresh it while the dashboard stays open.
+    const warm = () => void fetch('/api/advice/warm', { method: 'POST' }).catch(() => undefined);
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(warm)
+        : window.setTimeout(warm, 1_000);
+    const timer = window.setInterval(warm, 5 * 60 * 60 * 1_000);
+    return () => {
+      if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+      window.clearInterval(timer);
+    };
+  }, [stateLoaded, hasLeagues]);
   useEffect(() => {
     if (!stateLoaded) return;
     const prefetch = () => {

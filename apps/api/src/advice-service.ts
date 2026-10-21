@@ -1061,7 +1061,21 @@ export function createAdviceService(deps: AdviceDependencies) {
     )
       throw new Error('The signed-in AI connection test could not be verified.');
   }
-  return { readiness, options, analyze, testConnection };
+  /** Preloads public stats and the player catalog so Advice opens without a cold download. */
+  async function warm(): Promise<void> {
+    const seasons = new Set(
+      deps.store
+        .snapshot()
+        .leagues.map((league) => league.season)
+        .filter((season): season is number => typeof season === 'number'),
+    );
+    if (!seasons.size) return;
+    await Promise.allSettled([
+      ...[...seasons].map((season) => deps.data.get(season)),
+      deps.catalog(),
+    ]);
+  }
+  return { readiness, options, analyze, testConnection, warm };
 
   async function models(settings: AppSettings) {
     const saved = modelName(settings);
