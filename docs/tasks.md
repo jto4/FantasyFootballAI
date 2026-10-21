@@ -12,7 +12,6 @@ Completed work and its evidence live in the archived task records and dated revi
 
 ### Advice data and setup pass — October 21, 2026
 
-- [ ] Decide how to treat the 2026 nflverse injury feed, which no longer publishes `date_modified`; every matched report is currently "undated" and cannot count as current. [Review](reviews/2026-10-21-advice-data-pass.md).
 - [ ] Owner: add ESPN `espn_s2`/`SWID` access in Settings → Credentials, then use Afton's "Import updated roster" → Connect league to switch it from snapshot to automatic refresh.
 - [ ] Owner: move the checkout out of iCloud Drive (or exclude it) to stop sync conflict copies in source, build output and `.git`.
 

@@ -117,3 +117,39 @@ it('groups per-season, per-week and per-game sources and keeps the worst state',
   expect(report.items.find((i) => i.name.startsWith('Sleeper published'))?.state).toBe('missing');
   expect(isAdviceDataReadiness(report)).toBe(true);
 });
+
+it('counts this week’s undated reports separately and validates their kickoff expiry', () => {
+  const asOf = '2026-10-09T12:00:00Z';
+  const report = buildAdviceReadiness({
+    request: { mode: 'lineup' },
+    league: undefined,
+    players: [],
+    sources: [],
+    injuries: [
+      { playerId: 'a', coverage: 'week-window', validUntil: '2026-10-11T17:00:00Z' },
+      { playerId: 'b', coverage: 'current', updatedAt: '2026-10-09T07:00:00Z' },
+    ],
+    asOf,
+  });
+  const item = report.items.find((i) => i.name === 'Injury report coverage');
+  expect(item?.state).toBe('current');
+  expect(item?.detail).toContain('1 has this week’s report without an update time');
+  expect(report.currentInjuryReports).toBe(1);
+  expect(isAdviceDataReadiness(report)).toBe(true);
+  const expired = {
+    ...report,
+    injuryReports: [
+      { playerId: 'a', coverage: 'week-window', validUntil: '2026-10-08T17:00:00Z' },
+      report.injuryReports[1]!,
+    ],
+  };
+  expect(isAdviceDataReadiness(expired)).toBe(false);
+  const dated = {
+    ...report,
+    injuryReports: [
+      { ...report.injuryReports[0]!, updatedAt: '2026-10-09T07:00:00Z' },
+      report.injuryReports[1]!,
+    ],
+  };
+  expect(isAdviceDataReadiness(dated)).toBe(false);
+});

@@ -9,7 +9,7 @@ export interface AdviceDataReadiness {
   projectionTotal: number;
   currentInjuryReports: number;
   injuryPlayers: number;
-  injuryReports: { playerId: string; updatedAt?: string; coverage: string }[];
+  injuryReports: { playerId: string; updatedAt?: string; validUntil?: string; coverage: string }[];
   items: { name: string; state: 'current' | 'stale' | 'unknown' | 'missing'; detail: string }[];
 }
 const object = (x: unknown): x is Record<string, unknown> =>
@@ -37,10 +37,22 @@ export function isAdviceDataReadiness(x: unknown): x is AdviceDataReadiness {
       (r) =>
         object(r) &&
         text(r.playerId, 256) &&
-        ['current', 'undated', 'stale', 'unmatched', 'ambiguous', 'unavailable'].includes(
-          String(r.coverage),
-        ) &&
+        [
+          'current',
+          'week-window',
+          'undated',
+          'stale',
+          'unmatched',
+          'ambiguous',
+          'unavailable',
+        ].includes(String(r.coverage)) &&
         (r.coverage !== 'current' || timestamp(r.updatedAt)) &&
+        // A week-window report has no publication time and is valid only until kickoff.
+        (r.coverage !== 'week-window' ||
+          (r.updatedAt === undefined &&
+            timestamp(r.validUntil) &&
+            Date.parse(r.validUntil) > Date.parse(String(x.checkedAt)))) &&
+        (r.validUntil === undefined || r.coverage === 'week-window') &&
         (r.updatedAt === undefined ||
           (timestamp(r.updatedAt) && Date.parse(r.updatedAt) <= Date.parse(String(x.checkedAt)))),
     ) &&
@@ -107,11 +119,12 @@ export function buildAdviceReadiness({
       detail: `${known} of ${considered.length} considered active players have a scoring-matched ${scope} estimate.${alreadyPlayed ? ` ${alreadyPlayed} ${alreadyPlayed === 1 ? 'player’s game has' : 'players’ games have'} already started or finished this week, so no pregame estimate applies.` : ''} Missing estimates remain unknown.`,
     });
   const current = injuries.filter((r) => r.coverage === 'current').length;
+  const weekly = injuries.filter((r) => r.coverage === 'week-window').length;
   if (injuries.length)
     items.push({
-      name: 'Dated injury coverage',
-      state: current === injuries.length ? 'current' : 'unknown',
-      detail: `${current} of ${injuries.length} players have a uniquely matched recent report. Missing, undated or conflicting reports do not establish health. Practice participation is not a playing guarantee.`,
+      name: 'Injury report coverage',
+      state: current + weekly === injuries.length ? 'current' : 'unknown',
+      detail: `${current} of ${injuries.length} players have a dated recent report.${weekly ? ` ${weekly} ${weekly === 1 ? 'has' : 'have'} this week’s report without an update time from the source, treated as current until their team kicks off.` : ''} Missing, undated or conflicting reports do not establish health. Practice participation is not a playing guarantee.`,
     });
   // Many sources differ only by season, week or game; group them so coverage stays readable.
   const rank = { missing: 3, stale: 2, unknown: 1, current: 0 } as const;

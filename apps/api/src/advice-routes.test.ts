@@ -1869,7 +1869,9 @@ it('checks data readiness without model configuration, AI calls or journal write
   expect(response.status).toBe(200);
   const report = await response.json();
   expect(report).toMatchObject({ status: 'limited', projectionTotal: 2 });
-  expect(report.items.some((i: { name: string }) => i.name === 'Dated injury coverage')).toBe(true);
+  expect(report.items.some((i: { name: string }) => i.name === 'Injury report coverage')).toBe(
+    true,
+  );
   expect(w.calls).toEqual([]);
   expect(w.configurations).toEqual([]);
   expect(w.store.snapshot()).toEqual(before);

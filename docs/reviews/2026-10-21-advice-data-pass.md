@@ -18,12 +18,14 @@ profile. Local macOS ARM, Node.js 22.23.3.
 
 ## Findings left for the owner
 
-- **Injury feed is undated:** the 2026 nflverse `injuries_2026.csv` no longer includes
-  `date_modified`. The evidence policy requires a verified update date, so every matched report
-  is "undated" and none can count as current (Afton: 6 undated, 11 correctly unmatched).
-  Enabling the feed by default would not change that. A fix needs a policy decision, for
-  example treating a week's report as current only between the previous week's final game and
-  that week's kickoffs.
+- **Injury feed is undated (resolved with owner approval):** the 2026 nflverse
+  `injuries_2026.csv` no longer includes `date_modified`, so every matched report was
+  "undated". An undated report for the requested week now counts as `week-window`: current only
+  after the previous week's last verified kickoff and before the player's own verified team
+  kickoff, then stale. Unverified schedules and conflicting rows stay undated or ambiguous.
+  Advice and readiness label it "this week's report, no update time from the source, valid until
+  kickoff". Real Afton Week 7 on Wednesday: A.J. Brown (NE) valid until the Thursday-night
+  kickoff; the other 16 players have no Week 7 row yet.
 - **Repository is in iCloud Drive:** `~/Documents` sync created conflict copies such as
   `advice-warnings 2.ts`, `.git/index 2` and offloaded `dist/* 3.js` files. Reading an
   offloaded file blocked a test. All copies were identical or build output and were removed;

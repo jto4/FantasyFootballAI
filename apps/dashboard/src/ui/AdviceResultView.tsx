@@ -146,13 +146,9 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
               {p.name} · {p.weeklyGameStatus === 'bye' ? 'Bye' : p.status}
             </span>
           ))}
-        {!!result.readiness?.injuryPlayers &&
-          result.readiness.currentInjuryReports < result.readiness.injuryPlayers && (
-            <span>
-              Availability unverified for{' '}
-              {result.readiness.injuryPlayers - result.readiness.currentInjuryReports} players.
-            </span>
-          )}
+        {!!result.readiness?.injuryPlayers && unverifiedInjuries(result.readiness) > 0 && (
+          <span>Availability unverified for {unverifiedInjuries(result.readiness)} players.</span>
+        )}
       </div>
       {result.marketQuote && (
         <section aria-label="Fetched price analyzed">
@@ -700,4 +696,10 @@ function Lineup({
       {!!lineup.missingSlots.length && <p>Missing: {lineup.missingSlots.join(', ')}</p>}
     </section>
   );
+}
+
+/** Dated reports and this week's pre-kickoff reports both count as current availability. */
+function unverifiedInjuries(readiness: NonNullable<AdviceResult['readiness']>): number {
+  const weekly = readiness.injuryReports.filter((r) => r.coverage === 'week-window').length;
+  return readiness.injuryPlayers - readiness.currentInjuryReports - weekly;
 }

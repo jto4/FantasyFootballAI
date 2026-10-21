@@ -1,6 +1,17 @@
 import type { AdviceDataReadiness } from '@sidekick/core';
 import { formatDateTime } from './date-format';
+const coverageLabels: Record<string, string> = {
+  current: 'dated report',
+  'week-window': 'this week’s report',
+  undated: 'report without an update time',
+  stale: 'out-of-date report',
+  unmatched: 'no matching report',
+  ambiguous: 'conflicting reports',
+  unavailable: 'injury feed unavailable',
+};
+
 export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
+  const weekly = report.injuryReports.filter((r) => r.coverage === 'week-window').length;
   return (
     <section className="data-readiness" aria-label="Data readiness">
       <h3>
@@ -23,8 +34,10 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
       )}
       {report.injuryPlayers > 0 && (
         <p>
-          {report.currentInjuryReports} of {report.injuryPlayers} players have a current dated
-          injury report; the rest remain unverified.
+          {report.currentInjuryReports + weekly} of {report.injuryPlayers} players have a current
+          injury report
+          {weekly ? ` (${weekly} from this week’s report, valid until their team kicks off)` : ''};
+          the rest remain unverified.
         </p>
       )}
       <ul>
@@ -50,10 +63,12 @@ export function DataReadiness({ report }: { report: AdviceDataReadiness }) {
         </ul>
         {report.injuryReports.map((r) => (
           <p key={r.playerId}>
-            {r.playerId}: {r.coverage}
-            {r.updatedAt
-              ? ` · report updated ${formatDateTime(r.updatedAt)}`
-              : ' · no verified report timestamp'}
+            {r.playerId}: {coverageLabels[r.coverage] ?? r.coverage}
+            {r.coverage === 'week-window' && r.validUntil
+              ? ` · no update time from the source, valid until kickoff ${formatDateTime(r.validUntil)}`
+              : r.updatedAt
+                ? ` · report updated ${formatDateTime(r.updatedAt)}`
+                : ' · no verified report timestamp'}
           </p>
         ))}
       </details>
