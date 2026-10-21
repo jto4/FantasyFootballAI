@@ -23,7 +23,13 @@ export async function freezeForecastProtocol(
     const root = dirname(entry);
     const coreExtension = entry.endsWith('.ts') ? '.ts' : '.js';
     const files = (await readdir(root))
-      .filter((name) => name.endsWith(coreExtension) && !/\.test\.[jt]s$/.test(name))
+      // Only real module names: sync conflict copies ("name 2.js") are never part of the build.
+      .filter(
+        (name) =>
+          /^[a-z0-9-]+\.[jt]s$/.test(name) &&
+          name.endsWith(coreExtension) &&
+          !/\.test\.[jt]s$/.test(name),
+      )
       .sort();
     if (!files.length || files.length > 300) throw new Error('Forecast code is unavailable.');
     const hash = createHash('sha256').update(

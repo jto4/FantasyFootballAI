@@ -20,6 +20,11 @@ service details, see the [setup guide](setup.md).
 - **The app reports that a port is already in use:** production uses `127.0.0.1:4173` and
   Vite development uses `127.0.0.1:5173`. Stop the other process or Sidekick instance, then
   try again. Sidekick does not share a port or bind to a network interface.
+- **Files like `advice-warnings 2.ts` appear, or a build or test hangs:** the checkout is in an
+  iCloud Drive folder such as `~/Documents`. Run `npm run icloud:safe`. It marks `.git`,
+  `node_modules`, `dist` and desktop build output as local-only for iCloud, removes conflict
+  copies in generated folders and source copies identical to their original, and lists any that
+  differ for you to review. `npm ci` and `npm run build` run it automatically.
 - **The browser did not open:** after `npm start`, open `http://127.0.0.1:4173` manually.
   During development, use `http://127.0.0.1:5173` after `npm run dev`.
 
