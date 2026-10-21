@@ -682,16 +682,6 @@
   font: inherit;
   font-size: 16px;
 }
-.first-report-explainer {
-  margin: 24px 0;
-}
-.first-report-explainer h2 {
-  font-size: 20px;
-}
-.first-report-explainer li {
-  padding: 8px 0;
-  line-height: 1.5;
-}
 
 /* Task-oriented flows use the same surfaces and readable control sizes as settings. */
 .help-link {
@@ -764,8 +754,10 @@
   color: var(--orange);
   font-weight: 700;
 }
-.sample-entry {
-  margin-bottom: 20px;
+.next-action-card .sample-entry {
+  display: block;
+  margin-top: 8px;
+  margin-left: 0;
 }
 .sample-dialog,
 .schedule-editor {
@@ -893,7 +885,7 @@
 }
 .schedule-editor .schedule-fields {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding-left: 0;
+  margin-left: 0;
 }
 .timezone-id {
   font:
@@ -946,4 +938,43 @@
 .advice-home-entry p {
   margin: 0;
   line-height: 1.6;
+}
+.weekly-plan-modal .saved-data-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.weekly-plan-modal .saved-data-choice input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+}
+.saved-data-guidance {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 10px 0 16px;
+}
+.schedule-rules > summary {
+  cursor: pointer;
+  padding: 8px 0;
+}
+.schedule-card h2 {
+  font-size: 17px;
+}
+.schedule-card p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.schedule-card small {
+  font-size: 12px;
+}
+.schedule-card .small-button,
+.schedule-card .text-button {
+  min-height: 44px;
+  font-size: 12px;
 }

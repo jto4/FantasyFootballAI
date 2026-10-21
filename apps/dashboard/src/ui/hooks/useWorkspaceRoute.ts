@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { settingTarget } from '../search-catalog';
 import { helpArticle } from '../help-content';
 import { isAdviceMode } from '../advice-navigation';
@@ -73,6 +73,12 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
     return parsed;
   });
   const current = useRef(route);
+  const startAtTop = useRef(false);
+  useLayoutEffect(() => {
+    if (!startAtTop.current) return;
+    startAtTop.current = false;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [route.section]);
   const guard = useRef(canLeave);
   guard.current = canLeave;
   const index = useRef(
@@ -105,6 +111,7 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
           );
         return;
       }
+      startAtTop.current = false;
       index.current = Number.isInteger(nextIndex) ? nextIndex : index.current + 1;
       current.current = readWorkspaceRoute();
       setRoute(current.current);
@@ -123,6 +130,7 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
     }
     if (JSON.stringify(next) === JSON.stringify(current.current)) return true;
     if (check && !guard.current()) return false;
+    startAtTop.current = next.section !== current.current.section && !next.settingId;
     current.current = next;
     if (!replace) index.current++;
     history[replace ? 'replaceState' : 'pushState'](

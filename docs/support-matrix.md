@@ -1,5 +1,13 @@
 # Support matrix
 
+Market Signals and player-prop research are implemented in source and verified with
+live public NFL/Kalshi/ESPN/news data plus desktop/mobile replays. The isolated
+prospective price cohort is awaiting outcomes; Polymarket had no exact contract
+for the tested game. Prop prices remain manual. See the
+[October 15 review](reviews/2026-10-15-market-signals.md) for source/browser and
+packaging evidence: macOS ARM smokes and isolated native capture/freeze/prop entry
+passed with zero dialogs/errors; no sportsbook superiority is established.
+
 The current macOS ARM preview supports quiet disposable verification: in-memory
 credentials and browser session, mock Keychain, popup-free unsaved Stop/restart
 and nonmodal expected errors. Source tests (1,020), browser cases (38), six native
@@ -944,3 +952,28 @@ content checks and eight actual reports render in the corrected macOS ARM previe
 dialogs/errors, including source links, two-decimal scores/year labels, missing graphs and
 mobile/black mode. No owner live league, future forecast outcome, interactive install or
 Windows/Linux native verification is claimed. [Current exact receipts](reviews/2026-10-14-real-report-quality.md).
+
+## Active owner verification — October 15, 2026
+
+Authorized private ESPN browser-source import now has API and real-file
+desktop/mobile/restart coverage: 12 teams, 199 roster entries, 192 picks and 198
+validated current-week league-applied forecasts. It is a labeled manual snapshot;
+authenticated automatic refresh, historical numeric-rule scoring and seasonal
+forecast coverage are not established by this test.
+
+One owner-authorized native imsg send was accepted and matched in outgoing scoped
+history after fixing `any;` GUID service checks. No device-delivery status is
+available. This supersedes the earlier version-only limitation for the source
+adapter, while the packaged selected-chat read probe returns 503 until the owner grants Full Disk Access. Native permission was not modified. No email provider
+credential is configured. Broader goal/rebuild status is tracked in the
+[active owner review](reviews/2026-10-15-owner-verification.md).
+
+## Saved-data scheduled drafts — October 15, 2026
+
+Explicit scoped dashboard drafts can now run from recent saved data without ESPN
+provider credentials. Default schedules still refresh. Source tests, desktop/mobile
+workflows and a genuine clock-driven Afton/GPT-6.1-Sol run verify one report, no
+league reads/sends, restart persistence and expired/duplicate rejection. Import time
+remains distinct from publisher freshness. Exact packaged and owner closeout are
+tracked in the [saved-data review](reviews/2026-10-15-saved-data-reports.md). Calendar
+events retain provider refresh; saved-data reports use ordinary report schedules.

@@ -151,8 +151,8 @@ With supported Node 22, decompress those inputs into a fresh local directory,
 then run the diagnosis or the frozen audit:
 
 ```sh
-node scripts/diagnose-expanded-total-losses.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v12-r2-frozen-settings.json
-node scripts/audit-seasonal-external-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v13-frozen-settings.json
+node scripts/research/diagnose-expanded-total-losses.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v12-r2-frozen-settings.json
+node scripts/research/audit-seasonal-external-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v13-frozen-settings.json
 ```
 
 The audit verifies frozen inputs, prior settings, diagnosis and source hashes.

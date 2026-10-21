@@ -151,7 +151,7 @@ With supported Node 22, decompress contexts and final tapes into a fresh local
 directory, then run:
 
 ```sh
-node scripts/audit-expanded-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v12-r2-frozen-settings.json
+node scripts/research/audit-expanded-totals.mjs /path/to/games.json /path/to/signals.json docs/research/2026-10-13-v12-r2-frozen-settings.json
 ```
 
 The audit checks plaintext data hashes, model parameters, frozen source hashes,

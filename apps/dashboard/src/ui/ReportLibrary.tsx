@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   isAppSettings,
+  reportDataProblem,
   settingsSectionPatch,
   scheduleRecommendations,
   type AppSettings,
@@ -33,6 +34,7 @@ export function ReportLibrary({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const manualSnapshot = league.connectionMode === 'snapshot';
   const weeklyKinds = ['power-rankings', 'matchup-preview'];
   function previewWeekly() {
     setError('');
@@ -51,13 +53,20 @@ export function ReportLibrary({
         mode: 'draft',
         channel: 'dashboard',
         leagueIds: [league.id],
+        dataMode: undefined,
         schedule,
       };
     });
     setPlan(next);
   }
   async function savePlan() {
-    if (!plan || saving) return;
+    if (
+      !plan ||
+      saving ||
+      (manualSnapshot &&
+        plan.actions.some((a) => weeklyKinds.includes(a.kind) && a.dataMode !== 'saved'))
+    )
+      return;
     setSaving(true);
     setError('');
     try {
@@ -91,9 +100,12 @@ export function ReportLibrary({
           <h3>{item.title}</h3>
           <p>{item.description}</p>
           <small>
-            {scheduled && action
-              ? `${action.mode === 'automatic' && action.channel !== 'dashboard' ? 'Auto-send' : 'Auto-draft'} · ${schedulePlanLabel(action)}`
-              : 'Create when you need it'}
+            {scheduled && action && (manualSnapshot || action.dataMode === 'saved')
+              ? (reportDataProblem(league, action, settings.leagueStaleAfterHours) ??
+                `Saved-data drafts · ${schedulePlanLabel(action)}`)
+              : scheduled && action
+                ? `${action.mode === 'automatic' && action.channel !== 'dashboard' ? 'Auto-send' : 'Auto-draft'} · ${schedulePlanLabel(action)}`
+                : 'Create when you need it'}
           </small>
         </div>
         <div className="template-actions">
@@ -132,6 +144,12 @@ export function ReportLibrary({
       <p className="library-context">
         For {league.displayName} · Generated drafts appear here for review.
       </p>
+      {manualSnapshot && (
+        <p role="note">
+          This league uses a manual browser snapshot. Create reports now, or schedule saved-data
+          drafts from a recent import.
+        </p>
+      )}
       {choice('power-rankings')}
       {choice('matchup-preview')}
       <details className="seasonal-templates">
@@ -173,6 +191,36 @@ export function ReportLibrary({
           <p>
             For <strong>{league.displayName}</strong>. New reports stay in the app as drafts.
           </p>
+          <label className="switch-label saved-data-choice">
+            <input
+              type="checkbox"
+              checked={plan.actions
+                .filter((a) => weeklyKinds.includes(a.kind))
+                .every((a) => a.dataMode === 'saved')}
+              onChange={(e) => {
+                const saved = e.target.checked;
+                setPlan((current) =>
+                  current
+                    ? {
+                        ...current,
+                        actions: current.actions.map((a) =>
+                          weeklyKinds.includes(a.kind)
+                            ? { ...a, dataMode: saved ? 'saved' : undefined }
+                            : a,
+                        ),
+                      }
+                    : null,
+                );
+              }}
+            />
+            Use saved league data for these drafts
+          </label>
+          <p className="saved-data-guidance">
+            Saved-data drafts require an import or sync within{' '}
+            {settings.leagueStaleAfterHours ?? 24} hours of each run. They do not refresh the
+            provider or send messages.{' '}
+            {manualSnapshot && 'Select this option to schedule this manual import.'}
+          </p>
           <ol className="weekly-plan-preview">
             {plan.actions
               .filter((action) => weeklyKinds.includes(action.kind))
@@ -200,7 +248,11 @@ export function ReportLibrary({
           <button
             type="button"
             className="primary-button full"
-            disabled={saving}
+            disabled={
+              saving ||
+              (manualSnapshot &&
+                plan.actions.some((a) => weeklyKinds.includes(a.kind) && a.dataMode !== 'saved'))
+            }
             onClick={() => void savePlan()}
           >
             {saving ? 'Saving…' : 'Enable weekly drafts'}

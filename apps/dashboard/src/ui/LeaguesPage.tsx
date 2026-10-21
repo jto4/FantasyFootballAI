@@ -56,6 +56,15 @@ export function LeaguesPage({
                     ? `${Object.keys(league.scoring).length} scoring rules`
                     : 'scoring details unavailable'}
                 </span>
+                {league.connectionMode === 'snapshot' && (
+                  <small>
+                    Imported{' '}
+                    {league.snapshotImportedAt
+                      ? new Date(league.snapshotImportedAt).toLocaleString()
+                      : 'at an unknown time'}
+                    . Provider update time is unverified; automatic refresh is unavailable.
+                  </small>
+                )}
                 {league.lastSyncError && <small>Last refresh failed: {league.lastSyncError}</small>}
                 <small>
                   {freshness !== 'unknown' && league.lastSyncedAt
@@ -70,7 +79,11 @@ export function LeaguesPage({
                 )}
               </div>
               <span className="credential-status ready">
-                {league.status === 'limited' ? 'LIMITED DATA' : 'CONNECTED'}
+                {league.connectionMode === 'snapshot'
+                  ? 'IMPORTED SNAPSHOT'
+                  : league.status === 'limited'
+                    ? 'LIMITED DATA'
+                    : 'CONNECTED'}
               </span>
               <button
                 className="small-button"
@@ -87,7 +100,11 @@ export function LeaguesPage({
                 disabled={refreshingLeagueId === league.id || disconnectingLeagueId === league.id}
               >
                 <RefreshCw size={14} />{' '}
-                {refreshingLeagueId === league.id ? 'Refreshing…' : 'Refresh'}
+                {refreshingLeagueId === league.id
+                  ? 'Refreshing…'
+                  : league.connectionMode === 'snapshot'
+                    ? 'Import update'
+                    : 'Refresh'}
               </button>
               <button
                 className="small-button danger"

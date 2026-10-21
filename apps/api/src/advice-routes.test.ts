@@ -1889,3 +1889,38 @@ it('checks data readiness without model configuration, AI calls or journal write
   });
   expect(await invalid.json()).toMatchObject({ status: 'blocked' });
 });
+
+it('saved Codex advice advertises its fixed model, omits unsupported budgets and API pricing', async () => {
+  const w = await workspace();
+  await w.store.update((state) => {
+    state.settings.aiRuntime = {
+      ...state.settings.aiRuntime!,
+      mode: 'codex-cli',
+      model: 'gpt-6.1-sol',
+      command: '',
+      args: '',
+    };
+  });
+  const options = await (await fetch(w.url + '/api/advice/options?league=league')).json();
+  expect(options.model).toBe('gpt-6.1-sol');
+  expect(options.tokenBudgetSupported).toBe(false);
+  const response = await fetch(w.url + '/api/advice/' + randomUUID(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode: 'lineup',
+      leagueId: 'league',
+      teamId: 'mine',
+      model: 'gpt-6.1-sol',
+    }),
+  });
+  expect(response.status).toBe(201);
+  const result = await response.json();
+  expect(isAdviceResult(result)).toBe(true);
+  expect(result.model).toBe('gpt-6.1-sol');
+  expect(result.usage.estimatedCostUsd).toBeUndefined();
+  expect(w.calls).toHaveLength(2);
+  expect(
+    w.calls.every((call) => call.maxOutputTokens === undefined && call.reasoningEffort === 'high'),
+  ).toBe(true);
+});

@@ -111,7 +111,11 @@ export async function buildMentionReplyDrafts(
     if (!body) throw new Error('The AI runtime returned an empty group chat reply.');
     const aiUsage = completion.usage
       ? summarizeAIUsage(
-          runtime?.mode === 'api' ? runtime.model || 'gpt-4o-mini' : 'unknown',
+          runtime?.mode === 'codex-cli'
+            ? 'gpt-6.1-sol'
+            : runtime?.mode === 'api'
+              ? runtime.model || 'gpt-4o-mini'
+              : 'unknown',
           completion.usage,
           runtime?.mode === 'api' ? runtime.inputUsdPerMillionTokens : undefined,
           runtime?.mode === 'api' ? runtime.outputUsdPerMillionTokens : undefined,

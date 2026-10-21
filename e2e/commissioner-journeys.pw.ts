@@ -185,7 +185,11 @@ test('generating, editing, and sending a draft respects review and destination',
   await page.getByRole('combobox', { name: 'Filter reports by status' }).selectOption('draft');
   await expect(page.getByText('No reports match these filters.', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await page.getByText('League standings & news', { exact: true }).click();
+  await expect(
+    page
+      .locator('details')
+      .filter({ has: page.getByText('League standings & news', { exact: true }) }),
+  ).toHaveJSProperty('open', true);
   await expect(page.getByText('Sent ·', { exact: false })).toBeVisible();
   expect(context.errors).toEqual([]);
 });

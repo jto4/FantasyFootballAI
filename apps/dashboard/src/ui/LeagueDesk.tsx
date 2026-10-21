@@ -7,7 +7,10 @@ import { seasonKicker } from './season-copy';
 import { formatTime } from './date-format';
 import { reportStatus } from './report-status';
 import { ActionInbox } from './ActionInbox';
+export type HomeDisclosures = Partial<Record<'connections' | 'activity' | 'news', boolean>>;
 type Props = {
+  disclosures?: HomeDisclosures;
+  onDisclosureChange?: (key: keyof HomeDisclosures, open: boolean) => void;
   state: AppState;
   league: LeagueConnection | undefined;
   aiReady: boolean;
@@ -33,6 +36,8 @@ type Props = {
 };
 export function LeagueDesk({
   state,
+  disclosures = {},
+  onDisclosureChange,
   league,
   aiReady,
   aiChecking = false,
@@ -108,11 +113,6 @@ export function LeagueDesk({
           </button>
         </section>
       )}
-      {!league && onSample && (
-        <button type="button" className="small-button sample-entry" onClick={onSample}>
-          Try a sample league
-        </button>
-      )}
       <section
         className={`next-action-card ${league && aiReady && !draftCount && !generatingKind ? 'next-action-compact' : ''}`}
         aria-labelledby="next-action-title"
@@ -174,14 +174,23 @@ export function LeagueDesk({
             Manage leagues
           </button>
         )}
+        {!league && onSample && (
+          <button type="button" className="text-button sample-entry" onClick={onSample}>
+            Try a sample league
+          </button>
+        )}
       </section>
       {status && (
-        <details className="home-disclosure">
+        <details
+          className="home-disclosure"
+          open={disclosures.connections ?? false}
+          onToggle={(event) => onDisclosureChange?.('connections', event.currentTarget.open)}
+        >
           <summary>Connections & scheduled reports</summary>
           {status}
         </details>
       )}
-      {!aiReady && (
+      {league && !aiReady && (
         <p className="setup-explanation">
           Report creation becomes available after your league and AI connection are ready. You can
           still browse your saved reports and league data.
@@ -190,7 +199,10 @@ export function LeagueDesk({
       {league && aiReady && (
         <details
           className="home-disclosure"
-          open={draftCount > 0 || deliveryIssues > 0 || !!generatingKind}
+          open={
+            !!generatingKind || (disclosures.activity ?? (draftCount > 0 || deliveryIssues > 0))
+          }
+          onToggle={(event) => onDisclosureChange?.('activity', event.currentTarget.open)}
         >
           <summary>
             Report activity{draftCount ? ` · ${draftCount} drafts` : ''}
@@ -208,18 +220,12 @@ export function LeagueDesk({
           />
         </details>
       )}
-      {!league && (
-        <section className="first-report-explainer">
-          <h2>Your first report in three steps</h2>
-          <ol>
-            <li>Connect your league.</li>
-            <li>Connect the AI service that writes your reports.</li>
-            <li>Create a draft, review it, and choose whether to send it.</li>
-          </ol>
-        </section>
-      )}
       {league && (
-        <details className="home-disclosure league-extra">
+        <details
+          className="home-disclosure league-extra"
+          open={disclosures.news ?? false}
+          onToggle={(event) => onDisclosureChange?.('news', event.currentTarget.open)}
+        >
           <summary>League standings & news</summary>
           <LeagueVisuals data={reportVisuals(league)} syncedAt={league.lastSyncedAt} />
           <div className="section-heading">

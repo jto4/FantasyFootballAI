@@ -155,8 +155,8 @@ v16 PBP fields reconstruct the same normalized input offline. Build dependencies
 under Node 22 and run:
 
 ```sh
-node scripts/replay-drive-signals.mjs /path/to/drive-stats.json
-node scripts/audit-recent-total-feedback.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v17-frozen-settings.json
+node scripts/research/replay-drive-signals.mjs /path/to/drive-stats.json
+node scripts/research/audit-recent-total-feedback.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/drive-stats.json docs/research/2026-10-13-v17-frozen-settings.json
 ```
 
 All eight candidate audits reproduce every row, probability and metric; only

@@ -701,7 +701,7 @@ describe('connector selection', () => {
               name: 'Avery Quarterback',
               position: 'QB',
               rosterPosition: 'QB',
-              status: 'ACTIVE',
+              status: 'Active',
             },
           ],
         },

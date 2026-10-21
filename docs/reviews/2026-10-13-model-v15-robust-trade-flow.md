@@ -175,8 +175,8 @@ With supported Node 22, decompress the original
 direction evidence into a fresh directory, then run:
 
 ```sh
-node scripts/replay-direction-correction.mjs /path/to/original-signals.json /path/to/direction-evidence.json /path/to/rebuilt-signals.json
-node scripts/audit-robust-total-flow.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/direction-evidence.json docs/research/2026-10-13-v15-frozen-settings.json
+node scripts/research/replay-direction-correction.mjs /path/to/original-signals.json /path/to/direction-evidence.json /path/to/rebuilt-signals.json
+node scripts/research/audit-robust-total-flow.mjs /path/to/games.json /path/to/original-signals.json /path/to/corrected-signals.json /path/to/direction-evidence.json docs/research/2026-10-13-v15-frozen-settings.json
 ```
 
 The audit verifies data/patch/source/parent hashes and that the repair leaves

@@ -77,6 +77,10 @@ export function ScheduleEditor({
   }
   async function save() {
     if (busy || !dirty) return;
+    if (action.dataMode === 'saved' && !action.leagueIds?.length) {
+      setError('Choose at least one league for saved-data drafts.');
+      return;
+    }
     const recipient =
       action.channel === 'email'
         ? base.emailRecipient
@@ -184,6 +188,7 @@ export function ScheduleEditor({
           confirmAutomatic={false}
           showSummary={false}
           actions={[action]}
+          maximumSavedAgeHours={base.leagueStaleAfterHours ?? 24}
           leagues={leagues}
           onApplySuggestions={() => {}}
           onActionChange={(_kind, patch) => setAction((current) => ({ ...current, ...patch }))}

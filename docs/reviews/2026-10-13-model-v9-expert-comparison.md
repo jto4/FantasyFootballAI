@@ -154,7 +154,7 @@ Use Node 22 and the unchanged public context snapshot, SHA-256
 npm run betting:hybrid-diagnose -- --contexts <recent-games.json>
 npm --silent run betting:expert-develop -- --contexts <recent-games.json> > development.json
 npm run betting:expert-audit -- --contexts <recent-games.json> --frozen development.json
-node scripts/audit-static-total-mixture.mjs --contexts <recent-games.json> --frozen development.json
+node scripts/research/audit-static-total-mixture.mjs --contexts <recent-games.json> --frozen development.json
 ```
 
 Artifacts under `docs/research`: `model-v9-2026-totals-diagnostics.json`,

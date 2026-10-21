@@ -3,3 +3,8 @@ docs/research/2026-10-13-v16-frozen-settings.json
 docs/research/2026-10-13-v16-flow-diagnosis.json
 docs/research/2026-10-13-v16-audit.json
 docs/research/model-v16-drive-provenance.json
+
+# Compiled bundles and local installer artifacts are checked through their sources.
+**/dist/
+**/coverage/
+apps/desktop/out/

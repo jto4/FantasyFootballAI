@@ -183,8 +183,8 @@ are untouched. The Bills–Rams forward sidecar remains excluded from this fixed
 Reproduce with Node 22 after a successful build:
 
 ```sh
-node scripts/develop-matchup-totals.mjs --contexts /tmp/sidekick-model-v6/recent-games.json --signals /tmp/sidekick-model-v10/signals.json
-node scripts/audit-matchup-totals.mjs --contexts /tmp/sidekick-model-v6/recent-games.json --signals /tmp/sidekick-model-v10/signals.json --frozen docs/research/model-v10-matchup-development.json
+node scripts/research/develop-matchup-totals.mjs --contexts /tmp/sidekick-model-v6/recent-games.json --signals /tmp/sidekick-model-v10/signals.json
+node scripts/research/audit-matchup-totals.mjs --contexts /tmp/sidekick-model-v6/recent-games.json --signals /tmp/sidekick-model-v10/signals.json --frozen docs/research/model-v10-matchup-development.json
 ```
 
 Validation: all **812 workspace tests** plus root/service suites pass; typecheck,

@@ -12,7 +12,9 @@ export interface ImsgChat {
   service: 'iMessage';
 }
 export function isImsgChatGuid(value: unknown): value is string {
-  return typeof value === 'string' && /^iMessage;[+-];[^\s\u0000-\u001f]{1,450}$/.test(value);
+  return (
+    typeof value === 'string' && /^(?:iMessage|any);[+-];[^\s\u0000-\u001f]{1,450}$/.test(value)
+  );
 }
 export async function resolveImsgExecutable(configured?: string): Promise<string> {
   if (process.platform !== 'darwin') throw new Error('Local imsg requires macOS.');
@@ -242,6 +244,26 @@ export class ImsgChannel implements MessageChannel {
         'Check the imsg installation and supported version before sending.',
         false,
       );
+    }
+    // Unified macOS GUIDs do not encode service. Verify the current native service
+    // before allowing any; routing, rather than interpreting it as an SMS-capable target.
+    if (message.to.startsWith('any;')) {
+      let matches: ImsgChat[];
+      try {
+        matches = (await new ImsgClient(this.executable, this.command).chats()).filter(
+          (c) => c.guid === message.to,
+        );
+      } catch {
+        throw new DeliveryFailure(
+          'The native iMessage service could not be verified. Refresh conversations before sending.',
+          false,
+        );
+      }
+      if (matches.length !== 1)
+        throw new DeliveryFailure(
+          'This unified chat is not a uniquely verified iMessage conversation. No message was sent.',
+          false,
+        );
     }
     let output: string;
     try {

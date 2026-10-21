@@ -2,7 +2,6 @@
 .decision-summary,
 .data-readiness,
 .readiness-entry,
-.betting-research-entry,
 .advice-journal {
   padding: 24px;
   margin: 20px 0;
@@ -11,8 +10,7 @@
   background: var(--surface);
   color: var(--ink);
 }
-.weekly-home-heading,
-.betting-research-entry {
+.weekly-home-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -59,20 +57,12 @@
 .data-readiness li {
   overflow-wrap: anywhere;
 }
-.betting-research-entry h2 {
-  font-size: 20px;
-  margin: 0 0 8px;
-}
-.betting-research-entry p {
-  margin: 0;
-}
 .readiness-entry ul,
 .data-readiness ul {
   padding-left: 20px;
 }
 @media (max-width: 760px) {
-  .weekly-home-heading,
-  .betting-research-entry {
+  .weekly-home-heading {
     align-items: stretch;
     flex-direction: column;
   }
@@ -85,7 +75,6 @@
   .decision-summary,
   .data-readiness,
   .readiness-entry,
-  .betting-research-entry,
   .advice-journal {
     padding: 16px;
   }
@@ -104,7 +93,6 @@
 .home-disclosure > summary,
 .settings-disclosure > summary,
 .result-disclosure > summary,
-.advice-connection > summary,
 .advice-model-choice > summary {
   cursor: pointer;
   min-height: 32px;

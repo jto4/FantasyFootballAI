@@ -152,14 +152,21 @@ export function normalizeActionSettings(input: unknown): ActionSetting[] {
         : undefined;
     return {
       ...defaults,
+      ...(candidate.dataMode === 'saved' ? { dataMode: 'saved' as const, leagueIds: [] } : {}),
       ...(Array.isArray(candidate.leagueIds)
         ? {
             leagueIds: [...new Set(candidate.leagueIds.filter(isValidLeagueId))].slice(0, 100),
           }
         : {}),
-      channel: isChannel(candidate.channel) ? candidate.channel : defaults.channel,
+      channel:
+        candidate.dataMode === 'saved'
+          ? 'dashboard'
+          : isChannel(candidate.channel)
+            ? candidate.channel
+            : defaults.channel,
       enabled: typeof candidate.enabled === 'boolean' ? candidate.enabled : defaults.enabled,
-      mode: candidate.mode === 'automatic' ? 'automatic' : 'draft',
+      mode:
+        candidate.dataMode !== 'saved' && candidate.mode === 'automatic' ? 'automatic' : 'draft',
       schedule: {
         enabled:
           typeof savedSchedule.enabled === 'boolean'

@@ -615,7 +615,7 @@ function matchupProjectionEvidence(
   const lineupFreshness = league.lastSyncedAt
     ? `Starter assignments came from the platform snapshot last synced ${league.lastSyncedAt}; confirm current lineups before kickoff.`
     : 'The starter snapshot has no recorded sync time; confirm current lineups before kickoff.';
-  return `Imported week-specific projection estimates from ${sourcesText}; the owner confirms these sources use the league's scoring settings, which is not independently verified. Complete starter-based totals: ${estimates.join('; ')}. ${lineupFreshness} These are model-independent sums of the owner's imported estimates, not platform scores or guaranteed outcomes. Do not treat incomplete or unmatched lineups as projected totals.`;
+  return `Imported week-specific projection estimates from ${sourcesText}; scoring alignment is recorded for these sources, but forecast accuracy is not independently validated. Complete starter-based totals: ${estimates.join('; ')}. ${lineupFreshness} These are model-independent sums of the owner's imported estimates, not platform scores or guaranteed outcomes. Do not treat incomplete or unmatched lineups as projected totals.`;
 }
 
 function matchupStarterIds(

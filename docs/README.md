@@ -16,6 +16,14 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Reference
 
+- [`reviews/2026-10-18-optimization.md`](reviews/2026-10-18-optimization.md) — lazy pages, dead CSS, research separation, file splits and open-only task list.
+
+- [`reviews/2026-10-15-saved-data-reports.md`](reviews/2026-10-15-saved-data-reports.md) — explicit scheduled drafts from recent saved data, real-clock Afton report and shared readiness checks.
+
+- [`reviews/2026-10-15-owner-verification.md`](reviews/2026-10-15-owner-verification.md) — active private ESPN import, weekly forecast arithmetic, native imsg and owner usability verification.
+
+- [`reviews/2026-10-15-market-signals.md`](reviews/2026-10-15-market-signals.md) — separate market research charts/ledger, real public-data checks, player-prop game logs and remaining limits.
+
 - [`reviews/2026-10-14-quiet-verification.md`](reviews/2026-10-14-quiet-verification.md) — test-only memory credentials, Chromium mock Keychain and popup-free teardown; ordinary protections retained.
 
 - [`reviews/2026-10-14-compact-workflows.md`](reviews/2026-10-14-compact-workflows.md) — shorter Home, separate Advice views, expandable result evidence and focused Settings; rendered review and regression coverage.
@@ -85,8 +93,9 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Keeping project context current
 
-- Update `tasks.md` when implementation changes. Keep each checklist item explicit about
-  what works, the evidence that supports it, and remaining gaps.
+- Update `tasks.md` when implementation changes. It lists open work only: add a short item
+  for a known gap, and when an item is done, record its evidence in a dated review and
+  delete the item. Completed history lives in `reviews/*-task-history.md`.
 - Update `support-matrix.md` only from recorded tests, live checks, or native platform
   verification. A mocked test is not evidence of live-provider or OS behavior.
 - Update `implementation-plan.md` when product scope changes; update `release-status.md` when

@@ -707,6 +707,7 @@ export function isAdviceOptions(value: unknown): value is AdviceOptions {
     integer(row.season, 2010, 2099) &&
     integer(row.week, 1, 18) &&
     text(row.model, 160) &&
+    optional(row.tokenBudgetSupported, (v) => typeof v === 'boolean') &&
     optional(row.connection, (v) => v === 'saved' || v === 'claude-cli' || v === 'codex-cli') &&
     optional(
       row.connections,

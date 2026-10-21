@@ -273,3 +273,28 @@ for the weekly Home, team-before-AI setup, evidence readiness, clearer results,
 prospective cohorts and fantasy outcome journal. Local messaging read verification
 is explicit and discards contents; sending still uses saved-report review and
 confirmation. Native team preferences persist across localhost port changes.
+
+## Use your existing Codex account
+
+In Settings → AI → Advanced AI options, choose **Codex account · GPT-6.1-Sol**, then **Test connection**. This saves a fixed GPT-6.1-Sol/high connection for reports, advice and other text generation through the existing isolated native adapter. An installed supported Codex CLI with ChatGPT sign-in is required; subscription limits apply. No API key is read or created, and a failed Codex connection does not fall back to API usage. Per-pass API token budgets and API price estimates do not apply. Restored backups reset the connection for explicit owner review. The verified native CLI versions and isolation limits remain documented in the compatibility review.
+
+### ESPN already signed in through a browser
+
+In Connect league, choose ESPN and enter the league/year. Expand **Use my signed-in
+browser instead**, open the supplied data link in that browser, and save **Page
+Source** to a JSON file. Import the file. The app keeps normalized league data and
+weekly forecasts only when exact scoring arithmetic can verify them; account/member
+contacts are discarded. No login cookies are copied. This is a manual snapshot:
+**Import updated roster** replaces it, and automatic refresh needs a configured
+provider connection. The import date is not a verified provider-update time.
+
+### Automatically draft from saved league data
+
+In Reports, choose **Set up weekly drafts** and explicitly check **Use saved league
+data for these drafts**, or choose **Use saved data · drafts only** in an individual
+report schedule. Review its selected leagues/time before enabling it. These jobs
+need an import or sync within your data-age threshold at each run (24 hours by
+default). Reimport before the next run when needed. The app creates a labeled draft
+without provider refresh or sending; import time does not verify source freshness.
+Expired/missing/future dates stop the job with guidance. Provider refresh remains
+the default and requires provider access. Calendar events use provider refresh.

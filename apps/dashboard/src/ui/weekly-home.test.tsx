@@ -43,3 +43,46 @@ it('keeps unknown availability and deadlines explicit and refuses a removed save
   expect(markup).toContain('No verified deadline');
   expect(markup).toContain('Saved decisions to revisit');
 });
+
+it('keeps neutral ESPN status out of alerts and retains a separate injury flag', () => {
+  const markup = renderToStaticMarkup(
+    createElement(WeeklyHome, {
+      league: {
+        id: 'l',
+        name: 'League',
+        displayName: 'League',
+        platform: 'espn',
+        teamCount: 1,
+        connectedAt: '2026-10-15T12:00:00Z',
+        scoring: {},
+        settings: {},
+        teams: [
+          {
+            id: 't',
+            name: 'Team',
+            roster: [
+              { id: 'normal', name: 'Normal Player', status: 'Normal' },
+              {
+                id: 'hurt',
+                name: 'Injured Player',
+                status: 'Active',
+                injuryStatus: 'Questionable',
+              },
+              { id: 'reserve', name: 'Reserve Player', status: 'Injured Reserve' },
+            ],
+          },
+        ],
+      },
+      settings: { actions: [] } as unknown as AppSettings,
+      teamId: 't',
+      onTeamChange: vi.fn(),
+      onAdvice: vi.fn(),
+      onRefresh: vi.fn(),
+      onSetup: vi.fn(),
+      onSavedAdvice: vi.fn(),
+    }),
+  );
+  expect(markup).not.toContain('Normal Player');
+  expect(markup).toContain('Injured Player: Questionable');
+  expect(markup).toContain('Reserve Player: Injured Reserve');
+});

@@ -100,3 +100,60 @@ it('keeps modern headlines, undated projections and catalog status out of an arc
     await rm(root, { recursive: true, force: true });
   }
 });
+it('labels saved imports deterministically and never relabels import time as a provider sync', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'sidekick-saved-report-')),
+    store = new LocalStore(join(root, 'state.sqlite'));
+  await store.load();
+  try {
+    const league: LeagueConnection = {
+      id: 'saved',
+      platform: 'espn',
+      name: 'League',
+      displayName: 'League',
+      season: 2026,
+      connectionMode: 'snapshot',
+      snapshotImportedAt: '2026-10-15T12:00:00Z',
+      connectedAt: '2026-10-15T12:00:00Z',
+      teamCount: 1,
+      teams: [{ id: 'one', name: 'One', pointsFor: 123.45 }],
+      scoring: {},
+      settings: { currentWeek: 6 },
+    };
+    await store.update((s) => {
+      s.leagues = [league];
+    });
+    const generate = vi.fn(async (_request: AIRequest) => 'One leads the saved points table.'),
+      credential = vi.fn(async () => null),
+      guard = new DeliveryGuard();
+    const service = createReportService({
+      store,
+      deliveryGuard: guard,
+      delivery: createDeliveryService({ store, readCredential: credential, deliveryGuard: guard }),
+      footballNewsCache: { get: async () => ({ items: [], stale: false }) },
+      nflInjuryReportCache: new NFLInjuryReportCache(),
+      configuredAI: async () => ({ id: 'test', generate }),
+    });
+    const { report } = await service.generateAndSaveReport(
+      league,
+      store.reportSnapshot(),
+      'power-rankings',
+      false,
+      'dashboard',
+      undefined,
+      undefined,
+      'saved',
+    );
+    expect(report.body).toMatch(/^Saved browser snapshot · imported 2026-10-15T12:00:00Z/);
+    expect(report.body).toContain('Provider update time is unverified');
+    expect(report.evidence?.guidance).toContain('Saved browser snapshot');
+    expect(report.evidence?.leagueSyncedAt).toBeUndefined();
+    const block = generate.mock.calls[0]![0].prompt.match(
+      /<untrusted_report_data>\n([\s\S]*?)\n<\/untrusted_report_data>/,
+    );
+    expect(JSON.parse(block![1]!).league.snapshotImportedAt).toBe('2026-10-15T12:00:00Z');
+    expect(credential).not.toHaveBeenCalled();
+  } finally {
+    store.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});

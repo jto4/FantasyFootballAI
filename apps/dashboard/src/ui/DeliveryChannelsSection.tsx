@@ -53,7 +53,8 @@ export function DeliveryChannelsSection({
   const localImsg = settings.imessageProvider === 'imsg';
   const macPlatform = navigator.platform.toLowerCase().startsWith('mac');
   const imessageReady = localImsg
-    ? macPlatform && /^iMessage;[+-];[^\s\u0000-\u001f]+$/.test(settings.imessageChatGuid ?? '')
+    ? macPlatform &&
+      /^(?:iMessage|any);[+-];[^\s\u0000-\u001f]{1,450}$/.test(settings.imessageChatGuid ?? '')
     : blueBubblesConfigured;
   const syncReady =
     imessageReady &&

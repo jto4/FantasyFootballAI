@@ -11,6 +11,41 @@ import {
   numberOrUndefined,
 } from './shared.js';
 
+// ESPN's public NFL team directory IDs; unknown IDs remain unmapped.
+const nflTeams: Record<string, string> = {
+  '1': 'ATL',
+  '2': 'BUF',
+  '3': 'CHI',
+  '4': 'CIN',
+  '5': 'CLE',
+  '6': 'DAL',
+  '7': 'DEN',
+  '8': 'DET',
+  '9': 'GB',
+  '10': 'TEN',
+  '11': 'IND',
+  '12': 'KC',
+  '13': 'LV',
+  '14': 'LAR',
+  '15': 'MIA',
+  '16': 'MIN',
+  '17': 'NE',
+  '18': 'NO',
+  '19': 'NYG',
+  '20': 'NYJ',
+  '21': 'PHI',
+  '22': 'ARI',
+  '23': 'PIT',
+  '24': 'LAC',
+  '25': 'SF',
+  '26': 'SEA',
+  '27': 'TB',
+  '28': 'WAS',
+  '29': 'CAR',
+  '30': 'JAX',
+  '33': 'BAL',
+  '34': 'HOU',
+};
 const positions: Record<number, string> = {
   1: 'QB',
   2: 'RB',
@@ -18,6 +53,17 @@ const positions: Record<number, string> = {
   4: 'TE',
   5: 'K',
   16: 'DST',
+};
+const availabilityLabels: Record<string, string> = {
+  NORMAL: 'Normal',
+  ACTIVE: 'Active',
+  QUESTIONABLE: 'Questionable',
+  DOUBTFUL: 'Doubtful',
+  OUT: 'Out',
+  INJURY_RESERVE: 'Injured Reserve',
+  SUSPENSION: 'Suspended',
+  SUSPENDED: 'Suspended',
+  DAY_TO_DAY: 'Day to day',
 };
 const lineupSlots: Record<number, string> = {
   0: 'QB',
@@ -47,94 +93,137 @@ export class EspnConnector implements LeagueConnector {
       `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/segments/0/leagues/${encodeURIComponent(id)}?view=mTeam&view=mSettings&view=mMatchupScore`,
       this.sessionCookie ? { headers: { cookie: this.sessionCookie } } : undefined,
     );
-    const data = asRecord(raw);
-    if (!data || !Array.isArray(data.teams) || data.teams.length === 0)
-      throw new Error(
-        'ESPN league unavailable or returned no teams. Private leagues need an owner-authorized session configured in Settings.',
-      );
-    if (data.teams.length > 32)
-      throw new Error('ESPN league returned more than 32 teams; refusing oversized league data.');
-    const settings = asRecord(data.settings) ?? {};
-    const displayName = boundedDisplayName(settings.name ?? data.name, `ESPN League ${id}`);
-    const status = asRecord(data.status);
-    const responseSeason = boundedInteger(data.seasonId, 2000, 2099);
-    const currentWeek = boundedInteger(status?.currentMatchupPeriod, 1, 30);
-    const seasonComplete = booleanOrUndefined(status?.isExpired);
-    const scheduleSettings = asRecord(settings.scheduleSettings);
-    const scoringSettings = asRecord(settings.scoringSettings);
-    const rosterPositions = espnRosterPositions(settings);
-    const scoringType = boundedString(scoringSettings?.scoringType, 32)?.toUpperCase();
-    const regularMatchupPeriods = boundedInteger(scheduleSettings?.matchupPeriodCount, 1, 30);
-    const playoffTeams = boundedInteger(scheduleSettings?.playoffTeamCount, 2, 64);
-    // ESPN's league endpoint is undocumented; keep this estimate gated on explicit H2H
-    // format, regular-season period count, and playoff team count, and label it as derived.
-    const inferredPlayoffStartWeek =
-      scoringType?.startsWith('H2H') && regularMatchupPeriods && playoffTeams
-        ? regularMatchupPeriods + 1
-        : undefined;
+    const currentWeek = boundedInteger(
+      asRecord(asRecord(raw)?.status)?.currentScoringPeriod ??
+        asRecord(asRecord(raw)?.status)?.currentMatchupPeriod,
+      1,
+      30,
+    );
     const supplemental = await espnSupplementalData(id, season, currentWeek, this.sessionCookie);
-    const scoringItems = Array.isArray(asRecord(settings.scoringSettings)?.scoringItems)
-      ? (asRecord(settings.scoringSettings)!.scoringItems as unknown[])
-      : [];
-    const scoring = Object.fromEntries(
-      scoringItems
-        .map((item) => {
-          const row = asRecord(item) ?? {};
-          const statId = boundedId(row.statId, 40);
-          return [statId, numberOrUndefined(row.points)];
-        })
-        .filter(
-          (entry): entry is [string, number] =>
-            typeof entry[0] === 'string' && entry[1] !== undefined,
-        ),
-    ) as Record<string, number>;
-    const teams = data.teams.map((entry, index) => {
-      const team = asRecord(entry) ?? {};
-      const teamId = boundedId(team.id, 40) ?? String(index);
-      const owner = boundedLabel(team.location, 120) ?? boundedLabel(team.nickname, 120);
-      return {
-        id: teamId,
-        name: boundedDisplayName(team.name, `Team ${index + 1}`),
-        ...(owner ? { owner } : {}),
-        wins: numberOrUndefined(
-          asRecord(team.record)?.overall && asRecord(asRecord(team.record)!.overall)?.wins,
-        ),
-        losses: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.losses),
-        pointsFor: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.pointsFor),
-      };
-    });
-    const rosterTeams = Array.isArray(supplemental?.teams) ? supplemental.teams : [];
-    espnApplyRosters(teams, rosterTeams);
-    const draft = espnDraft(supplemental?.draftDetail, season, id, teams);
-    const draftScheduledAt = espnDraftScheduledAt(asRecord(settings.draftSettings)?.date);
-    const matchups = espnCurrentWeekMatchups(data.schedule, currentWeek);
+    return normalizeEspnLeague(raw, id, season, supplemental);
+  }
+}
+
+/** Shared allowlist normalization for direct reads and owner-exported browser data. */
+export function normalizeEspnLeague(
+  raw: unknown,
+  id: string,
+  season: number,
+  supplementalInput?: unknown,
+): LeagueConnection {
+  const data = asRecord(raw);
+  if (!data || !Array.isArray(data.teams) || data.teams.length === 0)
+    throw new Error(
+      'ESPN league unavailable or returned no teams. Private leagues need an owner-authorized session configured in Settings.',
+    );
+  if (data.teams.length > 32)
+    throw new Error('ESPN league returned more than 32 teams; refusing oversized league data.');
+  if (
+    (data.id !== undefined && String(data.id) !== id) ||
+    (data.seasonId !== undefined && data.seasonId !== season)
+  )
+    throw new Error('ESPN league identity does not match the requested league/season.');
+  const settings = asRecord(data.settings) ?? {};
+  const displayName = boundedDisplayName(settings.name ?? data.name, `ESPN League ${id}`);
+  const status = asRecord(data.status);
+  const responseSeason = boundedInteger(data.seasonId, 2000, 2099);
+  const matchupPeriod = boundedInteger(status?.currentMatchupPeriod, 1, 30);
+  const currentWeek = boundedInteger(
+    status?.currentScoringPeriod ?? status?.currentMatchupPeriod,
+    1,
+    30,
+  );
+  const seasonComplete = booleanOrUndefined(status?.isExpired);
+  const scheduleSettings = asRecord(settings.scheduleSettings);
+  const scoringSettings = asRecord(settings.scoringSettings);
+  const rosterPositions = espnRosterPositions(settings);
+  const scoringType = boundedString(scoringSettings?.scoringType, 32)?.toUpperCase();
+  const regularMatchupPeriods = boundedInteger(scheduleSettings?.matchupPeriodCount, 1, 30);
+  const playoffTeams = boundedInteger(scheduleSettings?.playoffTeamCount, 2, 64);
+  // ESPN's league endpoint is undocumented; keep this estimate gated on explicit H2H
+  // format, regular-season period count, and playoff team count, and label it as derived.
+  const inferredPlayoffStartWeek =
+    scoringType?.startsWith('H2H') && regularMatchupPeriods && playoffTeams
+      ? regularMatchupPeriods + 1
+      : undefined;
+  const supplemental = asRecord(supplementalInput);
+  const scoringItems = Array.isArray(asRecord(settings.scoringSettings)?.scoringItems)
+    ? (asRecord(settings.scoringSettings)!.scoringItems as unknown[])
+    : [];
+  const scoring = Object.fromEntries(
+    scoringItems
+      .map((item) => {
+        const row = asRecord(item) ?? {};
+        const statId = boundedId(row.statId, 40);
+        return [statId, numberOrUndefined(row.points)];
+      })
+      .filter(
+        (entry): entry is [string, number] =>
+          typeof entry[0] === 'string' && entry[1] !== undefined,
+      ),
+  ) as Record<string, number>;
+  const teams: LeagueConnection['teams'] = data.teams.map((entry, index) => {
+    const team = asRecord(entry) ?? {};
+    const teamId = boundedId(team.id, 40) ?? String(index);
+    const owner = boundedLabel(team.location, 120) ?? boundedLabel(team.nickname, 120);
     return {
-      id,
-      platform: 'espn',
-      name: displayName,
-      displayName,
-      season: responseSeason ?? season,
-      teamCount: teams.length,
-      scoring,
-      settings: {
-        ...(scoringType ? { scoringType } : {}),
-        ...(currentWeek !== undefined ? { currentWeek } : {}),
-        ...(seasonComplete !== undefined ? { seasonComplete } : {}),
-        ...(rosterPositions ? { roster_positions: rosterPositions } : {}),
-        ...(inferredPlayoffStartWeek !== undefined
+      id: teamId,
+      name: boundedDisplayName(team.name, `Team ${index + 1}`),
+      ...(owner ? { owner } : {}),
+      wins: numberOrUndefined(
+        asRecord(team.record)?.overall && asRecord(asRecord(team.record)!.overall)?.wins,
+      ),
+      losses: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.losses),
+      pointsFor: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.pointsFor),
+    };
+  });
+  const rosterTeams = Array.isArray(supplemental?.teams) ? supplemental.teams : [];
+  espnApplyRosters(teams, rosterTeams);
+  const draft = espnDraft(supplemental?.draftDetail, season, id, teams);
+  const draftScheduledAt = espnDraftScheduledAt(asRecord(settings.draftSettings)?.date);
+  const matchups = espnCurrentWeekMatchups(data.schedule, matchupPeriod)?.map((m) => ({
+    ...m,
+    week: currentWeek ?? m.week,
+    teams: m.teams.map((t) => {
+      const roster = teams.find((team) => team.id === t.teamId)?.roster;
+      return {
+        ...t,
+        ...(roster?.length && roster.every((p) => p.rosterPosition)
           ? {
-              playoffStartWeek: inferredPlayoffStartWeek,
-              playoffStartWeekSource: 'derived',
+              starters: roster
+                .filter((p) => !['BENCH', 'IR'].includes(p.rosterPosition!))
+                .map((p) => p.id),
             }
           : {}),
-      },
-      teams,
-      ...(draft ? { draft } : {}),
-      ...(draftScheduledAt ? { draftScheduledAt } : {}),
-      ...(matchups ? { matchups } : {}),
-      connectedAt: new Date().toISOString(),
-    };
-  }
+      };
+    }),
+  }));
+  return {
+    id,
+    platform: 'espn',
+    name: displayName,
+    displayName,
+    season: responseSeason ?? season,
+    teamCount: teams.length,
+    scoring,
+    settings: {
+      ...(scoringType ? { scoringType } : {}),
+      ...(currentWeek !== undefined ? { currentWeek } : {}),
+      ...(seasonComplete !== undefined ? { seasonComplete } : {}),
+      ...(rosterPositions ? { roster_positions: rosterPositions } : {}),
+      ...(inferredPlayoffStartWeek !== undefined
+        ? {
+            playoffStartWeek: inferredPlayoffStartWeek,
+            playoffStartWeekSource: 'derived',
+          }
+        : {}),
+    },
+    teams,
+    ...(draft ? { draft } : {}),
+    ...(draftScheduledAt ? { draftScheduledAt } : {}),
+    ...(matchups ? { matchups } : {}),
+    connectedAt: new Date().toISOString(),
+  };
 }
 
 function espnRosterPositions(settings: Record<string, unknown>): string[] | undefined {
@@ -241,7 +330,10 @@ function espnApplyRosters(teams: LeagueConnection['teams'], rawTeams: unknown[])
           name,
           ...(positionId && positions[positionId] ? { position: positions[positionId] } : {}),
           ...(rosterPosition ? { rosterPosition } : {}),
-          ...(status ? { status } : {}),
+          ...(nflTeams[String(player?.proTeamId)]
+            ? { nflTeam: nflTeams[String(player?.proTeamId)]! }
+            : {}),
+          ...(status ? { status: availabilityLabels[status] ?? status } : {}),
         },
       ];
     });

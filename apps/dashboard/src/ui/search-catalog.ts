@@ -233,7 +233,7 @@ const definitions: [string, SettingsSection, string, string, string, boolean?][]
     'schedules',
     'Report schedules and automatic sending',
     'Choose when reports run and whether to review before sending.',
-    'schedule reports automation automatic delivery stop sending review first timezone',
+    'schedule reports automation automatic delivery stop sending review first timezone saved data snapshot import offline draft recent',
   ],
   [
     'league-calendar',

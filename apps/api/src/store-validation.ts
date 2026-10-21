@@ -9,6 +9,7 @@ import {
   isDeliveryEnvelope,
   isGenerationJob,
   isReportVisuals,
+  isValidReportDataMode,
   record,
   settingsSectionFields,
 } from '@sidekick/core';
@@ -81,6 +82,13 @@ export function validateState(input: unknown): AppState {
       ))
   )
     throw new Error('Invalid settings revisions.');
+  if (
+    Array.isArray(candidate.settings.actions) &&
+    candidate.settings.actions.some(
+      (a) => a && typeof a === 'object' && a.dataMode !== undefined && !isValidReportDataMode(a),
+    )
+  )
+    throw new Error('Invalid saved-report data policy.');
   const rawSettings = candidate.settings as unknown as Record<string, unknown>;
   if (
     !rawSettings ||
@@ -527,8 +535,12 @@ export function makeRestoredStateSafe(state: AppState): AppState {
   const requiresRuntimeReview =
     state.settings.aiRuntime?.mode === 'cli' ||
     state.settings.aiRuntime?.mode === 'apple-cli' ||
+    state.settings.aiRuntime?.mode === 'codex-cli' ||
     state.settings.aiRuntime?.baseUrl !== defaultRuntime.baseUrl;
   const hasAutomaticActions = state.settings.actions.some((action) => action.mode === 'automatic');
+  const hasSavedDataSchedules = state.settings.actions.some(
+    (action) => action.dataMode === 'saved' && action.schedule.enabled,
+  );
   const hasAutoSync =
     state.settings.imessageAutoSyncEnabled === true ||
     state.settings.twilioConversationAutoSyncEnabled === true;
@@ -538,6 +550,7 @@ export function makeRestoredStateSafe(state: AppState): AppState {
   if (
     !requiresRuntimeReview &&
     !hasAutomaticActions &&
+    !hasSavedDataSchedules &&
     !hasAutoSync &&
     !hasMcpDelivery &&
     !hasChatReplies
@@ -554,7 +567,7 @@ export function makeRestoredStateSafe(state: AppState): AppState {
       mcpDeliveryEnabled: false,
       chatRepliesEnabled: false,
       chatRepliesAutoSend: false,
-      ...(requiresRuntimeReview || hasAutomaticActions
+      ...(requiresRuntimeReview || hasAutomaticActions || hasSavedDataSchedules
         ? {
             actions: state.settings.actions.map((action) => ({
               ...action,
@@ -571,7 +584,9 @@ function isValidStoredRuntime(value: unknown): boolean {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const runtime = value as Record<string, unknown>;
   return (
-    (runtime.mode === 'api' || runtime.mode === 'cli' || runtime.mode === 'apple-cli') &&
+    ['api', 'cli', 'apple-cli', 'codex-cli'].includes(String(runtime.mode)) &&
+    (runtime.mode !== 'codex-cli' ||
+      (runtime.model === 'gpt-6.1-sol' && runtime.command === '' && runtime.args === '')) &&
     typeof runtime.model === 'string' &&
     runtime.model.length <= 120 &&
     typeof runtime.command === 'string' &&

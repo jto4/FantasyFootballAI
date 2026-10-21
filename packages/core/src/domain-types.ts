@@ -59,6 +59,9 @@ export interface LeagueConnection {
   lastSyncedAt?: string;
   lastSyncError?: string;
   status?: 'connected' | 'limited';
+  /** Browser data import without persistent provider authorization. */
+  connectionMode?: 'snapshot';
+  snapshotImportedAt?: string;
 }
 
 export type LeagueSyncFreshness = 'fresh' | 'stale' | 'unknown';
@@ -100,7 +103,7 @@ export interface PlayerProjection {
   leagueId: string;
   /** Stable ID for one replaceable owner-imported source set; absent on legacy rows. */
   sourceId?: string;
-  /** Owner confirmation that imported point totals use this league's scoring settings. */
+  /** Recorded scoring compatibility: owner confirmation or checked publisher arithmetic. */
   scoringMatched?: boolean;
   playerId?: string;
   playerName: string;
@@ -221,6 +224,8 @@ export interface ActionSetting {
   enabled: boolean;
   mode: 'draft' | 'automatic';
   schedule: ReportSchedule;
+  /** Explicit saved-data mode creates scoped dashboard drafts without a provider read. */
+  dataMode?: 'saved' | undefined;
   /** Omitted means every connected league; an explicit list scopes scheduled reports. */
   leagueIds?: string[];
 }
@@ -282,7 +287,7 @@ export interface AppSettings {
   /** Additional retries for transient scheduled league refresh failures; defaults to off. */
   scheduledSyncRetries?: 0 | 1 | 2 | 3;
   aiRuntime?: {
-    mode: 'api' | 'cli' | 'apple-cli';
+    mode: 'api' | 'cli' | 'apple-cli' | 'codex-cli';
     model: string;
     command: string;
     args: string;

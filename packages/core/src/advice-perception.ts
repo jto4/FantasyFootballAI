@@ -64,6 +64,7 @@ export function buildAdvicePerception(
   teamCodes: string[],
   sources: FootballDataSource[],
   asOf: string,
+  footballFeedContext = false,
 ) {
   const now = Date.parse(asOf),
     windowHours = 168;
@@ -102,6 +103,7 @@ export function buildAdvicePerception(
         })
         .map((player) => player.id);
       const footballContext =
+        footballFeedContext ||
         /\b(?:nfl|football|fantasy|quarterback|receiver|running back|touchdown|practice|injur\w*|roster|coach|defense|offense|kickoff|qb|rb|wr|te)\b/.test(
           text,
         );

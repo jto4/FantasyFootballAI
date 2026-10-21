@@ -206,3 +206,96 @@ test('Help links to the signed-in connection guidance and the actual Advice page
     await workspace.close();
   }
 });
+
+test('Codex can be saved app-wide without an API key and saved advice uses its subscription budget', async ({
+  page,
+}, info) => {
+  const w = await apiWorkspace(true, false, undefined, 'signed-in', 'codex-cli');
+  const runtimeErrors = errors(page);
+  try {
+    await seedAdvice(w.store);
+    await page.goto(w.url);
+    await expect(page).toHaveTitle('Sunday Sidekick');
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
+    await page.getByText('Advanced AI options', { exact: true }).click();
+    await page
+      .getByRole('combobox', { name: 'Connection type', exact: true })
+      .selectOption('codex-cli');
+    await expect(
+      page.getByText('Uses your existing Codex ChatGPT sign-in', { exact: false }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Test connection', exact: true }).click();
+    await expect(page.getByText('Your AI connection works.', { exact: false })).toBeVisible();
+    expect(w.store.settingsSnapshot().aiRuntime).toMatchObject({
+      mode: 'codex-cli',
+      model: 'gpt-6.1-sol',
+      command: '',
+      args: '',
+    });
+    await page.reload();
+    await expect(page.getByRole('combobox', { name: 'Connection type', exact: true })).toHaveValue(
+      'codex-cli',
+    );
+    await open(page, w.url);
+    await expect(
+      page.getByRole('combobox', { name: 'AI for this analysis', exact: true }),
+    ).toHaveValue('gpt-6.1-sol');
+    await page.getByText('Advanced analysis limits', { exact: true }).click();
+    await expect(
+      page.getByText('Codex subscription limits apply.', { exact: false }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('combobox', { name: 'Reasoning and answer limit per pass', exact: true }),
+    ).toHaveCount(0);
+    await page.getByRole('button', { name: 'Analyze my choices', exact: true }).click();
+    await expect(page.getByRole('article', { name: 'Advice result' })).toBeVisible();
+    expect(w.adviceCalls).toHaveLength(2);
+    expect(w.adviceCalls.every((call) => call.maxOutputTokens === undefined)).toBe(true);
+    expect(w.credentialWrites).toHaveLength(0);
+    expect(w.sends).toHaveLength(0);
+    expect(runtimeErrors).toEqual([]);
+    await page.screenshot({ path: info.outputPath('saved-codex-result.png') });
+  } finally {
+    await w.close();
+  }
+});
+
+test('a saved Codex connection becomes ready when credentials finish loading during its startup check', async ({
+  page,
+}) => {
+  const w = await apiWorkspace(true, false, undefined, 'signed-in', 'codex-cli');
+  let probes = 0;
+  try {
+    await w.store.update((s) => {
+      s.settings.aiRuntime = {
+        mode: 'codex-cli',
+        model: 'gpt-6.1-sol',
+        command: '',
+        args: '',
+        baseUrl: 'https://api.openai.com/v1',
+      };
+    });
+    await page.route('**/api/credentials', async (route) => {
+      const response = await route.fetch();
+      await new Promise((r) => setTimeout(r, 100));
+      await route.fulfill({ response });
+    });
+    await page.route('**/api/ai/test', async (route) => {
+      probes++;
+      await new Promise((r) => setTimeout(r, 400));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+    await page.goto(w.url + '/#/desk');
+    await page.getByText('Connections & scheduled reports', { exact: true }).click();
+    await expect(page.getByText('Report writer is ready.', { exact: true })).toBeVisible();
+    expect(probes).toBe(1);
+    expect(w.credentialWrites).toEqual([]);
+    expect(w.sends).toEqual([]);
+  } finally {
+    await w.close();
+  }
+});

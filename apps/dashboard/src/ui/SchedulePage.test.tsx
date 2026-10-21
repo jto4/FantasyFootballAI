@@ -53,3 +53,33 @@ describe('SchedulePage', () => {
     expect(markup).not.toContain('Send now');
   });
 });
+
+it('keeps unscheduled cards compact and limits import readiness warnings to active schedules', () => {
+  const actions = structuredClone(defaultActionSettings).map((a) => ({ ...a, enabled: false }));
+  const markup = renderToStaticMarkup(
+    <SchedulePage
+      actions={actions}
+      scheduledRuns={[]}
+      retryingRunId=""
+      onGenerate={vi.fn()}
+      onRetry={vi.fn()}
+      manualSnapshot
+      league={{
+        id: 'l',
+        platform: 'espn',
+        name: 'League',
+        displayName: 'League',
+        teamCount: 0,
+        teams: [],
+        scoring: {},
+        settings: {},
+        connectedAt: '2026-10-01T00:00:00Z',
+        connectionMode: 'snapshot',
+        snapshotImportedAt: '2026-10-01T00:00:00Z',
+      }}
+    />,
+  );
+  expect(markup).not.toContain('Provider refresh is unavailable');
+  expect(markup).not.toContain('Destination:');
+  expect(markup.match(/ON DEMAND/g)).toHaveLength(actions.length);
+});

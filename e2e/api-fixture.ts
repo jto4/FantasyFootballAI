@@ -1,3 +1,5 @@
+import { createMarketResearchRouter } from '../apps/api/src/market-research-routes.js';
+import { MarketResearchStore } from '../apps/api/src/market-research-store.js';
 import { createLeagueRouter } from '../apps/api/src/league-routes.js';
 import { createProviderRouter } from '../apps/api/src/provider-routes.js';
 import express from 'express';
@@ -194,6 +196,37 @@ export async function apiWorkspace(
   const queue = createGenerationQueue(store, generateAndSaveReport);
   let port = 0;
   const app = createLocalHttpApp(() => port);
+  const marketResearch = new MarketResearchStore(join(directory, 'market-research.sqlite'));
+  let marketTape: import('@sidekick/core').ExternalTotalTape | undefined;
+  let researchOdds: import('@sidekick/core').SportsbookSnapshot | undefined;
+  let researchNews: import('@sidekick/integrations').FootballNewsSnapshot = {
+    items: [],
+    stale: false,
+  };
+  app.use(
+    createMarketResearchRouter({
+      research: marketResearch,
+      now: () => adviceClock,
+      data: { get: async () => structuredClone(adviceFootballData) },
+      markets: {
+        getTotal: async (_g, p, cutoff) =>
+          marketTape && marketTape.provider === p
+            ? {
+                ...structuredClone(marketTape),
+                cutoffAt: cutoff,
+                windowStartAt: new Date(Date.parse(cutoff) - 86400000).toISOString(),
+                capturedAt: new Date(adviceClock).toISOString(),
+              }
+            : undefined,
+      },
+      odds: {
+        get: async (g) => researchOdds ?? sportsbook.get(g),
+        result: (g) => sportsbook.result(g),
+      },
+      news: { get: async () => researchNews },
+      catalog: async () => new Map(advicePlayers),
+    }),
+  );
   app.use(createProjectionRouter({ store, now: () => adviceNow }));
   app.get('/api/email/received', (_req, res) => res.json([]));
   app.use(
@@ -213,7 +246,9 @@ export async function apiWorkspace(
       catalog: async () => new Map(advicePlayers),
       configuredAI: async () => {
         savedAdviceConfigurations++;
-        return credentials.has('openai') ? await configuredAI() : null;
+        return store.settingsSnapshot().aiRuntime?.mode === 'codex-cli' || credentials.has('openai')
+          ? await configuredAI()
+          : null;
       },
       ...(signedInStatus !== undefined
         ? {
@@ -408,6 +443,16 @@ export async function apiWorkspace(
   port = address.port;
   return {
     app,
+    marketResearch,
+    setMarketTape: (t: import('@sidekick/core').ExternalTotalTape | undefined) => {
+      marketTape = t;
+    },
+    setResearchOdds: (o: import('@sidekick/core').SportsbookSnapshot) => {
+      researchOdds = o;
+    },
+    setResearchNews: (n: import('@sidekick/integrations').FootballNewsSnapshot) => {
+      researchNews = n;
+    },
     url: `http://127.0.0.1:${port}`,
     store,
     sends,
@@ -486,6 +531,7 @@ export async function apiWorkspace(
         server.close((error) => (error ? reject(error) : resolve()));
         server.closeAllConnections();
       });
+      marketResearch.close();
       store.close();
       await rm(directory, { recursive: true, force: true });
     },

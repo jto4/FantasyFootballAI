@@ -12,7 +12,7 @@ writes run asynchronously in request order and drain before graceful quit.
 This device-local preference does not enter the API settings schema, SQLite,
 provider payloads, or backups.
 
-The repository is an npm workspaces monorepo. `apps/api` owns the localhost HTTP boundary, versioned SQLite persistence, and scheduling; feature routers such as `backup-routes.ts`, `image-routes.ts`, `league-routes.ts`, `member-memory-routes.ts`, `provider-routes.ts`, `state-routes.ts`, `projection-routes.ts`, `settings-routes.ts`, `report-routes.ts`, and `chat-sync-routes.ts` keep backup lifecycle, image generation/library, authorized league connection and lifecycle, member profile controls, credential/AI setup and health, read-only state, and projection import behavior outside the bootstrap through injected dependencies. `settings-validation.ts` holds the complete untrusted dashboard-settings boundary, including current league membership checks, separately from API route orchestration. Backup restore reconfigures schedules, news, retention, and chat polling through an explicit post-restore callback after the database and image library have been replaced. `apps/dashboard` is a React/Vite client; `app-state.ts` owns initial dashboard state and validates API state/news/credential payloads before rendering, the Leagues page owns connection-list rendering, the Schedule page owns schedules and job history, the Reports page owns draft editing and delivery review, the League desk owns next-action rendering, and reusable date and season-status presentation helpers stay in focused UI modules. `apps/desktop` hosts the Electron shell and packaging configuration. `packages/core` contains domain types, settings defaults, validation, and scoring-aware analysis. `packages/integrations` contains platform, AI, news, email, SMS, BlueBubbles iMessage, image, and MCP adapters. Platform adapters live in separate `platforms/sleeper.ts`, `platforms/yahoo.ts`, and `platforms/espn.ts` modules; `platforms/shared.ts` holds bounded parsing helpers, and `platforms.ts` preserves the stable connector barrel for consumers. `npm start` builds each workspace in dependency order before starting the production-style local app; `npm run dev` remains the development workflow. Operational API events are JSON lines with allowlisted metadata only. Desktop installs persist those events to a private rotating log set in the selected local data folder; unstructured API stderr is drained and discarded.
+The repository is an npm workspaces monorepo. `apps/api` owns the localhost HTTP boundary, versioned SQLite persistence, and scheduling; feature routers such as `backup-routes.ts`, `image-routes.ts`, `league-routes.ts`, `member-memory-routes.ts`, `provider-routes.ts`, `state-routes.ts`, `projection-routes.ts`, `settings-routes.ts`, `report-routes.ts`, and `chat-sync-routes.ts` keep backup lifecycle, image generation/library, authorized league connection and lifecycle, member profile controls, credential/AI setup and health, read-only state, and projection import behavior outside the bootstrap through injected dependencies. `settings-validation.ts` holds the complete untrusted dashboard-settings boundary, including current league membership checks, separately from API route orchestration. Backup restore reconfigures schedules, news, retention, and chat polling through an explicit post-restore callback after the database and image library have been replaced. `apps/dashboard` is a React/Vite client; `app-state.ts` owns initial dashboard state and validates API state/news/credential payloads before rendering, the Leagues page owns connection-list rendering, the Schedule page owns schedules and job history, the Reports page owns draft editing and delivery review, the League desk owns next-action rendering, and reusable date and season-status presentation helpers stay in focused UI modules. `apps/desktop` hosts the Electron shell and packaging configuration. `packages/core` contains domain types, settings defaults, validation, and scoring-aware analysis. `packages/integrations` contains platform, AI, news, email, SMS, BlueBubbles iMessage, image, and MCP adapters. Betting-model research modules that only `scripts/` use live in `packages/core/src/research/` and `packages/integrations/src/research/`; they are not exported from either package index, so production code cannot depend on them. Platform adapters live in separate `platforms/sleeper.ts`, `platforms/yahoo.ts`, and `platforms/espn.ts` modules; `platforms/shared.ts` holds bounded parsing helpers, and `platforms.ts` preserves the stable connector barrel for consumers. `npm start` builds each workspace in dependency order before starting the production-style local app; `npm run dev` remains the development workflow. Operational API events are JSON lines with allowlisted metadata only. Desktop installs persist those events to a private rotating log set in the selected local data folder; unstructured API stderr is drained and discarded.
 
 Provider secrets use a small credential-manager boundary backed by keytar and the operating system's keychain, credential vault, or Secret Service. Only known provider names are accepted for read, write, and delete operations; ordinary provider values are trimmed and limited to 8,000 characters. Backup passphrases preserve exact whitespace and are limited to 12–200 characters. The dashboard receives configured/not-configured status only, never stored secret values. The manager contract is tested with an in-memory fake backend so provider validation and value handling can be checked without reading or changing a developer's actual credential store.
 
@@ -783,3 +783,75 @@ The production scheduled runner is a typed, dependency-injected API module. `sav
 Report prompts include the season, generation time and league sync time. News publication dates must be valid, nonfuture and within the league season (including the following January/February); old/future setups omit current catalog status and legacy undated estimates. Explicitly dated owner projection periods remain usable for the matching season. This prevents a newly retrieved archive from borrowing current availability/news as historical evidence. Availability guidance uses both status and injuryStatus. A recorded inactive starter invalidates an active matchup sum; it does not create zero points or invent a substitute.
 
 Numeric chart snapshots include an optional season for backwards compatibility. Recorded scores use two decimals; wins use integer counts. Sleeper commissioner `custom_points` values take precedence over calculated points, including zero. Plain-text report instructions avoid unsupported Markdown rendering. No numerical advice model or provider dependency changes are introduced.
+
+## App-wide Codex account connection
+
+The saved `codex-cli` runtime uses the existing typed, isolated signed-in Codex adapter with fixed `gpt-6.1-sol` and high reasoning. Reports, advice and other configured text generation share this resolution path. It does not load or fall back to an API key. Native version/protocol checks and tool/instruction isolation remain unchanged. Validators require the fixed model and empty executable/argument fields; backup restores reset it for owner review. Advice options disclose unsupported token budgets, and subscription usage never borrows API prices. The Settings preset can be saved and tested without a key.
+
+## Separate Market Signals research
+
+`market-research-routes.ts` exposes public-data capture, server-snapshot freezing,
+result checks and export under `/api/market-signals`. It reuses the typed, bounded
+Kalshi/Polymarket totals adapter, current two-sided ESPN-displayed sportsbook
+prices and the configured NFL news cache. A 90-second capture deadline and
+single-flight guard bound remote work. Only exact upcoming regular-season game,
+kickoff and half-point total matches are eligible. Capture sends no owner league,
+AI credentials, wagers or wallet addresses to providers.
+
+The lazy Advice → Market signals panel displays prices, hourly executed cash in
+trades of at least $500 and dated relevant headline counts. Trade direction uses
+the existing corrected taker semantics; cash is shares times paid outcome price.
+Large trades are anonymous activity, not verified whale identities/skill. NFL-feed
+context permits nickname matching only in this research view; production media
+matching retains its default context checks. No synthetic sentiment score or
+missing-as-zero observations are generated. Numeric SVG charts have accessible
+labels, expandable data, zero-based axes, units and source/coverage details.
+
+`MarketResearchStore` uses a separate private `market-research.sqlite` beside the
+main database, capped at 500 immutable first game/provider records. It is excluded
+from application snapshots, AI prompts, reports, prediction history and existing
+Settings backups; its dedicated JSON export must be archived separately. The
+fixed `external-price-v1` policy freezes the latest verified Over contract price
+and matched no-vig sportsbook probability before kickoff. Complete pagination,
+price age ≤60 minutes, quote/capture age ≤5 minutes and exact identities are
+required. POST accepts a server snapshot ID, never user probabilities/outcomes.
+Only independently matched final scores resolve records. Brier summaries remain
+separate by provider/season; manually selected small samples cannot prove an edge.
+There is no automatic promotion, tuning or probability-dispatch connection.
+
+`player-prop-research.ts` provides recent completed-game logs independently from
+market signals. Prop research and betting player choices can recover a missing
+catalog GSIS ID only with a unique historical name/position identity and matching
+current-season team; explicit IDs never fall back to names. Logs exclude missing,
+duplicate, wrong-team/opponent and uncompleted games, with a 24-hour availability
+allowance. The existing prop analysis, frequency comparison and outcome ledger
+remain in use; model formulas and game-market dispatch are unchanged. Live prop
+quotes are not supplied by the current feed; exact lines/prices remain manual.
+
+## Authorized ESPN browser snapshots
+
+The league router can accept a bounded owner-saved ESPN JSON response through a
+route-local binary parser. The typed integrations normalizer is shared with direct
+provider reads; account/member payloads never enter stored state. A snapshot has
+`connectionMode: snapshot` and an import timestamp, without a fabricated sync time.
+Provider-refresh paths require reimport or provider authorization. An explicitly selected saved-data report schedule can instead create a dashboard draft from an age-bounded saved copy; it does not refresh the provider or fabricate a sync time. A
+separate typed parser retains only current-week publisher forecasts whose applied
+components and exact league/position rules reproduce their totals. It does not map
+undocumented ESPN numeric stat IDs into historical model scoring or invent seasonal
+forecasts. Existing projection storage/import validation and clean HTTPS source
+metadata apply.
+
+Native imsg may return `any;` stable GUIDs. These are permitted for sends only after
+matching exactly one current chat whose explicit service is iMessage; service must
+never be inferred from the prefix. Forced iMessage/no-SMS fallback remains required.
+
+## Explicit saved-data scheduled drafts
+
+`ActionSetting.dataMode: saved` is a scoped dashboard/draft policy; omission keeps
+provider refresh. A shared core policy validates IDs and the existing stale-age
+threshold, using import time for manual snapshots and actual sync time otherwise.
+This tests saved-data age only, not publisher freshness. The scheduler skips
+credentials/provider refresh and passes automatic delivery false. Report source
+provenance is deterministic in body/evidence and model context. Backup restoration
+pauses these schedules. Home/Reports/Schedule use the same readiness policy;
+calendar events continue to require provider refresh. See the saved-data review.

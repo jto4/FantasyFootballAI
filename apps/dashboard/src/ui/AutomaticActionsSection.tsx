@@ -14,6 +14,7 @@ const actionNames: Record<string, string> = {
 
 type Props = {
   actions: ActionSetting[];
+  maximumSavedAgeHours?: number;
   confirmAutomatic?: boolean;
   showSummary?: boolean;
   leagues: LeagueConnection[];
@@ -28,6 +29,7 @@ type Props = {
 
 export function AutomaticActionsSection({
   actions,
+  maximumSavedAgeHours = 24,
   confirmAutomatic = true,
   showSummary = true,
   leagues,
@@ -136,6 +138,7 @@ export function AutomaticActionsSection({
                   <span>Delivery channel</span>
                   <select
                     aria-label={`${actionNames[action.kind]} delivery channel`}
+                    disabled={action.dataMode === 'saved'}
                     value={action.channel}
                     onChange={(event) =>
                       onActionChange(action.kind, {
@@ -153,6 +156,7 @@ export function AutomaticActionsSection({
                   <span>Delivery policy</span>
                   <select
                     aria-label={`${actionNames[action.kind]} delivery policy`}
+                    disabled={action.dataMode === 'saved'}
                     value={action.mode}
                     onChange={(event) => {
                       if (
@@ -173,6 +177,37 @@ export function AutomaticActionsSection({
                   </select>
                 </label>
               </div>
+              <label className="action-delivery-field">
+                <span>Report data</span>
+                <select
+                  aria-label={`${actionNames[action.kind]} report data`}
+                  value={action.dataMode ?? 'refresh'}
+                  onChange={(e) =>
+                    onActionChange(
+                      action.kind,
+                      e.target.value === 'saved'
+                        ? {
+                            dataMode: 'saved',
+                            mode: 'draft',
+                            channel: 'dashboard',
+                            leagueIds: action.leagueIds ?? leagues.map((l) => l.id),
+                          }
+                        : { dataMode: undefined },
+                    )
+                  }
+                >
+                  <option value="refresh">Refresh from platform</option>
+                  <option value="saved" disabled={!leagues.length}>
+                    Use saved data · drafts only
+                  </option>
+                </select>
+              </label>
+              {action.dataMode === 'saved' && (
+                <p className="saved-data-guidance">
+                  Uses data imported or synced within {maximumSavedAgeHours} hours. No live refresh
+                  or automatic delivery. Import time does not verify the provider’s update time.
+                </p>
+              )}
               <div className="action-schedule">
                 <label className="schedule-toggle">
                   <input

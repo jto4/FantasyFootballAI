@@ -13,12 +13,12 @@ file once; a cached synchronous IPC reply restores colors before paint, while
 serialized asynchronous atomic writes save changes and finish before graceful
 quit. Browser-only clients continue to use local storage.
 
-`apps/dashboard/design-source/images/soft-gradient-waves.png` is the high-resolution source for the locally served `apps/dashboard/public/images/soft-gradient-waves.webp` derivative. Regenerate it with `cwebp -q 88 -m 6 apps/dashboard/design-source/images/soft-gradient-waves.png -o apps/dashboard/public/images/soft-gradient-waves.webp`. The 1774 × 887 WebP is about 28 KB, compared with 1.4 MB for the PNG source, and preserves the same composition for the decorative hero. A dashboard test keeps the served asset below 64 KB and checks that the hero CSS uses the derivative. Neither file is a screenshot or a source of product facts. `dashboard-concept.png` is a separate visual concept; its example teams, scores, reports, and news are synthetic and must never appear as seeded application data.
+`apps/dashboard/design-source/images/soft-gradient-waves.png` is the retained high-resolution source for the earlier decorative hero band. The current dashboard does not render a hero image, so no served WebP derivative is bundled; regenerate one with `cwebp -q 88 -m 6` if a hero returns. The source is not a screenshot or a source of product facts. `dashboard-concept.png` is a separate visual concept; its example teams, scores, reports, and news are synthetic and must never appear as seeded application data.
 
 ## Acceptance criteria
 
 - The interface is primarily white by default, quiet, and editorial while keeping league status and controls easy to scan.
 - Dark mode is reachable from the header and Settings, works by keyboard, and persists across reloads with restoration before rendering.
-- The hero artwork is bundled locally, decorative, and does not obscure content.
+- Any decorative artwork is bundled locally and does not obscure content.
 - Navigation, controls, empty/loading/error states, responsive layouts, keyboard focus, and reduced-motion behavior remain usable.
 - Review the implemented dashboard at desktop and narrow widths after visual changes.

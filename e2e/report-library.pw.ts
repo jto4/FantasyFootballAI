@@ -251,3 +251,80 @@ test('larger leagues stay compact and charts remain readable in black mode at na
     await workspace.close();
   }
 });
+
+test('manual imports offer explicit saved-data drafts and Home explains expired data', async ({
+  page,
+}, info) => {
+  const w = await apiWorkspace();
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  try {
+    await w.store.update((s) => {
+      Object.assign(s.leagues[0]!, {
+        platform: 'espn',
+        connectionMode: 'snapshot',
+        snapshotImportedAt: new Date().toISOString(),
+      });
+      delete s.leagues[0]!.lastSyncedAt;
+    });
+    await page.goto(w.url + '/#/reports?league=browser-league');
+    await page.getByRole('button', { name: 'Set up weekly drafts', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'A week of league reports' }),
+      enable = dialog.getByRole('button', { name: 'Enable weekly drafts', exact: true });
+    await expect(enable).toBeDisabled();
+    await dialog.getByLabel('Use saved league data for these drafts', { exact: true }).check();
+    await expect(dialog).toContainText('within 24 hours');
+    await expect(enable).toBeEnabled();
+    await page.screenshot({ path: info.outputPath('saved-data-plan.png') });
+    await enable.click();
+    const scheduled = w.store
+      .settingsSnapshot()
+      .actions.filter((a) => ['power-rankings', 'matchup-preview'].includes(a.kind));
+    expect(
+      scheduled.every(
+        (a) =>
+          a.dataMode === 'saved' &&
+          a.mode === 'draft' &&
+          a.channel === 'dashboard' &&
+          a.leagueIds?.[0] === 'browser-league',
+      ),
+    ).toBe(true);
+    await w.store.update((s) => {
+      s.leagues[0]!.snapshotImportedAt = '2020-01-01T00:00:00Z';
+    });
+    await page.goto(w.url + '/#/desk?league=browser-league');
+    await page.getByText('Connections & scheduled reports', { exact: true }).click();
+    await expect(
+      page.getByText(/Import or refresh league data saved within the last 24 hours/).first(),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+    // Schedule is lazy-loaded; wait for its first card before reading the heading order.
+    await expect(page.getByRole('heading', { level: 2, name: 'Power rankings' })).toBeVisible();
+    expect((await page.getByRole('heading', { level: 2 }).allTextContents()).slice(0, 2)).toEqual([
+      'Power rankings',
+      'Matchup preview',
+    ]);
+    await page.screenshot({ path: info.outputPath('saved-data-schedule.png'), fullPage: true });
+    await expect(
+      page
+        .getByRole('status')
+        .filter({ hasText: 'Import or refresh league data saved within the last 24 hours' }),
+    ).toHaveCount(2);
+    await page.getByRole('button', { name: 'Edit power rankings schedule', exact: true }).click();
+    const editor = page.getByRole('dialog', { name: 'Schedule power rankings', exact: true });
+    await expect(
+      editor.getByRole('combobox', { name: 'Weekly power rankings report data', exact: true }),
+    ).toHaveValue('saved');
+    await expect(
+      editor.getByRole('combobox', { name: 'Weekly power rankings delivery policy', exact: true }),
+    ).toBeDisabled();
+    await expect(
+      editor.getByRole('combobox', { name: 'Weekly power rankings delivery channel', exact: true }),
+    ).toHaveValue('dashboard');
+    expect(errors).toEqual([]);
+    expect(w.sends).toEqual([]);
+    expect(w.generations()).toBe(0);
+  } finally {
+    await w.close();
+  }
+});
