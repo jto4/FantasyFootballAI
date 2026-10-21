@@ -156,10 +156,16 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
         parsed.season ?? season,
       );
       const now = new Date().toISOString();
+      // Reconnecting (for example a browser snapshot switching to live refresh) keeps the
+      // owner's label and original connection date.
+      const existing = store.snapshot().leagues.find((item) => item.id === normalized.id);
       const league: LeagueConnection = {
         ...normalized,
-        displayName: typeof name === 'string' && name.trim() ? name.trim() : normalized.name,
-        connectedAt: now,
+        displayName:
+          typeof name === 'string' && name.trim()
+            ? name.trim()
+            : (existing?.displayName ?? normalized.name),
+        connectedAt: existing?.connectedAt ?? now,
         lastSyncedAt: now,
       };
       await store.update((state) => {

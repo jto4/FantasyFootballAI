@@ -607,7 +607,11 @@ export function App() {
       setLeagueId(id);
       setEspnSeason(saved.season ?? new Date().getFullYear());
       setConnectionError('');
-      setNotice('Import a new browser snapshot to update this league.');
+      setNotice(
+        credentialProviders.some((item) => item.provider === 'espn' && item.configured)
+          ? 'Your ESPN access is saved. Choose Connect league to switch to automatic refresh, or import a new snapshot.'
+          : 'Import a new browser snapshot to update this league, or add ESPN access in Settings for automatic refresh.',
+      );
       setModal(true);
       return;
     }

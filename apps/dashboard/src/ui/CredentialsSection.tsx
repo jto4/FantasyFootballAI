@@ -156,7 +156,9 @@ export function CredentialsSection({
                         </li>
                         <li>
                           Open the browser’s developer tools and find Cookies under Application or
-                          Storage for espn.com.
+                          Storage for espn.com. In Safari, first turn on Settings → Advanced → Show
+                          features for web developers, then choose Develop → Show Web Inspector →
+                          Storage → Cookies.
                         </li>
                         <li>
                           Copy the values named espn_s2 and SWID. Paste them below as{' '}
