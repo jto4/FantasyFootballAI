@@ -190,7 +190,7 @@ export function AppTopbar({
             </select>
             <span>
               {league
-                ? `${platformName(league.platform)} · ${league.teamCount} teams`
+                ? `${platformName(league.platform)} · ${league.teamCount} teams${updatedLabel(league)}`
                 : 'Connect to get started'}
             </span>
           </div>
@@ -215,4 +215,20 @@ export function AppTopbar({
       </div>
     </header>
   );
+}
+
+/** One freshness phrase shared by the header: when league data last arrived, in plain words. */
+export function updatedLabel(
+  league: Pick<LeagueConnection, 'lastSyncedAt' | 'snapshotImportedAt'>,
+  now = Date.now(),
+): string {
+  const at = Date.parse(league.lastSyncedAt ?? league.snapshotImportedAt ?? '');
+  if (!Number.isFinite(at) || at > now + 60_000) return '';
+  const minutes = Math.floor((now - at) / 60_000);
+  if (minutes < 2) return ' · updated just now';
+  if (minutes < 60) return ` · updated ${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return ` · updated ${hours} hr ago`;
+  const days = Math.floor(hours / 24);
+  return ` · updated ${days} day${days === 1 ? '' : 's'} ago`;
 }

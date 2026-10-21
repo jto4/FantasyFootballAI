@@ -367,6 +367,9 @@ export function SettingsPage({
         ? 'Test credential saved for this session only.'
         : 'Credential saved to the operating system credential store.',
     );
+    // Confirm ESPN access right away so a wrong cookie is caught before the next refresh.
+    if (provider === 'espn' && leagues.some((league) => league.platform === 'espn'))
+      void credentialTests.testEspn();
   }
 
   async function removeSecret(provider: string) {
