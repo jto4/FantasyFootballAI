@@ -17,7 +17,7 @@
 - Validate imported data and remote responses at trust boundaries. Use request timeouts and bounded response sizes.
 - Do not run automated security scans; the project owner explicitly excluded them. Continue ordinary manual code and security reviews.
 - Use comments for security assumptions, non-obvious behavior, and trade-offs. Do not narrate straightforward code.
-- Update `docs/tasks.md` and relevant architecture or decision notes when behavior changes.
+- Keep docs proportional: update `docs/tasks.md` when work opens or closes, and decision or architecture notes only for durable design changes. See `docs/README.md`.
 - Use `docs/README.md` to find the documentation source of truth; keep durable guidance in `docs/memory.md` and current work/status in the task and support-matrix files.
 - Before release, run the documented checks and complete both code and security review checklists.
 
