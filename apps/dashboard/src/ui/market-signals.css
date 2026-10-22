@@ -38,7 +38,7 @@
 }
 .research-chart text {
   fill: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .research-grid {
   stroke: var(--line);

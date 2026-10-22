@@ -13,7 +13,7 @@ import {
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
-import { AppSidebar, AppTopbar, isToolSection } from './AppChrome';
+import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
 import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
@@ -137,7 +137,8 @@ export function App() {
   });
   const { section, leagueId: activeLeagueId, reportId: initialReviewId } = route;
   useEffect(() => {
-    if (isToolSection(section)) setShowTools(true);
+    // On phones More is a pop-up menu over the page, so it must not reopen by itself.
+    if (isToolSection(section) && !isPhoneLayout()) setShowTools(true);
   }, [section]);
   const setSection = (section: string) => updateRoute({ section });
   const setActiveLeagueId = (leagueId: string) => updateRoute({ leagueId, reportId: '' });

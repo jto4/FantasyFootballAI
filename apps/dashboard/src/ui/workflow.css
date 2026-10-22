@@ -18,7 +18,7 @@
 }
 .operations-card small {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
   color: var(--muted);
 }
@@ -239,7 +239,7 @@
 }
 .workspace-search-trigger kbd {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .workspace-search-dialog {
@@ -341,7 +341,7 @@
 }
 .workspace-search-result small {
   color: var(--orange);
-  font-size: 11px;
+  font-size: 13px;
 }
 .workspace-search-result strong {
   font-size: 15px;
@@ -368,7 +368,7 @@
 }
 .workspace-search-footer span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .workspace-search-empty {
   padding: 12px;

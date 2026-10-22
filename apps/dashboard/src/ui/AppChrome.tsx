@@ -36,6 +36,13 @@ const tools = [
   { section: 'Imports', label: 'Imports', icon: FileText, labs: true },
 ];
 
+/** Matches the CSS breakpoint where navigation becomes a bottom tab bar. */
+export function isPhoneLayout() {
+  return (
+    typeof window !== 'undefined' && window.matchMedia?.('(max-width: 800px)').matches === true
+  );
+}
+
 export function isToolSection(section: string) {
   return tools.some((tool) => tool.section === section);
 }
@@ -85,24 +92,31 @@ export function AppSidebar({
           open={showTools}
           onToggle={(event) => onShowToolsChange(event.currentTarget.open)}
         >
-          <summary>More tools</summary>
-          {tools.map(({ section: destination, label, icon: Icon, labs }, index) => (
-            <Fragment key={destination}>
-              {labs && !tools[index - 1]?.labs && (
-                <span className="nav-group-label" aria-hidden="true">
-                  Labs
-                </span>
-              )}
-              <button
-                type="button"
-                className={`nav-item ${section === destination ? 'active' : ''}`}
-                onClick={() => navigate(destination)}
-              >
-                <Icon size={17} />
-                <span>{label}</span>
-              </button>
-            </Fragment>
-          ))}
+          <summary>
+            More<span className="more-tools-full"> tools</span>
+          </summary>
+          <div className="more-tools-menu">
+            {tools.map(({ section: destination, label, icon: Icon, labs }, index) => (
+              <Fragment key={destination}>
+                {labs && !tools[index - 1]?.labs && (
+                  <span className="nav-group-label" aria-hidden="true">
+                    Labs
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className={`nav-item ${section === destination ? 'active' : ''}`}
+                  onClick={() => {
+                    if (isPhoneLayout()) onShowToolsChange(false);
+                    navigate(destination);
+                  }}
+                >
+                  <Icon size={17} />
+                  <span>{label}</span>
+                </button>
+              </Fragment>
+            ))}
+          </div>
         </details>
       </nav>
       <div className="sidebar-bottom">
