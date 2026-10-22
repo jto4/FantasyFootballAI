@@ -40,8 +40,8 @@ export function HelpPage({
           <p className="section-overline">GET ANSWERS & KEEP GOING</p>
           <h1>Help & FAQ</h1>
           <p>
-            Find an answer, then go straight to the place that helps. You can also find these
-            answers using the app search above.
+            Find an answer, then go straight to the place that helps. No question is dumber than
+            starting a player on bye. You can also find these answers using the app search above.
           </p>
           <p className="help-shortcuts-hint">
             Press <kbd>?</kbd> anywhere to see keyboard shortcuts.

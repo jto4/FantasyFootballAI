@@ -86,7 +86,7 @@ export function rankWaivers(
     );
   if (!evidence.some((p) => p.projectedPoints !== undefined))
     warnings.push(
-      'No player estimates are available for this week yet. Check back closer to games.',
+      'No player estimates are available for this week yet. Check back closer to games; even the projections need coffee.',
     );
   const name = (id: string) => mine.find((p) => p.id === id)?.name ?? id;
   const weakSpots = (current?.assignments ?? [])

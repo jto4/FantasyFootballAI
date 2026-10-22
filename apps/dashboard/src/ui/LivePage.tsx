@@ -112,7 +112,9 @@ export function LivePage({
           <p className="section-overline">GAME DAY</p>
           <h1>Live</h1>
           <p>
-            {report ? `${report.leagueName} · Week ${report.week}` : 'Your matchup as games play.'}
+            {report
+              ? `${report.leagueName} · Week ${report.week}`
+              : 'Your matchup as games play. Refreshing every minute so you don’t have to.'}
             {checkedAt ? ` · checked ${formatDateTime(checkedAt)}` : ''}
           </p>
         </div>
@@ -135,14 +137,17 @@ export function LivePage({
         </p>
       )}
       {report && !live && (
-        <p className="empty-activity">This week’s matchup isn’t in the league data yet.</p>
+        <p className="empty-activity">
+          This week’s matchup isn’t in the league data yet. Your opponent is safe, for now.
+        </p>
       )}
       {live && (
         <>
           {live.winChance !== undefined && (
             <section className="live-chance" aria-label="Win chance">
               <p>
-                <strong>{Math.round(live.winChance * 100)}%</strong> rough chance you win
+                <strong>{Math.round(live.winChance * 100)}%</strong> rough chance you win (bragging
+                rights not included)
               </p>
               <span className="live-chance-bar" aria-hidden="true">
                 <span style={{ width: `${Math.round(live.winChance * 100)}%` }} />

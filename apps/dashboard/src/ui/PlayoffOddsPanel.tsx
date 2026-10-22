@@ -16,7 +16,12 @@ export function PlayoffOddsPanel({
   selected: string;
 }) {
   const odds = useMemo(() => playoffOdds(league), [league]);
-  if (!odds) return <p className="trend-caption">Playoff odds appear after two played weeks.</p>;
+  if (!odds)
+    return (
+      <p className="trend-caption">
+        Playoff odds appear after two played weeks. Week one overreactions are not data.
+      </p>
+    );
   if (!odds.remainingWeeks.length)
     return <p className="trend-caption">The regular season is complete.</p>;
   return (

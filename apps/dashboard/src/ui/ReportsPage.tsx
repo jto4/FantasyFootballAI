@@ -318,7 +318,10 @@ export function ReportsPage({
         <div>
           <p className="section-overline">REVIEW & DELIVERY</p>
           <h1>Reports</h1>
-          <p>Review and edit drafts. Nothing is sent until you confirm where it goes.</p>
+          <p>
+            Review and edit drafts, then unleash them on the group chat. Nothing is sent until you
+            confirm where it goes.
+          </p>
         </div>
         {/* With a league selected, the Create tab is the one way in. */}
         {onCreate && !(league && onCreateKind) && (
@@ -586,7 +589,7 @@ export function ReportsPage({
         {filtered.length === 0 && !history.loading && !history.error && (
           <p className="empty-activity">
             {leagueFilter === 'all' && statusFilter === 'all'
-              ? 'No reports yet.'
+              ? 'No reports yet. The group chat is suspiciously quiet.'
               : 'No reports match these filters.'}{' '}
             {league && onCreateKind ? (
               <button type="button" className="text-button" onClick={() => setView('create')}>

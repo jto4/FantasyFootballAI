@@ -1037,7 +1037,11 @@ export function AdvicePage({
         <div>
           <p className="section-overline">DECIDE WITH EVIDENCE</p>
           <h1>Advice</h1>
-          {!result && <p>Choose a task, check the data, then get advice.</p>}
+          {!result && (
+            <p>
+              Pick a decision, check the evidence, then make the call your league will screenshot.
+            </p>
+          )}
         </div>
         <button
           className="small-button"

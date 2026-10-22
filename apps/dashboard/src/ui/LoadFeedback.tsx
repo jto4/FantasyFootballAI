@@ -1,3 +1,18 @@
+const quips = [
+  'Checking the injury report twice.',
+  'Bribing the projections.',
+  'Asking the kicker for an opinion.',
+  'Reviewing the tape in slow motion.',
+  'Recounting your bench points.',
+  'Consulting the group chat (not really).',
+];
+/** Same quip for the same message, so a reload doesn't shuffle it mid-glance. */
+function quip(message: string) {
+  let hash = 0;
+  for (const char of message) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return quips[hash % quips.length];
+}
+
 /** Placeholder blocks shaped like the content on its way, with the message kept as a caption. */
 export function LoadingStatus({
   message,
@@ -14,7 +29,10 @@ export function LoadingStatus({
           <span key={index} />
         ))}
       </div>
-      <p>{message}</p>
+      <p>
+        {message}
+        <span className="loading-quip"> {quip(message)}</span>
+      </p>
     </div>
   );
 }

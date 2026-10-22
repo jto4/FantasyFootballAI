@@ -373,7 +373,10 @@ export function MemoryPage({
         <div>
           <p className="section-overline">LOCAL CONTEXT</p>
           <h1>{mode === 'imports' ? 'Conversation imports' : 'League members'}</h1>
-          <p>Imported archives and editable profiles stay on this computer.</p>
+          <p>
+            Imported archives and editable profiles stay on this computer. What happens in the group
+            chat stays in the app.
+          </p>
         </div>
         {mode === 'members' && (
           <div className="profile-buttons">

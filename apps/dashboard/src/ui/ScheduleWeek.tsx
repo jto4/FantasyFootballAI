@@ -64,7 +64,8 @@ export function ScheduleWeek({
       <h2 id="schedule-week-title">Next 7 days</h2>
       {runs.length === 0 ? (
         <p className="schedule-week-empty">
-          Nothing is scheduled this week. Reports you create yourself still save as drafts.{' '}
+          Nothing is scheduled this week. The trash talk won’t write itself (well, it will, if you
+          schedule it). Reports you create yourself still save as drafts.{' '}
           {onSetUp && (
             <button type="button" className="text-button" onClick={onSetUp}>
               Schedule weekly reports →

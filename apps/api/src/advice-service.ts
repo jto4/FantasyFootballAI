@@ -1544,7 +1544,9 @@ export function createAdviceService(deps: AdviceDependencies) {
         ? ['No rest-of-season estimates are available yet, so trades cannot be compared.']
         : ideas.length
           ? []
-          : ['No one-for-one trade improves both teams’ best lineups with the current estimates.'],
+          : [
+              'No one-for-one trade improves both teams’ best lineups right now. Everyone’s holding their guys like family heirlooms.',
+            ],
     };
   }
   /**

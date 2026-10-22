@@ -75,7 +75,7 @@ export function AdviceScorecard({ onOpen }: { onOpen: () => void }) {
       {!sources.length && !graded.length ? (
         <p>
           After games finish, this compares projections with actual points and checks how saved
-          decisions turned out. Save some lineup or waiver advice to start the record.
+          decisions turned out. Accountability, but for spreadsheets.
         </p>
       ) : (
         <div className="advice-scorecard-grid">

@@ -73,7 +73,7 @@ export function NextUpCard({
       ? {
           tone: 'warning',
           title: 'Your league data is out of date',
-          body: 'Update it before trusting this week’s advice.',
+          body: 'Advice built on last week’s rosters is how dynasties end. Update it first.',
           action: 'Update league',
           run: onRefresh,
         }
@@ -95,7 +95,7 @@ export function NextUpCard({
             }
           : {
               tone: 'calm',
-              title: 'You’re set for this week',
+              title: 'You’re set for this week. Go touch grass until kickoff.',
               body: next ? `Next kickoff ${formatDateTime(next)}.` : 'Nothing needs attention.',
               action: 'Follow live',
               run: onLive,

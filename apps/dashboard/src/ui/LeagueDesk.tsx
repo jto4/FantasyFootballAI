@@ -95,7 +95,7 @@ export function LeagueDesk({
           <h1>Sunday’s league desk</h1>
           <p className="intro">
             {league
-              ? `Your ${league.displayName} weekly decisions and league updates.`
+              ? `Your ${league.displayName} weekly decisions, league drama and receipts.`
               : 'Set up your first league and choose how your new league-mate should work.'}
           </p>
         </div>

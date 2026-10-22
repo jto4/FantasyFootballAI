@@ -37,7 +37,7 @@ export function LeaguesPage({
         <div>
           <p className="section-overline">YOUR COMPETITIONS</p>
           <h1>Leagues</h1>
-          <p>Saved league data stay on this computer.</p>
+          <p>Saved league data stay on this computer, where your shame is private.</p>
         </div>
         <button className="primary-button" onClick={onConnect}>
           <Plus size={15} /> Connect a league
