@@ -22,12 +22,44 @@ function inline(text: string): ReactNode[] {
   return parts;
 }
 
-/** A small Markdown subset for chat answers: headings, bullet and numbered lists, paragraphs. */
+/** A small Markdown subset for chat answers: headings, lists, simple tables and paragraphs. */
 export function ChatMarkdown({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
   let list: { ordered: boolean; items: string[] } | undefined;
   let paragraph: string[] = [];
+  let table: string[][] = [];
+  const cells = (line: string) =>
+    line
+      .replace(/^\||\|$/g, '')
+      .split('|')
+      .map((cell) => cell.trim());
   const flush = () => {
+    if (table.length) {
+      const [head, ...rows] = table;
+      blocks.push(
+        <div className="chat-table" key={blocks.length}>
+          <table>
+            <thead>
+              <tr>
+                {head!.map((cell, i) => (
+                  <th key={i}>{inline(cell)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, r) => (
+                <tr key={r}>
+                  {row.map((cell, i) => (
+                    <td key={i}>{inline(cell)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      );
+    }
+    table = [];
     if (paragraph.length) blocks.push(<p key={blocks.length}>{inline(paragraph.join(' '))}</p>);
     paragraph = [];
     if (list) {
@@ -43,8 +75,14 @@ export function ChatMarkdown({ text }: { text: string }) {
     const bullet = /^[-*•]\s+(.*)$/.exec(line);
     const numbered = /^\d+[.)]\s+(.*)$/.exec(line);
     const heading = /^#{1,4}\s+(.*)$/.exec(line);
+    const tableRow = /^\|.*\|$/.test(line);
+    if (table.length && !tableRow) flush();
     if (!line) flush();
-    else if (heading) {
+    else if (tableRow) {
+      if (!table.length) flush();
+      // The |---|---| divider row only marks the header; it isn't shown.
+      if (!/^\|[\s:|-]+\|$/.test(line)) table.push(cells(line));
+    } else if (heading) {
       flush();
       blocks.push(<h4 key={blocks.length}>{inline(heading[1]!)}</h4>);
     } else if (bullet || numbered) {

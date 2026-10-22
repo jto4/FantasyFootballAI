@@ -19,3 +19,15 @@ it('renders headings, lists, bold and https links without injecting HTML', () =>
   );
   expect(html).not.toContain('href="javascript');
 });
+
+it('renders a simple Markdown table and drops the divider row', () => {
+  const html = renderToStaticMarkup(
+    <ChatMarkdown text={'| Market | Bears |\n|---|---:|\n| Moneyline | **-155** |\nAfter.'} />,
+  );
+  expect(html).toContain('<thead><tr><th>Market</th><th>Bears</th></tr></thead>');
+  expect(html).toContain(
+    '<tbody><tr><td>Moneyline</td><td><strong>-155</strong></td></tr></tbody>',
+  );
+  expect(html).not.toContain('---');
+  expect(html).toContain('<p>After.</p>');
+});

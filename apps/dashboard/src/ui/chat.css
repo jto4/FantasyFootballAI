@@ -260,3 +260,17 @@
     display: none;
   }
 }
+.chat-table {
+  overflow-x: auto;
+  margin: 0 0 8px;
+}
+.chat-table table {
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.chat-table th,
+.chat-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
