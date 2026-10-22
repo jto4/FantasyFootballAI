@@ -347,6 +347,9 @@ export function createReportService({
  */
 function reportStructure(kind: string, length: string): string {
   const short = length === 'short';
+  // The prompt names data fields; readers should see plain words like "luck", never the field names.
+  const plainWords =
+    'Write for league members: never mention data field names such as seasonFacts, powerRank, luckWins or playoffChancePercent; say "power rank", "luck" or "playoff chance" instead.';
   if (kind === 'power-rankings')
     return [
       short
@@ -354,6 +357,7 @@ function reportStructure(kind: string, length: string): string {
         : 'Rank every team, best to worst, using seasonFacts.standings.powerRank (all-play strength) and records. Aim for about 550–850 words.',
       'For each team write one line or two: rank with movement since last week (for example "↑2", "↓1" or "–" from powerRankChange), record, one stat-backed observation (points for, streak, best or worst week, luck, playoff chance), then one banter line: hype for hot teams, a roast for cold ones.',
       'After the list add short labeled lines: Team of the week, Fraud watch (most positive luckWins), Robbed (most negative luckWins), Basement report (last place) and Playoff picture (using playoffChancePercent; it is a simulation, not a guarantee).',
+      plainWords,
     ].join(' ');
   if (kind === 'matchup-preview')
     return [
@@ -362,6 +366,7 @@ function reportStructure(kind: string, length: string): string {
         : 'Preview every matchup in seasonFacts.thisWeek. Aim for about 550–850 words.',
       'For each matchup: both teams with records, projected totals and margin when supplied (call anything under five points a coin flip), the deciding factor (a key starter, an injury or bye flag, a streak or luck), then one trash-talk line and a pick.',
       'Finish with short labeled lines: Game of the week (closest projected margin), Lock of the week (biggest margin), Upset alert, and a one-line nudge to set lineups before kickoff.',
+      plainWords,
     ].join(' ');
   return '';
 }
