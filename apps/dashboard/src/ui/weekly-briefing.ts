@@ -20,6 +20,15 @@ export type WeeklyBriefing = {
   }[];
   waivers: { id: string; name: string; position: string; gain: number }[];
   notes: string[];
+  matchup?: { week: number; you: MatchupSide; opponent: MatchupSide };
+};
+
+export type MatchupSide = {
+  teamId: string;
+  name: string;
+  points?: number;
+  starters: { id: string; name: string; position: string; estimate?: number }[];
+  projected?: number;
 };
 
 const record = (x: unknown): x is Record<string, unknown> =>
@@ -27,6 +36,25 @@ const record = (x: unknown): x is Record<string, unknown> =>
 const text = (x: unknown, max = 200): x is string => typeof x === 'string' && x.length <= max;
 const finite = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
 const person = (x: unknown) => record(x) && text(x.id, 160) && text(x.name);
+
+function isMatchupSide(x: unknown): x is MatchupSide {
+  return (
+    record(x) &&
+    text(x.teamId, 256) &&
+    text(x.name, 500) &&
+    (x.points === undefined || finite(x.points)) &&
+    (x.projected === undefined || finite(x.projected)) &&
+    Array.isArray(x.starters) &&
+    x.starters.length <= 30 &&
+    x.starters.every(
+      (p) =>
+        person(p) &&
+        text((p as { position?: unknown }).position, 10) &&
+        ((p as { estimate?: unknown }).estimate === undefined ||
+          finite((p as { estimate?: unknown }).estimate)),
+    )
+  );
+}
 
 /** Validates the API's deterministic weekly briefing before it is rendered on Home. */
 export function isWeeklyBriefing(value: unknown): value is WeeklyBriefing {
@@ -62,7 +90,12 @@ export function isWeeklyBriefing(value: unknown): value is WeeklyBriefing {
     value.waivers.every((w) => person(w) && text(w.position, 10) && finite(w.gain)) &&
     Array.isArray(value.notes) &&
     value.notes.length <= 10 &&
-    value.notes.every((n) => text(n, 400))
+    value.notes.every((n) => text(n, 400)) &&
+    (value.matchup === undefined ||
+      (record(value.matchup) &&
+        Number.isInteger(value.matchup.week) &&
+        isMatchupSide(value.matchup.you) &&
+        isMatchupSide(value.matchup.opponent)))
   );
 }
 

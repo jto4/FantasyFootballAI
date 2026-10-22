@@ -9,6 +9,7 @@ import {
 } from '@sidekick/core';
 import { formatDateTime } from './date-format';
 import { isWeeklyBriefing, points, type WeeklyBriefing } from './weekly-briefing';
+import { MatchupCard } from './MatchupCard';
 export function WeeklyHome({
   league,
   settings,
@@ -131,6 +132,7 @@ export function WeeklyHome({
             <p>Choose your team to get started.</p>
           ) : (
             <>
+              {briefing && <MatchupCard briefing={briefing} />}
               {briefing?.notes.length ? (
                 <ul className="weekly-notes">
                   {briefing.notes.map((note) => (

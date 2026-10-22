@@ -128,7 +128,8 @@ export function LeagueDesk({
         </section>
       )}
       <section
-        className={`next-action-card ${league && aiReady && !draftCount && !generatingKind ? 'next-action-compact' : ''}`}
+        // Once a league is connected, the next step is a one-line banner below the weekly answer.
+        className={`next-action-card ${league ? 'next-action-compact' : ''}`}
         aria-labelledby="next-action-title"
       >
         <p className="section-overline">YOUR NEXT STEP</p>

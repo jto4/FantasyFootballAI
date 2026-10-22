@@ -99,6 +99,21 @@ export interface WeeklyBriefing {
   }[];
   waivers: { id: string; name: string; position: string; gain: number }[];
   notes: string[];
+  matchup?: {
+    week: number;
+    you: MatchupSide;
+    opponent: MatchupSide;
+  };
+}
+
+export interface MatchupSide {
+  teamId: string;
+  name: string;
+  /** Platform-recorded score; may be live during games. */
+  points?: number;
+  starters: { id: string; name: string; position: string; estimate?: number }[];
+  /** Sum of starter estimates, only when every starter has one for this week. */
+  projected?: number;
 }
 
 export class AdviceGameTimingError extends Error {
@@ -1253,11 +1268,57 @@ export function createAdviceService(deps: AdviceDependencies) {
       );
     else if (!optimal?.complete)
       notes.push('Some starting spots have no estimate yet, so the lineup suggestion is partial.');
+    // The recorded matchup is the league's current week; estimates only apply to that same week.
+    const allRostered = new Map(
+      league.teams.flatMap((team) => (team.roster ?? []).map((player) => [player.id, player])),
+    );
+    const current = (league.matchups ?? []).find(
+      (m) => m.week === leagueWeek && m.teams.some((t) => t.teamId === teamId),
+    );
+    const side = (entry: NonNullable<typeof current>['teams'][number]) => {
+      const lineup = (entry.starters ?? []).filter(Boolean).slice(0, 30);
+      const players = lineup.map((id) => {
+        const player = byId.get(id) ?? allRostered.get(id);
+        const estimate = week === leagueWeek ? byId.get(id)?.projectedPoints : undefined;
+        return {
+          id,
+          name: player?.name ?? 'Unknown player',
+          position: player?.position ?? '',
+          ...(estimate !== undefined ? { estimate } : {}),
+        };
+      });
+      // Platforms list starters in their own order; sort by position so both sides line up.
+      const order = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'DST', 'D/ST'];
+      const rank = (position: string) => {
+        const index = order.indexOf(position.toUpperCase());
+        return index < 0 ? order.length : index;
+      };
+      players.sort((a, b) => rank(a.position) - rank(b.position));
+      const estimated = players.filter((p) => p.estimate !== undefined);
+      return {
+        teamId: entry.teamId,
+        name: league.teams.find((t) => t.id === entry.teamId)?.name ?? entry.teamId,
+        ...(entry.points !== undefined ? { points: entry.points } : {}),
+        starters: players,
+        ...(players.length && estimated.length === players.length
+          ? { projected: estimated.reduce((sum, p) => sum + p.estimate!, 0) }
+          : {}),
+      };
+    };
+    const matchup =
+      current && current.teams.length === 2
+        ? {
+            week: current.week,
+            you: side(current.teams.find((t) => t.teamId === teamId)!),
+            opponent: side(current.teams.find((t) => t.teamId !== teamId)!),
+          }
+        : undefined;
     return {
       leagueId,
       teamId,
       week,
       asOf,
+      ...(matchup ? { matchup } : {}),
       coverage: { known, total: considered.length, alreadyPlayed: played },
       lineup: {
         complete: optimal?.complete === true,

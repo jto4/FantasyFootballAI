@@ -220,3 +220,85 @@ p.weekly-answer {
   flex-basis: 100%;
   margin: 0;
 }
+
+.matchup-card {
+  margin: 4px 0 18px;
+  padding: 16px 18px;
+  background: var(--surface-raised);
+  border-radius: 8px;
+}
+.matchup-card h3 {
+  margin: 2px 0 8px;
+  font-size: 18px;
+}
+.matchup-note {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.matchup-scoreline {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.matchup-side p {
+  margin: 0;
+}
+.matchup-side-end {
+  text-align: right;
+}
+.matchup-team {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.matchup-score {
+  font-size: 32px;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.matchup-projected {
+  color: var(--muted);
+  font-size: 13px;
+}
+.matchup-vs {
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.matchup-lineups {
+  margin-top: 12px;
+}
+.matchup-lineups summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.matchup-lineups table {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.matchup-lineups th,
+.matchup-lineups td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.matchup-lineups th:nth-child(n + 2):nth-child(-n + 3),
+.matchup-estimate {
+  width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.matchup-lineups th:last-child,
+.matchup-lineups td:last-child {
+  text-align: right;
+}
+.matchup-position {
+  display: inline-block;
+  min-width: 32px;
+  color: var(--muted);
+  font-size: 12px;
+}
