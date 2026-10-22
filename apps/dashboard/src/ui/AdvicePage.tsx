@@ -716,7 +716,6 @@ export function AdvicePage({
                           ))}
                         </select>
                       </label>
-                      <p>Applies to this analysis only; your saved settings don’t change.</p>
                       {connection !== 'saved' && (
                         <>
                           <p>
@@ -763,6 +762,44 @@ export function AdvicePage({
                       </button>
                       {connectionFeedback && <p role="status">{connectionFeedback}</p>}
                     </section>
+                  )}
+                  {!!options?.models?.length && (
+                    <div className="advice-model-choice">
+                      <label>
+                        Model
+                        <select
+                          value={model}
+                          onChange={(event) => {
+                            setModel(event.target.value);
+                            changed();
+                          }}
+                        >
+                          {!options.models.some((item) => item.id === model) && (
+                            <option value={model} disabled>
+                              {model} · No longer available
+                            </option>
+                          )}
+                          {options.models.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.id}
+                              {item.id === options.recommendedModel
+                                ? ' · Recommended for deep analysis'
+                                : ''}
+                              {item.id === options.model && connection === 'saved'
+                                ? ' · Saved model'
+                                : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <p>
+                        {connection !== 'saved'
+                          ? 'Applies to this analysis only. Your saved API prices do not apply to subscription usage.'
+                          : model !== options.model
+                            ? 'Applies to this analysis only. Your saved model’s prices do not apply, so a cost estimate will be unavailable.'
+                            : 'Applies to this analysis only; your saved settings don’t change.'}
+                      </p>
+                    </div>
                   )}
                   {['lineup', 'waivers'].includes(mode) && (
                     <label>
@@ -979,43 +1016,6 @@ export function AdvicePage({
                       placeholder="Example: I need safer starters this week, or I want to improve my running back depth."
                     />
                   </label>
-                  {!!options?.models?.length && (
-                    <div className="advice-model-choice">
-                      <label>
-                        Model
-                        <select
-                          value={model}
-                          onChange={(event) => {
-                            setModel(event.target.value);
-                            changed();
-                          }}
-                        >
-                          {!options.models.some((item) => item.id === model) && (
-                            <option value={model} disabled>
-                              {model} · No longer available
-                            </option>
-                          )}
-                          {options.models.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.id}
-                              {item.id === options.recommendedModel
-                                ? ' · Recommended for deep analysis'
-                                : ''}
-                              {item.id === options.model && connection === 'saved'
-                                ? ' · Saved model'
-                                : ''}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <p>
-                        {connection !== 'saved'
-                          ? 'Your saved API prices do not apply to subscription usage.'
-                          : model !== options.model &&
-                            'Your saved model’s prices do not apply, so a cost estimate will be unavailable.'}
-                      </p>
-                    </div>
-                  )}
                   <details>
                     <summary>Advanced analysis limits</summary>
                     {usesCodex ? (
