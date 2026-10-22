@@ -28,6 +28,8 @@ import { createOperationsRouter } from '../apps/api/src/operations-routes.js';
 import { createBackupRouter } from '../apps/api/src/backup-routes.js';
 import { createPortableBackup } from '../apps/api/src/backup-archive.js';
 import { createAdviceRouter } from '../apps/api/src/advice-routes.js';
+import { createChatRouter } from '../apps/api/src/chat-routes.js';
+import { ChatStore } from '../apps/api/src/chat-store.js';
 import { createProjectionRouter } from '../apps/api/src/projection-routes.js';
 import type { NFLInjuryReportRow } from '@sidekick/integrations';
 import { adviceAnswer, adviceCatalog, adviceData, adviceNow } from './advice-fixture';
@@ -173,6 +175,11 @@ export async function apiWorkspace(
           });
         return invalidAdvice ? 'unverified model response' : modelAdviceAnswer(request);
       }
+      // Chat: ask for the standings once, then answer from them.
+      if (request.prompt.includes("User's question:"))
+        return request.prompt.includes('<lookup_result>')
+          ? '{"answer":"**Start your studs.** The fixture standings are in, and the trash talk writes itself."}'
+          : '{"lookups":[{"tool":"league_overview"}]}';
       if (!request.prompt.includes('untrusted_report_data'))
         return 'Sunday Sidekick runtime ready.';
       generations++;
@@ -414,6 +421,15 @@ export async function apiWorkspace(
       discoverModels: async () => ['gpt-6-luna'],
     }),
   );
+  const chats = new ChatStore(':memory:');
+  app.use(
+    createChatRouter({
+      store,
+      chats,
+      configuredAI,
+      local: async (path) => (await fetch(`http://127.0.0.1:${port}${path}`)).json(),
+    }),
+  );
   app.use(createGenerationRouter(store, queue));
   app.use(
     createReportRouter({
@@ -532,6 +548,7 @@ export async function apiWorkspace(
         server.closeAllConnections();
       });
       marketResearch.close();
+      chats.close();
       store.close();
       await rm(directory, { recursive: true, force: true });
     },

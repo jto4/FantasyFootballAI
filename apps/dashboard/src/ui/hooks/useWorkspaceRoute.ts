@@ -7,6 +7,7 @@ import type { AdviceMode } from '@sidekick/core';
 const pages = {
   desk: 'League desk',
   live: 'Live',
+  ask: 'Ask',
   leagues: 'Leagues',
   schedule: 'Schedule',
   reports: 'Reports',

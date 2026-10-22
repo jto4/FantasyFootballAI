@@ -12,6 +12,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  MessagesSquare,
   Users,
   Zap,
 } from 'lucide-react';
@@ -25,6 +26,7 @@ export type ServiceStatus = 'checking' | 'running' | 'stopping' | 'stopped' | 'u
 const menu = [
   { section: 'League desk', label: 'Home', icon: Home },
   { section: 'Advice', label: 'Advice', icon: Sparkles },
+  { section: 'Ask', label: 'Ask', icon: MessagesSquare },
   { section: 'Reports', label: 'Reports', icon: FileText },
   { section: 'Live', label: 'Live', icon: Radio },
   { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
@@ -82,7 +84,8 @@ export function AppSidebar({
             key={label}
             aria-current={section === destination ? 'page' : undefined}
             onClick={() => navigate(destination)}
-            className={`nav-item ${section === destination ? 'active' : ''}`}
+            // The phone bottom bar has no room for Ask; the top bar's Ask button opens chat there.
+            className={`nav-item ${section === destination ? 'active' : ''}${destination === 'Ask' ? ' nav-item-desktop' : ''}`}
           >
             <Icon size={17} strokeWidth={1.8} />
             <span>{label}</span>
@@ -177,7 +180,12 @@ export function AppTopbar({
   staleAfterHours = 24,
   refreshing = false,
   onFreshen,
+  chatOpen = false,
+  onChat,
 }: {
+  chatOpen?: boolean;
+  /** Opens or closes the docked chat panel; absent on the Ask page itself. */
+  onChat?: () => void;
   staleAfterHours?: number;
   refreshing?: boolean;
   /** Refreshes a connected league or starts a re-import for an imported one. */
@@ -251,6 +259,18 @@ export function AppTopbar({
       <WorkspaceSearch leagues={leagues} reports={reports} onNavigate={onSearchNavigate} />
       <div className="top-actions">
         <span className="date-label">{dateLabel}</span>
+        {onChat && (
+          <button
+            type="button"
+            className={`small-button chat-toggle${chatOpen ? ' active' : ''}`}
+            aria-pressed={chatOpen}
+            title="Ask Sidekick (⌘J)"
+            onClick={onChat}
+          >
+            <MessagesSquare size={15} aria-hidden="true" />
+            <span>Ask</span>
+          </button>
+        )}
         <ThemeSwitch />
         <span className={`status-pulse ${serviceStatus !== 'running' ? 'offline' : ''}`} />
         <span

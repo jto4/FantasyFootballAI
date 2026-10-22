@@ -1,0 +1,262 @@
+/* Ask Sidekick: the docked chat panel and the full Ask page share these styles. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  color: var(--ink);
+}
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.chat-head strong {
+  display: block;
+  font-size: 15px;
+}
+.chat-head small,
+.chat-note,
+.chat-sources,
+.chat-history small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.chat-head-actions {
+  display: flex;
+  gap: 4px;
+}
+.chat .icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.chat .icon-button:hover,
+.chat .icon-button[aria-pressed='true'] {
+  border-color: var(--line);
+  color: var(--ink);
+}
+.chat .icon-button.primary {
+  background: var(--orange);
+  color: #fff;
+}
+.chat .icon-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.chat-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.chat-history {
+  flex: 0 0 240px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  padding: 8px;
+}
+.chat-history ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chat-history li {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+.chat-history li.active,
+.chat-history li:hover {
+  background: color-mix(in srgb, var(--orange) 9%, transparent);
+}
+.chat-history li > button:first-child {
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.chat-history li span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+.chat-history p {
+  padding: 8px;
+  color: var(--muted);
+}
+.chat-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+}
+.chat-empty p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.chat-starters {
+  display: grid;
+  gap: 8px;
+}
+.chat-starters button {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.chat-starters button:hover {
+  border-color: var(--orange);
+}
+.chat-message {
+  max-width: 92%;
+  margin: 0 0 12px;
+  line-height: 1.55;
+  font-size: 14px;
+}
+.chat-message.user {
+  margin-left: auto;
+  padding: 9px 13px;
+  border-radius: 12px 12px 2px 12px;
+  background: color-mix(in srgb, var(--orange) 14%, var(--surface));
+}
+.chat-message p {
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+}
+.chat-message p:last-child {
+  margin-bottom: 0;
+}
+.chat-message h4 {
+  margin: 10px 0 4px;
+  font-size: 14px;
+}
+.chat-message ul,
+.chat-message ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.chat-message code {
+  font-size: 12px;
+}
+.chat-message.thinking p {
+  color: var(--muted);
+  font-style: italic;
+}
+.chat-sources {
+  display: block;
+  margin-top: 6px;
+}
+.chat-error {
+  margin: 0 16px 8px;
+  color: var(--orange);
+}
+.chat-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 0 16px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.chat-form:focus-within {
+  border-color: var(--orange);
+}
+.chat-form textarea {
+  flex: 1;
+  min-height: 40px;
+  max-height: 160px;
+  resize: vertical;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+}
+.chat-note {
+  display: block;
+  padding: 6px 16px 12px;
+}
+
+/* Docked panel: a column beside the page on desktop, an overlay on narrow windows. */
+.chat-dock {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 40;
+  display: flex;
+  width: 400px;
+  max-width: 100vw;
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgb(0 0 0 / 8%);
+}
+.chat-dock .chat {
+  flex: 1;
+}
+.chat-dock .chat-history {
+  flex-basis: 100%;
+  border-right: 0;
+}
+.chat-dock .chat-history + .chat-main {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .chat-docked .main-area {
+    margin-right: 400px;
+  }
+  .chat-dock {
+    box-shadow: none;
+  }
+}
+.topbar .chat-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.topbar .chat-toggle.active {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.ask-page .chat-page {
+  height: max(520px, calc(100vh - 250px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+@media (max-width: 800px) {
+  .ask-page .chat-page .chat-history {
+    display: none;
+  }
+}
+@media (max-width: 800px) {
+  .nav-list .nav-item-desktop {
+    display: none;
+  }
+}

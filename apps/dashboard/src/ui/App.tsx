@@ -17,6 +17,7 @@ import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
 import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
+import { ChatBox } from './ChatBox';
 import type { SchedulePrefill } from './ScheduleEditor';
 import type { SearchTask } from './search-tasks';
 import type { SearchDestination } from './search-catalog';
@@ -182,6 +183,23 @@ export function App() {
   const [aiChecking, setAiChecking] = useState(false);
   const [aiCredentialRevision, setAiCredentialRevision] = useState(0);
   const [showTools, setShowTools] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  useEffect(() => {
+    // ⌘/Ctrl+J toggles the chat panel from anywhere, including while typing in it.
+    const listener = (event: KeyboardEvent) => {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.key === 'j'
+      ) {
+        event.preventDefault();
+        setChatOpen((open) => !open);
+      }
+    };
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, []);
   const [setupWizardOpen, setSetupWizardOpen] = useState(false);
   const [setupWizardStep, setSetupWizardStep] = useState(setupProgress?.step ?? 0);
   const setupWizardTriggerRef = useRef<HTMLButtonElement>(null);
@@ -830,7 +848,7 @@ export function App() {
     day: 'numeric',
   }).format(new Date());
   return (
-    <div className="app-shell">
+    <div className={`app-shell${chatOpen && section !== 'Ask' ? ' chat-docked' : ''}`}>
       <AppSidebar
         asideRef={sidebarRef}
         section={section}
@@ -854,6 +872,8 @@ export function App() {
           staleAfterHours={state.settings.leagueStaleAfterHours ?? 24}
           refreshing={Boolean(league && refreshingLeagueId === league.id)}
           {...(league ? { onFreshen: () => void refreshLeague(league.id) } : {})}
+          chatOpen={chatOpen}
+          {...(section !== 'Ask' ? { onChat: () => setChatOpen((open) => !open) } : {})}
         />
 
         <div className="page-content">
@@ -963,6 +983,20 @@ export function App() {
                 onSample={() => setSampleOpen(true)}
               />
             </Suspense>
+          ) : section === 'Ask' ? (
+            <div className="ask-page">
+              <div className="page-title-block">
+                <div>
+                  <p className="section-overline">CHAT WITH YOUR DATA</p>
+                  <h1>Ask Sidekick</h1>
+                  <p>
+                    Lineups, standings, waivers, news and betting prices, answered from your league
+                    data with the receipts attached.
+                  </p>
+                </div>
+              </div>
+              <ChatBox variant="page" leagueId={league?.id} teamId={homeTeamId} page="Ask" />
+            </div>
           ) : section === 'Advice' ? (
             <Suspense fallback={<LoadingStatus message="Opening advice…" />}>
               <AdvicePage
@@ -1221,6 +1255,17 @@ export function App() {
           </footer>
         </div>
       </main>
+      {chatOpen && section !== 'Ask' && (
+        <aside className="chat-dock">
+          <ChatBox
+            variant="panel"
+            leagueId={league?.id}
+            teamId={homeTeamId}
+            page={section}
+            onClose={() => setChatOpen(false)}
+          />
+        </aside>
+      )}
 
       {sampleOpen && (
         <Suspense fallback={<LoadingStatus message="Opening preview…" />}>

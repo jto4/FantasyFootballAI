@@ -9,6 +9,7 @@ export const pageShortcuts = [
   { key: 's', digit: '4', section: 'Schedule', label: 'Schedule' },
   { key: ',', digit: '5', section: 'Settings', label: 'Settings' },
   { key: 'l', digit: '6', section: 'Live', label: 'Live' },
+  { key: 'k', digit: '7', section: 'Ask', label: 'Ask' },
 ] as const;
 
 const typing = (target: EventTarget | null) =>

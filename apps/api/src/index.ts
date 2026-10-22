@@ -1,7 +1,9 @@
 import { dirname as researchDirname, join as researchJoin } from 'node:path';
 import { MarketResearchStore } from './market-research-store.js';
 import { createMarketResearchRouter } from './market-research-routes.js';
-import { PublicPredictionMarketData } from '@sidekick/integrations';
+import { PublicPredictionMarketData, readBoundedJson } from '@sidekick/integrations';
+import { createChatRouter } from './chat-routes.js';
+import { ChatStore } from './chat-store.js';
 import { resolveConfiguredAI } from './ai-runtime.js';
 import { createImsgRouter } from './imsg-routes.js';
 import { RoutineBackups } from './routine-backups.js';
@@ -479,6 +481,27 @@ app.use(
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,
     injuries: nflInjuryReportCache,
+  }),
+);
+const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
+app.use(
+  createChatRouter({
+    store,
+    chats,
+    configuredAI,
+    // Chat lookups reuse this API's own read-only GET routes, with their validation and caches.
+    local: async (path) => {
+      const response = await fetch(`http://127.0.0.1:${port}${path}`, {
+        headers: { accept: 'application/json' },
+        redirect: 'error',
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw new Error(`Local lookup failed with ${response.status}.`);
+      }
+      return readBoundedJson<unknown>(response, 3_000_000);
+    },
   }),
 );
 app.use(
@@ -1018,5 +1041,6 @@ process.once('SIGINT', stopApplication);
 process.once('SIGTERM', stopApplication);
 process.once('beforeExit', () => {
   marketResearch.close();
+  chats.close();
   store.close();
 });

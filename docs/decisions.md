@@ -396,3 +396,20 @@ not shown in results; no stake sizing is offered because no edge has been shown.
 Advice keeps its two-pass flow (answer, then review). Skipping the review for Hold answers was
 tried and reverted: the evaluation suite grades the raw reviewed answer separately, and the
 review is part of that safety design. Cost is controlled by model choice instead.
+
+## Chat runs its own lookup loop (October 22, 2026)
+
+Ask Sidekick (the Ask page and the ⌘J panel) answers from the same data as the rest of the app.
+The model never gets provider-native tools: it replies in JSON asking for named, read-only
+lookups, and the API fetches them from its own loopback GET routes (standings, rosters, lineup
+check, waivers, trades, live, alerts, news, games, odds, props, book prices, betting record and
+reports). This keeps the isolated Codex connection's no-tools guarantee and works the same on
+every AI connection. Lookup results enter the prompt as escaped `<lookup_result>` data blocks,
+are capped in size, and are limited to three rounds of up to three lookups.
+
+Chat cannot send, bet, or change settings or lineups; it points to the page that does. Betting
+answers quote prices only and never give the AI's own probability or "edge", matching the advice
+decision above. Conversations live in `chat.sqlite` beside the main store (newest 50, 80 messages
+each), outside app state, exports and report prompts, and can be deleted from the panel. Answers
+arrive whole, with progress lines while lookups run: the reply format decides between "look up"
+and "answer" only once the model finishes, so token-by-token streaming is not offered.

@@ -26,6 +26,7 @@ test('a beginner connects a league and AI, chooses a report, reviews it, and exp
     await expect(page.locator('.nav-list > button')).toHaveText([
       'Home',
       'Advice',
+      'Ask',
       'Reports',
       'Live',
       'Schedule',
