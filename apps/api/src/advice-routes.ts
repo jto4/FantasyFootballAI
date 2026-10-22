@@ -115,6 +115,50 @@ export function createAdviceRouter(
       });
     return res.json({ available: true, protocol });
   });
+  // Deterministic waiver ranking and trade ideas for the chosen team; no AI call.
+  for (const [path, read] of [
+    ['/api/advice/waiver-day', 'waiverDay'],
+    ['/api/advice/trade-ideas', 'tradeIdeas'],
+  ] as const)
+    router.get(path, async (req, res) => {
+      if (
+        Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
+        typeof req.query.league !== 'string' ||
+        typeof req.query.team !== 'string' ||
+        req.query.league.length > 256 ||
+        req.query.team.length > 256
+      )
+        return res.status(400).json({ error: 'Choose a connected league and team.' });
+      try {
+        res.json(await service[read](req.query.league, req.query.team));
+      } catch (error) {
+        const missing = error instanceof Error && /not in the connected league/.test(error.message);
+        res.status(missing ? 404 : 502).json({
+          error: missing
+            ? 'That team is not in the connected league.'
+            : 'This list could not be prepared. Try again shortly.',
+        });
+      }
+    });
+  // Polled by the desktop shell for game-day notifications; deterministic and AI-free.
+  router.get('/api/alerts', async (req, res) => {
+    if (
+      Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
+      typeof req.query.league !== 'string' ||
+      typeof req.query.team !== 'string' ||
+      req.query.league.length > 256 ||
+      req.query.team.length > 256
+    )
+      return res.status(400).json({ error: 'Choose a connected league and team.' });
+    try {
+      res.json(await service.alerts(req.query.league, req.query.team));
+    } catch (error) {
+      const missing = error instanceof Error && /not in the connected league/.test(error.message);
+      res.status(missing ? 404 : 502).json({
+        error: missing ? 'That team is not in the connected league.' : 'Alerts are unavailable.',
+      });
+    }
+  });
   // Deterministic and AI-free; safe to load whenever Home shows a selected team.
   router.get('/api/advice/briefing', async (req, res) => {
     if (

@@ -3281,3 +3281,8 @@ kbd {
 .league-details {
   min-width: 0;
 }
+.league-auto-refresh {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}

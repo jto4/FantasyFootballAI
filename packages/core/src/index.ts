@@ -156,3 +156,4 @@ export {
 export { isInactiveFootballStatus } from './player-availability.js';
 export { weeklyGameWithheldWarning } from './advice-warnings.js';
 export * from './league-insights.js';
+export * from './roster-moves.js';

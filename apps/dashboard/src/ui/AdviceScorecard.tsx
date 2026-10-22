@@ -9,6 +9,8 @@ import { validPerformance } from './AdvicePerformance';
 
 const sourceNames: Record<string, string> = {
   'public-projection-v1': 'ESPN projections',
+  imported: 'Your imported projections',
+  'historical-baseline': 'Recent-games average',
   'rolling-form-v1': 'App’s own model',
   'rolling-baseline-v1': 'App’s own model (baseline)',
 };

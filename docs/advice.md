@@ -1205,3 +1205,25 @@ calibration and rarely differs by more than two points, so the Tentative-choice 
 fires. `npm run betting:paper-simulate` replays flat paper bets at archived prices; returns are
 within chance. The in-app historical test now shows the current season as an untouched holdout.
 See [the test](reviews/2026-10-22-betting-model-test.md).
+
+## Game-day alerts, Waiver day, Trade ideas and weekly projection records — October 22, 2026
+
+**Game-day alerts (desktop app).** While the app runs, the desktop shell asks the local service
+(`GET /api/alerts?league=&team=`, loopback only) every 15 minutes about each team picked on
+Home. It shows a system notification, once per player and week, when a starter is Out,
+Doubtful, inactive or on bye within 24 hours of that player's kickoff, and when an imported
+league is older than the stale threshold within 48 hours of the next kickoff. Clicking opens
+lineup advice or Leagues. Sent notifications persist in the app-data folder; disposable test
+profiles never notify. Notification permission is controlled by the operating system.
+
+**Waiver day and Trade ideas.** In Advice → Find waiver pickups and Compare a trade, deterministic
+shortlists rank free agents by this week's best-lineup gain (with the cheapest drop) and
+one-for-one trades that improve both teams' rest-of-season best lineups (ranked by the smaller
+side's gain). Choosing a row fills the form for the full analysis. Missing estimates never count
+as zero: lineups with an unestimated slot are compared only with lineups missing the same slot.
+League imports carry no FAAB budget or waiver order.
+
+**Weekly projection records.** Each weekly summary (Home or the alert check) records this week's
+projection for every player on the selected roster before kickoff, plus ESPN's public projection
+for players whose estimate came from an import, so the Home scorecard compares sources without
+saved advice. Record ids are stable per league, week, source and player.

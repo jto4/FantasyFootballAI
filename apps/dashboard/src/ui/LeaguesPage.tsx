@@ -16,6 +16,7 @@ export function LeaguesPage({
   onSetActive,
   onRefresh,
   onDisconnect,
+  onAddEspnLogin,
 }: {
   leagues: LeagueConnection[];
   activeLeagueId?: string;
@@ -26,6 +27,7 @@ export function LeaguesPage({
   onSetActive: (leagueId: string) => void;
   onRefresh: (leagueId: string) => void;
   onDisconnect: (leagueId: string) => void;
+  onAddEspnLogin?: () => void;
 }) {
   const staleAfterMs = (staleAfterHours ?? defaultLeagueStaleAfterHours) * 60 * 60 * 1_000;
 
@@ -92,6 +94,18 @@ export function LeaguesPage({
                     ? ' · imports don’t refresh on their own.'
                     : ' · refreshes automatically around kickoffs.'}
               </p>
+              {imported && league.platform === 'espn' && onAddEspnLogin && (
+                <p className="league-auto-refresh">
+                  To stop re-importing: save your ESPN login once, then connect this league again
+                  with its link. It will then refresh on its own around kickoffs.{' '}
+                  <button type="button" className="text-button" onClick={onAddEspnLogin}>
+                    Add ESPN login
+                  </button>{' '}
+                  <button type="button" className="text-button" onClick={onConnect}>
+                    Connect again
+                  </button>
+                </p>
+              )}
               {league.lastSyncError && (
                 <p className="league-error">Last refresh failed: {league.lastSyncError}</p>
               )}

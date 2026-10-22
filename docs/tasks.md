@@ -301,3 +301,10 @@ Completed work and its evidence live in the archived task records and dated revi
 - [ ] Collect a season of graded projections before letting measured accuracy reorder projection sources; the Home scorecard reports accuracy but does not change source order.
 - [ ] New betting model versions are paused until a source the books don't already price is available (see `decisions.md`).
 - [ ] Re-run `betting:model-audit` and `betting:paper-simulate` at season end; act only if the untouched 2026 holdout interval stays above zero (see `reviews/2026-10-22-betting-model-test.md`).
+
+### Game-day alerts, roster moves and projection records — October 22, 2026
+
+- [ ] Owner: confirm a real game-day notification on the packaged desktop app (allow notifications for Sunday Sidekick in System Settings). Covered by unit tests; no live notification was shown during implementation.
+- [ ] Owner: re-import Afton (or connect it with an ESPN login) so Waiver day and Trade ideas have this week's estimates; the current import has none, so both lists were only verified with fixtures.
+- [ ] Optional: read FAAB budget and waiver order from Sleeper/ESPN adapters for Waiver day.
+- [ ] Continue splitting `AdvicePage.tsx` (form sections) and `App.tsx` (league and report actions) into hooks/components; history, lazy loaders and roster-move panels are extracted.

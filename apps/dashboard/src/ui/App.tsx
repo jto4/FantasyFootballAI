@@ -25,7 +25,7 @@ import type { ActionSetting } from '@sidekick/core';
 import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import type { SendPreview } from './ReportsPage';
 
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { parseLeagueInput, detectLeagueLink, type Platform } from '@sidekick/core';
 import { SetupWizard } from './SetupWizard';
 import { resolveActiveLeague } from './league-selection';
@@ -44,45 +44,19 @@ import {
   type CredentialProvider,
   type NewsSnapshot,
 } from './app-state';
-// Main pages load on demand to keep the startup bundle small, then prefetch while idle
-// so later navigation does not wait on the network.
-const pageLoaders = {
-  settings: () => import('./SettingsPage'),
-  leagues: () => import('./LeaguesPage'),
-  reports: () => import('./ReportsPage'),
-  schedule: () => import('./SchedulePage'),
-  memory: () => import('./MemoryPage'),
-  advice: () => import('./AdvicePage'),
-};
-const HelpPage = lazy(() => import('./HelpPage').then((module) => ({ default: module.HelpPage })));
-const AdvicePage = lazy(() =>
-  pageLoaders.advice().then((module) => ({ default: module.AdvicePage })),
-);
-const SampleExperience = lazy(() =>
-  import('./SampleExperience').then((module) => ({ default: module.SampleExperience })),
-);
-const ScheduleEditor = lazy(() =>
-  import('./ScheduleEditor').then((module) => ({ default: module.ScheduleEditor })),
-);
-const SettingsPage = lazy(() =>
-  pageLoaders.settings().then((module) => ({ default: module.SettingsPage })),
-);
-const LeaguesPage = lazy(() =>
-  pageLoaders.leagues().then((module) => ({ default: module.LeaguesPage })),
-);
-const ReportsPage = lazy(() =>
-  pageLoaders.reports().then((module) => ({ default: module.ReportsPage })),
-);
-const SchedulePage = lazy(() =>
-  pageLoaders.schedule().then((module) => ({ default: module.SchedulePage })),
-);
-const MemoryPage = lazy(() =>
-  pageLoaders.memory().then((module) => ({ default: module.MemoryPage })),
-);
-const DeliveryTask = lazy(() =>
-  import('./DeliveryTask').then((module) => ({ default: module.DeliveryTask })),
-);
-
+import {
+  pageLoaders,
+  HelpPage,
+  AdvicePage,
+  SampleExperience,
+  ScheduleEditor,
+  SettingsPage,
+  LeaguesPage,
+  ReportsPage,
+  SchedulePage,
+  MemoryPage,
+  DeliveryTask,
+} from './lazy-pages';
 export function App() {
   const [verificationMode] = useState(
     () => typeof window !== 'undefined' && window.sidekickDesktop?.isVerificationMode?.() === true,
@@ -1047,6 +1021,9 @@ export function App() {
                 onSetActive={setActiveLeagueId}
                 onRefresh={(id) => void refreshLeague(id)}
                 onDisconnect={(id) => void removeLeague(id)}
+                onAddEspnLogin={() =>
+                  searchNavigate({ section: 'Settings', settingId: 'credential-espn' })
+                }
               />
             </Suspense>
           ) : section === 'Reports' ? (

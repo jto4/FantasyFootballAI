@@ -19,15 +19,16 @@ import {
 } from '@sidekick/core';
 import { requestJson, requestResponse, ApiError } from './api-client';
 import { adviceChoices, adviceTitle } from './advice-navigation';
-import { isAdviceHistory, type AdviceSummary } from './advice-data';
+import { AdviceHistory } from './AdviceHistory';
+import { useAdviceHistory } from './hooks/useAdviceHistory';
 import { AdviceResultView } from './AdviceResultView';
 import { LoadingStatus } from './LoadFeedback';
 import { useMediaQuery } from './hooks/useMediaQuery';
-import { formatDateTime } from './date-format';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
 import { BetFields } from './BetFields';
 import { BetLimit } from './BetLimit';
+import { TradeIdeasPanel, WaiverDayPanel } from './RosterMoves';
 import { PlayerPicker } from './PlayerPicker';
 import { AdvicePerformance } from './AdvicePerformance';
 import { AdviceJournal } from './AdviceJournal';
@@ -64,7 +65,6 @@ export function AdvicePage({
   const [week, setWeek] = useState('');
   const [tradeThroughWeek, setTradeThroughWeek] = useState('18');
   const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>(initialView);
-  const [historyLimit, setHistoryLimit] = useState(5);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [dropPlayerId, setDropPlayerId] = useState('');
   const [lineupComparison, setLineupComparison] = useState(false);
@@ -92,9 +92,7 @@ export function AdvicePage({
   const [outputLimit, setOutputLimit] = useState('16384');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [optionsRevision, setOptionsRevision] = useState(0);
-  const [historyRevision, setHistoryRevision] = useState(0);
-  const [history, setHistory] = useState<AdviceSummary[]>([]);
-  const [historyError, setHistoryError] = useState('');
+  const { history, historyError, reload: reloadHistory } = useAdviceHistory();
   const [result, setResult] = useState<AdviceResult | null>(null);
   const [resultLoading, setResultLoading] = useState(Boolean(resultId));
   const [error, setError] = useState('');
@@ -161,20 +159,6 @@ export function AdvicePage({
       });
     return () => controller.abort();
   }, [mode, league?.id, betting, resultId, wide, optionsRevision, connection]);
-  useEffect(() => {
-    const controller = new AbortController();
-    requestJson('/api/advice', isAdviceHistory, { signal: controller.signal })
-      .then((data) => {
-        if (!controller.signal.aborted) {
-          setHistory(data.items);
-          setHistoryError('');
-        }
-      })
-      .catch((failure: unknown) => {
-        if (!controller.signal.aborted) setHistoryError(message(failure));
-      });
-    return () => controller.abort();
-  }, [historyRevision]);
   useEffect(() => {
     if (!resultId) return;
     const controller = new AbortController();
@@ -419,7 +403,7 @@ export function AdvicePage({
       if (!mounted.current || controller.signal.aborted) return;
       setResult(data);
       setDirty(false);
-      setHistoryRevision((value) => value + 1);
+      reloadHistory();
       setStatus('Advice saved.');
       onDirtyChange(false);
       onNavigate(
@@ -439,7 +423,7 @@ export function AdvicePage({
           ? 'Check saved advice before starting a new paid analysis.'
           : 'Data could not be verified. No AI analysis was started.',
       );
-      setHistoryRevision((value) => value + 1);
+      reloadHistory();
     } finally {
       if (mounted.current && !controller.signal.aborted) setBusy(false);
       if (analysis.current?.id === id) analysis.current = null;
@@ -516,6 +500,30 @@ export function AdvicePage({
       }}
     >
       <h2>{adviceTitle(mode)}</h2>
+      {/* Deterministic shortlists; picking a row fills this form for the full analysis. */}
+      {!result && league && teamId && mode === 'waivers' && (
+        <WaiverDayPanel
+          league={league.id}
+          team={teamId}
+          onUse={(candidate, drop) => {
+            setCandidates([candidate]);
+            setDropPlayerId(drop ?? '');
+            changed();
+          }}
+        />
+      )}
+      {!result && league && teamId && mode === 'trade' && (
+        <TradeIdeasPanel
+          league={league.id}
+          team={teamId}
+          onUse={(idea) => {
+            setTradeTeamId(idea.teamId);
+            setGive([idea.give.playerId]);
+            setReceive([idea.receive.playerId]);
+            changed();
+          }}
+        />
+      )}
       {optionsLoading && (
         <LoadingStatus message="Loading public football data and player choices…" />
       )}
@@ -1206,61 +1214,24 @@ export function AdvicePage({
           <AdvicePerformance disabled={busy} />
         </section>
       )}
-      <section
+      <AdviceHistory
         hidden={view !== 'history'}
-        className="advice-history"
-        aria-labelledby="advice-history-title"
-      >
-        <h2 id="advice-history-title">Saved advice</h2>
-        <p>Saved locally. Opening a result does not call the AI again.</p>
-        {historyError && <p role="alert">{historyError}</p>}
-        <button
-          className="text-button"
-          type="button"
-          onClick={() => setHistoryRevision((value) => value + 1)}
-        >
-          Refresh saved advice
-        </button>
-        {!history.length && !historyError && <p>Your completed analyses will appear here.</p>}
-        <ul>
-          {history.slice(0, historyLimit).map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (
-                    item.id === resultId ||
-                    onNavigate({
-                      section: 'Advice',
-                      adviceId: item.id,
-                      adviceMode: item.mode,
-                      ...(item.leagueId ? { leagueId: item.leagueId } : {}),
-                    })
-                  )
-                    setView('decision');
-                }}
-              >
-                <strong>{item.headline}</strong>
-                <span>
-                  {adviceTitle(item.mode)} · {formatDateTime(item.createdAt)} ·{' '}
-                  {item.confidenceLabel
-                    ? `${item.confidenceLabel} evidence confidence`
-                    : 'Evidence details in result'}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        {history.length > historyLimit && (
-          <button
-            type="button"
-            className="small-button"
-            onClick={() => setHistoryLimit((n) => n + 5)}
-          >
-            Show more saved advice
-          </button>
-        )}
-      </section>
+        history={history}
+        historyError={historyError}
+        onRefresh={reloadHistory}
+        onOpen={(item) => {
+          if (
+            item.id === resultId ||
+            onNavigate({
+              section: 'Advice',
+              adviceId: item.id,
+              adviceMode: item.mode,
+              ...(item.leagueId ? { leagueId: item.leagueId } : {}),
+            })
+          )
+            setView('decision');
+        }}
+      />
     </div>
   );
 }

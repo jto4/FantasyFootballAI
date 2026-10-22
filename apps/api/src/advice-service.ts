@@ -26,12 +26,16 @@ import {
   type AdviceOptions,
   type AdviceRequest,
   type AdviceResult,
+  type PredictionRecord,
   type AIProvider,
   type AppSettings,
   type FootballDataSource,
   type LeagueConnection,
+  type PlayerAdviceEvidence,
   type RosterPlayer,
   capturePredictionRecords,
+  rankWaivers,
+  findTrades,
   captureDecisionSnapshot,
   maximumPredictionRecords,
   maximumPredictionBytes,
@@ -76,6 +80,23 @@ export interface AdviceDependencies {
 }
 
 /** Deterministic Home summary; contains no AI output and no private league members' data. */
+export interface LineupAlerts {
+  leagueId: string;
+  teamId: string;
+  leagueName: string;
+  week: number;
+  alerts: {
+    playerId: string;
+    name: string;
+    reason: 'out' | 'doubtful' | 'bye';
+    status?: string;
+    kickoffAt?: string;
+  }[];
+  /** Earliest upcoming kickoff among this week's starters. */
+  nextKickoffAt?: string;
+  /** Present for imported leagues, which cannot refresh on their own. */
+  snapshot?: { importedAt?: string; stale: boolean };
+}
 export interface WeeklyBriefing {
   leagueId: string;
   teamId: string;
@@ -1066,27 +1087,7 @@ export function createAdviceService(deps: AdviceDependencies) {
         const anchor = records.find((r) => r.kind === 'fantasy');
         if (anchor) anchor.decision = decision;
       }
-      const previous = state.predictionRecords ?? [];
-      const ids = new Set(previous.map((r) => r.id));
-      let bytes = Buffer.byteLength(JSON.stringify(previous)),
-        omitted = 0;
-      const added = [...previous];
-      for (const record of records) {
-        if (ids.has(record.id)) continue;
-        const size = Buffer.byteLength(JSON.stringify(record)) + 1;
-        // Leave room for final outcome/timestamp fields so a full ledger can still settle.
-        if (
-          added.length >= maximumPredictionRecords ||
-          bytes + size > maximumPredictionBytes - maximumPredictionRecords * 160
-        ) {
-          omitted++;
-          continue;
-        }
-        added.push(record);
-        ids.add(record.id);
-        bytes += size;
-      }
-      state.predictionRecords = added;
+      const omitted = appendPredictionRecords(state, records);
       if (omitted)
         result.warnings.push(
           'The prediction ledger reached its storage limit. This advice is saved, but some forecasts were not added to performance tracking. Export or clear the track record before recording more.',
@@ -1255,6 +1256,9 @@ export function createAdviceService(deps: AdviceDependencies) {
         position: byId.get(candidate.playerId)?.position ?? '',
         gain: candidate.value!,
       }));
+    await recordWeeklyProjections(league, loaded, evidence, roster, week, asOf).catch(
+      () => undefined,
+    );
     const notes: string[] = [];
     if (week !== leagueWeek)
       notes.push(
@@ -1350,7 +1354,207 @@ export function createAdviceService(deps: AdviceDependencies) {
       attempt(() => deps.catalog()),
     ]);
   }
-  return { readiness, options, analyze, testConnection, warm, briefing };
+  /**
+   * Records this week's projection for every player on the selected roster so the accuracy
+   * scorecard fills without saved advice. With imported projections, ESPN's public projection is
+   * recorded alongside them for comparison. Ids are stable per league/week/source/player, so
+   * repeated briefings add nothing, and only players whose game has not started are recorded.
+   */
+  async function recordWeeklyProjections(
+    league: LeagueConnection,
+    loaded: Awaited<ReturnType<typeof load>>,
+    evidence: PlayerAdviceEvidence[],
+    roster: { id: string }[],
+    week: number,
+    asOf: string,
+  ) {
+    const mine = new Set(roster.map((p) => p.id));
+    const sets: { tag: string; players: PlayerAdviceEvidence[] }[] = [
+      { tag: 'league', players: evidence.filter((p) => mine.has(p.id)) },
+    ];
+    // Only players whose league projection came from an import need a separate public record.
+    const imported = new Set(
+      evidence.filter((p) => mine.has(p.id) && p.projectionMethod === 'imported').map((p) => p.id),
+    );
+    if (imported.size)
+      sets.push({
+        tag: 'public',
+        players: buildPlayerEvidence({
+          league,
+          players: loaded.players.filter((p) => imported.has(p.id)),
+          projections: [],
+          data: loaded.data,
+          season: loaded.season,
+          week,
+          scope: 'week',
+          asOf,
+        }),
+      });
+    const records = sets.flatMap(({ tag, players }) =>
+      capturePredictionRecords(
+        {
+          id: `weekly-${league.id}-${loaded.season}-${week}-${tag}`.slice(0, 160),
+          request: { mode: 'lineup', leagueId: league.id },
+          season: loaded.season,
+          week,
+          players,
+        } as unknown as AdviceResult,
+        loaded.data,
+        league,
+        loaded.players,
+        asOf,
+      ),
+    );
+    const existing = new Set((deps.store.snapshot().predictionRecords ?? []).map((r) => r.id));
+    const fresh = records.filter((r) => !existing.has(r.id));
+    if (!fresh.length) return;
+    await deps.store.update((state) => {
+      appendPredictionRecords(state, fresh);
+    });
+  }
+  /**
+   * Game-day problems with this week's starters (Out/Doubtful/inactive or on bye) and whether an
+   * imported league is out of date. Deterministic and AI-free; the desktop shell polls it to
+   * decide on notifications.
+   */
+  async function alerts(leagueId: string, teamId: string): Promise<LineupAlerts> {
+    const summary = await briefing(leagueId, teamId);
+    const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId)!;
+    const loaded = await load({ mode: 'lineup', leagueId, week: summary.week });
+    const starters = summary.matchup?.you.starters ?? [];
+    const statusById = new Map(summary.availability.map((row) => [row.id, row.status]));
+    const asOf = now();
+    const weekGames = loaded.data.games.filter(
+      (game) => game.season === loaded.season && game.week === summary.week,
+    );
+    const rows: LineupAlerts['alerts'] = [];
+    const kickoffs: number[] = [];
+    for (const starter of starters) {
+      const player = loaded.players.find((row) => row.id === starter.id);
+      const team = player?.nflTeam ? nflTeamKey(player.nflTeam) : undefined;
+      const game = team
+        ? weekGames.find((g) => nflTeamKey(g.home) === team || nflTeamKey(g.away) === team)
+        : undefined;
+      const kickoff = game?.kickoffAt ? Date.parse(game.kickoffAt) : undefined;
+      if (kickoff !== undefined && kickoff > asOf) kickoffs.push(kickoff);
+      const status = statusById.get(starter.id);
+      // A team with no game this week is on bye; an unknown team is not guessed.
+      const reason =
+        team && weekGames.length && !game
+          ? ('bye' as const)
+          : isInactiveFootballStatus(status)
+            ? ('out' as const)
+            : /^doubtful$/i.test(status ?? '')
+              ? ('doubtful' as const)
+              : undefined;
+      if (!reason) continue;
+      if (kickoff !== undefined && kickoff <= asOf) continue;
+      rows.push({
+        playerId: starter.id,
+        name: starter.name,
+        reason,
+        ...(status ? { status } : {}),
+        ...(game?.kickoffAt ? { kickoffAt: game.kickoffAt } : {}),
+      });
+    }
+    const staleAfterMs = (deps.store.settingsSnapshot().leagueStaleAfterHours ?? 24) * 3_600_000;
+    const importedAt = leagueRow.snapshotImportedAt;
+    return {
+      leagueId,
+      teamId,
+      leagueName: leagueRow.displayName,
+      week: summary.week,
+      alerts: rows,
+      ...(kickoffs.length ? { nextKickoffAt: new Date(Math.min(...kickoffs)).toISOString() } : {}),
+      ...(leagueRow.connectionMode === 'snapshot'
+        ? {
+            snapshot: {
+              ...(importedAt ? { importedAt } : {}),
+              stale: !importedAt || asOf - Date.parse(importedAt) > staleAfterMs,
+            },
+          }
+        : {}),
+    };
+  }
+  /** Evidence for every player in the league pool, for this week or the rest of the season. */
+  async function poolEvidence(leagueId: string, scope: 'week' | 'remaining-season') {
+    const probe = await load({ mode: 'lineup', leagueId });
+    const asOf = new Date(now()).toISOString();
+    const upcoming = probe.data.games
+      .filter((game) => game.season === probe.season && isUpcomingFootballGame(game, asOf))
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    const week = upcoming && upcoming.week > probe.week ? upcoming.week : probe.week;
+    const loaded = week === probe.week ? probe : await load({ mode: 'lineup', leagueId, week });
+    const league = loaded.league!;
+    const injury = await deps.injuries.get(loaded.season).catch(() => undefined);
+    for (const player of loaded.players) {
+      const evidence = adviceInjuryEvidence(
+        player,
+        injury,
+        loaded.season,
+        week,
+        asOf,
+        loaded.data.games,
+      );
+      if (evidence.status) player.status = evidence.status;
+    }
+    const evidence = buildPlayerEvidence({
+      league,
+      players: loaded.players,
+      projections: deps.store
+        .snapshot()
+        .playerProjections.filter((row) => row.leagueId === league.id)
+        .map((row) => ({ ...row, sourceId: projectionSourceId(row) })),
+      data: loaded.data,
+      season: loaded.season,
+      week,
+      scope,
+      ...(scope === 'remaining-season' ? { throughWeek: 18 } : {}),
+      asOf,
+    });
+    return { league, week, season: loaded.season, evidence };
+  }
+  function requireTeam(leagueId: string, teamId: string) {
+    const league = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
+    if (!league?.teams.some((team) => team.id === teamId))
+      throw new Error('That team is not in the connected league.');
+  }
+  /** Deterministic waiver ranking for this week; no AI call. */
+  async function waiverDay(leagueId: string, teamId: string) {
+    requireTeam(leagueId, teamId);
+    const { league, week, evidence } = await poolEvidence(leagueId, 'week');
+    return { leagueId, teamId, week, ...rankWaivers(league, teamId, evidence) };
+  }
+  /** Deterministic one-for-one trade ideas over the rest of the season; no AI call. */
+  async function tradeIdeas(leagueId: string, teamId: string) {
+    requireTeam(leagueId, teamId);
+    const { league, week, evidence } = await poolEvidence(leagueId, 'remaining-season');
+    const ideas = findTrades(league, teamId, evidence);
+    const estimated = evidence.filter((p) => p.projectedPoints !== undefined).length;
+    return {
+      leagueId,
+      teamId,
+      fromWeek: week,
+      throughWeek: 18,
+      ideas,
+      warnings: !estimated
+        ? ['No rest-of-season estimates are available yet, so trades cannot be compared.']
+        : ideas.length
+          ? []
+          : ['No one-for-one trade improves both teams’ best lineups with the current estimates.'],
+    };
+  }
+  return {
+    readiness,
+    options,
+    analyze,
+    testConnection,
+    warm,
+    briefing,
+    alerts,
+    waiverDay,
+    tradeIdeas,
+  };
 
   async function models(settings: AppSettings) {
     const saved = modelName(settings);
@@ -1403,4 +1607,35 @@ function modelName(settings: AppSettings): string {
       : settings.aiRuntime?.mode === 'apple-cli'
         ? 'Apple Foundation Models'
         : (settings.aiRuntime?.model ?? 'gpt-6-luna');
+}
+
+/**
+ * Adds new prediction records within the ledger limits, skipping ids already present. Returns how
+ * many were left out for space; room is kept for later outcome fields so a full ledger can settle.
+ */
+function appendPredictionRecords(
+  state: { predictionRecords?: PredictionRecord[] },
+  records: PredictionRecord[],
+): number {
+  const previous = state.predictionRecords ?? [];
+  const ids = new Set(previous.map((r) => r.id));
+  let bytes = Buffer.byteLength(JSON.stringify(previous)),
+    omitted = 0;
+  const added = [...previous];
+  for (const record of records) {
+    if (ids.has(record.id)) continue;
+    const size = Buffer.byteLength(JSON.stringify(record)) + 1;
+    if (
+      added.length >= maximumPredictionRecords ||
+      bytes + size > maximumPredictionBytes - maximumPredictionRecords * 160
+    ) {
+      omitted++;
+      continue;
+    }
+    added.push(record);
+    ids.add(record.id);
+    bytes += size;
+  }
+  state.predictionRecords = added;
+  return omitted;
 }

@@ -5,6 +5,7 @@ import {
   ipcMain,
   Menu,
   nativeImage,
+  Notification,
   shell,
   Tray,
   utilityProcess,
@@ -18,6 +19,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 import { resolveVerificationProfile } from '@sidekick/integrations';
 import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
+import { startGameDayAlerts } from './game-day-alerts.mjs';
 import {
   getTeamSelectionPreference,
   setTeamSelectionPreference,
@@ -97,6 +99,7 @@ const dataDirectoryPreference = join(app.getPath('appData'), app.getName(), 'dat
 const startupPreference = join(app.getPath('appData'), app.getName(), 'startup.json');
 const appearancePreference = join(app.getPath('appData'), app.getName(), 'appearance.json');
 const teamPreference = join(app.getPath('appData'), app.getName(), 'team-selection.json');
+const gameDayAlertState = join(app.getPath('appData'), app.getName(), 'game-day-alerts.json');
 let teamSelections = {};
 let teamSelectionWrites = Promise.resolve();
 ipcMain.on('sidekick:get-team-selections', (event) => {
@@ -420,6 +423,7 @@ async function start() {
     return;
   }
   await writeFile(join(dataDirectory, 'service-port'), `${apiPort}\n`, { mode: 0o600 });
+  startLineupNotifications();
   if (
     shouldKeepDashboardClosed({ headless: headlessMode, showWindowRequested: showWindowWhenReady })
   ) {
@@ -641,6 +645,39 @@ async function restartWithDataDirectory(nextDirectory, currentDirectory) {
     }
     throw error;
   }
+}
+
+/**
+ * Game-day notifications for the teams picked on Home. The local service decides what is wrong;
+ * the shell only polls it over loopback. Disposable test profiles never notify.
+ */
+function startLineupNotifications() {
+  if (verificationProfile || !Notification.isSupported()) return;
+  startGameDayAlerts({
+    statePath: gameDayAlertState,
+    teams: () => teamSelections,
+    fetchReport: async (league, team) => {
+      const response = await fetch(
+        `http://127.0.0.1:${apiPort}/api/alerts?${new URLSearchParams({ league, team })}`,
+        { signal: AbortSignal.timeout(60_000) },
+      );
+      if (!response.ok) throw new Error('Alerts are unavailable.');
+      return response.json();
+    },
+    notify: ({ title, body, hash }) => {
+      const notification = new Notification({ title, body });
+      notification.on('click', () => openDashboardAt(hash));
+      notification.show();
+    },
+  });
+}
+
+function openDashboardAt(hash) {
+  if (apiPort === undefined) return;
+  if (!mainWindow) createWindow();
+  void mainWindow.loadURL(`http://127.0.0.1:${apiPort}/${hash}`);
+  mainWindow.show();
+  mainWindow.focus();
 }
 
 function createWindow({ initiallyHidden = false } = {}) {
