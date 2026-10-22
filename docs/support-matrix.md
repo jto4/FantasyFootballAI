@@ -53,7 +53,8 @@ On October 22, 2026 the macOS `codex-cli 0.163.0-alpha.11` bundled with ChatGPT 
 fixture and existing-home request captures (`scripts/verify-codex-isolation.mjs`: no tools, no
 canary leak, global AGENTS read denied, no MCP launch or saved session; GPT-6.1-Sol at high
 reasoning) and the app's connection test, so it was added to the new-protocol allowlist with the
-same isolation arguments. A full model-quality rerun on 0.163 has not been done.
+same isolation arguments. A full model-quality rerun on 0.163 has not been done. ChatGPT's
+same-day update to `codex-cli 0.163.0-alpha.11.2` passed both captures again and was added too.
 
 Current readiness and gates live in [release status](release-status.md). This matrix retains detailed verification evidence; passing fixtures or package smokes do not prove live account behavior or interactive installation.
 

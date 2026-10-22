@@ -13,7 +13,11 @@ export const signedInCodexModel = 'gpt-6.1-sol';
 const legacyVersion = 'codex-cli 0.162.0-alpha.2';
 const currentVersion = 'codex-cli 0.162.0-alpha.17.2';
 /** macOS builds that use the newer native protocol and passed the same isolation proof. */
-const newProtocolVersions = new Set([currentVersion, 'codex-cli 0.163.0-alpha.11']);
+const newProtocolVersions = new Set([
+  currentVersion,
+  'codex-cli 0.163.0-alpha.11',
+  'codex-cli 0.163.0-alpha.11.2',
+]);
 const newProtocol = (version: string) => newProtocolVersions.has(version);
 function verifiedVersion(version: string): boolean {
   return version === legacyVersion || (process.platform === 'darwin' && newProtocol(version));
