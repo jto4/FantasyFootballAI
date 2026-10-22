@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+/** Group chats show long posts as a wall of text; past this length, suggest trimming. */
+const longMessage = 1_500;
+
 export function ReportSharing({
   title,
   body,
@@ -50,6 +53,23 @@ export function ReportSharing({
         Copy or download the reviewed text and post it wherever your league chats. No delivery setup
         is needed.
       </p>
+      <details className="chat-preview">
+        <summary>Preview as a group-chat message</summary>
+        <div className="chat-thread" aria-label="Group chat preview">
+          <div className="chat-bubble">
+            <strong>{title}</strong>
+            {body.split(/\n{2,}/).map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+          <small>
+            {text.length.toLocaleString()} characters
+            {text.length > longMessage
+              ? ' · long for a group chat; consider trimming before you post.'
+              : ''}
+          </small>
+        </div>
+      </details>
       <div className="report-sharing-actions">
         <button
           type="button"

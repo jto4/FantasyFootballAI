@@ -25,6 +25,8 @@ export interface TeamInsight {
   /** Actual wins (ties count half) minus expected wins; positive means a kind schedule. */
   luck: number;
   weekly: TeamWeek[];
+  /** Rank by season-to-date all-play win share after each week (1 is best). */
+  rankByWeek: { week: number; rank: number }[];
 }
 
 export interface WeekSummary {
@@ -119,7 +121,29 @@ export function leagueInsights(
         expectedWins,
         luck: wins + ties / 2 - expectedWins,
         weekly: rows,
+        rankByWeek: [] as { week: number; rank: number }[],
       };
     });
+  // Power rank: season-to-date all-play win share, then points scored, after each week.
+  for (const { week } of weeks) {
+    const standing = teams.map((team) => {
+      let won = 0,
+        played = 0,
+        points = 0;
+      for (const row of team.weekly) {
+        if (row.week > week) continue;
+        const others = [...byWeek.get(row.week)!.entries()].filter(([id]) => id !== team.id);
+        won += others.filter(([, p]) => row.points > p).length;
+        won += others.filter(([, p]) => row.points === p).length / 2;
+        played += others.length;
+        points += row.points;
+      }
+      return { team, share: played ? won / played : -1, points };
+    });
+    standing
+      .filter((entry) => entry.share >= 0)
+      .sort((a, b) => b.share - a.share || b.points - a.points)
+      .forEach((entry, index) => entry.team.rankByWeek.push({ week, rank: index + 1 }));
+  }
   return { weeks, teams };
 }

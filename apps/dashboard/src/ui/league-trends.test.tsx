@@ -41,6 +41,7 @@ it('renders the trend, luck and scatter charts with an accessible standings tabl
   );
   for (const text of [
     'Weekly scoring',
+    'Power rank by week',
     'Luck check',
     'Points for vs. against',
     'Standings from completed weeks',

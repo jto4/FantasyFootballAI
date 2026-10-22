@@ -32,6 +32,9 @@ it('derives records, points against, all-play and luck from completed weeks', ()
   const b = insights.teams.find((row) => row.id === 'b')!;
   expect(b.wins).toBe(2);
   expect(b.luck).toBeGreaterThan(0);
+  // After week 1, b (130) leads; after week 2, a's two strong weeks rank it first.
+  expect(insights.teams.find((row) => row.id === 'b')!.rankByWeek[0]).toEqual({ week: 1, rank: 1 });
+  expect(a.rankByWeek.map((r) => r.rank)).toEqual([2, 1]);
   expect(insights.weeks).toEqual([
     { week: 1, median: 105, low: 80, high: 130 },
     { week: 2, median: 85, low: 60, high: 110 },

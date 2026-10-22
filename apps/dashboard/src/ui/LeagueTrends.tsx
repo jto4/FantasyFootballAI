@@ -217,6 +217,167 @@ function WeeklyScoring({ weeks, team }: { weeks: WeekSummary[]; team: TeamInsigh
   );
 }
 
+function PowerRank({
+  weeks,
+  teams,
+  selected,
+}: {
+  weeks: WeekSummary[];
+  teams: TeamInsight[];
+  selected: string;
+}) {
+  const [ref, width] = useWidth();
+  const [tip, setTip] = useState<Tip>();
+  const [active, setActive] = useState<number>();
+  const count = teams.length;
+  const rowGap = 22,
+    top = 12,
+    bottom = 28,
+    left = 32,
+    right = width < 480 ? 96 : 140;
+  const height = top + (count - 1) * rowGap + bottom;
+  const first = weeks[0]!.week,
+    last = weeks.at(-1)!.week;
+  const plotWidth = width - left - right;
+  const x = (week: number) =>
+    left + (last === first ? plotWidth / 2 : ((week - first) / (last - first)) * plotWidth);
+  const y = (rank: number) => top + (rank - 1) * rowGap;
+  const path = (team: TeamInsight) =>
+    team.rankByWeek.map((r) => `${x(r.week)},${y(r.rank)}`).join(' ');
+  const mine = teams.find((t) => t.id === selected)!;
+  const latest = mine.rankByWeek.at(-1);
+  const step = weeks.length > 1 ? plotWidth / (weeks.length - 1) : plotWidth;
+  // Selected team drawn last so it sits on top of the context lines.
+  const ordered = [...teams].sort((a, b) => Number(a.id === selected) - Number(b.id === selected));
+  return (
+    <div className="trend-chart" ref={ref}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`${mine.name} power rank by week: ${mine.rankByWeek
+          .map((r) => `week ${r.week} rank ${r.rank}`)
+          .join(', ')}`}
+        onMouseLeave={() => {
+          setTip(undefined);
+          setActive(undefined);
+        }}
+      >
+        {[1, Math.ceil(count / 2), count].map((rank) => (
+          <text
+            key={rank}
+            x={left - 8}
+            y={y(rank)}
+            dy="0.32em"
+            textAnchor="end"
+            className="trend-axis"
+          >
+            {rank}
+          </text>
+        ))}
+        {weeks.map((w) => (
+          <text
+            key={w.week}
+            x={x(w.week)}
+            y={height - 6}
+            textAnchor="middle"
+            className="trend-axis"
+          >
+            {weeks.length > 12 && w.week % 2 === 0 && w.week !== last ? '' : `W${w.week}`}
+          </text>
+        ))}
+        {active !== undefined && (
+          <line
+            x1={x(active)}
+            x2={x(active)}
+            y1={top - 6}
+            y2={y(count) + 6}
+            className="trend-crosshair"
+          />
+        )}
+        {ordered.map((team) => (
+          <polyline
+            key={team.id}
+            points={path(team)}
+            className={
+              team.id === selected
+                ? 'trend-line trend-line-highlight'
+                : 'trend-line trend-line-context rank-line-context'
+            }
+          />
+        ))}
+        {mine.rankByWeek.map((r) => (
+          <circle
+            key={r.week}
+            cx={x(r.week)}
+            cy={y(r.rank)}
+            r={active === r.week ? 6 : 4}
+            className="trend-dot"
+          />
+        ))}
+        {latest && (
+          <text
+            x={x(latest.week) + 10}
+            y={y(latest.rank)}
+            dy="0.32em"
+            className="trend-label-strong"
+          >
+            #{latest.rank}{' '}
+            {mine.name.length > (width < 480 ? 9 : 14)
+              ? `${mine.name.slice(0, width < 480 ? 8 : 13)}…`
+              : mine.name}
+          </text>
+        )}
+        {weeks.map((w) => (
+          <rect
+            key={w.week}
+            x={x(w.week) - step / 2}
+            y={0}
+            width={step}
+            height={height - bottom}
+            className="trend-hit"
+            onMouseEnter={() => {
+              setActive(w.week);
+              const ranked = teams
+                .map((t) => ({ t, r: t.rankByWeek.find((item) => item.week === w.week)?.rank }))
+                .filter((entry): entry is { t: TeamInsight; r: number } => entry.r !== undefined)
+                .sort((a, b) => a.r - b.r);
+              const you = ranked.find((entry) => entry.t.id === selected);
+              setTip({
+                x: (x(w.week) / width) * 100,
+                y: 8,
+                content: (
+                  <>
+                    <strong>After week {w.week}</strong>
+                    {ranked.slice(0, 3).map((entry) => (
+                      <span key={entry.t.id}>
+                        #{entry.r} {entry.t.name}
+                      </span>
+                    ))}
+                    {you && you.r > 3 && (
+                      <span>
+                        #{you.r} {you.t.name}
+                      </span>
+                    )}
+                  </>
+                ),
+              });
+            }}
+          />
+        ))}
+      </svg>
+      <Tooltip tip={tip} />
+      <ul className="trend-legend" aria-label="Legend">
+        <li>
+          <span className="key-line key-highlight" /> {mine.name}
+        </li>
+        <li>
+          <span className="key-line key-context" /> Other teams
+        </li>
+      </ul>
+    </div>
+  );
+}
+
 function LuckCheck({ teams, selected }: { teams: TeamInsight[]; selected: string }) {
   const [ref, width] = useWidth();
   const [tip, setTip] = useState<Tip>();
@@ -541,6 +702,13 @@ export function LeagueTrends({ league }: { league: LeagueConnection }) {
         <div className="visual-panel trend-panel-wide">
           <h3>Weekly scoring</h3>
           <WeeklyScoring weeks={insights.weeks} team={team} />
+        </div>
+        <div className="visual-panel trend-panel-wide">
+          <h3>Power rank by week</h3>
+          <p className="trend-caption">
+            Rank by season-to-date record against every team, so one lucky matchup does not move it.
+          </p>
+          <PowerRank weeks={insights.weeks} teams={insights.teams} selected={selected} />
         </div>
         <div className="visual-panel">
           <h3>Luck check</h3>
