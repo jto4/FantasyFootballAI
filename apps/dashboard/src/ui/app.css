@@ -3426,3 +3426,42 @@ kbd {
     padding: 0;
   }
 }
+
+/* Report generation progress and failures on the Reports page. */
+.report-card.job-card {
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 14px 18px;
+}
+.job-card h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.job-card p {
+  margin: 0;
+  max-height: none;
+  color: var(--muted);
+}
+.report-card.job-card-problem {
+  border-left: 3px solid var(--orange);
+}
+
+.live-team-choice {
+  max-width: 460px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.live-team-choice h2 {
+  margin: 0 0 6px;
+}
+.live-team-choice p {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+.live-team-choice label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}

@@ -64,10 +64,12 @@ export function LivePage({
   league,
   teamId,
   onLeagues,
+  onChooseTeam,
 }: {
   league: LeagueConnection | undefined;
   teamId: string | undefined;
   onLeagues: () => void;
+  onChooseTeam: (id: string) => void;
 }) {
   const [report, setReport] = useState<LiveReport>();
   const [error, setError] = useState('');
@@ -119,10 +121,26 @@ export function LivePage({
           </p>
         </div>
       </div>
-      {!league || !teamId ? (
-        <p className="empty-activity">
-          Connect a league and choose your team on Home to follow it live.
-        </p>
+      {!league ? (
+        <p className="empty-activity">Connect a league to follow your matchup live.</p>
+      ) : !teamId ? (
+        <section className="live-team-choice" aria-label="Choose your team">
+          <h2>Which team is yours?</h2>
+          <p>Pick it once and Live, Home and Advice will all follow it.</p>
+          <label>
+            Your team
+            <select defaultValue="" onChange={(event) => onChooseTeam(event.target.value)}>
+              <option value="" disabled>
+                Choose your team
+              </option>
+              {league.teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </section>
       ) : !report && !error ? (
         <LoadingStatus message="Loading your matchup…" shape="cards" />
       ) : null}

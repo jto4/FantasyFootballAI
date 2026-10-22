@@ -111,6 +111,7 @@ export function LeagueDesk({
             setInitialReviewId(id);
             navigate('Reports');
           }}
+          onLibrary={() => navigate('Reports')}
         />
       )}
       {!weekly && (
@@ -138,12 +139,12 @@ export function LeagueDesk({
             ? 'Connect your fantasy league'
             : generatingKind
               ? 'Your report is being created'
-              : draftCount
-                ? `${draftCount} ${draftCount === 1 ? 'draft is' : 'drafts are'} ready for your review`
-                : !aiReady
-                  ? aiChecking
-                    ? 'Checking your AI connection'
-                    : 'Finish connecting your AI writer'
+              : !aiReady
+                ? aiChecking
+                  ? 'Checking your AI connection'
+                  : 'Finish connecting your AI writer'
+                : draftCount
+                  ? 'Want a fresh take?'
                   : 'Create a report for your league'}
         </h2>
         <p>
@@ -151,19 +152,19 @@ export function LeagueDesk({
             ? 'Paste a league link and we’ll help you get started.'
             : generatingKind
               ? 'Its progress is saved. You can keep using the app while it finishes.'
-              : draftCount
-                ? 'Read and edit your draft, then choose when to send it.'
-                : !aiReady
-                  ? 'We’ll check that your AI connection works before creating a report.'
+              : !aiReady
+                ? 'We’ll check that your AI connection works before creating a report.'
+                : draftCount
+                  ? 'Your drafts are above. Write a new one if the league has moved on since.'
                   : `Choose a report for ${league.displayName}. You’ll review the draft before anything is sent.`}
         </p>
         <button
           ref={setupWizardTriggerRef}
           type="button"
           className="primary-button"
-          disabled={Boolean(league && !draftCount && !generatingKind && aiChecking)}
+          disabled={Boolean(league && !generatingKind && aiChecking)}
           onClick={() => {
-            if (league && (draftCount || generatingKind)) navigate('Reports');
+            if (league && generatingKind) navigate('Reports');
             else if (!league || !aiReady) openSetupWizard();
             else void createReport('power-rankings');
           }}
@@ -172,13 +173,11 @@ export function LeagueDesk({
             ? 'Guided setup'
             : generatingKind
               ? 'View report progress'
-              : draftCount
-                ? 'Review your drafts'
-                : !aiReady
-                  ? aiChecking
-                    ? 'Checking connection…'
-                    : 'Finish AI setup'
-                  : 'Create a report'}{' '}
+              : !aiReady
+                ? aiChecking
+                  ? 'Checking connection…'
+                  : 'Finish AI setup'
+                : 'Create a report'}{' '}
           <span aria-hidden="true">→</span>
         </button>
         {!aiReady && !draftCount && (

@@ -947,7 +947,12 @@ export function App() {
             )
           ) : section === 'Live' ? (
             <Suspense fallback={<LoadingStatus message="Opening live view…" />}>
-              <LivePage league={league} teamId={homeTeamId} onLeagues={() => navigate('Leagues')} />
+              <LivePage
+                league={league}
+                teamId={homeTeamId}
+                onLeagues={() => navigate('Leagues')}
+                onChooseTeam={chooseTeam}
+              />
             </Suspense>
           ) : section === 'Help' ? (
             <Suspense fallback={<LoadingStatus message="Opening help…" />}>

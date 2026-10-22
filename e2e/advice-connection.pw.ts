@@ -6,6 +6,7 @@ async function open(page: Page, url: string) {
   await page.goto(`${url}/#/advice?league=browser-league&mode=lineup`);
   await expect(page).toHaveTitle('Sunday Sidekick');
   await expect(page.getByRole('heading', { name: 'Advice', exact: true })).toBeVisible();
+  await page.getByText('Change AI connection or model', { exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'AI connection', exact: true })).toBeEnabled();
 }
 function errors(page: Page) {

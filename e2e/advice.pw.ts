@@ -573,6 +573,7 @@ test('deeper model selection reuses credentials and leaves report settings uncha
     });
     const settings = workspace.store.settingsSnapshot();
     await open(page, workspace.url, 'lineup');
+    await page.getByText('Change AI connection or model', { exact: true }).click();
     const choice = page.getByRole('combobox', { name: 'Model' });
     await expect(choice).toHaveValue('gpt-6-astra');
     await expect(choice.locator('option')).toHaveCount(3);
@@ -628,6 +629,7 @@ test('an unavailable model stays selected until the user chooses a replacement',
       state.settings.aiRuntime!.baseUrl = 'https://api.openai.com/v1';
     });
     await open(page, workspace.url, 'lineup');
+    await page.getByText('Change AI connection or model', { exact: true }).click();
     const choice = page.getByRole('combobox', { name: 'Model' });
     await choice.selectOption('gpt-6.1-sol');
     available.splice(available.indexOf('gpt-6.1-sol'), 1);

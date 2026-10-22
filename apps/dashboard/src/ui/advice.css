@@ -331,15 +331,30 @@
   }
 }
 
+/* Underlined tabs, matching Reports, so they read differently from the decision buttons below. */
 .advice-view-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 20px;
+  border-bottom: 1px solid var(--line);
 }
-.advice-view-nav .active {
-  color: var(--orange);
-  border-color: var(--orange);
+.advice-view-nav button {
+  padding: 12px 18px;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+.advice-view-nav button.active {
+  border-bottom-color: var(--orange);
+  color: var(--ink);
+}
+.advice-view-nav button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 .advice-page [hidden] {
   display: none;
@@ -702,4 +717,14 @@
 .roster-moves-note {
   color: var(--muted);
   font-size: 13px;
+}
+
+.advice-ai-options {
+  margin: 4px 0 12px;
+}
+.advice-ai-options > summary {
+  cursor: pointer;
+  color: var(--orange);
+  font-weight: 600;
+  margin-bottom: 10px;
 }

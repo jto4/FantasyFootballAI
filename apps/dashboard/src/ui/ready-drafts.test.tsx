@@ -12,9 +12,21 @@ it('lists ready drafts with a copy shortcut and renders nothing without drafts',
     status: 'draft' as const,
     revision: 0,
   };
-  const markup = renderToStaticMarkup(<ReadyDrafts drafts={[draft]} onReview={() => undefined} />);
+  const markup = renderToStaticMarkup(
+    <ReadyDrafts
+      drafts={[draft, { ...draft, id: 'r0', createdAt: '2026-10-20T12:00:00Z' }]}
+      onReview={() => undefined}
+      onLibrary={() => undefined}
+    />,
+  );
   expect(markup).toContain('Your report is ready');
+  expect(markup).toContain('1 older draft is in the Reports library.');
   expect(markup).toContain('Week 7 Power Rankings');
   expect(markup).toContain('Copy for group chat');
-  expect(renderToStaticMarkup(<ReadyDrafts drafts={[]} onReview={() => undefined} />)).toBe('');
+  expect(markup).toContain('Review your drafts');
+  expect(
+    renderToStaticMarkup(
+      <ReadyDrafts drafts={[]} onReview={() => undefined} onLibrary={() => undefined} />,
+    ),
+  ).toBe('');
 });

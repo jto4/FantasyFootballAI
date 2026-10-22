@@ -802,116 +802,123 @@ export function AdvicePage({
                 <strong>{options.model}</strong>
               </p>
             )}
-            {!!options?.connections?.length && (
-              <section aria-label="AI connection for this analysis">
-                <label>
-                  AI connection
-                  <select
-                    value={connection}
-                    onChange={(event) => {
-                      setConnection(event.target.value as AdviceConnection);
-                      setModel('');
-                      setConnectionFeedback('');
-                      changed();
-                    }}
-                  >
-                    {options.connections.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                        {item.status === 'not-installed'
-                          ? ' · Not installed'
-                          : item.status === 'signed-out'
-                            ? ' · Sign in needed'
-                            : item.status === 'unavailable'
-                              ? ' · Sign-in check unavailable'
-                              : ''}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {connection !== 'saved' && (
-                  <>
-                    <p>
-                      {options.connections.find((item) => item.id === connection)?.status ===
-                      'signed-in'
-                        ? connection === 'codex-cli'
-                          ? 'Your ChatGPT subscription is signed in. No new API key is needed. GPT-6.1-Sol analyzes and reviews with high reasoning; subscription limits apply.'
-                          : 'Your Claude subscription is signed in. No new API key is needed. Opus analyzes and reviews; subscription limits apply.'
-                        : connection === 'codex-cli'
-                          ? 'An installed Codex CLI with a supported version and ChatGPT sign-in is needed. Check Help, then reload connections. This does not create an account or API key.'
-                          : 'An installed, signed-in Claude CLI is needed. Check its sign-in, then reload connections. This does not create an account or API key.'}
-                    </p>
+            {/* Most people keep the saved connection, so per-analysis overrides stay tucked away. */}
+            {(!!options?.connections?.length || !!options?.models?.length) && (
+              <details className="advice-ai-options" open={connection !== 'saved' || undefined}>
+                <summary>Change AI connection or model</summary>
+                {!!options?.connections?.length && (
+                  <section aria-label="AI connection for this analysis">
+                    <label>
+                      AI connection
+                      <select
+                        value={connection}
+                        onChange={(event) => {
+                          setConnection(event.target.value as AdviceConnection);
+                          setModel('');
+                          setConnectionFeedback('');
+                          changed();
+                        }}
+                      >
+                        {options.connections.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.label}
+                            {item.status === 'not-installed'
+                              ? ' · Not installed'
+                              : item.status === 'signed-out'
+                                ? ' · Sign in needed'
+                                : item.status === 'unavailable'
+                                  ? ' · Sign-in check unavailable'
+                                  : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {connection !== 'saved' && (
+                      <>
+                        <p>
+                          {options.connections.find((item) => item.id === connection)?.status ===
+                          'signed-in'
+                            ? connection === 'codex-cli'
+                              ? 'Your ChatGPT subscription is signed in. No new API key is needed. GPT-6.1-Sol analyzes and reviews with high reasoning; subscription limits apply.'
+                              : 'Your Claude subscription is signed in. No new API key is needed. Opus analyzes and reviews; subscription limits apply.'
+                            : connection === 'codex-cli'
+                              ? 'An installed Codex CLI with a supported version and ChatGPT sign-in is needed. Check Help, then reload connections. This does not create an account or API key.'
+                              : 'An installed, signed-in Claude CLI is needed. Check its sign-in, then reload connections. This does not create an account or API key.'}
+                        </p>
+                        <button
+                          type="button"
+                          className="small-button"
+                          disabled={
+                            !options.connections.some(
+                              (item) => item.id === connection && item.status === 'signed-in',
+                            )
+                          }
+                          onClick={() => void testSignedInConnection()}
+                        >
+                          Test signed-in AI
+                        </button>
+                        <details>
+                          <summary>Connection details</summary>
+                          <p>
+                            Uses the {connection === 'codex-cli' ? 'Codex' : 'Claude'} CLI installed
+                            on this computer. Sign-in does not guarantee the model is currently
+                            available. Test signed-in AI checks generation without sharing league
+                            data.
+                            {connection === 'codex-cli' &&
+                              ' This experimental connection requires the verified CLI version listed in Help.'}
+                          </p>
+                        </details>
+                      </>
+                    )}
                     <button
                       type="button"
-                      className="small-button"
-                      disabled={
-                        !options.connections.some(
-                          (item) => item.id === connection && item.status === 'signed-in',
-                        )
-                      }
-                      onClick={() => void testSignedInConnection()}
+                      className="text-button"
+                      onClick={() => setOptionsRevision((value) => value + 1)}
                     >
-                      Test signed-in AI
+                      Reload connections
                     </button>
-                    <details>
-                      <summary>Connection details</summary>
-                      <p>
-                        Uses the {connection === 'codex-cli' ? 'Codex' : 'Claude'} CLI installed on
-                        this computer. Sign-in does not guarantee the model is currently available.
-                        Test signed-in AI checks generation without sharing league data.
-                        {connection === 'codex-cli' &&
-                          ' This experimental connection requires the verified CLI version listed in Help.'}
-                      </p>
-                    </details>
-                  </>
+                    {connectionFeedback && <p role="status">{connectionFeedback}</p>}
+                  </section>
                 )}
-                <button
-                  type="button"
-                  className="text-button"
-                  onClick={() => setOptionsRevision((value) => value + 1)}
-                >
-                  Reload connections
-                </button>
-                {connectionFeedback && <p role="status">{connectionFeedback}</p>}
-              </section>
-            )}
-            {!!options?.models?.length && (
-              <div className="advice-model-choice">
-                <label>
-                  Model
-                  <select
-                    value={model}
-                    onChange={(event) => {
-                      setModel(event.target.value);
-                      changed();
-                    }}
-                  >
-                    {!options.models.some((item) => item.id === model) && (
-                      <option value={model} disabled>
-                        {model} · No longer available
-                      </option>
-                    )}
-                    {options.models.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.id}
-                        {item.id === options.recommendedModel
-                          ? ' · Recommended for deep analysis'
-                          : ''}
-                        {item.id === options.model && connection === 'saved'
-                          ? ' · Saved model'
-                          : ''}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <p>
-                  {connection !== 'saved'
-                    ? 'Applies to this analysis only. Your saved API prices do not apply to subscription usage.'
-                    : model !== options.model
-                      ? 'Applies to this analysis only. Your saved model’s prices do not apply, so a cost estimate will be unavailable.'
-                      : 'Applies to this analysis only; your saved settings don’t change.'}
-                </p>
-              </div>
+                {!!options?.models?.length && (
+                  <div className="advice-model-choice">
+                    <label>
+                      Model
+                      <select
+                        value={model}
+                        onChange={(event) => {
+                          setModel(event.target.value);
+                          changed();
+                        }}
+                      >
+                        {!options.models.some((item) => item.id === model) && (
+                          <option value={model} disabled>
+                            {model} · No longer available
+                          </option>
+                        )}
+                        {options.models.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.id}
+                            {item.id === options.recommendedModel
+                              ? ' · Recommended for deep analysis'
+                              : ''}
+                            {item.id === options.model && connection === 'saved'
+                              ? ' · Saved model'
+                              : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <p>
+                      {connection !== 'saved'
+                        ? 'Applies to this analysis only. Your saved API prices do not apply to subscription usage.'
+                        : model !== options.model
+                          ? 'Applies to this analysis only. Your saved model’s prices do not apply, so a cost estimate will be unavailable.'
+                          : 'Applies to this analysis only; your saved settings don’t change.'}
+                    </p>
+                  </div>
+                )}
+              </details>
             )}
             <details>
               <summary>Advanced analysis limits</summary>
@@ -1067,26 +1074,20 @@ export function AdvicePage({
           [
             ['decision', result ? 'Your decision' : 'New decision'],
             ['history', `Saved advice${history.length ? ` (${history.length})` : ''}`],
-            ['research', 'Track results', 'labs'],
-            ['signals', 'Market signals', 'labs'],
+            ['research', 'Track results'],
+            ['signals', 'Market signals'],
           ] as const
-        ).map(([key, label, group]) => (
-          <Fragment key={key}>
-            {group && key === 'research' && (
-              <span className="labs-label" aria-hidden="true">
-                Labs
-              </span>
-            )}
-            <button
-              type="button"
-              aria-current={view === key ? 'page' : undefined}
-              className={view === key ? 'small-button active' : 'small-button'}
-              disabled={busy || testingConnection || checkingReadiness}
-              onClick={() => setView(key)}
-            >
-              {label}
-            </button>
-          </Fragment>
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            aria-current={view === key ? 'page' : undefined}
+            className={view === key ? 'active' : undefined}
+            disabled={busy || testingConnection || checkingReadiness}
+            onClick={() => setView(key)}
+          >
+            {label}
+          </button>
         ))}
       </nav>
       <div hidden={view !== 'decision'}>

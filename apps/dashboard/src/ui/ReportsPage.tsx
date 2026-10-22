@@ -369,13 +369,23 @@ export function ReportsPage({
         />
       )}
       <div hidden={view === 'charts'}>
-        {jobs
-          .filter((job) => job.status !== 'completed')
+        {[...jobs]
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+          // Only the newest job per league and report type matters; a later success or retry
+          // makes an older failure irrelevant.
+          .filter(
+            (job, index, all) =>
+              all.findIndex((j) => j.leagueId === job.leagueId && j.kind === job.kind) === index &&
+              job.status !== 'completed',
+          )
           .slice(0, 10)
           .map((job) => (
-            <article className="report-card" key={job.id}>
+            <article
+              className={`report-card job-card${['queued', 'running'].includes(job.status) ? '' : ' job-card-problem'}`}
+              key={job.id}
+            >
               <div>
-                <h2>{job.kind.replaceAll('-', ' ')}</h2>
+                <h2>{job.kind.charAt(0).toUpperCase() + job.kind.slice(1).replaceAll('-', ' ')}</h2>
                 <p role="status">Generation {job.status}</p>
                 {job.error && <p>{job.error}</p>}
               </div>

@@ -3,16 +3,25 @@ import { isSavedReport, type ReportSummary } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
 
-/** Home shortcut for reviewed sharing: copies saved text only and never sends anything. */
+/**
+ * Home shortcut for reviewed sharing: copies saved text only and never sends anything. Shows the
+ * newest draft of each report type; older drafts of the same type stay in the Reports library.
+ */
 export function ReadyDrafts({
   drafts,
   onReview,
+  onLibrary,
 }: {
   drafts: ReportSummary[];
   onReview: (id: string) => void;
+  onLibrary: () => void;
 }) {
   const [status, setStatus] = useState<{ id: string; message: string }>();
   if (!drafts.length) return null;
+  const latest = [...drafts]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .filter((draft, index, all) => all.findIndex((d) => d.kind === draft.kind) === index);
+  const older = drafts.length - latest.length;
   async function copy(id: string) {
     try {
       const report = await requestJson(`/api/reports/${encodeURIComponent(id)}`, isSavedReport);
@@ -24,12 +33,24 @@ export function ReadyDrafts({
   }
   return (
     <section className="ready-drafts" aria-labelledby="ready-drafts-title">
-      <p className="section-overline">READY TO SEND</p>
-      <h2 id="ready-drafts-title">
-        {drafts.length === 1 ? 'Your report is ready' : `${drafts.length} reports are ready`}
-      </h2>
+      <div className="ready-drafts-head">
+        <div>
+          <p className="section-overline">READY TO SEND</p>
+          <h2 id="ready-drafts-title">
+            {latest.length === 1 ? 'Your report is ready' : `${latest.length} reports are ready`}
+          </h2>
+          {older > 0 && (
+            <small>
+              {older} older {older === 1 ? 'draft is' : 'drafts are'} in the Reports library.
+            </small>
+          )}
+        </div>
+        <button type="button" className="text-button" onClick={onLibrary}>
+          Review your drafts
+        </button>
+      </div>
       <ul>
-        {drafts.slice(0, 3).map((draft) => (
+        {latest.map((draft) => (
           <li key={draft.id}>
             <div>
               <strong>{draft.title}</strong>

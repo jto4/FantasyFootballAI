@@ -193,6 +193,17 @@ p.weekly-answer {
 .ready-drafts h2 {
   margin: 4px 0 12px;
 }
+.ready-drafts-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ready-drafts-head small {
+  display: block;
+  margin: -6px 0 12px;
+  color: var(--muted);
+}
 .ready-drafts ul {
   margin: 0;
   padding: 0;
