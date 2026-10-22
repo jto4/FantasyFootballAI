@@ -3238,3 +3238,46 @@ textarea:focus-visible {
   align-items: center;
   gap: 6px;
 }
+
+.shortcuts-modal {
+  width: min(460px, 100%);
+}
+.shortcuts-table {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.shortcuts-table th,
+.shortcuts-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.shortcuts-table th {
+  font-weight: 600;
+}
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  font:
+    12px 'DM Mono',
+    monospace;
+  text-align: center;
+}
+
+/* Top bar: the league subtitle stays on one line so the search box keeps its width. */
+.league-details span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.league-details {
+  min-width: 0;
+}

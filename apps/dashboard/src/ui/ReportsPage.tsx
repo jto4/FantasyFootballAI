@@ -22,6 +22,8 @@ import { Dialog } from './Dialog';
 import { formatDateTime } from './date-format';
 import { FriendlyError } from './FriendlyError';
 import { LoadingStatus } from './LoadFeedback';
+import { useMediaQuery } from './hooks/useMediaQuery';
+import { reportName } from './beginner-flow';
 import { ReportSharing } from './ReportSharing';
 import { LeagueTrends } from './LeagueTrends';
 import { ReportLibrary } from './ReportLibrary';
@@ -224,6 +226,36 @@ export function ReportsPage({
     }
   }
   const filtered = history.items;
+  const wide = useMediaQuery('(min-width: 1000px)');
+  const [sort, setSort] = useState<{
+    key: 'title' | 'kind' | 'league' | 'status' | 'createdAt';
+    ascending: boolean;
+  }>({ key: 'createdAt', ascending: false });
+  const leagueName = (item: ReportSummary) =>
+    leagues.find((entry) => entry.id === item.leagueId)?.displayName ?? 'Disconnected league';
+  const sortValue = (item: ReportSummary) =>
+    sort.key === 'title'
+      ? item.title
+      : sort.key === 'kind'
+        ? reportName(item.kind)
+        : sort.key === 'league'
+          ? leagueName(item)
+          : sort.key === 'status'
+            ? reportStatus(item)
+            : item.createdAt;
+  const sorted = [...filtered].sort(
+    (a, b) => sortValue(a).localeCompare(sortValue(b)) * (sort.ascending ? 1 : -1),
+  );
+  function openReview(id: string) {
+    setSelectedId(id);
+    onReviewChange?.(id);
+    setEditing(false);
+    setError('');
+    setReplyToId('');
+    setEmailSubject('');
+    setConfirmSend(false);
+    setDraftSaved(false);
+  }
   // An opened review (including a just-created draft) returns to the Library when closed.
   useEffect(() => {
     if (selectedId) setView((current) => (current === 'charts' ? current : 'library'));
@@ -449,39 +481,97 @@ export function ReportsPage({
             </select>
           </label>
         </div>
-        <div className="report-list">
-          {filtered.map((item) => (
-            <article className="report-card" key={item.id}>
-              <div>
-                <span className={`report-status-chip ${statusTone(item)}`}>
-                  {reportStatus(item)}
-                </span>
-                <h2>{item.title}</h2>
-                <p>
-                  {leagues.find((league) => league.id === item.leagueId)?.displayName ??
-                    'Disconnected league'}{' '}
-                  · Generated {formatDateTime(item.createdAt)}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => {
-                  setSelectedId(item.id);
-                  onReviewChange?.(item.id);
-                  setEditing(false);
-                  setError('');
-                  setReplyToId('');
-                  setEmailSubject('');
-                  setConfirmSend(false);
-                  setDraftSaved(false);
-                }}
-              >
-                Review report
-              </button>
-            </article>
-          ))}
-        </div>
+        {wide && sorted.length > 0 ? (
+          <table className="report-table">
+            <caption className="visually-hidden">
+              Saved reports. Sorting applies to the reports loaded so far.
+            </caption>
+            <thead>
+              <tr>
+                {(
+                  [
+                    ['title', 'Report'],
+                    ['kind', 'Type'],
+                    ['league', 'League'],
+                    ['status', 'Status'],
+                    ['createdAt', 'Created'],
+                  ] as const
+                ).map(([key, label]) => (
+                  <th
+                    key={key}
+                    scope="col"
+                    aria-sort={
+                      sort.key === key ? (sort.ascending ? 'ascending' : 'descending') : undefined
+                    }
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSort((current) => ({
+                          key,
+                          ascending: current.key === key ? !current.ascending : key !== 'createdAt',
+                        }))
+                      }
+                    >
+                      {label}
+                      <span aria-hidden="true">
+                        {sort.key === key ? (sort.ascending ? ' ▲' : ' ▼') : ''}
+                      </span>
+                    </button>
+                  </th>
+                ))}
+                <th scope="col">
+                  <span className="visually-hidden">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((item) => (
+                <tr key={item.id}>
+                  <th scope="row">{item.title}</th>
+                  <td>{reportName(item.kind)}</td>
+                  <td>{leagueName(item)}</td>
+                  <td>
+                    <span className={`report-status-chip ${statusTone(item)}`}>
+                      {reportStatus(item)}
+                    </span>
+                  </td>
+                  <td>
+                    <time dateTime={item.createdAt}>{formatDateTime(item.createdAt)}</time>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="small-button"
+                      onClick={() => openReview(item.id)}
+                    >
+                      Review report
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="report-list">
+            {filtered.map((item) => (
+              <article className="report-card" key={item.id}>
+                <div>
+                  <span className={`report-status-chip ${statusTone(item)}`}>
+                    {reportStatus(item)}
+                  </span>
+                  <h2>{item.title}</h2>
+                  <p>
+                    {leagueName(item)} · Generated {formatDateTime(item.createdAt)}
+                  </p>
+                </div>
+                <button type="button" className="small-button" onClick={() => openReview(item.id)}>
+                  Review report
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
         {history.loading && <LoadingStatus message="Loading report history…" shape="rows" />}
         {history.cursor && (
           <button

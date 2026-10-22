@@ -303,7 +303,12 @@ test('a failed delivery remains visible and cannot be edited before retry', asyn
   await expect(page.getByRole('button', { name: 'Edit draft', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Close report review' }).click();
   await page.getByRole('combobox', { name: 'Filter reports by status' }).selectOption('failed');
-  await expect(page.getByRole('heading', { name: 'Fixture rankings' })).toBeVisible();
+  // Phones list reports as cards with headings; desktop shows a table row per report.
+  await expect(
+    page
+      .getByRole('heading', { name: 'Fixture rankings' })
+      .or(page.getByRole('rowheader', { name: 'Fixture rankings' })),
+  ).toBeVisible();
   expect(context.errors).toEqual([
     'Failed to load resource: the server responded with a status of 502 (Bad Gateway)',
   ]);

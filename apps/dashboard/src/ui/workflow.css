@@ -1113,3 +1113,72 @@
 .schedule-snapshot-note {
   padding: 10px 12px;
 }
+
+/* Desktop week: seven equal columns, today first; runs stack under their day. */
+.schedule-week.wide ol {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.schedule-week.wide ol > li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+.schedule-week.wide ol > li:first-child {
+  border-color: var(--accent-border);
+}
+.schedule-week.wide ol > li.quiet {
+  background: transparent;
+}
+.schedule-week.wide ul li {
+  display: grid;
+  gap: 2px;
+}
+
+/* Desktop Settings: the section menu becomes a left rail beside the active section. */
+@media (min-width: 1100px) {
+  .settings-page {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: 32px;
+    align-items: start;
+  }
+  .settings-page > * {
+    grid-column: 2;
+  }
+  .settings-page > .page-title-block,
+  .settings-page > .settings-overview {
+    grid-column: 1 / -1;
+  }
+  .settings-page > .settings-tabs {
+    position: sticky;
+    top: 16px;
+    grid-column: 1;
+    grid-row: 3 / span 40;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .settings-page > .settings-tabs button {
+    justify-content: flex-start;
+    width: 100%;
+    text-align: left;
+  }
+}
+@media (min-width: 1100px) {
+  .settings-page > .settings-tabs button:not(.active) {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink);
+  }
+  .settings-page > .settings-tabs button:not(.active):hover {
+    background: var(--surface-raised);
+  }
+}

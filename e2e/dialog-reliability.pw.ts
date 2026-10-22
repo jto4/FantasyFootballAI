@@ -126,8 +126,8 @@ test('a delayed refresh of the previous report cannot replace a newly opened rep
     await review.getByRole('button', { name: 'Close report review' }).click();
     await expect(review).toBeHidden();
     await page
-      .locator('.report-card')
-      .filter({ has: page.getByRole('heading', { name: 'Fictional report B', exact: true }) })
+      .locator('.report-card, .report-table tbody tr')
+      .filter({ hasText: 'Fictional report B' })
       .getByRole('button', { name: 'Review report', exact: true })
       .click();
     await expect(

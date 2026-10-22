@@ -43,6 +43,9 @@ export function HelpPage({
             Find an answer, then go straight to the place that helps. You can also find these
             answers using the app search above.
           </p>
+          <p className="help-shortcuts-hint">
+            Press <kbd>?</kbd> anywhere to see keyboard shortcuts.
+          </p>
         </div>
       </div>
       <section className="help-start">

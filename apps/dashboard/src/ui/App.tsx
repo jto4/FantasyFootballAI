@@ -34,6 +34,7 @@ import { suggestedSetupStep } from './setup';
 import type { ScheduledRun } from './SchedulePage';
 
 import { LoadError, LoadingStatus } from './LoadFeedback.js';
+import { KeyboardShortcutsDialog, useKeyboardShortcuts } from './KeyboardShortcuts';
 import {
   initialAppState,
   isAppState,
@@ -191,6 +192,10 @@ export function App() {
   function navigate(next: string) {
     setSection(next);
   }
+  const shortcuts = useKeyboardShortcuts({
+    onNavigate: navigate,
+    onNewReport: () => void createReport('power-rankings'),
+  });
   const [settingsFocusTarget, setSettingsFocusTarget] = useState<
     'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null
   >(null);
@@ -1264,6 +1269,7 @@ export function App() {
           />
         </Suspense>
       )}
+      {shortcuts.helpOpen && <KeyboardShortcutsDialog onClose={shortcuts.closeHelp} />}
       {composerKind && league && (
         <ReportComposer
           key={`${league.id}:${composerKind}`}

@@ -73,8 +73,8 @@ test('a delayed draft save cannot replace another report or display feedback in 
     await review.getByRole('button', { name: 'Close report review' }).click();
     await expect(review).toBeHidden();
     await page
-      .locator('.report-card')
-      .filter({ has: page.getByRole('heading', { name: 'Fictional report B', exact: true }) })
+      .locator('.report-card, .report-table tbody tr')
+      .filter({ hasText: 'Fictional report B' })
       .getByRole('button', { name: 'Review report' })
       .click();
     await expect(

@@ -635,480 +635,487 @@ export function AdvicePage({
                 <fieldset
                   disabled={busy || optionsLoading || testingConnection || checkingReadiness}
                 >
-                  {!betting && (
-                    <div className="advice-fields">
-                      <label>
-                        Fantasy league
-                        <select
-                          value={league?.id ?? ''}
-                          onChange={(event) =>
-                            onNavigate({
-                              section: 'Advice',
-                              leagueId: event.target.value,
-                              adviceMode: mode,
-                              adviceId: '',
-                            })
-                          }
-                        >
-                          {leagues.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.displayName}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label>
-                        Your team
-                        <select
-                          value={teamId}
-                          onChange={(event) => {
-                            setTeamId(event.target.value);
-                            onTeamSelect?.(event.target.value);
-                            setDropPlayerId('');
-                            setCandidates([]);
-                            setGive([]);
-                            setReceive([]);
-                            changed();
-                          }}
-                        >
-                          {league?.teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                              {team.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-                  )}
-                  {options && (
-                    <p>
-                      {options.season} NFL season ·{' '}
-                      {connection !== 'saved'
-                        ? 'AI connection for this analysis: '
-                        : 'Saved AI connection: '}
-                      <strong>{options.model}</strong>
-                    </p>
-                  )}
-                  {!!options?.connections?.length && (
-                    <section aria-label="AI connection for this analysis">
-                      <label>
-                        AI connection
-                        <select
-                          value={connection}
-                          onChange={(event) => {
-                            setConnection(event.target.value as AdviceConnection);
-                            setModel('');
-                            setConnectionFeedback('');
-                            changed();
-                          }}
-                        >
-                          {options.connections.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.label}
-                              {item.status === 'not-installed'
-                                ? ' · Not installed'
-                                : item.status === 'signed-out'
-                                  ? ' · Sign in needed'
-                                  : item.status === 'unavailable'
-                                    ? ' · Sign-in check unavailable'
-                                    : ''}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      {connection !== 'saved' && (
+                  <div className="advice-form-columns">
+                    <div className="advice-form-main">
+                      {!betting && (
+                        <div className="advice-fields">
+                          <label>
+                            Fantasy league
+                            <select
+                              value={league?.id ?? ''}
+                              onChange={(event) =>
+                                onNavigate({
+                                  section: 'Advice',
+                                  leagueId: event.target.value,
+                                  adviceMode: mode,
+                                  adviceId: '',
+                                })
+                              }
+                            >
+                              {leagues.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                  {item.displayName}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            Your team
+                            <select
+                              value={teamId}
+                              onChange={(event) => {
+                                setTeamId(event.target.value);
+                                onTeamSelect?.(event.target.value);
+                                setDropPlayerId('');
+                                setCandidates([]);
+                                setGive([]);
+                                setReceive([]);
+                                changed();
+                              }}
+                            >
+                              {league?.teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                  {team.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        </div>
+                      )}
+                      {['lineup', 'waivers'].includes(mode) && (
+                        <label>
+                          NFL week
+                          <input
+                            type="number"
+                            min="1"
+                            max="18"
+                            required
+                            value={week}
+                            onChange={(event) => {
+                              setWeek(event.target.value);
+                              changed();
+                            }}
+                          />
+                        </label>
+                      )}
+                      {mode === 'lineup' && (
                         <>
-                          <p>
-                            {options.connections.find((item) => item.id === connection)?.status ===
-                            'signed-in'
-                              ? connection === 'codex-cli'
-                                ? 'Your ChatGPT subscription is signed in. No new API key is needed. GPT-6.1-Sol analyzes and reviews with high reasoning; subscription limits apply.'
-                                : 'Your Claude subscription is signed in. No new API key is needed. Opus analyzes and reviews; subscription limits apply.'
-                              : connection === 'codex-cli'
-                                ? 'An installed Codex CLI with a supported version and ChatGPT sign-in is needed. Check Help, then reload connections. This does not create an account or API key.'
-                                : 'An installed, signed-in Claude CLI is needed. Check its sign-in, then reload connections. This does not create an account or API key.'}
-                          </p>
-                          <button
-                            type="button"
-                            className="small-button"
-                            disabled={
-                              !options.connections.some(
-                                (item) => item.id === connection && item.status === 'signed-in',
-                              )
-                            }
-                            onClick={() => void testSignedInConnection()}
-                          >
-                            Test signed-in AI
-                          </button>
-                          <details>
-                            <summary>Connection details</summary>
-                            <p>
-                              Uses the {connection === 'codex-cli' ? 'Codex' : 'Claude'} CLI
-                              installed on this computer. Sign-in does not guarantee the model is
-                              currently available. Test signed-in AI checks generation without
-                              sharing league data.
-                              {connection === 'codex-cli' &&
-                                ' This experimental connection requires the verified CLI version listed in Help.'}
+                          <label>
+                            What do you want to check?
+                            <select
+                              value={lineupComparison ? 'compare' : 'full'}
+                              onChange={(event) => {
+                                setLineupComparison(event.target.value === 'compare');
+                                setCandidates([]);
+                                changed();
+                              }}
+                            >
+                              <option value="full">My full starting lineup</option>
+                              <option value="compare">Compare players for one spot</option>
+                            </select>
+                          </label>
+                          {lineupComparison && (
+                            <PlayerPicker
+                              label="Players competing for one spot"
+                              players={mine}
+                              selected={candidates}
+                              onChange={(ids) => {
+                                setCandidates(ids);
+                                changed();
+                              }}
+                              hint="Choose 2–20 players from your team who fit the same starting spot, such as two receivers or a running back and receiver for Flex. Other lineup slots are not included."
+                            />
+                          )}
+                          {lineupComparison && candidates.length >= 2 && !commonStartingSpot && (
+                            <p role="status">
+                              Choose players who share a starting spot in your league, such as two
+                              receivers or a running back and receiver for Flex.
                             </p>
-                          </details>
+                          )}
                         </>
                       )}
-                      <button
-                        type="button"
-                        className="text-button"
-                        onClick={() => setOptionsRevision((value) => value + 1)}
-                      >
-                        Reload connections
-                      </button>
-                      {connectionFeedback && <p role="status">{connectionFeedback}</p>}
-                    </section>
-                  )}
-                  {!!options?.models?.length && (
-                    <div className="advice-model-choice">
-                      <label>
-                        Model
-                        <select
-                          value={model}
-                          onChange={(event) => {
-                            setModel(event.target.value);
-                            changed();
-                          }}
-                        >
-                          {!options.models.some((item) => item.id === model) && (
-                            <option value={model} disabled>
-                              {model} · No longer available
-                            </option>
-                          )}
-                          {options.models.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.id}
-                              {item.id === options.recommendedModel
-                                ? ' · Recommended for deep analysis'
-                                : ''}
-                              {item.id === options.model && connection === 'saved'
-                                ? ' · Saved model'
-                                : ''}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <p>
-                        {connection !== 'saved'
-                          ? 'Applies to this analysis only. Your saved API prices do not apply to subscription usage.'
-                          : model !== options.model
-                            ? 'Applies to this analysis only. Your saved model’s prices do not apply, so a cost estimate will be unavailable.'
-                            : 'Applies to this analysis only; your saved settings don’t change.'}
-                      </p>
-                    </div>
-                  )}
-                  {['lineup', 'waivers'].includes(mode) && (
-                    <label>
-                      NFL week
-                      <input
-                        type="number"
-                        min="1"
-                        max="18"
-                        required
-                        value={week}
-                        onChange={(event) => {
-                          setWeek(event.target.value);
-                          changed();
-                        }}
-                      />
-                    </label>
-                  )}
-                  {mode === 'lineup' && (
-                    <>
-                      <label>
-                        What do you want to check?
-                        <select
-                          value={lineupComparison ? 'compare' : 'full'}
-                          onChange={(event) => {
-                            setLineupComparison(event.target.value === 'compare');
-                            setCandidates([]);
-                            changed();
-                          }}
-                        >
-                          <option value="full">My full starting lineup</option>
-                          <option value="compare">Compare players for one spot</option>
-                        </select>
-                      </label>
-                      {lineupComparison && (
+                      {['draft-plan', 'draft-review', 'trade'].includes(mode) && (
+                        <p>
+                          {mode === 'trade'
+                            ? `We estimate remaining points for ${options?.season ?? 'this season'}, weeks ${options?.week ?? 'the current week'}–${tradeThroughWeek}, from public stats and the NFL schedule when enough history is available. Already-earned points are excluded.`
+                            : 'We estimate season points from public stats and the NFL schedule when enough history is available. Estimates assume the player’s recorded role continues.'}{' '}
+                          Matching scoring-confirmed imports take priority and can cover missing
+                          estimates.{' '}
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => onNavigate({ section: 'Imports' })}
+                          >
+                            Import projections
+                          </button>
+                        </p>
+                      )}
+                      {mode === 'trade' && (
+                        <label>
+                          Count remaining value through NFL week
+                          <input
+                            type="number"
+                            min={options?.week ?? 1}
+                            max="18"
+                            required
+                            value={tradeThroughWeek}
+                            onChange={(event) => {
+                              setTradeThroughWeek(event.target.value);
+                              changed();
+                            }}
+                          />
+                          <span>
+                            Choose your league’s last week. Automatic estimates exclude byes and
+                            played games. Imported projections must cover the same interval.
+                          </span>
+                        </label>
+                      )}
+                      {mode === 'draft-review' && (
+                        <p>
+                          We review the connected team’s logged picks. Refresh the league after the
+                          draft so its latest picks are included.
+                        </p>
+                      )}
+                      {['draft-plan', 'waivers'].includes(mode) && (
                         <PlayerPicker
-                          label="Players competing for one spot"
-                          players={mine}
+                          label="Players to compare (optional)"
+                          players={available}
                           selected={candidates}
                           onChange={(ids) => {
                             setCandidates(ids);
                             changed();
                           }}
-                          hint="Choose 2–20 players from your team who fit the same starting spot, such as two receivers or a running back and receiver for Flex. Other lineup slots are not included."
+                          hint="Leave empty to screen available players. Search and choose up to 20 for a specific comparison."
                         />
                       )}
-                      {lineupComparison && candidates.length >= 2 && !commonStartingSpot && (
-                        <p role="status">
-                          Choose players who share a starting spot in your league, such as two
-                          receivers or a running back and receiver for Flex.
-                        </p>
-                      )}
-                    </>
-                  )}
-                  {['draft-plan', 'draft-review', 'trade'].includes(mode) && (
-                    <p>
-                      {mode === 'trade'
-                        ? `We estimate remaining points for ${options?.season ?? 'this season'}, weeks ${options?.week ?? 'the current week'}–${tradeThroughWeek}, from public stats and the NFL schedule when enough history is available. Already-earned points are excluded.`
-                        : 'We estimate season points from public stats and the NFL schedule when enough history is available. Estimates assume the player’s recorded role continues.'}{' '}
-                      Matching scoring-confirmed imports take priority and can cover missing
-                      estimates.{' '}
-                      <button
-                        type="button"
-                        className="text-button"
-                        onClick={() => onNavigate({ section: 'Imports' })}
-                      >
-                        Import projections
-                      </button>
-                    </p>
-                  )}
-                  {mode === 'trade' && (
-                    <label>
-                      Count remaining value through NFL week
-                      <input
-                        type="number"
-                        min={options?.week ?? 1}
-                        max="18"
-                        required
-                        value={tradeThroughWeek}
-                        onChange={(event) => {
-                          setTradeThroughWeek(event.target.value);
-                          changed();
-                        }}
-                      />
-                      <span>
-                        Choose your league’s last week. Automatic estimates exclude byes and played
-                        games. Imported projections must cover the same interval.
-                      </span>
-                    </label>
-                  )}
-                  {mode === 'draft-review' && (
-                    <p>
-                      We review the connected team’s logged picks. Refresh the league after the
-                      draft so its latest picks are included.
-                    </p>
-                  )}
-                  {['draft-plan', 'waivers'].includes(mode) && (
-                    <PlayerPicker
-                      label="Players to compare (optional)"
-                      players={available}
-                      selected={candidates}
-                      onChange={(ids) => {
-                        setCandidates(ids);
-                        changed();
-                      }}
-                      hint="Leave empty to screen available players. Search and choose up to 20 for a specific comparison."
-                    />
-                  )}
-                  {mode === 'waivers' && (
-                    <label>
-                      Player to drop (optional)
-                      <select
-                        aria-label="Player to drop (optional)"
-                        aria-describedby="advice-waiver-drop-hint"
-                        value={mine.some((p) => p.id === dropPlayerId) ? dropPlayerId : ''}
-                        onChange={(event) => {
-                          setDropPlayerId(event.target.value);
-                          changed();
-                        }}
-                      >
-                        <option value="">Screen additions before choosing a drop</option>
-                        {mine.map((player) => (
-                          <option key={player.id} value={player.id}>
-                            {player.name} · {player.position}
-                          </option>
-                        ))}
-                      </select>
-                      <span id="advice-waiver-drop-hint">
-                        Choose a player to compare the full add/drop impact on your starting lineup.
-                        Confirm roster locks and waiver rules before submitting a move.
-                      </span>
-                    </label>
-                  )}
-                  {mode === 'trade' && (
-                    <>
-                      <PlayerPicker
-                        label="Players you give"
-                        players={mine}
-                        selected={give}
-                        onChange={(ids) => {
-                          setGive(ids);
-                          changed();
-                        }}
-                      />
-                      <label>
-                        Other team
-                        <select
-                          value={tradeTeamId}
-                          onChange={(event) => {
-                            setTradeTeamId(event.target.value);
-                            setReceive([]);
-                            changed();
-                          }}
-                        >
-                          <option value="">Choose a team</option>
-                          {league?.teams
-                            .filter((team) => team.id !== teamId)
-                            .map((team) => (
-                              <option key={team.id} value={team.id}>
-                                {team.name}
-                              </option>
-                            ))}
-                        </select>
-                      </label>
-                      <PlayerPicker
-                        label="Players you receive"
-                        players={other}
-                        selected={receive}
-                        onChange={(ids) => {
-                          setReceive(ids);
-                          changed();
-                        }}
-                      />
-                    </>
-                  )}
-                  {betting && (
-                    <BetFields
-                      options={options}
-                      game={game}
-                      gamePlayers={gamePlayers}
-                      selectedQuote={selectedQuote}
-                      busy={busy}
-                      betKind={betKind}
-                      setBetKind={setBetKind}
-                      gameId={gameId}
-                      setGameId={setGameId}
-                      propPlayer={propPlayer}
-                      setPropPlayer={setPropPlayer}
-                      stat={stat}
-                      setStat={setStat}
-                      side={side}
-                      setSide={setSide}
-                      line={line}
-                      setLine={setLine}
-                      odds={odds}
-                      setOdds={setOdds}
-                      oppositeOdds={oppositeOdds}
-                      setOppositeOdds={setOppositeOdds}
-                      quote={quote}
-                      setQuote={setQuote}
-                      changed={changed}
-                      onExploreSignals={() => setView('signals')}
-                    />
-                  )}
-                  <label>
-                    Anything else to consider? (optional)
-                    <textarea
-                      rows={3}
-                      maxLength={2000}
-                      value={question}
-                      onChange={(event) => {
-                        setQuestion(event.target.value);
-                        changed();
-                      }}
-                      placeholder="Example: I need safer starters this week, or I want to improve my running back depth."
-                    />
-                  </label>
-                  <details>
-                    <summary>Advanced analysis limits</summary>
-                    {usesCodex ? (
-                      <p>
-                        Codex subscription limits apply. This connection does not support a token
-                        budget per pass. Analysis still has a time and response-size limit, and you
-                        can cancel it.
-                      </p>
-                    ) : (
-                      <>
+                      {mode === 'waivers' && (
                         <label>
-                          Reasoning and answer limit per pass
+                          Player to drop (optional)
                           <select
-                            value={outputLimit}
+                            aria-label="Player to drop (optional)"
+                            aria-describedby="advice-waiver-drop-hint"
+                            value={mine.some((p) => p.id === dropPlayerId) ? dropPlayerId : ''}
                             onChange={(event) => {
-                              setOutputLimit(event.target.value);
+                              setDropPlayerId(event.target.value);
                               changed();
                             }}
                           >
-                            <option value="16384">Deep analysis · up to 16,384 tokens</option>
-                            <option value="8192">Standard · up to 8,192 tokens</option>
-                            <option value="4096">Compact · up to 4,096 tokens</option>
+                            <option value="">Screen additions before choosing a drop</option>
+                            {mine.map((player) => (
+                              <option key={player.id} value={player.id}>
+                                {player.name} · {player.position}
+                              </option>
+                            ))}
                           </select>
+                          <span id="advice-waiver-drop-hint">
+                            Choose a player to compare the full add/drop impact on your starting
+                            lineup. Confirm roster locks and waiver rules before submitting a move.
+                          </span>
                         </label>
+                      )}
+                      {mode === 'trade' && (
+                        <>
+                          <PlayerPicker
+                            label="Players you give"
+                            players={mine}
+                            selected={give}
+                            onChange={(ids) => {
+                              setGive(ids);
+                              changed();
+                            }}
+                          />
+                          <label>
+                            Other team
+                            <select
+                              value={tradeTeamId}
+                              onChange={(event) => {
+                                setTradeTeamId(event.target.value);
+                                setReceive([]);
+                                changed();
+                              }}
+                            >
+                              <option value="">Choose a team</option>
+                              {league?.teams
+                                .filter((team) => team.id !== teamId)
+                                .map((team) => (
+                                  <option key={team.id} value={team.id}>
+                                    {team.name}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                          <PlayerPicker
+                            label="Players you receive"
+                            players={other}
+                            selected={receive}
+                            onChange={(ids) => {
+                              setReceive(ids);
+                              changed();
+                            }}
+                          />
+                        </>
+                      )}
+                      {betting && (
+                        <BetFields
+                          options={options}
+                          game={game}
+                          gamePlayers={gamePlayers}
+                          selectedQuote={selectedQuote}
+                          busy={busy}
+                          betKind={betKind}
+                          setBetKind={setBetKind}
+                          gameId={gameId}
+                          setGameId={setGameId}
+                          propPlayer={propPlayer}
+                          setPropPlayer={setPropPlayer}
+                          stat={stat}
+                          setStat={setStat}
+                          side={side}
+                          setSide={setSide}
+                          line={line}
+                          setLine={setLine}
+                          odds={odds}
+                          setOdds={setOdds}
+                          oppositeOdds={oppositeOdds}
+                          setOppositeOdds={setOppositeOdds}
+                          quote={quote}
+                          setQuote={setQuote}
+                          changed={changed}
+                          onExploreSignals={() => setView('signals')}
+                        />
+                      )}
+                      <label>
+                        Anything else to consider? (optional)
+                        <textarea
+                          rows={3}
+                          maxLength={2000}
+                          value={question}
+                          onChange={(event) => {
+                            setQuestion(event.target.value);
+                            changed();
+                          }}
+                          placeholder="Example: I need safer starters this week, or I want to improve my running back depth."
+                        />
+                      </label>
+                    </div>
+                    {/* Connection, limits and the Analyze button stay in view beside the inputs on desktop. */}
+                    <div className="advice-run-panel">
+                      {options && (
                         <p>
-                          The provider counts reasoning and answer text toward this limit. Lower
-                          limits can end an answer early. Charges depend on actual usage.
+                          {options.season} NFL season ·{' '}
+                          {connection !== 'saved'
+                            ? 'AI connection for this analysis: '
+                            : 'Saved AI connection: '}
+                          <strong>{options.model}</strong>
                         </p>
-                      </>
-                    )}
-                  </details>
-                  <p className="advice-privacy">
-                    Uses two AI calls, which your provider may charge for. Only football data and
-                    your note are sent.
-                  </p>
-                  <details>
-                    <summary>Privacy & analysis details</summary>
-                    <p>
-                      The selected football evidence, team name and note go to your chosen AI
-                      service. Private member notes and conversations are excluded. Analysis and
-                      review may take several minutes; you can cancel while they run. No new key is
-                      needed.
-                    </p>
-                  </details>
+                      )}
+                      {!!options?.connections?.length && (
+                        <section aria-label="AI connection for this analysis">
+                          <label>
+                            AI connection
+                            <select
+                              value={connection}
+                              onChange={(event) => {
+                                setConnection(event.target.value as AdviceConnection);
+                                setModel('');
+                                setConnectionFeedback('');
+                                changed();
+                              }}
+                            >
+                              {options.connections.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                  {item.label}
+                                  {item.status === 'not-installed'
+                                    ? ' · Not installed'
+                                    : item.status === 'signed-out'
+                                      ? ' · Sign in needed'
+                                      : item.status === 'unavailable'
+                                        ? ' · Sign-in check unavailable'
+                                        : ''}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          {connection !== 'saved' && (
+                            <>
+                              <p>
+                                {options.connections.find((item) => item.id === connection)
+                                  ?.status === 'signed-in'
+                                  ? connection === 'codex-cli'
+                                    ? 'Your ChatGPT subscription is signed in. No new API key is needed. GPT-6.1-Sol analyzes and reviews with high reasoning; subscription limits apply.'
+                                    : 'Your Claude subscription is signed in. No new API key is needed. Opus analyzes and reviews; subscription limits apply.'
+                                  : connection === 'codex-cli'
+                                    ? 'An installed Codex CLI with a supported version and ChatGPT sign-in is needed. Check Help, then reload connections. This does not create an account or API key.'
+                                    : 'An installed, signed-in Claude CLI is needed. Check its sign-in, then reload connections. This does not create an account or API key.'}
+                              </p>
+                              <button
+                                type="button"
+                                className="small-button"
+                                disabled={
+                                  !options.connections.some(
+                                    (item) => item.id === connection && item.status === 'signed-in',
+                                  )
+                                }
+                                onClick={() => void testSignedInConnection()}
+                              >
+                                Test signed-in AI
+                              </button>
+                              <details>
+                                <summary>Connection details</summary>
+                                <p>
+                                  Uses the {connection === 'codex-cli' ? 'Codex' : 'Claude'} CLI
+                                  installed on this computer. Sign-in does not guarantee the model
+                                  is currently available. Test signed-in AI checks generation
+                                  without sharing league data.
+                                  {connection === 'codex-cli' &&
+                                    ' This experimental connection requires the verified CLI version listed in Help.'}
+                                </p>
+                              </details>
+                            </>
+                          )}
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => setOptionsRevision((value) => value + 1)}
+                          >
+                            Reload connections
+                          </button>
+                          {connectionFeedback && <p role="status">{connectionFeedback}</p>}
+                        </section>
+                      )}
+                      {!!options?.models?.length && (
+                        <div className="advice-model-choice">
+                          <label>
+                            Model
+                            <select
+                              value={model}
+                              onChange={(event) => {
+                                setModel(event.target.value);
+                                changed();
+                              }}
+                            >
+                              {!options.models.some((item) => item.id === model) && (
+                                <option value={model} disabled>
+                                  {model} · No longer available
+                                </option>
+                              )}
+                              {options.models.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                  {item.id}
+                                  {item.id === options.recommendedModel
+                                    ? ' · Recommended for deep analysis'
+                                    : ''}
+                                  {item.id === options.model && connection === 'saved'
+                                    ? ' · Saved model'
+                                    : ''}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <p>
+                            {connection !== 'saved'
+                              ? 'Applies to this analysis only. Your saved API prices do not apply to subscription usage.'
+                              : model !== options.model
+                                ? 'Applies to this analysis only. Your saved model’s prices do not apply, so a cost estimate will be unavailable.'
+                                : 'Applies to this analysis only; your saved settings don’t change.'}
+                          </p>
+                        </div>
+                      )}
+                      <details>
+                        <summary>Advanced analysis limits</summary>
+                        {usesCodex ? (
+                          <p>
+                            Codex subscription limits apply. This connection does not support a
+                            token budget per pass. Analysis still has a time and response-size
+                            limit, and you can cancel it.
+                          </p>
+                        ) : (
+                          <>
+                            <label>
+                              Reasoning and answer limit per pass
+                              <select
+                                value={outputLimit}
+                                onChange={(event) => {
+                                  setOutputLimit(event.target.value);
+                                  changed();
+                                }}
+                              >
+                                <option value="16384">Deep analysis · up to 16,384 tokens</option>
+                                <option value="8192">Standard · up to 8,192 tokens</option>
+                                <option value="4096">Compact · up to 4,096 tokens</option>
+                              </select>
+                            </label>
+                            <p>
+                              The provider counts reasoning and answer text toward this limit. Lower
+                              limits can end an answer early. Charges depend on actual usage.
+                            </p>
+                          </>
+                        )}
+                      </details>
+                      <p className="advice-privacy">
+                        Uses two AI calls, which your provider may charge for. Only football data
+                        and your note are sent.
+                      </p>
+                      <details>
+                        <summary>Privacy & analysis details</summary>
+                        <p>
+                          The selected football evidence, team name and note go to your chosen AI
+                          service. Private member notes and conversations are excluded. Analysis and
+                          review may take several minutes; you can cancel while they run. No new key
+                          is needed.
+                        </p>
+                      </details>
 
-                  {!canAnalyze && options && (
-                    <p>
-                      {connection !== 'saved' &&
-                      !options.connections?.some(
-                        (item) => item.id === connection && item.status === 'signed-in',
-                      )
-                        ? connection === 'codex-cli'
-                          ? 'Check the supported Codex CLI version and ChatGPT sign-in, then reload connections before analyzing.'
-                          : 'Check the Claude CLI sign-in and reload connections before analyzing.'
-                        : options.models?.length &&
-                            !options.models.some((item) => item.id === model)
-                          ? 'Choose an available AI model to continue. Your previous choice has been retained.'
-                          : mode === 'trade'
-                            ? 'Choose players from both teams to continue.'
-                            : betting
-                              ? 'Choose a game and complete the line, odds, and player when needed.'
-                              : 'Choose your team and a valid week to continue.'}
-                    </p>
-                  )}
-                  <section className="readiness-entry">
-                    <h3>Check the evidence first</h3>
-                    <p>
-                      See which players have estimates and injury reports before spending an AI
-                      call.
-                    </p>
-                    <button
-                      type="button"
-                      className="small-button"
-                      disabled={!canAnalyze || busy || checkingReadiness}
-                      onClick={() => void showReadiness()}
-                    >
-                      {checkingReadiness ? 'Checking data…' : 'Check data readiness'}
-                    </button>
-                    {currentReadiness && <DataReadiness report={currentReadiness} />}
-                  </section>
-                  <button
-                    className="primary-button"
-                    type="submit"
-                    disabled={
-                      !canAnalyze ||
-                      busy ||
-                      testingConnection ||
-                      checkingReadiness ||
-                      currentReadiness?.status === 'blocked'
-                    }
-                  >
-                    {busy ? 'Analyzing & reviewing…' : 'Analyze my choices'}
-                  </button>
+                      {!canAnalyze && options && (
+                        <p>
+                          {connection !== 'saved' &&
+                          !options.connections?.some(
+                            (item) => item.id === connection && item.status === 'signed-in',
+                          )
+                            ? connection === 'codex-cli'
+                              ? 'Check the supported Codex CLI version and ChatGPT sign-in, then reload connections before analyzing.'
+                              : 'Check the Claude CLI sign-in and reload connections before analyzing.'
+                            : options.models?.length &&
+                                !options.models.some((item) => item.id === model)
+                              ? 'Choose an available AI model to continue. Your previous choice has been retained.'
+                              : mode === 'trade'
+                                ? 'Choose players from both teams to continue.'
+                                : betting
+                                  ? 'Choose a game and complete the line, odds, and player when needed.'
+                                  : 'Choose your team and a valid week to continue.'}
+                        </p>
+                      )}
+                      <section className="readiness-entry">
+                        <h3>Check the evidence first</h3>
+                        <p>
+                          See which players have estimates and injury reports before spending an AI
+                          call.
+                        </p>
+                        <button
+                          type="button"
+                          className="small-button"
+                          disabled={!canAnalyze || busy || checkingReadiness}
+                          onClick={() => void showReadiness()}
+                        >
+                          {checkingReadiness ? 'Checking data…' : 'Check data readiness'}
+                        </button>
+                        {currentReadiness && <DataReadiness report={currentReadiness} />}
+                      </section>
+                      <button
+                        className="primary-button"
+                        type="submit"
+                        disabled={
+                          !canAnalyze ||
+                          busy ||
+                          testingConnection ||
+                          checkingReadiness ||
+                          currentReadiness?.status === 'blocked'
+                        }
+                      >
+                        {busy ? 'Analyzing & reviewing…' : 'Analyze my choices'}
+                      </button>
+                    </div>
+                  </div>
                 </fieldset>
                 {testingConnection && (
                   <button className="small-button" type="button" onClick={cancelConnectionTest}>

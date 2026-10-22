@@ -1,5 +1,6 @@
 import { nextSchedule, type AppSettings } from '@sidekick/core';
 import { reportName } from './beginner-flow';
+import { useMediaQuery } from './hooks/useMediaQuery';
 
 type Action = AppSettings['actions'][number];
 const dayMs = 86_400_000;
@@ -41,19 +42,25 @@ export function ScheduleWeek({
     date.setDate(date.getDate() + index);
     return date;
   });
-  // Consecutive days without runs collapse into one line ("Thu–Mon · Nothing scheduled").
+  // Desktop shows the week as seven columns; narrow windows collapse consecutive quiet days
+  // into one line ("Thu–Mon · Nothing scheduled").
+  const wide = useMediaQuery('(min-width: 1000px)');
   const segments: { days: { date: Date; index: number }[]; runs: typeof runs }[] = [];
   days.forEach((date, index) => {
     const dayRuns = runs.filter((run) => dayKey(run.at) === date.toDateString());
     const previous = segments[segments.length - 1];
-    if (!dayRuns.length && previous && !previous.runs.length) previous.days.push({ date, index });
+    if (!wide && !dayRuns.length && previous && !previous.runs.length)
+      previous.days.push({ date, index });
     else segments.push({ days: [{ date, index }], runs: dayRuns });
   });
   const dayLabel = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
   const dateLabel = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
   const timeLabel = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
   return (
-    <section className="schedule-week" aria-labelledby="schedule-week-title">
+    <section
+      className={`schedule-week${wide ? ' wide' : ''}`}
+      aria-labelledby="schedule-week-title"
+    >
       <h2 id="schedule-week-title">Next 7 days</h2>
       {runs.length === 0 ? (
         <p className="schedule-week-empty">

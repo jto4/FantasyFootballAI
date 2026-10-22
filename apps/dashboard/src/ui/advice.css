@@ -465,3 +465,35 @@
 .advice-verdict-line {
   margin: 8px 0 4px;
 }
+
+/* Desktop Advice form: inputs on the left, connection and Analyze in a panel that stays in view. */
+@media (min-width: 1100px) {
+  .advice-form-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: 28px;
+    align-items: start;
+  }
+  .advice-run-panel {
+    position: sticky;
+    top: 16px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-raised);
+  }
+  .advice-run-panel > :first-child {
+    margin-top: 0;
+  }
+  .advice-run-panel {
+    display: flex;
+    flex-direction: column;
+  }
+  /* The panel can be taller than the window; keep its main action first. */
+  .advice-run-panel > .primary-button {
+    order: -1;
+    width: 100%;
+    margin: 0 0 14px;
+    justify-content: center;
+  }
+}
