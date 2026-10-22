@@ -12,8 +12,11 @@ export const signedInCodexModel = 'gpt-6.1-sol';
 // must pass the same captured-request proof before this allowlist is expanded.
 const legacyVersion = 'codex-cli 0.162.0-alpha.2';
 const currentVersion = 'codex-cli 0.162.0-alpha.17.2';
+/** macOS builds that use the newer native protocol and passed the same isolation proof. */
+const newProtocolVersions = new Set([currentVersion, 'codex-cli 0.163.0-alpha.11']);
+const newProtocol = (version: string) => newProtocolVersions.has(version);
 function verifiedVersion(version: string): boolean {
-  return version === legacyVersion || (process.platform === 'darwin' && version === currentVersion);
+  return version === legacyVersion || (process.platform === 'darwin' && newProtocol(version));
 }
 // Public native catalog capability metadata, pinned to the verified new protocol.
 // The same model/effort is used; standard tool mode prevents model metadata from
@@ -351,7 +354,7 @@ export async function isolatedCodexArguments(
     signedInCodexModel,
     '--json',
   ];
-  if (version === currentVersion) args.unshift('--no-daemon');
+  if (newProtocol(version)) args.unshift('--no-daemon');
   const settings = {
     model_reasoning_effort: 'high',
     model_instructions_file: instructions,
@@ -361,7 +364,7 @@ export async function isolatedCodexArguments(
     'features.skip_host_skill_discovery': true,
     suppress_unstable_features_warning: true,
   };
-  if (version === currentVersion) {
+  if (newProtocol(version)) {
     const catalog = join(dirname(instructions), 'model-catalog.json');
     await writeFile(catalog, JSON.stringify(isolatedModelCatalog), { mode: 0o600 });
     Object.assign(settings, {
@@ -384,7 +387,7 @@ export async function isolatedCodexArguments(
     `skills.config=[${skills.map((path) => `{path=${JSON.stringify(path)},enabled=false}`).join(',')}]`,
   );
   for (const feature of disabledFeatures) args.push('--disable', feature);
-  if (version === currentVersion)
+  if (newProtocol(version))
     for (const feature of [
       'goals',
       'sleep_tool',
