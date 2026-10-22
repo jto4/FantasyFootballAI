@@ -342,3 +342,37 @@ p.weekly-answer {
   color: var(--green);
   font-size: 12px;
 }
+
+/* Home: one "do this next" card above everything else. */
+.next-up {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin: 0 0 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+.next-up h3 {
+  margin: 2px 0 4px;
+  font-size: 20px;
+}
+.next-up p {
+  margin: 0;
+}
+.next-up.urgent {
+  border-left-color: var(--pink);
+}
+.next-up.warning {
+  border-left-color: var(--warning);
+}
+.next-up.action {
+  border-left-color: var(--orange);
+}
+.next-up.calm {
+  border-left-color: var(--green);
+}

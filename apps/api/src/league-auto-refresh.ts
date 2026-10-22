@@ -7,6 +7,8 @@ export const maximumAgeMs = 12 * hour;
 /** Refresh shortly before kickoffs, when late injury and lineup news lands. */
 const preKickoffMs = 90 * 60_000;
 const preKickoffMaxAgeMs = hour;
+/** During games, refresh whenever the last sync is older than this. */
+const liveMaxAgeMs = 10 * 60_000;
 /** NFL games usually end within four hours of kickoff. */
 const gameLengthMs = 4 * hour;
 
@@ -31,6 +33,9 @@ export function leaguesDueForRefresh(
     if (age >= maximumAgeMs) return true;
     const kickoffSoon = kickoffs.some((at) => at > now && at - now <= preKickoffMs);
     if (kickoffSoon && age >= preKickoffMaxAgeMs) return true;
+    // While games are on, matchup points change constantly; keep them within one check.
+    const gameLive = kickoffs.some((at) => at <= now && now < at + gameLengthMs);
+    if (gameLive && age >= liveMaxAgeMs) return true;
     // A game that finished after the last sync changed scores and standings.
     return kickoffs.some((at) => at + gameLengthMs > synced && at + gameLengthMs <= now);
   });

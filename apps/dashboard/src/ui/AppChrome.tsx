@@ -8,6 +8,7 @@ import {
   Home,
   MessageCircle,
   Power,
+  Radio,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -25,6 +26,7 @@ const menu = [
   { section: 'League desk', label: 'Home', icon: Home },
   { section: 'Advice', label: 'Advice', icon: Sparkles },
   { section: 'Reports', label: 'Reports', icon: FileText },
+  { section: 'Live', label: 'Live', icon: Radio },
   { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
   { section: 'Settings', label: 'Settings', icon: Settings },
 ];
@@ -172,7 +174,14 @@ export function AppTopbar({
   verificationMode,
   onLeagueChange,
   onSearchNavigate,
+  staleAfterHours = 24,
+  refreshing = false,
+  onFreshen,
 }: {
+  staleAfterHours?: number;
+  refreshing?: boolean;
+  /** Refreshes a connected league or starts a re-import for an imported one. */
+  onFreshen?: () => void;
   league: LeagueConnection | undefined;
   leagues: LeagueConnection[];
   reports: ReportSummary[];
@@ -182,6 +191,7 @@ export function AppTopbar({
   onLeagueChange: (leagueId: string) => void;
   onSearchNavigate: (destination: SearchDestination) => boolean;
 }) {
+  const stale = league ? isStale(league, staleAfterHours) : false;
   return (
     <header className="topbar">
       <div className="topbar-context">
@@ -209,7 +219,7 @@ export function AppTopbar({
                 ))
               )}
             </select>
-            <span>
+            <span className={stale ? 'league-stale' : undefined}>
               {league
                 ? `${platformName(league.platform)} · ${league.teamCount} teams${updatedLabel(league)}`
                 : 'Connect to get started'}
@@ -217,6 +227,21 @@ export function AppTopbar({
           </div>
           <ChevronDown size={15} aria-hidden="true" />
         </div>
+        {stale && onFreshen && (
+          <button
+            type="button"
+            className="small-button freshness-action"
+            disabled={refreshing}
+            onClick={onFreshen}
+            title="League data is older than your stale-data setting"
+          >
+            {refreshing
+              ? 'Refreshing…'
+              : league?.connectionMode === 'snapshot'
+                ? 'Out of date · Re-import'
+                : 'Out of date · Refresh'}
+          </button>
+        )}
       </div>
       <WorkspaceSearch leagues={leagues} reports={reports} onNavigate={onSearchNavigate} />
       <div className="top-actions">
@@ -236,6 +261,16 @@ export function AppTopbar({
       </div>
     </header>
   );
+}
+
+/** League data older than the owner's stale threshold, or with no update time at all. */
+export function isStale(
+  league: Pick<LeagueConnection, 'lastSyncedAt' | 'snapshotImportedAt'>,
+  staleAfterHours: number,
+  now = Date.now(),
+): boolean {
+  const at = Date.parse(league.lastSyncedAt ?? league.snapshotImportedAt ?? '');
+  return !Number.isFinite(at) || now - at > staleAfterHours * 3_600_000;
 }
 
 /** One freshness phrase shared by the header: when league data last arrived, in plain words. */

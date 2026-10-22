@@ -182,6 +182,11 @@ export function normalizeEspnLeague(
   const draft = espnDraft(supplemental?.draftDetail, season, id, teams);
   const draftScheduledAt = espnDraftScheduledAt(asRecord(settings.draftSettings)?.date);
   const weeklyScores = espnWeeklyScores(data.schedule, matchupPeriod, regularMatchupPeriods);
+  const upcomingSchedule = espnUpcomingSchedule(
+    data.schedule,
+    matchupPeriod,
+    regularMatchupPeriods,
+  );
   const matchups = espnCurrentWeekMatchups(data.schedule, matchupPeriod)?.map((m) => ({
     ...m,
     week: currentWeek ?? m.week,
@@ -212,6 +217,8 @@ export function normalizeEspnLeague(
       ...(currentWeek !== undefined ? { currentWeek } : {}),
       ...(seasonComplete !== undefined ? { seasonComplete } : {}),
       ...(rosterPositions ? { roster_positions: rosterPositions } : {}),
+      ...(regularMatchupPeriods ? { regularSeasonWeeks: regularMatchupPeriods } : {}),
+      ...(playoffTeams ? { playoffTeams } : {}),
       ...(inferredPlayoffStartWeek !== undefined
         ? {
             playoffStartWeek: inferredPlayoffStartWeek,
@@ -224,6 +231,7 @@ export function normalizeEspnLeague(
     ...(draftScheduledAt ? { draftScheduledAt } : {}),
     ...(matchups ? { matchups } : {}),
     ...(weeklyScores.length ? { weeklyScores } : {}),
+    ...(upcomingSchedule.length ? { upcomingSchedule } : {}),
     connectedAt: new Date().toISOString(),
   };
 }
@@ -328,6 +336,33 @@ function espnWeeklyScores(
         ],
       },
     ];
+  });
+}
+
+/** Regular-season pairings from the current matchup period on; scores are not needed. */
+function espnUpcomingSchedule(
+  rawSchedule: unknown,
+  currentPeriod: number | undefined,
+  regularPeriods: number | undefined,
+): NonNullable<LeagueConnection['upcomingSchedule']> {
+  if (!Array.isArray(rawSchedule) || currentPeriod === undefined || regularPeriods === undefined)
+    return [];
+  return rawSchedule.slice(0, 1000).flatMap((entry) => {
+    const row = asRecord(entry);
+    const period = numberOrUndefined(row?.matchupPeriodId);
+    const home = numberOrUndefined(asRecord(row?.home)?.teamId);
+    const away = numberOrUndefined(asRecord(row?.away)?.teamId);
+    if (
+      period === undefined ||
+      !Number.isInteger(period) ||
+      period < currentPeriod ||
+      period > regularPeriods ||
+      home === undefined ||
+      away === undefined ||
+      home === away
+    )
+      return [];
+    return [{ week: period, teamIds: [String(home), String(away)] as [string, string] }];
   });
 }
 

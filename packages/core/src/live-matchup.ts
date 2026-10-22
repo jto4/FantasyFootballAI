@@ -1,0 +1,104 @@
+import { nflTeamKey } from './advice-math.js';
+
+export type LiveGameState = 'pre' | 'in' | 'post' | 'bye' | 'unknown';
+
+export interface LiveStarterInput {
+  id: string;
+  name: string;
+  position: string;
+  nflTeam?: string;
+  estimate?: number;
+}
+
+export interface LiveSide {
+  teamId: string;
+  name: string;
+  /** Platform score so far; undefined when the league data has no live points. */
+  points?: number;
+  /** Score so far plus estimates for starters whose games have not started. */
+  projectedFinal?: number;
+  starters: (LiveStarterInput & { state: LiveGameState; detail?: string })[];
+  yetToPlay: number;
+  playing: number;
+}
+
+export interface LiveMatchup {
+  you: LiveSide;
+  opponent: LiveSide;
+  /** Rough chance you finish ahead; present only when both sides have scores and estimates. */
+  winChance?: number;
+}
+
+/** Normal cumulative distribution (Abramowitz–Stegun 7.1.26). */
+function normal(z: number) {
+  const t = 1 / (1 + (0.3275911 * Math.abs(z)) / Math.SQRT2);
+  const y =
+    1 -
+    ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) *
+      t *
+      Math.exp(-(z * z) / 2);
+  return z >= 0 ? (1 + y) / 2 : (1 - y) / 2;
+}
+
+/**
+ * Combines platform matchup points, NFL game states and weekly estimates.
+ *
+ * Projected final adds estimates only for starters whose games have not kicked off; players in
+ * progress are already partly counted in the platform score, so they add nothing further. The win
+ * chance is a normal approximation with each unplayed starter's spread set to 45% of their
+ * estimate, so it is a rough guide rather than a calibrated probability.
+ */
+export function liveMatchup(
+  sides: {
+    you: { teamId: string; name: string; points?: number; starters: LiveStarterInput[] };
+    opponent: { teamId: string; name: string; points?: number; starters: LiveStarterInput[] };
+  },
+  games: { home: string; away: string; state: 'pre' | 'in' | 'post'; detail: string }[],
+  byeTeams: string[] = [],
+): LiveMatchup {
+  const byTeam = new Map<string, (typeof games)[number]>();
+  for (const game of games) {
+    byTeam.set(nflTeamKey(game.home), game);
+    byTeam.set(nflTeamKey(game.away), game);
+  }
+  const byes = new Set(byeTeams.map(nflTeamKey));
+  let variance = 0;
+  const side = (input: (typeof sides)['you']): LiveSide => {
+    let unknownRemaining = false;
+    let remaining = 0;
+    const starters = input.starters.map((starter) => {
+      const team = starter.nflTeam ? nflTeamKey(starter.nflTeam) : undefined;
+      const game = team ? byTeam.get(team) : undefined;
+      const state: LiveGameState = game ? game.state : team && byes.has(team) ? 'bye' : 'unknown';
+      if (state === 'pre' || state === 'unknown') {
+        if (starter.estimate === undefined) unknownRemaining = true;
+        else {
+          remaining += starter.estimate;
+          variance += (0.45 * starter.estimate) ** 2;
+        }
+      }
+      return { ...starter, state, ...(game?.detail ? { detail: game.detail } : {}) };
+    });
+    return {
+      teamId: input.teamId,
+      name: input.name,
+      ...(input.points !== undefined ? { points: input.points } : {}),
+      ...(input.points !== undefined && !unknownRemaining
+        ? { projectedFinal: input.points + remaining }
+        : {}),
+      starters,
+      yetToPlay: starters.filter((s) => s.state === 'pre' || s.state === 'unknown').length,
+      playing: starters.filter((s) => s.state === 'in').length,
+    };
+  };
+  const you = side(sides.you),
+    opponent = side(sides.opponent);
+  let winChance: number | undefined;
+  if (you.projectedFinal !== undefined && opponent.projectedFinal !== undefined) {
+    const lead = you.projectedFinal - opponent.projectedFinal;
+    // Players mid-game still add uncertainty that the estimate model does not track.
+    const spread = Math.sqrt(variance + 9 * (you.playing + opponent.playing));
+    winChance = spread > 0 ? normal(lead / spread) : lead > 0 ? 1 : lead < 0 ? 0 : 0.5;
+  }
+  return { you, opponent, ...(winChance !== undefined ? { winChance } : {}) };
+}

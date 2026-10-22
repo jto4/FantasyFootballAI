@@ -119,6 +119,7 @@ export function createAdviceRouter(
   for (const [path, read] of [
     ['/api/advice/waiver-day', 'waiverDay'],
     ['/api/advice/trade-ideas', 'tradeIdeas'],
+    ['/api/live', 'live'],
   ] as const)
     router.get(path, async (req, res) => {
       if (

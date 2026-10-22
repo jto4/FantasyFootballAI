@@ -56,6 +56,7 @@ import {
   SchedulePage,
   MemoryPage,
   DeliveryTask,
+  LivePage,
 } from './lazy-pages';
 export function App() {
   const [verificationMode] = useState(
@@ -850,6 +851,9 @@ export function App() {
           verificationMode={verificationMode}
           onLeagueChange={setActiveLeagueId}
           onSearchNavigate={searchNavigate}
+          staleAfterHours={state.settings.leagueStaleAfterHours ?? 24}
+          refreshing={Boolean(league && refreshingLeagueId === league.id)}
+          {...(league ? { onFreshen: () => void refreshLeague(league.id) } : {})}
         />
 
         <div className="page-content">
@@ -941,6 +945,10 @@ export function App() {
                 onRetry={() => void refresh()}
               />
             )
+          ) : section === 'Live' ? (
+            <Suspense fallback={<LoadingStatus message="Opening live view…" />}>
+              <LivePage league={league} teamId={homeTeamId} onLeagues={() => navigate('Leagues')} />
+            </Suspense>
           ) : section === 'Help' ? (
             <Suspense fallback={<LoadingStatus message="Opening help…" />}>
               <HelpPage
@@ -1150,6 +1158,7 @@ export function App() {
                     onAdvice={(mode) =>
                       searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
                     }
+                    onLive={() => navigate('Live')}
                     onResults={() =>
                       searchNavigate({ section: 'Advice', adviceId: '', adviceView: 'results' })
                     }

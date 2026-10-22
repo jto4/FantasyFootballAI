@@ -1227,3 +1227,23 @@ League imports carry no FAAB budget or waiver order.
 projection for every player on the selected roster before kickoff, plus ESPN's public projection
 for players whose estimate came from an import, so the Home scorecard compares sources without
 saved advice. Record ids are stable per league, week, source and player.
+
+## Live, playoff odds, freshness and "Do this next" — October 22, 2026
+
+**Live** (sidebar, `g` `l`, or Cmd/Ctrl+6) shows your matchup during games: platform points,
+each starter's NFL game state from ESPN's public scoreboard (cached one minute; byes from the
+same feed), a projected final that adds estimates only for starters who have not kicked off,
+and a rough win chance (normal approximation, 45% spread per unplayed estimate; not calibrated).
+A score from an earlier week is withheld rather than shown under the current week. Connected
+leagues now refresh during live games whenever their last sync is older than 10 minutes;
+imported leagues cannot update scores and say so. `GET /api/live?league=&team=`.
+
+**Playoff odds** (Reports → League charts) simulate the rest of the regular season 5,000 times
+with a fixed seed. Strength is each team's weekly average pulled toward the league average by
+three league-average weeks, with one league-wide spread. The ESPN import now keeps the remaining
+schedule (`upcomingSchedule`), regular-season length and playoff team count; leagues without a
+schedule use random pairings and say so.
+
+**Top bar** shows "Out of date · Refresh/Re-import" once league data is older than the stale
+setting. **Home** leads with one "Do this next" card: a starter problem, stale data, a better
+lineup, a waiver pickup, or "You're set" with the next kickoff.

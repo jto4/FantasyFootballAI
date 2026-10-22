@@ -56,6 +56,22 @@ it('refreshes stale, pre-kickoff and post-game leagues but never snapshots', () 
   ).toEqual(['after-game']);
 });
 
+it('keeps live matchup points current while a game is in progress', () => {
+  const games = [game('2026-10-25T17:00:00Z')];
+  const during = Date.parse('2026-10-25T18:30:00Z');
+  expect(
+    leaguesDueForRefresh(
+      [
+        league('twelve-minutes', '2026-10-25T18:18:00Z'),
+        league('five-minutes', '2026-10-25T18:25:00Z'),
+        league('snapshot', '2026-10-25T18:00:00Z', true),
+      ],
+      games,
+      during,
+    ).map((l) => l.id),
+  ).toEqual(['twelve-minutes']);
+});
+
 it('refreshes due leagues one at a time and keeps going after a failure', async () => {
   const refresh = vi
     .fn<(league: LeagueConnection) => Promise<void>>()

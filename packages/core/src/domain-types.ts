@@ -60,6 +60,8 @@ export interface LeagueConnection {
    * Kept separate from `matchups`, which always describes the current week.
    */
   weeklyScores?: WeeklyScore[];
+  /** Remaining regular-season pairings, current week included, when the platform lists them. */
+  upcomingSchedule?: { week: number; teamIds: [string, string] }[];
   connectedAt: string;
   lastSyncedAt?: string;
   lastSyncError?: string;

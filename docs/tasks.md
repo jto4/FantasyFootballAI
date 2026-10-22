@@ -308,3 +308,9 @@ Completed work and its evidence live in the archived task records and dated revi
 - [ ] Owner: re-import Afton (or connect it with an ESPN login) so Waiver day and Trade ideas have this week's estimates; the current import has none, so both lists were only verified with fixtures.
 - [ ] Optional: read FAAB budget and waiver order from Sleeper/ESPN adapters for Waiver day.
 - [ ] Continue splitting `AdvicePage.tsx` (form sections) and `App.tsx` (league and report actions) into hooks/components; history, lazy loaders and roster-move panels are extracted.
+
+### Live, playoff odds and Home focus — October 22, 2026
+
+- [ ] Owner: check Live during a real game window with a connected league (live points depend on platform refreshes every ~10–15 minutes); verified against the real NFL scoreboard pre-game with an imported league only.
+- [ ] Owner: re-import Afton to pick up the remaining schedule so playoff odds use real pairings.
+- [ ] Optional: read Sleeper's future-week matchups for playoff-odds schedules.

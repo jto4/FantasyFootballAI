@@ -663,3 +663,48 @@
   color: var(--muted);
   white-space: nowrap;
 }
+
+/* Playoff odds: one bar per team, the selected team in the highlight color. */
+.playoff-odds {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+.playoff-odds li {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) 48px;
+  gap: 12px;
+  align-items: center;
+  font-size: 14px;
+}
+.playoff-odds-team {
+  display: grid;
+  min-width: 0;
+}
+.playoff-odds-team small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.playoff-odds-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--chart-band);
+}
+.playoff-odds-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chart-context);
+}
+.playoff-odds li.selected .playoff-odds-bar span {
+  background: var(--chart-highlight);
+}
+.playoff-odds li.selected .playoff-odds-team {
+  font-weight: 700;
+}
+.playoff-odds strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,6 +1,7 @@
 import { platformName } from './platform-name';
 import { useEffect, useState } from 'react';
 import { AdviceScorecard } from './AdviceScorecard';
+import { NextUpCard } from './NextUpCard';
 import { requestJson } from './api-client';
 import {
   leagueSyncFreshness,
@@ -21,6 +22,7 @@ export function WeeklyHome({
   onSetup,
   onSavedAdvice,
   onResults,
+  onLive,
 }: {
   league: LeagueConnection | undefined;
   settings: AppSettings;
@@ -31,6 +33,7 @@ export function WeeklyHome({
   onSetup: () => void;
   onSavedAdvice: (id: string, mode: AdviceMode) => void;
   onResults?: () => void;
+  onLive?: () => void;
 }) {
   const [decisions, setDecisions] = useState<
     { id: string; mode: AdviceMode; headline: string; createdAt: string }[]
@@ -118,6 +121,17 @@ export function WeeklyHome({
         </p>
       ) : (
         <>
+          {teamId && onLive && (
+            <NextUpCard
+              leagueId={league.id}
+              teamId={teamId}
+              briefing={briefing}
+              stale={freshness === 'stale'}
+              onAdvice={onAdvice}
+              onRefresh={onRefresh}
+              onLive={onLive}
+            />
+          )}
           <p className={freshness === 'fresh' ? 'connection-success' : 'field-warning'}>
             {league.connectionMode === 'snapshot'
               ? `Imported from ${platformName(league.platform)}${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}.`

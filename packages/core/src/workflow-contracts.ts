@@ -544,6 +544,23 @@ export function isLeagueConnection(value: unknown): value is LeagueConnection {
     )
   )
     return false;
+  if (
+    value.upcomingSchedule !== undefined &&
+    !(
+      Array.isArray(value.upcomingSchedule) &&
+      value.upcomingSchedule.length <= 30 * 32 &&
+      value.upcomingSchedule.every(
+        (game) =>
+          record(game) &&
+          boundedNumber(game.week, 1, 30, true) &&
+          Array.isArray(game.teamIds) &&
+          game.teamIds.length === 2 &&
+          game.teamIds.every((id) => text(id, 256)) &&
+          game.teamIds[0] !== game.teamIds[1],
+      )
+    )
+  )
+    return false;
   return (
     value.matchups === undefined ||
     (Array.isArray(value.matchups) &&

@@ -6,6 +6,7 @@ import {
   type WeekSummary,
 } from '@sidekick/core';
 import { readTeamSelections, selectedTeamId } from './team-selection';
+import { PlayoffOddsPanel } from './PlayoffOddsPanel';
 
 const one = (value: number) => value.toFixed(1);
 const signed = (value: number) => `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(1)}`;
@@ -709,6 +710,10 @@ export function LeagueTrends({ league }: { league: LeagueConnection }) {
             Rank by season-to-date record against every team, so one lucky matchup does not move it.
           </p>
           <PowerRank weeks={insights.weeks} teams={insights.teams} selected={selected} />
+        </div>
+        <div className="visual-panel trend-panel-wide">
+          <h3>Playoff odds</h3>
+          <PlayoffOddsPanel league={league} selected={selected} />
         </div>
         <div className="visual-panel">
           <h3>Luck check</h3>

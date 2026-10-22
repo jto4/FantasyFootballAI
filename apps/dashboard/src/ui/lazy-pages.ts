@@ -9,6 +9,7 @@ export const pageLoaders = {
   schedule: () => import('./SchedulePage'),
   memory: () => import('./MemoryPage'),
   advice: () => import('./AdvicePage'),
+  live: () => import('./LivePage'),
 };
 export const HelpPage = lazy(() =>
   import('./HelpPage').then((module) => ({ default: module.HelpPage })),
@@ -39,4 +40,8 @@ export const MemoryPage = lazy(() =>
 );
 export const DeliveryTask = lazy(() =>
   import('./DeliveryTask').then((module) => ({ default: module.DeliveryTask })),
+);
+
+export const LivePage = lazy(() =>
+  pageLoaders.live().then((module) => ({ default: module.LivePage })),
 );

@@ -132,3 +132,4 @@ export { PublicPredictionMarketData } from './prediction-market-data.js';
 export { normalizeEspnLeague } from './platforms/espn.js';
 export { espnSnapshotWeeklyProjections } from './espn-snapshot-projections.js';
 export { AnthropicProvider, defaultClaudeModel } from './anthropic-ai.js';
+export { PublicNflScoreboard, parseNflScoreboard, type LiveNflGame } from './nfl-scoreboard.js';

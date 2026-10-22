@@ -34,6 +34,7 @@ import {
   type PlayerAdviceEvidence,
   type RosterPlayer,
   capturePredictionRecords,
+  liveMatchup,
   rankWaivers,
   findTrades,
   captureDecisionSnapshot,
@@ -48,6 +49,7 @@ import type {
   SignedInAIConnection,
   PublicSportsbookLines,
   PublicPropLines,
+  PublicNflScoreboard,
 } from '@sidekick/integrations';
 import {
   adviceModelChoices,
@@ -76,6 +78,7 @@ export interface AdviceDependencies {
   signedInCodex?: SignedInAIConnection;
   odds?: Pick<PublicSportsbookLines, 'get' | 'verify' | 'result'>;
   props?: Pick<PublicPropLines, 'props' | 'books'>;
+  scoreboard?: Pick<PublicNflScoreboard, 'current'>;
   now?: () => number;
 }
 
@@ -1544,7 +1547,52 @@ export function createAdviceService(deps: AdviceDependencies) {
           : ['No one-for-one trade improves both teams’ best lineups with the current estimates.'],
     };
   }
+  /**
+   * Your matchup during games: platform points, each starter's NFL game state from the public
+   * scoreboard, a projected final and a rough win chance. Deterministic; no AI call.
+   */
+  async function live(leagueId: string, teamId: string) {
+    const summary = await briefing(leagueId, teamId);
+    const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId)!;
+    const base = {
+      leagueId,
+      teamId,
+      leagueName: leagueRow.displayName,
+      week: summary.week,
+      imported: leagueRow.connectionMode === 'snapshot',
+      ...(leagueRow.lastSyncedAt ? { updatedAt: leagueRow.lastSyncedAt } : {}),
+      ...(leagueRow.snapshotImportedAt ? { importedAt: leagueRow.snapshotImportedAt } : {}),
+    };
+    if (!summary.matchup) return { ...base, matchup: undefined, gamesAvailable: false };
+    const loaded = await load({ mode: 'lineup', leagueId, week: summary.week });
+    const team = (id: string) => loaded.players.find((p) => p.id === id)?.nflTeam;
+    const board = await deps.scoreboard?.current().catch(() => undefined);
+    // Game states only apply when the scoreboard shows the same NFL week as the matchup.
+    const sameWeek = board?.week === summary.week;
+    // A score from an earlier week (old league data) must not read as this week's score.
+    const currentScores = summary.matchup.week === summary.week;
+    const sideInput = (side: MatchupSide) => ({
+      teamId: side.teamId,
+      name: side.name,
+      ...(currentScores && side.points !== undefined ? { points: side.points } : {}),
+      starters: side.starters.map((s) => ({
+        ...s,
+        ...(team(s.id) ? { nflTeam: team(s.id)! } : {}),
+      })),
+    });
+    return {
+      ...base,
+      gamesAvailable: Boolean(sameWeek && board?.games.length),
+      matchupWeek: summary.matchup.week,
+      matchup: liveMatchup(
+        { you: sideInput(summary.matchup.you), opponent: sideInput(summary.matchup.opponent) },
+        sameWeek ? board!.games : [],
+        sameWeek ? board!.byeTeams : [],
+      ),
+    };
+  }
   return {
+    live,
     readiness,
     options,
     analyze,
