@@ -235,7 +235,7 @@ describe('league-specific player scoring', () => {
       scoreHistoricalGame({ platform: 'sleeper', scoring: { rec: 1, bonus_rec_yd_100: 3 } }, row),
     ).toEqual({ unsupported: ['bonus_rec_yd_100'], missing: [] });
     expect(
-      scoreHistoricalGame({ platform: 'espn', scoring: { '53': 1 } }, row).points,
+      scoreHistoricalGame({ platform: 'espn', scoring: { '999': 1 } }, row).points,
     ).toBeUndefined();
     expect(scoreHistoricalGame({ platform: 'sleeper', scoring: { rush_yd: 0.1 } }, row)).toEqual({
       unsupported: [],
@@ -412,4 +412,63 @@ it('caps confidence for stale, short-sample or incomplete evidence and distingui
   expect(adviceConfidence({ ...full, fresh: false }).score).toBeLessThanOrEqual(59);
   expect(adviceConfidence({ ...full, sampleSize: 2 }).score).toBeLessThanOrEqual(59);
   expect(adviceConfidence(full).meaning).toContain('not a win probability');
+});
+
+it('scores ESPN leagues from numeric stat IDs and leaves return/defensive TDs out', () => {
+  const espn = {
+    platform: 'espn' as const,
+    scoring: {
+      '3': 0.04,
+      '4': 4,
+      '20': -2,
+      '42': 0.1,
+      '43': 6,
+      '53': 0.5,
+      '72': -2,
+      '101': 6,
+      '89': 0,
+    },
+  };
+  const scored = scoreHistoricalGame(espn, {
+    playerId: 'p',
+    name: 'Fictional Receiver',
+    position: 'WR',
+    team: 'LA',
+    opponent: 'SF',
+    gameId: 'g',
+    season: 2026,
+    week: 7,
+    seasonType: 'REG',
+    stats: {
+      passing_yards: 0,
+      passing_tds: 0,
+      passing_interceptions: 0,
+      receiving_yards: 92,
+      receiving_tds: 1,
+      receptions: 7,
+      rushing_fumbles_lost: 0,
+      receiving_fumbles_lost: 0,
+      sack_fumbles_lost: 0,
+    },
+  });
+  // 92 × 0.1 + 6 + 7 × 0.5 = 18.7; the kick-return TD rule (101) is not modeled.
+  expect(scored.points).toBeCloseTo(18.7);
+  expect(scored.unsupported).toEqual([]);
+  expect(
+    scoreHistoricalGame(
+      { platform: 'espn', scoring: { '999': 1 } },
+      {
+        playerId: 'p',
+        name: 'X',
+        position: 'WR',
+        team: 'LA',
+        opponent: 'SF',
+        gameId: 'g',
+        season: 2026,
+        week: 7,
+        seasonType: 'REG',
+        stats: {},
+      },
+    ).unsupported,
+  ).toContain('999');
 });

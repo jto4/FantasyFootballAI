@@ -336,7 +336,7 @@ it('withholds active-lineup estimates on bye/out flags while keeping factual sta
 it('supports confirmed imports when scoring is unfamiliar while exposing the historical scoring gap', () => {
   const evidence = buildPlayerEvidence({
     ...input,
-    league: { ...league, platform: 'espn', scoring: { '53': 1 } },
+    league: { ...league, platform: 'espn', scoring: { '999': 1 } },
     projections: [projection({ importedAt: '2026-01-01' })],
   })[0]!;
   expect(evidence.historicalPoints).toEqual([]);

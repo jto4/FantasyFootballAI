@@ -48,6 +48,26 @@ const yahooScoring: Record<string, FootballStatKey | 'fumblesLost'> = {
   'Fumbles Lost': 'fumblesLost',
   'Fum Lost': 'fumblesLost',
 };
+// ESPN league scoring uses numeric stat IDs (the same IDs as ESPN's projection feed).
+const espnScoring: Record<string, FootballStatKey | 'fumblesLost'> = {
+  '3': 'passing_yards',
+  '4': 'passing_tds',
+  '19': 'passing_2pt_conversions',
+  '20': 'passing_interceptions',
+  '24': 'rushing_yards',
+  '25': 'rushing_tds',
+  '26': 'rushing_2pt_conversions',
+  '42': 'receiving_yards',
+  '43': 'receiving_tds',
+  '44': 'receiving_2pt_conversions',
+  '53': 'receptions',
+  '72': 'fumblesLost',
+};
+// ESPN return, defensive and conversion-return scores (fumble-recovery TD, blocked-kick TD,
+// kick/punt/interception/fumble return TDs, two-point and one-point returns). Neither public
+// projections nor box-score inputs model them, so player estimates leave them out, as with
+// team-defense rules. Kicking and team-defense IDs are handled by their own scorers.
+const espnNonOffense = new Set(['63', '93', '101', '102', '103', '104', '206', '209']);
 // Team-defense and kicking rules do not contribute to QB/RB/WR/TE player scores.
 const sleeperNonOffense = new Set([
   ...sleeperKickingRules,
@@ -132,7 +152,9 @@ export function scoreHistoricalGame(
       ? offensiveScoring
       : league.platform === 'yahoo'
         ? yahooScoring
-        : {};
+        : league.platform === 'espn'
+          ? espnScoring
+          : {};
   for (const [key, weight] of Object.entries(league.scoring)) {
     if (!Number.isFinite(weight)) {
       unsupported.push(key);
@@ -164,7 +186,8 @@ export function scoreHistoricalGame(
     }
     if (
       (league.platform === 'sleeper' && sleeperNonOffense.has(key)) ||
-      (league.platform === 'yahoo' && yahooNonOffense.has(key))
+      (league.platform === 'yahoo' && yahooNonOffense.has(key)) ||
+      (league.platform === 'espn' && espnNonOffense.has(key))
     )
       continue;
     const stat = Object.hasOwn(mapping, key) ? mapping[key] : undefined;

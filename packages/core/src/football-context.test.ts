@@ -292,7 +292,7 @@ it('does not infer offensive league scoring from unsupported provider rules', ()
   const result = buildFootballContext(fixture(), target, [player], {
     ...league,
     platform: 'espn',
-    scoring: { '53': 1 },
+    scoring: { '999': 1 },
   });
   expect(
     result.players
