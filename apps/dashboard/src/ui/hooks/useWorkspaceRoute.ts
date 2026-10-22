@@ -23,6 +23,8 @@ export type Route = {
   helpId?: string;
   adviceMode?: AdviceMode;
   adviceId?: string;
+  /** Advice opened on its results view instead of a new decision. */
+  adviceView?: 'results' | undefined;
 };
 export function readWorkspaceRoute(
   hash = typeof window === 'undefined' ? '' : window.location.hash,
@@ -39,6 +41,7 @@ export function readWorkspaceRoute(
     ...(page === 'advice' && isAdviceMode(id('mode'))
       ? { adviceMode: id('mode') as AdviceMode }
       : {}),
+    ...(page === 'advice' && id('view') === 'results' ? { adviceView: 'results' as const } : {}),
     ...(page === 'advice' &&
     /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id('result'))
       ? { adviceId: id('result') }
@@ -56,6 +59,7 @@ export function workspaceHash(route: Route): string {
   if (page === 'advice' && route.adviceMode && isAdviceMode(route.adviceMode))
     params.set('mode', route.adviceMode);
   if (page === 'advice' && route.adviceId) params.set('result', route.adviceId);
+  if (page === 'advice' && route.adviceView === 'results') params.set('view', 'results');
   return `#/${page}${params.size ? `?${params}` : ''}`;
 }
 
@@ -127,6 +131,7 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
     if (next.section !== 'Advice') {
       delete next.adviceMode;
       delete next.adviceId;
+      delete next.adviceView;
     }
     if (JSON.stringify(next) === JSON.stringify(current.current)) return true;
     if (check && !guard.current()) return false;

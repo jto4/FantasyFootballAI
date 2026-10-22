@@ -3,6 +3,7 @@ import type { AdviceOptions, BetTerms, FootballStatKey, SportsbookQuote } from '
 import { LiveSportsbookPrices } from './LiveSportsbookPrices';
 import { PlayerPicker } from './PlayerPicker';
 import { LoadingStatus } from './LoadFeedback';
+import { PublishedProps } from './PublishedProps';
 
 const PlayerPropResearch = lazy(() =>
   import('./PlayerPropResearch').then((m) => ({ default: m.PlayerPropResearch })),
@@ -174,10 +175,37 @@ export function BetFields({
             setOppositeOdds(String(q.oppositeAmericanOdds));
             changed();
           }}
+          onUsePrice={(price) => {
+            setQuote(undefined);
+            setLine(price.line === undefined ? '' : String(price.line));
+            setOdds(String(price.odds));
+            setOppositeOdds(price.oppositeOdds === undefined ? '' : String(price.oppositeOdds));
+            changed();
+          }}
+        />
+      )}
+      {betKind === 'player-prop' && (
+        <PublishedProps
+          game={game}
+          season={options?.season ?? new Date().getFullYear()}
+          players={gamePlayers}
+          statLabels={Object.fromEntries(propStats.map((item) => [item.value, item.label]))}
+          disabled={busy}
+          onPick={(pick) => {
+            setQuote(undefined);
+            setPropPlayer([pick.playerId]);
+            setStat(pick.stat);
+            setLine(String(pick.line));
+            setSide(pick.side);
+            setOdds(pick.odds === undefined ? '' : String(pick.odds));
+            setOppositeOdds(pick.oppositeOdds === undefined ? '' : String(pick.oppositeOdds));
+            changed();
+          }}
         />
       )}
       {betKind === 'player-prop' && (
         <>
+          <h3 className="prop-manual-heading">Or enter the prop yourself</h3>
           <PlayerPicker
             label="Player for this prop"
             players={gamePlayers}
@@ -300,6 +328,22 @@ export function BetFields({
           />
         </label>
       </div>
+      {betKind === 'player-prop' && !odds.trim() && (
+        <p className="prop-price-hint">
+          No price yet.{' '}
+          <button
+            type="button"
+            className="text-button"
+            onClick={() => {
+              setOdds('-110');
+              changed();
+            }}
+          >
+            Use the typical −110
+          </button>{' '}
+          or enter your sportsbook’s price.
+        </p>
+      )}
       <p>
         Odds must be −100 or below, or +100 or above. Opposite odds help estimate the price before
         the sportsbook’s margin.

@@ -13,6 +13,8 @@ const knownProviders = [
   'bluebubbles',
   'bluebubbles-webhook-token',
   'backup-encryption',
+  'odds-api',
+  'anthropic',
 ] as const;
 export type CredentialProvider = (typeof knownProviders)[number];
 

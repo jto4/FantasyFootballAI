@@ -45,3 +45,18 @@ it('validates persisted Codex settings and resets subscription access on backup 
     ).toThrow();
   }
 });
+
+it('uses the Anthropic key only for the Claude API mode and returns nothing without one', async () => {
+  const claude = {
+    ...settings,
+    aiRuntime: { ...settings.aiRuntime, mode: 'anthropic-api' as const, model: 'claude-opus-5-5' },
+  };
+  const openai = vi.fn(async () => 'openai-key');
+  const codex = { provider: vi.fn() };
+  expect(await resolveConfiguredAI(claude, openai, codex, async () => null)).toBeNull();
+  const ai = await resolveConfiguredAI(claude, openai, codex, async () => 'test-anthropic-key');
+  expect(ai?.id).toBe('anthropic');
+  expect(openai).not.toHaveBeenCalled();
+  expect(isValidRuntime(claude.aiRuntime)).toBe(true);
+  expect(isValidRuntime({ ...claude.aiRuntime, model: 'gpt-6-luna' })).toBe(false);
+});

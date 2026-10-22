@@ -11,6 +11,7 @@ export type SearchDestination = {
   helpId?: string;
   adviceMode?: AdviceMode;
   adviceId?: string;
+  adviceView?: 'results';
   task?: SearchTask;
 };
 export type SearchItem = {

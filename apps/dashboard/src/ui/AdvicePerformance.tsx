@@ -7,7 +7,7 @@ const interval = (x: unknown) =>
   x === undefined || (Array.isArray(x) && x.length === 2 && x.every(numeric) && x[0] <= x[1]);
 const warnings = (x: unknown) =>
   Array.isArray(x) && x.length <= 20 && x.every((w) => shortText(w, 3000));
-function validPerformance(x: unknown): x is PredictionPerformance {
+export function validPerformance(x: unknown): x is PredictionPerformance {
   const paper = record(x) && record(x.paper) ? x.paper : null;
   return (
     record(x) &&
@@ -320,6 +320,7 @@ export function AdvicePerformance({ disabled = false }: { disabled?: boolean }) 
             {report.paper.roiInterval &&
               ` Weekly-cluster interval: ${number(report.paper.roiInterval[0] * 100)}% to ${number(report.paper.roiInterval[1] * 100)}%.`}
           </p>
+          <PaperTracking paper={report.paper} />
           {report.warnings.map((w) => (
             <p key={w}>{w}</p>
           ))}
@@ -440,5 +441,63 @@ export function AdvicePerformance({ disabled = false }: { disabled?: boolean }) 
         </section>
       )}
     </details>
+  );
+}
+
+/**
+ * Closing line value and a running week-by-week paper result. Beating the closing price is the
+ * earliest dependable sign of an edge; wins and losses take far longer to mean anything.
+ */
+function PaperTracking({ paper }: { paper: PredictionPerformance['paper'] }) {
+  const clv = paper.closingLineValue;
+  const weeks = Array.isArray(paper.byWeek) ? paper.byWeek.slice(-18) : [];
+  let running = 0;
+  return (
+    <section className="paper-tracking" aria-label="Closing line value and running results">
+      <h4>Closing line value</h4>
+      {clv ? (
+        <p>
+          Across {clv.samples} selections with a comparable closing price, the price taken was{' '}
+          <strong>
+            {clv.average >= 0 ? 'better' : 'worse'} than the close by{' '}
+            {number(Math.abs(clv.average) * 100)} percentage points
+          </strong>{' '}
+          on average. {clv.beatClose} of {clv.samples} beat the closing price.
+        </p>
+      ) : (
+        <p>
+          The app records each selection’s closing price shortly before kickoff while it’s running.
+          Results appear here once a game with a saved price has started.
+        </p>
+      )}
+      {weeks.length > 0 && (
+        <>
+          <h4>Running paper result</h4>
+          <table className="paper-weeks">
+            <thead>
+              <tr>
+                <th scope="col">Week</th>
+                <th scope="col">Net units</th>
+                <th scope="col">Running total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weeks.map((w) => {
+                running += w.netUnits;
+                return (
+                  <tr key={`${w.season}-${w.week}`}>
+                    <th scope="row">
+                      {w.season} week {w.week}
+                    </th>
+                    <td>{number(w.netUnits)}</td>
+                    <td className={running >= 0 ? 'positive' : 'negative'}>{number(running)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </>
+      )}
+    </section>
   );
 }

@@ -93,6 +93,7 @@ export {
   parseSportsbookQuotes,
   parseFinalFootballResult,
 } from './sportsbook-lines.js';
+export { PublicPropLines, type PropLinesSnapshot, type BookLinesSnapshot } from './prop-lines.js';
 export {
   buildPregameAvailability,
   parseQuarterbackObservations,
@@ -130,3 +131,4 @@ export { PublicPredictionMarketData } from './prediction-market-data.js';
 
 export { normalizeEspnLeague } from './platforms/espn.js';
 export { espnSnapshotWeeklyProjections } from './espn-snapshot-projections.js';
+export { AnthropicProvider, defaultClaudeModel } from './anthropic-ai.js';

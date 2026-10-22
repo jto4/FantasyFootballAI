@@ -58,6 +58,11 @@ const freshAt = (date: string | undefined, asOf: number, hours: number) => {
 };
 
 /** Select current attributed media evidence; never manufacture an overall public sentiment score. */
+/** Full NFL team name for an abbreviation, as other feeds (for example The Odds API) spell it. */
+export function nflTeamFullName(team: string): string | undefined {
+  return teamNames[nflTeamKey(team)];
+}
+
 export function buildAdvicePerception(
   snapshot: { items: NewsItem[]; stale: boolean; refreshedAt?: string; error?: string } | undefined,
   players: PlayerAdviceEvidence[],

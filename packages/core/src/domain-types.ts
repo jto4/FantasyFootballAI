@@ -297,7 +297,7 @@ export interface AppSettings {
   /** Additional retries for transient scheduled league refresh failures; defaults to off. */
   scheduledSyncRetries?: 0 | 1 | 2 | 3;
   aiRuntime?: {
-    mode: 'api' | 'cli' | 'apple-cli' | 'codex-cli';
+    mode: 'api' | 'anthropic-api' | 'cli' | 'apple-cli' | 'codex-cli';
     model: string;
     command: string;
     args: string;

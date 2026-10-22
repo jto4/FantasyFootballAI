@@ -4,6 +4,7 @@ import {
   settlePredictionRecord,
   predictionPerformance,
   capturePredictionRecords,
+  recordClosingPrice,
   type PredictionRecord,
 } from './prediction-records.js';
 import { isAdviceOptions } from './advice-contracts.js';
@@ -229,4 +230,31 @@ it('accepts the actual three saved/Claude/Codex connection choices without accep
       connections: [...choices, choices[0]],
     }),
   ).toBe(false);
+});
+
+it('records the closing price before kickoff and reports closing line value only for the same line', () => {
+  const before = '2026-10-12T23:50:00.000Z';
+  // The book moved to -130 at the same line: the -110 taken beat the close.
+  const closed = recordClosingPrice(
+    record,
+    [{ ...quote, americanOdds: -130, oppositeAmericanOdds: 110, observedAt: before }],
+    before,
+  );
+  expect(closed.closing).toMatchObject({ americanOdds: -130, oppositeAmericanOdds: 110, line: -3 });
+  expect(closed.closing!.clv).toBeGreaterThan(0);
+  expect(isPredictionRecord(closed)).toBe(true);
+  // A moved line is recorded, but its value is not comparable.
+  const moved = recordClosingPrice(record, [{ ...quote, line: -4.5 }], before);
+  expect(moved.closing!.line).toBe(-4.5);
+  expect(moved.closing!.clv).toBeUndefined();
+  // Other books, settled records and forged closing values are ignored or rejected.
+  expect(recordClosingPrice(record, [{ ...quote, providerId: '200' }], before)).toBe(record);
+  expect(
+    recordClosingPrice({ ...record, status: 'settled' }, [quote], before).closing,
+  ).toBeUndefined();
+  expect(isPredictionRecord({ ...closed, closing: { ...closed.closing!, clv: 3 } })).toBe(false);
+  expect(isPredictionRecord({ ...closed, closing: { ...closed.closing!, extra: 1 } })).toBe(false);
+  const performance = predictionPerformance([settlePredictionRecord(closed, data, [final], end)]);
+  expect(performance.paper.closingLineValue).toMatchObject({ samples: 1, beatClose: 1 });
+  expect(performance.paper.byWeek).toEqual([{ season: 2026, week: 5, netUnits: 100 / 110 }]);
 });

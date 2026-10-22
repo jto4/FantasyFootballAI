@@ -830,6 +830,9 @@ export function App() {
         helpId: destination.helpId ?? '',
         adviceMode: destination.adviceMode ?? 'lineup',
         adviceId: destination.adviceId ?? '',
+        ...(destination.adviceView
+          ? { adviceView: destination.adviceView }
+          : { adviceView: undefined }),
       },
       false,
       check && !reviewedDiscard,
@@ -976,7 +979,8 @@ export function App() {
           ) : section === 'Advice' ? (
             <Suspense fallback={<LoadingStatus message="Opening advice…" />}>
               <AdvicePage
-                key={`${activeLeagueId}:${route.adviceMode ?? 'lineup'}:${route.adviceId ?? ''}`}
+                key={`${activeLeagueId}:${route.adviceMode ?? 'lineup'}:${route.adviceId ?? ''}:${route.adviceView ?? ''}`}
+                initialView={route.adviceView === 'results' ? 'research' : 'decision'}
                 leagues={state.leagues}
                 leagueId={activeLeagueId}
                 preferredTeamId={homeTeamId}
@@ -1168,6 +1172,9 @@ export function App() {
                     }
                     onAdvice={(mode) =>
                       searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
+                    }
+                    onResults={() =>
+                      searchNavigate({ section: 'Advice', adviceId: '', adviceView: 'results' })
                     }
                     onRefresh={() => {
                       if (league) void refreshLeague(league.id);

@@ -8,6 +8,7 @@ import {
   type FinalFootballResult,
 } from './sportsbook-types.js';
 import { americanOdds, nflTeamKey, playerNameKey, scoreHistoricalGame } from './advice-math.js';
+import { closingLineValue } from './prop-lines.js';
 export const maximumPredictionRecords = 2000;
 export const maximumPredictionBytes = 8000000;
 type TargetGame = Pick<
@@ -52,6 +53,18 @@ export interface PredictionRecord {
   actual?: number;
   profitUnits?: number;
   settledAt?: string;
+  /**
+   * Last pregame price at the same book and side, captured shortly before kickoff. `clv` is the
+   * no-vig closing probability minus the probability implied by the price taken; it is present
+   * only when the line itself did not move, so the two prices describe the same bet.
+   */
+  closing?: {
+    observedAt: string;
+    americanOdds: number;
+    oppositeAmericanOdds: number;
+    line?: number;
+    clv?: number;
+  };
 }
 const obj = (x: unknown): x is Record<string, unknown> =>
   !!x && typeof x === 'object' && !Array.isArray(x);
@@ -135,6 +148,7 @@ export function isPredictionRecord(x: unknown): x is PredictionRecord {
           'actual',
           'profitUnits',
           'settledAt',
+          'closing',
         ].includes(k),
     ) ||
     !text(x.id, 256) ||
@@ -223,6 +237,24 @@ export function isPredictionRecord(x: unknown): x is PredictionRecord {
           300000)
     )
       return false;
+    if (x.closing !== undefined) {
+      const c = x.closing;
+      if (
+        !obj(c) ||
+        Object.keys(c).some(
+          (k) => !['observedAt', 'americanOdds', 'oppositeAmericanOdds', 'line', 'clv'].includes(k),
+        ) ||
+        !x.quote ||
+        !date(c.observedAt) ||
+        Date.parse(String(c.observedAt)) < Date.parse((x.quote as SportsbookQuote).observedAt) ||
+        ![c.americanOdds, c.oppositeAmericanOdds].every(
+          (o) => Number.isInteger(o) && Math.abs(Number(o)) >= 100 && Math.abs(Number(o)) <= 100000,
+        ) ||
+        (c.line !== undefined && !finite(c.line)) ||
+        (c.clv !== undefined && (!finite(c.clv) || Math.abs(Number(c.clv)) > 1))
+      )
+        return false;
+    }
     if (x.status === 'settled') {
       if (![-1, 0, 1].includes(Number(x.actual))) return false;
       const profit =
@@ -238,6 +270,7 @@ export function isPredictionRecord(x: unknown): x is PredictionRecord {
   const p = x.player;
   return (
     x.terms === undefined &&
+    x.closing === undefined &&
     x.quote === undefined &&
     x.selected === false &&
     x.profitUnits === undefined &&
@@ -550,6 +583,10 @@ export interface PredictionPerformance {
     roi?: number;
     weeks: number;
     roiInterval?: [number, number];
+    /** Average closing line value of paper selections with a comparable closing price. */
+    closingLineValue?: { samples: number; average: number; beatClose: number };
+    /** Net units per settled week, in order, for a running profit-and-loss view. */
+    byWeek: { season: number; week: number; netUnits: number }[];
   };
   warnings: string[];
 }
@@ -634,6 +671,13 @@ export function predictionPerformance(records: PredictionRecord[]): PredictionPe
     weeks.set(key, g);
   }
   const roi = closed.length ? net / closed.length : undefined;
+  const withClv = [...selected.values()].filter((r) => r.closing?.clv !== undefined);
+  const byWeek = [...weeks.entries()]
+    .map(([key, g]) => {
+      const [season, week] = key.split(':').map(Number);
+      return { season: season!, week: week!, netUnits: g.profit };
+    })
+    .sort((a, b) => a.season - b.season || a.week - b.week);
   const se =
     roi !== undefined && weeks.size >= 8
       ? Math.sqrt(
@@ -659,6 +703,16 @@ export function predictionPerformance(records: PredictionRecord[]): PredictionPe
       ...(se === undefined || roi === undefined
         ? {}
         : { roiInterval: [roi - 1.96 * se, roi + 1.96 * se] as [number, number] }),
+      ...(withClv.length
+        ? {
+            closingLineValue: {
+              samples: withClv.length,
+              average: withClv.reduce((s, r) => s + r.closing!.clv!, 0) / withClv.length,
+              beatClose: withClv.filter((r) => r.closing!.clv! > 0).length,
+            },
+          }
+        : {}),
+      byWeek,
     },
     warnings: [
       'Local forward-recorded predictions and hypothetical one-unit paper selections; not actual wagers or realized money.',
@@ -666,5 +720,40 @@ export function predictionPerformance(records: PredictionRecord[]): PredictionPe
       'Paper returns use only fetched verified prices and actionable saved choices, at most one selection per game/market. Fees, taxes, fill availability and price slippage are not modeled.',
       'Positive results in this sample do not establish future profitability. Weekly-cluster intervals need at least eight settled weeks.',
     ],
+  };
+}
+
+/**
+ * Records the latest pregame price for a bet record's book and side. Called repeatedly before
+ * kickoff; the last call before the game starts becomes the closing price.
+ */
+export function recordClosingPrice(
+  record: PredictionRecord,
+  quotes: SportsbookQuote[],
+  observedAt: string,
+): PredictionRecord {
+  const taken = record.quote;
+  if (record.kind !== 'bet' || !taken || record.status !== 'pending') return record;
+  const match = quotes.find(
+    (q) => q.providerId === taken.providerId && q.kind === taken.kind && q.side === taken.side,
+  );
+  if (!match || Date.parse(observedAt) < Date.parse(taken.observedAt)) return record;
+  const sameLine = match.line === taken.line;
+  return {
+    ...record,
+    closing: {
+      observedAt,
+      americanOdds: match.americanOdds,
+      oppositeAmericanOdds: match.oppositeAmericanOdds,
+      ...(match.line !== undefined ? { line: match.line } : {}),
+      ...(sameLine
+        ? {
+            clv: closingLineValue(taken.americanOdds, {
+              odds: match.americanOdds,
+              oppositeOdds: match.oppositeAmericanOdds,
+            }),
+          }
+        : {}),
+    },
   };
 }

@@ -26,7 +26,7 @@ export const helpArticles = [
     aliases:
       'live sportsbook betting lines odds DraftKings ESPN spread moneyline total refresh prices fetch',
     answer:
-      'In Advice, choose Analyze a bet, an upcoming NFL game and Moneyline, Spread or Total. Click Fetch sportsbook prices, then Use this price for the displayed sportsbook. Sidekick fills both sides’ odds and the selected handicap or total. These public ESPN snapshots need no new key and may have limited sportsbook coverage. Retrieval time is shown; prices can change. Refresh if a selection expires. Analysis checks it again before and after generation. Changing a number makes it a manual price. Player props still use manual entry. Fetching never places a bet.',
+      'In Advice, choose Analyze a bet, an upcoming NFL game and Moneyline, Spread or Total. Click Fetch sportsbook prices, then Use this price for the displayed sportsbook. Sidekick fills both sides’ odds and the selected handicap or total. These public ESPN snapshots need no new key and may have limited sportsbook coverage. Retrieval time is shown; prices can change. Refresh if a selection expires. Analysis checks it again before and after generation. Changing a number makes it a manual price. For player props, pick a published line from the list after choosing the game: ESPN lists lines without prices, and an optional The Odds API key in Credentials adds prices and other sportsbooks. Fetching never places a bet.',
     action: { label: 'Analyze a bet', section: 'Advice', adviceMode: 'betting' },
   },
   {
@@ -145,7 +145,7 @@ export const helpArticles = [
     aliases:
       'confidence probability accuracy odds evidence quality uncertainty forecast betting historical rate',
     answer:
-      'No. Evidence confidence measures coverage, freshness, samples, source independence and the decision margin. It is not your chance of winning. Historical hit rates describe prior samples. The rolling statistical betting forecast separately tests predictions on later games and compares probability errors with the sportsbook baseline when paired prices and enough history are available. Legacy scores-only and player-prop fallbacks have separate limits. Its band describes earlier similar estimates; it does not guarantee this game or prove betting profit. The separately labeled AI forecast is an uncalibrated judgment. Missing projections, unsupported scoring, ambiguous players and uncertain injury data can prevent a reliable recommendation. Check the supporting numbers and data gaps before acting.',
+      'No. Evidence confidence measures coverage, freshness, samples, source independence and the decision margin. It is not your chance of winning. Historical hit rates describe prior samples. The rolling statistical betting forecast separately tests predictions on later games and compares probability errors with the sportsbook baseline when paired prices and enough history are available. Legacy scores-only and player-prop fallbacks have separate limits. Its band describes earlier similar estimates; it does not guarantee this game or prove betting profit. The AI’s own win-probability guess is uncalibrated, so it is kept for research and not shown. Missing projections, unsupported scoring, ambiguous players and uncertain injury data can prevent a reliable recommendation. Check the supporting numbers and data gaps before acting.',
     action: { label: 'Open Advice', section: 'Advice' },
   },
   {

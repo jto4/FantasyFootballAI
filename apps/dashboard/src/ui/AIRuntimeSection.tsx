@@ -37,6 +37,10 @@ export function AIRuntimeSection({
       onChange('command', '');
       onChange('args', '');
     }
+    // Model names belong to one provider; switching providers starts from that one's default.
+    if (mode === 'anthropic-api' && !runtime.model.startsWith('claude-'))
+      onChange('model', 'claude-opus-5-5');
+    if (mode === 'api' && runtime.model.startsWith('claude-')) onChange('model', 'gpt-6-luna');
     onChange('mode', mode);
   }
   return (
@@ -83,6 +87,7 @@ export function AIRuntimeSection({
                     onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
                   >
                     <option value="api">AI service (OpenAI or compatible)</option>
+                    <option value="anthropic-api">Claude API (Anthropic)</option>
                     <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                     <option value="cli">Local AI tool (advanced)</option>
                     <option value="apple-cli" disabled={!appleCliPlatform}>
@@ -189,6 +194,7 @@ export function AIRuntimeSection({
                 onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
               >
                 <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="anthropic-api">Claude API (Anthropic)</option>
                 <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                 <option value="cli">Local AI tool (advanced)</option>
                 <option value="apple-cli" disabled={!appleCliPlatform}>
@@ -227,6 +233,7 @@ export function AIRuntimeSection({
                 onChange={(event) => changeMode(event.target.value as AIRuntime['mode'])}
               >
                 <option value="api">AI service (OpenAI or compatible)</option>
+                <option value="anthropic-api">Claude API (Anthropic)</option>
                 <option value="codex-cli">Codex account · GPT-6.1-Sol</option>
                 <option value="cli">Local AI tool (advanced)</option>
                 <option value="apple-cli" disabled={!appleCliPlatform}>
@@ -234,7 +241,31 @@ export function AIRuntimeSection({
                 </option>
               </select>
             </label>
-            {runtime.mode === 'codex-cli' ? (
+            {runtime.mode === 'anthropic-api' ? (
+              <>
+                <label>
+                  MODEL
+                  <select
+                    data-search-target="ai-model"
+                    value={runtime.model}
+                    onChange={(event) => onChange('model', event.target.value)}
+                  >
+                    <option value="claude-opus-5-5">Claude Opus 5.5 (recommended)</option>
+                    <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (lower cost)</option>
+                    <option value="claude-haiku-5-5">Claude Haiku 5.5 (lowest cost)</option>
+                  </select>
+                </label>
+                <p className="schedule-explainer wide">
+                  {apiKeyConfigured === true
+                    ? 'Uses the Anthropic API key saved in Credentials. '
+                    : 'Add an Anthropic API key in Credentials, then test. '}
+                  League data in each report or analysis is sent to Anthropic.{' '}
+                  <button type="button" className="text-button" onClick={onOpenCredentials}>
+                    Manage API credentials →
+                  </button>
+                </p>
+              </>
+            ) : runtime.mode === 'codex-cli' ? (
               <p className="schedule-explainer">
                 Uses your existing Codex ChatGPT sign-in with GPT-6.1-Sol and high reasoning for
                 reports and advice. No API key is needed. Account limits apply. Only supplied

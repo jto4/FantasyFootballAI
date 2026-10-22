@@ -174,6 +174,9 @@ dedicated documents. Update `docs/decisions.md` when a durable architectural cho
   deterministic evaluation and price support; AI wording cannot bypass the gate.
   A current entered threshold used on historical games is not a historical price
   or a profit backtest. Keep real model/prospective betting quality unproven until evaluated.
+- Prefer measurable betting tools (published lines, margin-free prices, closing line value)
+  over new forecast versions; versions v1–v18 did not beat the books. Show no AI win
+  probability and offer no stake sizing without a demonstrated edge.
 - Anchor advice evidence time after news/injury refreshes finish; request-start time
   must not cause genuinely fresh provider retrievals to be labeled future/stale.
 - Advice quality evaluation must grade the raw reviewed model answer as well as the

@@ -382,3 +382,17 @@ Options, smallest first:
 
 Recommendation: keep option 1 now and decide on option 2 only with that threat model written
 and reviewed. Do not add any non-loopback listener until then.
+
+## Price checking over new betting models (October 22, 2026)
+
+Eighteen forecast versions were evaluated against sportsbook prices; none beat the books
+consistently (see `docs/advice.md` and `docs/reviews/`). New model versions are paused until a
+data source the books don't already price is available. Betting work now favors tools that are
+measurable today: published prop lines, other books' prices with the margin removed, a
+closing-price record for each saved selection (closing line value), weekly running paper results
+and a self-set weekly bet limit. The AI's own win probability stays in research records but is
+not shown in results; no stake sizing is offered because no edge has been shown.
+
+Advice keeps its two-pass flow (answer, then review). Skipping the review for Hold answers was
+tried and reverted: the evaluation suite grades the raw reviewed answer separately, and the
+review is part of that safety design. Cost is controlled by model choice instead.

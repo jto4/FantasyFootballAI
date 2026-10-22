@@ -11,6 +11,10 @@ import { createGenerationQueue, createGenerationRouter } from './generation-jobs
 import { storageStartupFailure } from './storage-startup.js';
 import { createReportRouter } from './report-routes.js';
 import { createScheduledRunRetryRouter } from './scheduled-run-retry-routes.js';
+import {
+  createPredictionPerformanceService,
+  startPredictionTracking,
+} from './prediction-performance.js';
 import { startLeagueAutoRefresh } from './league-auto-refresh.js';
 import { createSettingsRouter } from './settings-routes.js';
 import { createDeliveryService } from './delivery-service.js';
@@ -44,6 +48,7 @@ import {
   NFLInjuryReportCache,
   PublicFootballData,
   PublicSportsbookLines,
+  PublicPropLines,
   PublicPregameEvidence,
   SignedInClaudeConnection,
   SignedInCodexConnection,
@@ -132,6 +137,10 @@ const footballNewsCache = new FootballNewsCache();
 const nflInjuryReportCache = new NFLInjuryReportCache();
 const publicFootballData = new PublicFootballData();
 const publicSportsbookLines = new PublicSportsbookLines();
+// Prop lines come from ESPN without a key; a saved Odds API key adds prices and other books.
+const publicPropLines = new PublicPropLines(
+  async () => (await readCredential('odds-api')) ?? undefined,
+);
 const publicPregameEvidence = new PublicPregameEvidence();
 let footballNewsRefreshTimer: NodeJS.Timeout | undefined;
 let conversationRetentionTimer: NodeJS.Timeout | undefined;
@@ -463,6 +472,7 @@ app.use(
     },
     data: publicFootballData,
     odds: publicSportsbookLines,
+    props: publicPropLines,
     pregame: publicPregameEvidence,
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,
@@ -526,7 +536,12 @@ app.use(
   }),
 );
 async function configuredAI(settings: ReturnType<LocalStore['snapshot']>['settings']) {
-  return resolveConfiguredAI(settings, () => readCredential('openai'));
+  return resolveConfiguredAI(
+    settings,
+    () => readCredential('openai'),
+    undefined,
+    () => readCredential('anthropic'),
+  );
 }
 
 function yahooRedirectUri(): string {
@@ -959,6 +974,19 @@ const leagueAutoRefresh = startLeagueAutoRefresh({
     await saveSyncedLeague(store, fetched);
   },
 });
+// Closing prices and settled results update in the background, not only on manual Refresh.
+const predictionTracking = startPredictionTracking(
+  createPredictionPerformanceService({
+    store,
+    data: publicFootballData,
+    odds: publicSportsbookLines,
+  }),
+  (error) =>
+    logEvent('warn', 'prediction.tracking.failed', {
+      component: 'advice',
+      errorName: errorName(error),
+    }),
+);
 stopApplication = createShutdownAction(
   server,
   [
@@ -980,6 +1008,7 @@ stopApplication = createShutdownAction(
     blueBubblesAutoSyncTask,
     twilioConversationAutoSyncTask,
     leagueAutoRefresh,
+    predictionTracking,
   ],
   () => logEvent('info', 'api.stopping', { component: 'api', reason: 'shutdown_requested' }),
 );

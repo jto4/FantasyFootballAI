@@ -65,6 +65,44 @@ export function createAdviceRouter(
       });
     }
   });
+  // Player-prop lines and other books' prices for one upcoming game. Same validation as odds.
+  for (const [path, read] of [
+    ['/api/advice/props', 'props'],
+    ['/api/advice/books', 'books'],
+  ] as const)
+    router.get(path, async (req, res) => {
+      const date = new Date((deps.now ?? Date.now)());
+      const season =
+        req.query.season === undefined
+          ? date.getUTCFullYear() - (date.getUTCMonth() < 2 ? 1 : 0)
+          : Number(req.query.season);
+      if (
+        Object.keys(req.query).some((k) => !['game', 'season'].includes(k)) ||
+        typeof req.query.game !== 'string' ||
+        (req.query.season !== undefined && typeof req.query.season !== 'string') ||
+        req.query.game.length > 80 ||
+        !Number.isInteger(season) ||
+        season < 2010 ||
+        season > 2099
+      )
+        return res.status(400).json({ error: 'Choose a valid NFL game and season.' });
+      try {
+        const data = await deps.data.get(season);
+        const games = data.games.filter((g) => g.id === req.query.game);
+        if (games.length !== 1)
+          return res.status(404).json({ error: 'The selected NFL game could not be verified.' });
+        if (!deps.props)
+          return res.json({
+            gameId: games[0]!.id,
+            lines: [],
+            ...(read === 'props' ? { priced: false } : {}),
+            warnings: ['Published lines are unavailable right now.'],
+          });
+        res.json(await deps.props[read](games[0]!));
+      } catch {
+        res.status(502).json({ error: 'Published lines could not be loaded. Try again shortly.' });
+      }
+    });
   router.get('/api/advice/protocol', async (_req, res) => {
     const protocol = await freezeForecastProtocol(
       'market-context-v3',

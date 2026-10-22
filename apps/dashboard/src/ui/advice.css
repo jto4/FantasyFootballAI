@@ -524,3 +524,143 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Published player props: search, then pick Over or Under to fill the bet. */
+.published-props {
+  margin: 12px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.published-props h3,
+.prop-manual-heading {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.prop-manual-heading {
+  margin-top: 16px;
+}
+.published-props-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+.published-props-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin: 8px 0;
+}
+.published-props-filters label {
+  display: grid;
+  gap: 4px;
+}
+.published-props-table {
+  max-height: 360px;
+  overflow: auto;
+}
+.published-props table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.published-props th,
+.published-props td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.published-props thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+}
+.published-props-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.prop-price-hint {
+  color: var(--warning);
+}
+.book-comparison {
+  margin-top: 12px;
+}
+.book-comparison h4 {
+  margin: 0 0 6px;
+}
+.book-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.book-comparison th,
+.book-comparison td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.best-price {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--success-bg);
+  color: var(--green);
+  font-size: 12px;
+}
+.book-comparison-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+.paper-weeks {
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.paper-weeks th,
+.paper-weeks td {
+  padding: 4px 14px 4px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.paper-weeks .positive {
+  color: var(--green);
+}
+.paper-weeks .negative {
+  color: var(--pink);
+}
+
+.bet-limit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.bet-limit p {
+  margin: 0;
+}
+.bet-limit.over {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.bet-limit-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+}
+.bet-limit-form label {
+  display: grid;
+  gap: 4px;
+}
+.bet-limit-form input {
+  width: 90px;
+}

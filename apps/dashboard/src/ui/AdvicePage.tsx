@@ -27,6 +27,7 @@ import { formatDateTime } from './date-format';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
 import { BetFields } from './BetFields';
+import { BetLimit } from './BetLimit';
 import { PlayerPicker } from './PlayerPicker';
 import { AdvicePerformance } from './AdvicePerformance';
 import { AdviceJournal } from './AdviceJournal';
@@ -45,7 +46,9 @@ export function AdvicePage({
   onTeamSelect,
   onNavigate,
   onDirtyChange,
+  initialView = 'decision',
 }: {
+  initialView?: 'decision' | 'research';
   leagues: LeagueConnection[];
   leagueId: string;
   mode?: AdviceMode;
@@ -60,7 +63,7 @@ export function AdvicePage({
   const [tradeTeamId, setTradeTeamId] = useState(league?.teams[1]?.id ?? '');
   const [week, setWeek] = useState('');
   const [tradeThroughWeek, setTradeThroughWeek] = useState('18');
-  const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>('decision');
+  const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>(initialView);
   const [historyLimit, setHistoryLimit] = useState(5);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [dropPlayerId, setDropPlayerId] = useState('');
@@ -736,6 +739,7 @@ export function AdvicePage({
                 />
               </>
             )}
+            {betting && <BetLimit history={history} />}
             {betting && (
               <BetFields
                 options={options}

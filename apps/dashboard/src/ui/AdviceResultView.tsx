@@ -252,25 +252,6 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
       </details>
       <details className="result-disclosure result-numbers">
         <summary>Numbers & comparisons</summary>
-        {result.assessment.forecast && (
-          <section className="advice-forecast" aria-label="AI betting forecast">
-            <h3>AI forecast · uncalibrated</h3>
-            <p>
-              <strong>{number(result.assessment.forecast.probability * 100)}%</strong> model
-              judgment; range {number(result.assessment.forecast.lower * 100)}–
-              {number(result.assessment.forecast.upper * 100)}%.
-            </p>
-            <p>
-              This is not a measured win rate or a proven betting edge. Historical frequencies below
-              describe past samples.
-            </p>
-            <Statement
-              statement={result.assessment.forecast.rationale}
-              metrics={metrics}
-              sources={sources}
-            />
-          </section>
-        )}
         {result.betHistory?.forecast && (
           <section
             className="advice-forecast"
@@ -374,7 +355,12 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           />
         )}
         <h3>Supporting numbers</h3>
-        <MetricTable metrics={result.metrics} sources={sources} />
+        {/* The AI's own win probability is kept for research records but not shown: it is
+            uncalibrated and a percentage reads as more certain than the evidence supports. */}
+        <MetricTable
+          metrics={result.metrics.filter((m) => !m.id.startsWith('bet-model-'))}
+          sources={sources}
+        />
         {!result.metrics.length && (
           <p>
             No complete decision-level estimate is available. Check the player evidence and

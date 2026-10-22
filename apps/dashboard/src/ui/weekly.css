@@ -302,3 +302,43 @@ p.weekly-answer {
   color: var(--muted);
   font-size: 12px;
 }
+
+/* Home scorecard: projection error by source and how graded decisions turned out. */
+.advice-scorecard {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.advice-scorecard-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.advice-scorecard h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.advice-scorecard h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.advice-scorecard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.advice-scorecard ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.scorecard-best {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--success-bg);
+  color: var(--green);
+  font-size: 12px;
+}

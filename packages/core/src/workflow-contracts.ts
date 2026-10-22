@@ -331,7 +331,11 @@ export function isAppSettings(value: unknown): value is AppSettings {
   if (
     value.aiRuntime !== undefined &&
     (!record(value.aiRuntime) ||
-      !['api', 'cli', 'apple-cli', 'codex-cli'].includes(String(value.aiRuntime.mode)) ||
+      !['api', 'anthropic-api', 'cli', 'apple-cli', 'codex-cli'].includes(
+        String(value.aiRuntime.mode),
+      ) ||
+      (value.aiRuntime.mode === 'anthropic-api' &&
+        !/^claude-[a-z0-9-]{1,60}$/.test(String(value.aiRuntime.model))) ||
       (value.aiRuntime.mode === 'codex-cli' &&
         (value.aiRuntime.model !== 'gpt-6.1-sol' ||
           value.aiRuntime.command !== '' ||

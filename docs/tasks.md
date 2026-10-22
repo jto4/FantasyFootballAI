@@ -292,4 +292,11 @@ Completed work and its evidence live in the archived task records and dated revi
 ### Market Signals and player props — October 15, 2026
 
 - [ ] Gather independent multi-week/season prospective outcomes before considering promotion. Owner: model research; no current sportsbook-edge claim.
-- [ ] Optional future work: connect a licensed exact-identity/two-sided prop-price provider. Current prop prices remain manual; no subscription or API key was purchased/provisioned.
+- [x] Published prop lines fill the prop form (ESPN lines without a key; two-sided prices and other books with an optional Odds API key). No key was purchased or provisioned during implementation; the Odds API path is verified with fixtures only.
+
+### Betting price tools, scorecard and Claude API — October 22, 2026
+
+- [ ] Owner: optionally add an Odds API key and confirm live prop prices and book comparison for a real game; implementation was verified against ESPN live data and Odds API fixtures only.
+- [ ] Owner: optionally add an Anthropic API key and run Settings → Test connection; the Claude provider is covered by unit tests, not a live call.
+- [ ] Collect a season of graded projections before letting measured accuracy reorder projection sources; the Home scorecard reports accuracy but does not change source order.
+- [ ] New betting model versions are paused until a source the books don't already price is available (see `decisions.md`).

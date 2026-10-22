@@ -450,10 +450,9 @@ for (const kind of ['spread', 'total', 'moneyline', 'player-prop'])
       const result = page.getByRole('article', { name: 'Advice result' });
       await expect(result).toBeVisible();
       await openNumbers(result);
-      await expect(result.getByRole('region', { name: 'AI betting forecast' })).toContainText(
-        '60%',
-      );
-      await expect(result).toContainText('Uncalibrated AI judgment');
+      // The AI's own uncalibrated win probability is recorded but not shown.
+      await expect(result.getByRole('region', { name: 'AI betting forecast' })).toHaveCount(0);
+      await expect(result).not.toContainText('AI judgment: win probability');
       await expect(result).toContainText('Break-even');
       const saved = workspace.store.snapshot().adviceResults![0]!;
       expect(saved.request.bet?.americanOdds).toBe(-110);
@@ -503,9 +502,7 @@ test('rolling statistical forecast stays separate from AI judgment and persists 
     await expect(forecast).toContainText('Evaluated chronologically');
     await expect(forecast).toContainText('separate from the AI');
     await expect(forecast.getByRole('status')).toContainText('does not support placing a bet');
-    await expect(result.getByRole('region', { name: 'AI betting forecast' })).toContainText(
-      'uncalibrated',
-    );
+    await expect(result.getByRole('region', { name: 'AI betting forecast' })).toHaveCount(0);
     await forecast.getByRole('heading').scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath('rolling-bet-forecast.png') });
     const saved = workspace.store.snapshot().adviceResults![0]!;

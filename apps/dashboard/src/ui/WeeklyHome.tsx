@@ -1,5 +1,6 @@
 import { platformName } from './platform-name';
 import { useEffect, useState } from 'react';
+import { AdviceScorecard } from './AdviceScorecard';
 import { requestJson } from './api-client';
 import {
   leagueSyncFreshness,
@@ -19,6 +20,7 @@ export function WeeklyHome({
   onRefresh,
   onSetup,
   onSavedAdvice,
+  onResults,
 }: {
   league: LeagueConnection | undefined;
   settings: AppSettings;
@@ -28,6 +30,7 @@ export function WeeklyHome({
   onRefresh: () => void;
   onSetup: () => void;
   onSavedAdvice: (id: string, mode: AdviceMode) => void;
+  onResults?: () => void;
 }) {
   const [decisions, setDecisions] = useState<
     { id: string; mode: AdviceMode; headline: string; createdAt: string }[]
@@ -246,6 +249,7 @@ export function WeeklyHome({
                   <p>No saved decisions this week.</p>
                 )}
               </section>
+              {onResults && <AdviceScorecard onOpen={onResults} />}
             </>
           )}
         </>

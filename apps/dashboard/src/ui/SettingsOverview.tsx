@@ -52,17 +52,24 @@ export function SettingsOverview({
     },
     {
       label: 'AI writer',
-      ok: runtime !== 'api' || configured('openai'),
+      ok:
+        runtime === 'anthropic-api'
+          ? configured('anthropic')
+          : runtime !== 'api' || configured('openai'),
       detail:
-        runtime === 'codex-cli'
-          ? 'Signed-in Codex'
-          : runtime === 'cli'
-            ? 'Local command-line tool'
-            : runtime === 'apple-cli'
-              ? 'Apple Foundation Models'
-              : configured('openai')
-                ? `API · ${settings.aiRuntime?.model ?? 'model not set'}`
-                : 'API key needed',
+        runtime === 'anthropic-api'
+          ? configured('anthropic')
+            ? `Claude API · ${settings.aiRuntime?.model ?? ''}`
+            : 'Anthropic API key needed'
+          : runtime === 'codex-cli'
+            ? 'Signed-in Codex'
+            : runtime === 'cli'
+              ? 'Local command-line tool'
+              : runtime === 'apple-cli'
+                ? 'Apple Foundation Models'
+                : configured('openai')
+                  ? `API · ${settings.aiRuntime?.model ?? 'model not set'}`
+                  : 'API key needed',
       target: 'ai',
     },
     {

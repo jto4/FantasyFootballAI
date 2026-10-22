@@ -123,6 +123,7 @@ export {
   type PlayerEvidenceInput,
 } from './player-evidence.js';
 export * from './sportsbook-types.js';
+export * from './prop-lines.js';
 export { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
 export {
   validateExternalTotalTape,

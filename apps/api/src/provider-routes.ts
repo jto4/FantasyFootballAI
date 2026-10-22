@@ -145,7 +145,9 @@ export function createProviderRouter(dependencies: ProviderRouteDependencies): R
               ? 'Apple Foundation Models CLI requires macOS 27 or later with the fm command available.'
               : settings.aiRuntime?.mode === 'cli'
                 ? 'Set an installed AI CLI command in Settings.'
-                : 'Save an AI API key in Settings before testing the runtime.',
+                : settings.aiRuntime?.mode === 'anthropic-api'
+                  ? 'Save an Anthropic API key in Credentials before testing the runtime.'
+                  : 'Save an AI API key in Settings before testing the runtime.',
         });
       }
       await ai.generate({

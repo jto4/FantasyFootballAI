@@ -1,12 +1,15 @@
 import {
   predictionPerformance,
+  recordClosingPrice,
   settlePredictionRecord,
   type FootballDataSnapshot,
   type FinalFootballResult,
   type FootballGame,
 } from '@sidekick/core';
 import type { AdviceDependencies } from './advice-service.js';
-export function createPredictionPerformanceService(deps: AdviceDependencies) {
+export function createPredictionPerformanceService(
+  deps: Pick<AdviceDependencies, 'store' | 'data' | 'odds' | 'now'>,
+) {
   let lastChecked = 0;
   const snapshot = () => predictionPerformance(deps.store.snapshot().predictionRecords ?? []);
   async function refresh(signal?: AbortSignal) {
@@ -109,5 +112,70 @@ export function createPredictionPerformanceService(deps: AdviceDependencies) {
       );
     return { ...report, checkedAt: observedAt };
   }
-  return { snapshot, refresh };
+  /**
+   * Updates the latest pregame price for pending bet records whose game starts within the hour.
+   * Run every few minutes; the final run before kickoff leaves the closing price in place.
+   */
+  async function captureClosingLines(signal?: AbortSignal) {
+    const now = (deps.now ?? Date.now)();
+    if (!deps.odds) return 0;
+    const records = deps.store.snapshot().predictionRecords ?? [];
+    const games = new Map<string, FootballGame>();
+    for (const r of records) {
+      const game = r.games[0];
+      if (r.kind !== 'bet' || !r.quote || r.status !== 'pending' || !game?.kickoffAt) continue;
+      const untilKickoff = Date.parse(game.kickoffAt) - now;
+      if (untilKickoff > 0 && untilKickoff <= 60 * 60_000 && games.size < 24)
+        games.set(game.id, { ...game });
+    }
+    if (!games.size) return 0;
+    const quotes = new Map<string, Awaited<ReturnType<NonNullable<typeof deps.odds>['get']>>>();
+    for (const game of games.values()) {
+      signal?.throwIfAborted();
+      const snapshot = await deps.odds.get(game).catch(() => undefined);
+      if (snapshot?.quotes.length) quotes.set(game.id, snapshot);
+    }
+    if (!quotes.size) return 0;
+    const observedAt = new Date(now).toISOString();
+    let updated = 0;
+    await deps.store.update((state) => {
+      state.predictionRecords = (state.predictionRecords ?? []).map((r) => {
+        const snapshot = r.games[0] ? quotes.get(r.games[0].id) : undefined;
+        if (!snapshot) return r;
+        const next = recordClosingPrice(r, snapshot.quotes, observedAt);
+        if (next !== r) updated++;
+        return next;
+      });
+    });
+    return updated;
+  }
+  return { snapshot, refresh, captureClosingLines };
+}
+
+/**
+ * Background tracking: closing prices every 10 minutes and settlement every 30, so accuracy and
+ * paper results stay current without a manual Refresh. Failures are logged by the caller only as
+ * a fixed event name; feeds are retried on the next tick.
+ */
+export function startPredictionTracking(
+  service: ReturnType<typeof createPredictionPerformanceService>,
+  onError: (error: unknown) => void = () => undefined,
+) {
+  let ticks = 0,
+    running = false;
+  const tick = async () => {
+    if (running) return;
+    running = true;
+    try {
+      await service.captureClosingLines();
+      if (ticks++ % 3 === 0) await service.refresh();
+    } catch (error) {
+      onError(error);
+    } finally {
+      running = false;
+    }
+  };
+  const timer = setInterval(() => void tick(), 10 * 60_000);
+  timer.unref();
+  return { tick, stop: () => clearInterval(timer) };
 }

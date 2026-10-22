@@ -156,7 +156,7 @@ export function createReportService({
       throw new Error(
         'Report member-memory sharing changed during generation. Review Settings and try again.',
       );
-    if (!ai && runtime?.mode === 'api')
+    if (!ai && (runtime?.mode === 'api' || runtime?.mode === 'anthropic-api'))
       throw new Error('Configure an AI API key to generate personalized reports.');
     if (!ai && runtime?.mode === 'apple-cli')
       throw new Error(

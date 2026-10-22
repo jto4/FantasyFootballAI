@@ -1,5 +1,6 @@
 import type { AIProvider, AppSettings } from '@sidekick/core';
 import {
+  AnthropicProvider,
   AppleFoundationModelCLIProvider,
   createLocalCLIProvider,
   OpenAICompatibleProvider,
@@ -15,8 +16,13 @@ export async function resolveConfiguredAI(
   settings: AppSettings,
   readApiKey: () => Promise<string | null>,
   codex: Pick<SignedInAIConnection, 'provider'> = codexConnection,
+  readAnthropicKey: () => Promise<string | null> = async () => null,
 ): Promise<AIProvider | null> {
   const runtime = settings.aiRuntime;
+  if (runtime?.mode === 'anthropic-api') {
+    const key = await readAnthropicKey();
+    return key ? new AnthropicProvider(key, runtime.model) : null;
+  }
   if (runtime?.mode === 'codex-cli') {
     if (runtime.model !== 'gpt-6.1-sol' || runtime.command || runtime.args)
       throw new Error('The saved Codex connection requires GPT-6.1-Sol and managed CLI options.');

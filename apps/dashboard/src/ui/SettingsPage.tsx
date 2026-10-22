@@ -696,7 +696,12 @@ export function SettingsPage({
             appleCliPlatform={appleCliPlatform}
             apiKeyConfigured={
               credentialStoreAvailable === true
-                ? secretState.some((item) => item.provider === 'openai' && item.configured)
+                ? secretState.some(
+                    (item) =>
+                      item.provider ===
+                        (form.aiRuntime?.mode === 'anthropic-api' ? 'anthropic' : 'openai') &&
+                      item.configured,
+                  )
                 : null
             }
             busy={runtimeBusy}
@@ -997,10 +1002,10 @@ export function SettingsPage({
         <CredentialsSection
           allowedProviders={
             section === 'ai'
-              ? ['openai']
+              ? ['openai', 'anthropic']
               : section === 'storage'
                 ? ['image-generation', 'stability-image-generation']
-                : ['espn', 'resend', 'twilio', 'bluebubbles']
+                : ['espn', 'odds-api', 'resend', 'twilio', 'bluebubbles']
           }
           showImages={section === 'storage'}
           headingRef={credentialsHeadingRef}

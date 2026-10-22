@@ -584,7 +584,8 @@ function isValidStoredRuntime(value: unknown): boolean {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const runtime = value as Record<string, unknown>;
   return (
-    ['api', 'cli', 'apple-cli', 'codex-cli'].includes(String(runtime.mode)) &&
+    ['api', 'anthropic-api', 'cli', 'apple-cli', 'codex-cli'].includes(String(runtime.mode)) &&
+    (runtime.mode !== 'anthropic-api' || /^claude-[a-z0-9-]{1,60}$/.test(String(runtime.model))) &&
     (runtime.mode !== 'codex-cli' ||
       (runtime.model === 'gpt-6.1-sol' && runtime.command === '' && runtime.args === '')) &&
     typeof runtime.model === 'string' &&

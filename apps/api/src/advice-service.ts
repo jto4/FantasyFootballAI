@@ -43,6 +43,7 @@ import type {
   PublicFootballData,
   SignedInAIConnection,
   PublicSportsbookLines,
+  PublicPropLines,
 } from '@sidekick/integrations';
 import {
   adviceModelChoices,
@@ -70,6 +71,7 @@ export interface AdviceDependencies {
   signedInAI?: SignedInAIConnection;
   signedInCodex?: SignedInAIConnection;
   odds?: Pick<PublicSportsbookLines, 'get' | 'verify' | 'result'>;
+  props?: Pick<PublicPropLines, 'props' | 'books'>;
   now?: () => number;
 }
 
@@ -1352,6 +1354,15 @@ export function createAdviceService(deps: AdviceDependencies) {
 
   async function models(settings: AppSettings) {
     const saved = modelName(settings);
+    if (settings.aiRuntime?.mode === 'anthropic-api')
+      return {
+        selection: {
+          models: [
+            ...new Set([saved, 'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5']),
+          ].map((id) => ({ id, reasoning: true })),
+        },
+        warnings: [] as string[],
+      };
     if (settings.aiRuntime?.mode && settings.aiRuntime.mode !== 'api')
       return {
         selection: { models: [{ id: saved, reasoning: settings.aiRuntime?.mode === 'codex-cli' }] },

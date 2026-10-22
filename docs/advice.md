@@ -1162,3 +1162,37 @@ completed games, average and Over/Under/Push counts at that exact line. Counts a
 historical descriptions, not calibrated winning probabilities. This uses public
 nflverse stats with identity/team/opponent checks and excludes missing values.
 The app still requires manually verified sportsbook prop prices; it places no bets.
+
+## Published prop lines, book prices and closing line value — October 22, 2026
+
+**Player props** no longer need typing. Choosing a game lists its published props; Over or
+Under fills player, statistic, line and (when available) price.
+
+- Without a key, lines come from ESPN's public prop feed (DraftKings lines at present). ESPN
+  publishes no prop prices, so odds stay empty until entered; **Use the typical −110** is an
+  explicit opt-in, never a silent default. Athlete names are resolved from ESPN athlete records
+  and matched to the game's players only by an exact, unique name.
+- With an optional **The Odds API** key (Settings → Delivery & access → Credentials), props come
+  with both sides' prices per sportsbook, and **Compare sportsbooks** shows each book's game
+  price, its implied chance and the margin-free consensus. The key is sent only to
+  `api.the-odds-api.com` (its required `apiKey` query parameter) and is never logged. Listing
+  events is free; each game's props or prices cost Odds API credits and are cached ten minutes.
+  Prices from other books fill the form as manual prices; only ESPN-verified quotes carry a
+  quote identity into paper selections.
+
+**Closing line value.** While the app runs, it records the latest same-book, same-side price
+for pending verified selections every ten minutes in the hour before kickoff; the last capture
+is the closing price. CLV is the margin-free closing probability minus the probability implied
+by the price taken, and is computed only when the line did not move. Track results shows average
+CLV, how many selections beat the close, and a week-by-week running paper result. Settlement
+also runs automatically every 30 minutes instead of only on **Check results**.
+
+The AI's own uncalibrated win probability is still recorded for research but is no longer
+shown in results. A weekly bet limit (stored on this computer) counts saved bet analyses from
+the last seven days; the app never places bets.
+
+**Claude API.** Settings → AI → Connection type → Claude API uses an Anthropic API key from
+the OS credential store with Claude Opus 5.5 by default (Sonnet 5.5 and Haiku 5.5 are lower-cost
+choices). Requests use adaptive thinking with effort from the analysis, no sampling temperature
+(the current API rejects it), and Anthropic's server-side fallback for safety-declined requests;
+a final refusal is an error, never partial advice.

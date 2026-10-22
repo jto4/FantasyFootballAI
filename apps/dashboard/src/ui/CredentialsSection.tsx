@@ -11,6 +11,16 @@ type SecretDefinition = { id: string; name: string; help: string };
 const secrets: SecretDefinition[] = [
   { id: 'openai', name: 'AI API key', help: 'Used only when API mode is selected.' },
   {
+    id: 'anthropic',
+    name: 'Anthropic (Claude) API key',
+    help: 'Used when the AI connection is set to Claude API. Saved in the operating system credential store.',
+  },
+  {
+    id: 'odds-api',
+    name: 'The Odds API key (optional)',
+    help: 'Adds prop prices and other sportsbooks’ prices to betting. Free keys are available at the-odds-api.com.',
+  },
+  {
     id: 'image-generation',
     name: 'OpenAI image generation key',
     help: 'Used for GPT Image. Saved in the operating system credential store.',
