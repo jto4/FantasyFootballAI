@@ -111,6 +111,8 @@ export function rankWaivers(
     let drop: WaiverDay['candidates'][number]['drop'];
     let dropPoints: number | undefined;
     for (const owned of mine) {
+      // A player without an estimate has unknown value; never suggest dropping them for free.
+      if (owned.projectedPoints === undefined) continue;
       const netGain = gain(
         current,
         points(league, [...mine.filter((p) => p.id !== owned.id), player]),

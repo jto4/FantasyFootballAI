@@ -92,3 +92,20 @@ it('suggests only trades that improve both lineups, ranked by the smaller gain',
   expect(ideas[1]).toMatchObject({ myGain: 9, theirGain: 11 });
   expect(ideas.every((idea) => idea.myGain > 0 && idea.theirGain > 0)).toBe(true);
 });
+
+it('never suggests dropping a player whose value is unknown', () => {
+  const evidence = [
+    player('qb1', 'QB', 18),
+    player('rb1', 'RB', 6),
+    player('wr1', 'WR', 12),
+    player('rb-unknown', 'RB'),
+    player('rb-bench', 'RB', 4),
+    player('fa-rb', 'RB', 14),
+  ];
+  const day = rankWaivers(
+    league({ me: ['qb1', 'rb1', 'wr1', 'rb-unknown', 'rb-bench'] }),
+    'me',
+    evidence,
+  );
+  expect(day.candidates[0]!.drop).toMatchObject({ playerId: 'rb-bench', netGain: 8 });
+});
