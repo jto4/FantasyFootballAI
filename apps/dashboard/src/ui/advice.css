@@ -497,3 +497,30 @@
     justify-content: center;
   }
 }
+
+/* Wide windows: the refilled form sits left of the saved result and scrolls on its own. */
+@media (min-width: 1200px) {
+  .advice-split {
+    display: grid;
+    grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .advice-split-form {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .advice-split-form .advice-form-columns {
+    display: block;
+  }
+  .advice-split-form .advice-run-panel {
+    position: static;
+    margin-top: 16px;
+  }
+  .advice-split-form .advice-fields {
+    grid-template-columns: 1fr;
+  }
+}
