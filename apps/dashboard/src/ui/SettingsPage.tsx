@@ -459,6 +459,10 @@ export function SettingsPage({
     }));
   }
 
+  const unsaved =
+    dirtySections.includes(section) ||
+    Object.values(secretValues).some((value) => Boolean(value.trim())) ||
+    backupDirty;
   return (
     <form ref={pageRef} className="settings-page" onSubmit={saveSettings}>
       <div className="page-title-block">
@@ -467,13 +471,11 @@ export function SettingsPage({
           <h1>Settings</h1>
           <p>Choose a section to manage.</p>
         </div>
-        <div className="settings-save-bar">
+        <div className={`settings-save-bar${unsaved || saving ? ' pending' : ''}`}>
           <span role="status">
             {saving
               ? 'Saving…'
-              : dirtySections.includes(section) ||
-                  Object.values(secretValues).some((value) => Boolean(value.trim())) ||
-                  backupDirty
+              : unsaved
                 ? saveFailed
                   ? 'Could not save. Your changes are still here.'
                   : 'Unsaved changes'

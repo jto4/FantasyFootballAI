@@ -46,76 +46,82 @@ export function LeaguesPage({
           const freshness = leagueSyncFreshness(league, Date.now(), staleAfterMs);
           const isActive = league.id === activeLeagueId;
 
+          const imported = league.connectionMode === 'snapshot';
+          const updatedAt = imported ? league.snapshotImportedAt : league.lastSyncedAt;
+          const stale =
+            freshness === 'stale' ||
+            (imported && (!updatedAt || Date.now() - Date.parse(updatedAt) > staleAfterMs));
+          const refreshing = refreshingLeagueId === league.id;
+          const disconnecting = disconnectingLeagueId === league.id;
           return (
-            <article className="management-row" key={league.id}>
-              <div className="league-avatar">{league.displayName.slice(0, 1)}</div>
-              <div className="management-copy">
-                <strong>{league.displayName}</strong>
-                <span>
-                  {platformName(league.platform)} · {league.teamCount} teams ·{' '}
-                  {Object.keys(league.scoring).length
-                    ? `${Object.keys(league.scoring).length} scoring rules`
-                    : 'scoring details unavailable'}
+            <article
+              className={`league-card${isActive ? ' active' : ''}${stale ? ' stale' : ''}`}
+              key={league.id}
+            >
+              <header>
+                <div className="league-avatar">{league.displayName.slice(0, 1)}</div>
+                <div className="management-copy">
+                  <strong>{league.displayName}</strong>
+                  <span>
+                    {platformName(league.platform)} · {league.teamCount} teams ·{' '}
+                    {Object.keys(league.scoring).length
+                      ? `${Object.keys(league.scoring).length} scoring rules`
+                      : 'scoring details unavailable'}
+                  </span>
+                </div>
+                <span
+                  className={`league-chip ${imported ? 'imported' : league.status === 'limited' ? 'limited' : 'live'}`}
+                >
+                  {imported ? 'Imported' : league.status === 'limited' ? 'Limited data' : 'Live'}
                 </span>
-                {league.connectionMode === 'snapshot' && (
-                  <small>
-                    Imported{' '}
-                    {league.snapshotImportedAt
-                      ? new Date(league.snapshotImportedAt).toLocaleString()
-                      : 'at an unknown time'}
-                    . Automatic refresh isn’t available for imports; re-import to update.
-                  </small>
-                )}
-                {league.lastSyncError && <small>Last refresh failed: {league.lastSyncError}</small>}
-                <small>
-                  {freshness !== 'unknown' && league.lastSyncedAt
-                    ? `Last successful refresh ${new Date(league.lastSyncedAt).toLocaleString()}`
-                    : 'Successful refresh time unavailable'}
-                </small>
-                {freshness === 'stale' && (
-                  <small className="sync-stale" role="status">
-                    Saved league data is older than your configured warning threshold. Refresh
-                    before relying on this data.
-                  </small>
-                )}
+              </header>
+              <p
+                className={`league-freshness${stale ? ' stale' : ''}`}
+                role={stale ? 'status' : undefined}
+              >
+                {updatedAt
+                  ? `${imported ? 'Imported' : 'Updated'} ${relativeAge(updatedAt)}`
+                  : imported
+                    ? 'Import time unknown'
+                    : 'Not refreshed yet'}
+                {stale
+                  ? imported
+                    ? ' · out of date. Re-import to use it in reports.'
+                    : ' · older than your warning threshold. Refresh before relying on it.'
+                  : imported
+                    ? ' · imports don’t refresh on their own.'
+                    : ' · refreshes automatically around kickoffs.'}
+              </p>
+              {league.lastSyncError && (
+                <p className="league-error">Last refresh failed: {league.lastSyncError}</p>
+              )}
+              <div className="league-actions">
+                <button
+                  className={stale ? 'primary-button' : 'small-button'}
+                  onClick={() => onRefresh(league.id)}
+                  disabled={refreshing || disconnecting}
+                >
+                  <RefreshCw size={14} />{' '}
+                  {refreshing ? 'Refreshing…' : imported ? 'Re-import' : 'Refresh now'}
+                </button>
+                <button
+                  className="small-button"
+                  onClick={() => onSetActive(league.id)}
+                  disabled={isActive}
+                  aria-pressed={isActive}
+                  aria-label={`${isActive ? 'Active' : 'Set as active'} league: ${league.displayName}`}
+                >
+                  {isActive ? 'Active' : 'Set active'}
+                </button>
+                <button
+                  className="text-button danger-text"
+                  onClick={() => onDisconnect(league.id)}
+                  disabled={disconnecting || refreshing}
+                  aria-label={`Disconnect ${league.displayName}`}
+                >
+                  <Trash2 size={14} /> {disconnecting ? 'Disconnecting…' : 'Disconnect'}
+                </button>
               </div>
-              <span className="credential-status ready">
-                {league.connectionMode === 'snapshot'
-                  ? 'IMPORTED SNAPSHOT'
-                  : league.status === 'limited'
-                    ? 'LIMITED DATA'
-                    : 'CONNECTED'}
-              </span>
-              <button
-                className="small-button"
-                onClick={() => onSetActive(league.id)}
-                disabled={isActive}
-                aria-pressed={isActive}
-                aria-label={`${isActive ? 'Active' : 'Set as active'} league: ${league.displayName}`}
-              >
-                {isActive ? 'Active' : 'Set active'}
-              </button>
-              <button
-                className="small-button"
-                onClick={() => onRefresh(league.id)}
-                disabled={refreshingLeagueId === league.id || disconnectingLeagueId === league.id}
-              >
-                <RefreshCw size={14} />{' '}
-                {refreshingLeagueId === league.id
-                  ? 'Refreshing…'
-                  : league.connectionMode === 'snapshot'
-                    ? 'Import update'
-                    : 'Refresh'}
-              </button>
-              <button
-                className="small-button danger"
-                onClick={() => onDisconnect(league.id)}
-                disabled={disconnectingLeagueId === league.id || refreshingLeagueId === league.id}
-                aria-label={`Disconnect ${league.displayName}`}
-              >
-                <Trash2 size={14} />{' '}
-                {disconnectingLeagueId === league.id ? 'Disconnecting…' : 'Disconnect'}
-              </button>
             </article>
           );
         })}
@@ -132,4 +138,16 @@ export function LeaguesPage({
       </div>
     </>
   );
+}
+
+/** "3 hours ago" style age; falls back to the date for anything older than two weeks. */
+function relativeAge(iso: string, now = Date.now()) {
+  const minutes = Math.round((now - Date.parse(iso)) / 60_000);
+  if (!Number.isFinite(minutes)) return 'at an unknown time';
+  if (minutes < 1) return 'just now';
+  const format = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+  if (minutes < 60) return format.format(-minutes, 'minute');
+  if (minutes < 48 * 60) return format.format(-Math.round(minutes / 60), 'hour');
+  if (minutes < 14 * 24 * 60) return format.format(-Math.round(minutes / 1440), 'day');
+  return `on ${new Date(iso).toLocaleDateString()}`;
 }

@@ -3125,3 +3125,116 @@ textarea:focus-visible {
     animation: none;
   }
 }
+
+/* League cards: identity, one freshness line, then actions. Stale data gets the primary action. */
+.league-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.league-card.active {
+  border-color: var(--accent-border);
+}
+.league-card.stale {
+  border-color: var(--warning-border);
+}
+.league-card header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.league-card .management-copy {
+  min-width: 0;
+}
+.league-card .management-copy strong {
+  font-size: 16px;
+}
+.league-card .management-copy span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.league-chip {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.league-chip.live {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--green);
+}
+.league-chip.imported {
+  border-color: var(--accent-border);
+  color: var(--orange);
+}
+.league-chip.limited {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.league-freshness,
+.league-error {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.league-freshness.stale {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.league-error {
+  color: var(--pink);
+}
+.league-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.league-actions .danger-text {
+  margin-left: auto;
+  color: var(--pink);
+}
+.danger-text {
+  color: var(--pink);
+}
+
+/* Destructive actions sit last on the page, set apart from everyday controls. */
+.danger-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 14px 16px;
+  border: 1px solid var(--pink);
+  border-radius: 10px;
+  background: var(--error-bg);
+}
+.danger-zone p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.help-topic h2 {
+  margin: 24px 0 10px;
+  font-size: 16px;
+}
+.league-actions .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

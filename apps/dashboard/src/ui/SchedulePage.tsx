@@ -54,20 +54,9 @@ export function SchedulePage({
           <p className="section-overline">REPORTING & DELIVERY</p>
           <h1>Schedule</h1>
           <p>
-            Choose when reports are created and whether you review them first. Creating a report
-            yourself always saves a draft.
+            When reports are made{leagueName ? ` for ${leagueName}` : ''}, and whether you review
+            them first.
           </p>
-          {leagueName && (
-            <p>
-              Selected league: <strong>{leagueName}</strong>
-            </p>
-          )}
-          {manualSnapshot && (
-            <p role="note">
-              This selected league uses a manual snapshot. Schedule saved-data drafts from a recent
-              import, or connect provider access for refreshed reports.
-            </p>
-          )}
         </div>
         {onEditSchedule && (
           <button type="button" className="primary-button" onClick={onEditSchedule}>
@@ -75,7 +64,12 @@ export function SchedulePage({
           </button>
         )}
       </div>
-      <ScheduleWeek actions={actions} />
+      {manualSnapshot && (
+        <p className="notice schedule-snapshot-note" role="note">
+          Imported league: schedules can only use saved data from a recent import.
+        </p>
+      )}
+      <ScheduleWeek actions={actions} onSetUp={onEditSchedule} />
       <div className="schedule-grid">
         {orderedActions.map((action) => {
           const scheduled = isActiveSchedule(action);

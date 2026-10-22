@@ -224,6 +224,10 @@ export function ReportsPage({
     }
   }
   const filtered = history.items;
+  // An opened review (including a just-created draft) returns to the Library when closed.
+  useEffect(() => {
+    if (selectedId) setView((current) => (current === 'charts' ? current : 'library'));
+  }, [selectedId]);
   const view =
     chosenView ??
     (initialReportId || reports.length > 0 || filtered.length > 0 || history.loading || !league
@@ -284,7 +288,8 @@ export function ReportsPage({
           <h1>Reports</h1>
           <p>Review and edit drafts. Nothing is sent until you confirm where it goes.</p>
         </div>
-        {onCreate && (
+        {/* With a league selected, the Create tab is the one way in. */}
+        {onCreate && !(league && onCreateKind) && (
           <button type="button" className="primary-button" onClick={onCreate}>
             Create a report
           </button>

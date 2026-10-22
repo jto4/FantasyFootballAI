@@ -63,55 +63,64 @@ export function HelpPage({
         />
       </label>
       <p role="status">{articles.length} answers</p>
-      <div className="help-articles">
-        {articles.map((article) => (
-          <details
-            id={`help-${article.id}`}
-            key={article.id}
-            className={`help-article ${articleId === article.id ? 'search-setting-highlight' : ''}`}
-          >
-            <summary>
-              {article.title}
-              <small>{article.category}</small>
-            </summary>
-            <p>{article.answer}</p>
-            {'action' in article && (
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => onNavigate(article.action)}
-              >
-                {article.action.label}
-              </button>
-            )}
-            {article.id === 'private-league' && (
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => onNavigate({ section: 'Settings', settingId: 'yahoo-access' })}
-              >
-                Open Yahoo access
-              </button>
-            )}
-            {article.id === 'sample' && (
-              <button type="button" className="small-button" onClick={onSample}>
-                Try a sample league
-              </button>
-            )}
-            {article.id === 'ai-billing' && (
-              <p>
-                <a
-                  href="https://help.openai.com/en/articles/9039756-managing-billing-settings-on-chatgpt-web-and-platform"
-                  target="_blank"
-                  rel="noreferrer"
+      {/* Grouped by topic in first-seen order so a filtered list keeps its relevance order. */}
+      {[...new Set(articles.map((article) => article.category))].map((category) => (
+        <section
+          className="help-topic"
+          key={category}
+          aria-labelledby={`help-topic-${category.replace(/\W+/g, '-')}`}
+        >
+          <h2 id={`help-topic-${category.replace(/\W+/g, '-')}`}>{category}</h2>
+          <div className="help-articles">
+            {articles
+              .filter((article) => article.category === category)
+              .map((article) => (
+                <details
+                  id={`help-${article.id}`}
+                  key={article.id}
+                  className={`help-article ${articleId === article.id ? 'search-setting-highlight' : ''}`}
                 >
-                  OpenAI’s API billing guide
-                </a>
-              </p>
-            )}
-          </details>
-        ))}
-      </div>
+                  <summary>{article.title}</summary>
+                  <p>{article.answer}</p>
+                  {'action' in article && (
+                    <button
+                      type="button"
+                      className="small-button"
+                      onClick={() => onNavigate(article.action)}
+                    >
+                      {article.action.label}
+                    </button>
+                  )}
+                  {article.id === 'private-league' && (
+                    <button
+                      type="button"
+                      className="small-button"
+                      onClick={() => onNavigate({ section: 'Settings', settingId: 'yahoo-access' })}
+                    >
+                      Open Yahoo access
+                    </button>
+                  )}
+                  {article.id === 'sample' && (
+                    <button type="button" className="small-button" onClick={onSample}>
+                      Try a sample league
+                    </button>
+                  )}
+                  {article.id === 'ai-billing' && (
+                    <p>
+                      <a
+                        href="https://help.openai.com/en/articles/9039756-managing-billing-settings-on-chatgpt-web-and-platform"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        OpenAI’s API billing guide
+                      </a>
+                    </p>
+                  )}
+                </details>
+              ))}
+          </div>
+        </section>
+      ))}
       {!articles.length && (
         <p>
           No help answers match yet. Try the app search above to find a setting, page, or report.

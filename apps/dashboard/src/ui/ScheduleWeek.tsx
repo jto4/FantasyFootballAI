@@ -24,7 +24,15 @@ export function upcomingRuns(actions: Action[], now = new Date()) {
 }
 
 /** Seven-day strip so the week's automatic work is visible without opening each card. */
-export function ScheduleWeek({ actions, now = new Date() }: { actions: Action[]; now?: Date }) {
+export function ScheduleWeek({
+  actions,
+  now = new Date(),
+  onSetUp,
+}: {
+  actions: Action[];
+  now?: Date;
+  onSetUp?: (() => void) | undefined;
+}) {
   const runs = upcomingRuns(actions, now);
   const dayKey = (time: number) => new Date(time).toDateString();
   const days = Array.from({ length: 7 }, (_, index) => {
@@ -32,6 +40,14 @@ export function ScheduleWeek({ actions, now = new Date() }: { actions: Action[];
     date.setHours(0, 0, 0, 0);
     date.setDate(date.getDate() + index);
     return date;
+  });
+  // Consecutive days without runs collapse into one line ("Thu–Mon · Nothing scheduled").
+  const segments: { days: { date: Date; index: number }[]; runs: typeof runs }[] = [];
+  days.forEach((date, index) => {
+    const dayRuns = runs.filter((run) => dayKey(run.at) === date.toDateString());
+    const previous = segments[segments.length - 1];
+    if (!dayRuns.length && previous && !previous.runs.length) previous.days.push({ date, index });
+    else segments.push({ days: [{ date, index }], runs: dayRuns });
   });
   const dayLabel = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
   const dateLabel = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
@@ -41,21 +57,38 @@ export function ScheduleWeek({ actions, now = new Date() }: { actions: Action[];
       <h2 id="schedule-week-title">Next 7 days</h2>
       {runs.length === 0 ? (
         <p className="schedule-week-empty">
-          Nothing is scheduled this week. Reports you create yourself still save as drafts.
+          Nothing is scheduled this week. Reports you create yourself still save as drafts.{' '}
+          {onSetUp && (
+            <button type="button" className="text-button" onClick={onSetUp}>
+              Schedule weekly reports →
+            </button>
+          )}
         </p>
       ) : (
         <ol>
-          {days.map((day, index) => {
-            const today = runs.filter((run) => dayKey(run.at) === day.toDateString());
+          {segments.map((segment) => {
+            const first = segment.days[0]!;
+            const last = segment.days[segment.days.length - 1]!;
+            const label = (day: { date: Date; index: number }) =>
+              day.index === 0 ? 'Today' : dayLabel.format(day.date);
             return (
-              <li key={day.toISOString()} className={today.length ? 'has-runs' : undefined}>
+              <li
+                key={first.date.toISOString()}
+                className={segment.runs.length ? 'has-runs' : 'quiet'}
+              >
                 <span className="schedule-week-day">
-                  <strong>{index === 0 ? 'Today' : dayLabel.format(day)}</strong>
-                  <small>{dateLabel.format(day)}</small>
+                  <strong>
+                    {label(first)}
+                    {segment.days.length > 1 ? `–${label(last)}` : ''}
+                  </strong>
+                  <small>
+                    {dateLabel.format(first.date)}
+                    {segment.days.length > 1 ? `–${dateLabel.format(last.date)}` : ''}
+                  </small>
                 </span>
-                {today.length ? (
+                {segment.runs.length ? (
                   <ul>
-                    {today.map((run) => (
+                    {segment.runs.map((run) => (
                       <li key={`${run.action.kind}-${run.at}`}>
                         <time dateTime={new Date(run.at).toISOString()}>
                           {timeLabel.format(run.at)}
@@ -70,7 +103,7 @@ export function ScheduleWeek({ actions, now = new Date() }: { actions: Action[];
                     ))}
                   </ul>
                 ) : (
-                  <small className="schedule-week-none">No runs</small>
+                  <small className="schedule-week-none">Nothing scheduled</small>
                 )}
               </li>
             );

@@ -380,13 +380,6 @@ export function MemoryPage({
             <a className="small-button" href="/api/memory/export">
               <Download size={14} /> Export memory
             </a>
-            <button
-              className="small-button danger"
-              onClick={() => void deleteAllProfiles()}
-              disabled={profiles.length === 0}
-            >
-              <Trash2 size={14} /> Delete all memory
-            </button>
           </div>
         )}
       </div>
@@ -967,6 +960,17 @@ export function MemoryPage({
           </div>
         )}
       </div>
+      {mode === 'members' && profiles.length > 0 && (
+        <section className="danger-zone" aria-label="Delete memory">
+          <div>
+            <strong>Delete all memory</strong>
+            <p>Removes every member profile and its imported source text. This can’t be undone.</p>
+          </div>
+          <button className="small-button danger" onClick={() => void deleteAllProfiles()}>
+            <Trash2 size={14} /> Delete all memory
+          </button>
+        </section>
+      )}
     </div>
   );
 }

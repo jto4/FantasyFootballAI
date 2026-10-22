@@ -594,3 +594,21 @@
     white-space: normal;
   }
 }
+
+/* Wide screens: the saved-report review docks to the right so the Library stays in view. */
+@media (min-width: 1280px) {
+  .modal-scrim:has(> .saved-report-review) {
+    place-items: stretch end;
+    padding: 0;
+    background: color-mix(in srgb, var(--scrim) 35%, transparent);
+    backdrop-filter: none;
+  }
+  .report-review-modal.saved-report-review {
+    width: min(780px, 56vw);
+    height: 100dvh;
+    max-height: 100dvh;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: -12px 0 32px var(--shadow);
+  }
+}

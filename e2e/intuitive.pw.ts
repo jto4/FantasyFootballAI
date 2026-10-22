@@ -73,7 +73,11 @@ test('a beginner connects a league and AI, chooses a report, reviews it, and exp
     await expect(review).toContainText('Choose a delivery channel and recipient');
     await expect(review.getByRole('button', { name: 'Send saved report' })).toBeDisabled();
     await review.getByRole('button', { name: 'Close report review' }).click();
-    await page.getByRole('button', { name: 'Create a report', exact: true }).click();
+    await page
+      .getByRole('navigation', { name: 'Reports workspace' })
+      .getByRole('button', { name: 'Create', exact: true })
+      .click();
+    await page.getByRole('button', { name: 'Create power rankings', exact: true }).click();
     await page
       .getByRole('dialog', { name: 'Create a report' })
       .getByRole('button', { name: 'Create draft', exact: true })

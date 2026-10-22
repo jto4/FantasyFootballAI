@@ -96,12 +96,15 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
   return (
     <article className="advice-result" aria-label="Advice result">
       <header>
-        <p className="section-overline">
-          {adviceTitle(result.request.mode)} · {verdictNames[result.assessment.verdict]}
-        </p>
+        <p className="section-overline">{adviceTitle(result.request.mode)}</p>
         <h2 tabIndex={-1} id="advice-result-title">
           {result.assessment.headline}
         </h2>
+        <p className="advice-verdict-line">
+          <span className={`verdict-chip ${result.assessment.verdict}`}>
+            {verdictNames[result.assessment.verdict]}
+          </span>
+        </p>
         <p>
           {result.season} · Week {result.week} · Saved {formatDateTime(result.createdAt)}
         </p>
@@ -117,11 +120,6 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
       </header>
       {result.assessment.reasons.length > 0 && (
         <section className="advice-verdict" aria-label="Verdict">
-          <p>
-            <span className={`verdict-chip ${result.assessment.verdict}`}>
-              {verdictNames[result.assessment.verdict]}
-            </span>
-          </p>
           <ul>
             {result.assessment.reasons.slice(0, 3).map((statement, index) => (
               <li key={index}>{renderAdviceStatement(statement, metrics)}</li>
