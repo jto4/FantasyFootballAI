@@ -22,7 +22,8 @@ export interface MarketBacktest {
   publicationTimingVerified: false;
   seasons: {
     season: number;
-    role: 'earlier' | 'later';
+    /** `current`: this season's completed games, never used to choose any method version. */
+    role: 'earlier' | 'later' | 'current';
     markets: {
       kind: 'moneyline' | 'spread' | 'total';
       games: number;
@@ -60,6 +61,7 @@ export function evaluateArchivedMarkets(
   data: FootballDataSnapshot,
   seasons: [number, number],
   asOf: string,
+  includeCurrent = false,
 ): MarketBacktest {
   if (
     data.games.length > 10000 ||
@@ -87,7 +89,12 @@ export function evaluateArchivedMarkets(
     ],
   };
   const prepared = gameForecastContext(data.games);
-  for (const season of seasons) {
+  const current = seasons[1] + 1;
+  if (includeCurrent)
+    report.warnings.push(
+      `${current} is scored separately as an untouched holdout: no method version was chosen with these games. Its sample is small and grows each week.`,
+    );
+  for (const season of includeCurrent ? [...seasons, current] : seasons) {
     const markets: MarketBacktest['seasons'][number]['markets'] = [];
     for (const kind of ['moneyline', 'spread', 'total'] as const) {
       let games = 0,
@@ -308,7 +315,11 @@ export function evaluateArchivedMarkets(
           : { roiInterval: [roi - 1.96 * se, roi + 1.96 * se] }),
       });
     }
-    report.seasons.push({ season, role: season === seasons[1] ? 'later' : 'earlier', markets });
+    report.seasons.push({
+      season,
+      role: season === current ? 'current' : season === seasons[1] ? 'later' : 'earlier',
+      markets,
+    });
   }
   const measured = report.seasons
     .flatMap((s) => s.markets)

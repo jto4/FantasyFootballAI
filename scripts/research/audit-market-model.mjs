@@ -46,7 +46,8 @@ if (args[0] === '--contexts') {
 const model = prepareGameRatingModel(games),
   cases = [];
 for (const r of model.observations) {
-  if (r.game.season < season - 4 || r.game.season >= season) continue;
+  // The current season is scored separately below as an untouched holdout.
+  if (r.game.season < season - 4 || r.game.season > season) continue;
   for (const kind of ['moneyline', 'spread', 'total']) {
     const q = r.markets[kind];
     if (!q || q.push) continue;
@@ -67,6 +68,11 @@ for (const r of model.observations) {
   }
 }
 const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+const clip = (p) => Math.min(1 - 1e-6, Math.max(1e-6, p));
+const logLoss = (rows, field) =>
+  mean(
+    rows.map((r) => -(r.y * Math.log(clip(r[field])) + (1 - r.y) * Math.log(1 - clip(r[field])))),
+  );
 function interval(rows, field, z) {
   if (!rows.length) return;
   const differences = rows.map((r) => (r[field] - r.y) ** 2 - (r.p - r.y) ** 2),
@@ -95,11 +101,15 @@ function summarize(rows, simultaneous = false) {
     v3Brier: mean(rows.map((r) => (r.v3 - r.y) ** 2)),
     v2Brier: mean(rows.map((r) => (r.v2 - r.y) ** 2)),
     bookBrier: mean(rows.map((r) => (r.b - r.y) ** 2)),
+    logLoss: logLoss(rows, 'p'),
+    bookLogLoss: logLoss(rows, 'b'),
     bookImprovementInterval: interval(rows, 'b', 1.96),
     v2ImprovementInterval: interval(rows, 'v2', 1.96),
     ...(simultaneous ? { simultaneousBookInterval: interval(rows, 'b', 2.8653) } : {}),
   };
 }
+const retrospective = cases.filter((r) => r.season < season);
+const holdout = cases.filter((r) => r.season === season);
 const markets = [];
 for (let year = season - 4; year < season; year++)
   for (const kind of ['moneyline', 'spread', 'total'])
@@ -117,7 +127,16 @@ console.log(
       method: games.some((g) => g.pregame) ? 'health-weather-total-v4' : 'market-context-v3',
       source,
       scoredAt: new Date().toISOString(),
-      pooled: summarize(cases),
+      pooled: summarize(retrospective),
+      // Completed games of the current season: never used to choose any model version.
+      holdout: {
+        season,
+        pooled: summarize(holdout),
+        markets: ['moneyline', 'spread', 'total'].map((kind) => ({
+          kind,
+          ...summarize(holdout.filter((r) => r.kind === kind)),
+        })),
+      },
       markets,
       consistency: {
         comparisons: markets.length,

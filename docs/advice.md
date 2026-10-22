@@ -1013,8 +1013,8 @@ v1/v2 advice is readable and never regraded; new ledger entries retain v3's meth
 The historical comparison also reports matched v2 error in its uncertainty details.
 See [the v3 evidence](reviews/2026-10-12-model-v3-comparison.md).
 
-`npm run betting:model-audit` prints matched model/v3/v2/book errors for four completed
-seasons, pooled weekly-cluster intervals, and consistency counts. Individual
+`npm run betting:model-audit` prints matched model/v3/v2/book errors and log loss for four completed
+seasons, a separate untouched current-season holdout, pooled weekly-cluster intervals, and consistency counts. Individual
 intervals are nominal; twelve season/market simultaneous comparisons use a
 Bonferroni normal approximation. Add `-- --snapshot <schedules.csv>` to replay a
 bounded local public archive snapshot instead of fetching current data.
@@ -1196,3 +1196,12 @@ the OS credential store with Claude Opus 5.5 by default (Sonnet 5.5 and Haiku 5.
 choices). Requests use adaptive thinking with effort from the analysis, no sampling temperature
 (the current API rejects it), and Anthropic's server-side fallback for safety-declined requests;
 a final refusal is an error, never partial advice.
+
+## Betting model test — October 22, 2026
+
+On 272 untouched 2026 outcomes the production model is marginally more accurate than the
+book (Brier 0.2440 vs 0.2444), with an interval that includes zero; it matches the book's
+calibration and rarely differs by more than two points, so the Tentative-choice gate never
+fires. `npm run betting:paper-simulate` replays flat paper bets at archived prices; returns are
+within chance. The in-app historical test now shows the current season as an untouched holdout.
+See [the test](reviews/2026-10-22-betting-model-test.md).

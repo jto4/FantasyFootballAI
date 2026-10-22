@@ -64,12 +64,12 @@ function validBacktest(x: unknown): x is MarketBacktest {
     shortText(x.asOf, 40) &&
     Number.isFinite(Date.parse(String(x.asOf))) &&
     Array.isArray(x.seasons) &&
-    x.seasons.length === 2 &&
+    (x.seasons.length === 2 || x.seasons.length === 3) &&
     x.seasons.every(
       (s) =>
         record(s) &&
         numeric(s.season) &&
-        ['earlier', 'later'].includes(String(s.role)) &&
+        ['earlier', 'later', 'current'].includes(String(s.role)) &&
         Array.isArray(s.markets) &&
         s.markets.length === 3 &&
         s.markets.every(
@@ -339,7 +339,12 @@ export function AdvicePerformance({ disabled = false }: { disabled?: boolean }) 
           {backtest.seasons.map((s) => (
             <section key={s.season}>
               <h4>
-                {s.season} · {s.role === 'later' ? 'Later test season' : 'Earlier test season'}
+                {s.season} ·{' '}
+                {s.role === 'current'
+                  ? 'This season so far (untouched holdout)'
+                  : s.role === 'later'
+                    ? 'Later test season'
+                    : 'Earlier test season'}
               </h4>
               <div className="advice-table-scroll">
                 <table className="advice-metrics advice-market-table">

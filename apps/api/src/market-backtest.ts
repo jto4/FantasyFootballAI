@@ -6,9 +6,10 @@ export function runMarketBacktest(
   seasons: [number, number],
   asOf: string,
   signal?: AbortSignal,
+  includeCurrent = false,
 ): Promise<MarketBacktest> {
   return new Promise((resolve, reject) => {
-    const bootstrap = `import {parentPort,workerData} from 'node:worker_threads'; import {evaluateArchivedMarkets} from ${JSON.stringify(import.meta.resolve('@sidekick/core'))}; parentPort.postMessage(evaluateArchivedMarkets(workerData.data,workerData.seasons,workerData.asOf));`;
+    const bootstrap = `import {parentPort,workerData} from 'node:worker_threads'; import {evaluateArchivedMarkets} from ${JSON.stringify(import.meta.resolve('@sidekick/core'))}; parentPort.postMessage(evaluateArchivedMarkets(workerData.data,workerData.seasons,workerData.asOf,workerData.includeCurrent));`;
     const worker = new Worker(new URL(`data:text/javascript,${encodeURIComponent(bootstrap)}`), {
       env: {},
       execArgv: [],
@@ -23,6 +24,7 @@ export function runMarketBacktest(
         },
         seasons,
         asOf,
+        includeCurrent,
       },
     });
     const timer = setTimeout(

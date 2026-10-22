@@ -215,6 +215,7 @@ export function createAdviceRouter(
         [season - 2, season - 1],
         new Date((deps.now ?? Date.now)()).toISOString(),
         controller.signal,
+        true,
       );
       controller.signal.throwIfAborted();
       cachedBacktest = report;

@@ -152,3 +152,15 @@ it('fits only earlier weeks even when future scores and target outcome are prese
   expect(Math.sqrt(original.brier!) + Math.sqrt(loss.brier!)).toBeCloseTo(1, 10); // same pregame probability, different observed outcome
   expect(d.sources[0]!.retrievedAt).toBe(asOf);
 });
+
+it('scores the current season as a separate untouched holdout only when asked', () => {
+  const plain = evaluateArchivedMarkets(data(), [2024, 2025], asOf);
+  expect(plain.seasons.map((s) => s.role)).toEqual(['earlier', 'later']);
+  const withCurrent = evaluateArchivedMarkets(data(), [2024, 2025], asOf, true);
+  expect(withCurrent.seasons.map((s) => [s.season, s.role])).toEqual([
+    [2024, 'earlier'],
+    [2025, 'later'],
+    [2026, 'current'],
+  ]);
+  expect(withCurrent.warnings.some((w) => w.includes('untouched holdout'))).toBe(true);
+});

@@ -57,6 +57,7 @@
     "sleeper:sample:capture": "npm run test:dependencies && node scripts/capture-sleeper-sample.mjs",
     "betting:market-evaluate": "npm run test:dependencies && node scripts/research/evaluate-market-prices.mjs",
     "betting:model-audit": "npm run test:dependencies && node scripts/research/audit-market-model.mjs",
+    "betting:paper-simulate": "npm run test:dependencies && node scripts/research/simulate-paper-bets.mjs",
     "betting:model-develop": "npm run test:dependencies && node scripts/research/develop-market-model.mjs",
     "betting:context-develop": "npm run test:dependencies && node scripts/research/develop-game-context.mjs",
     "betting:personnel-develop": "npm run test:dependencies && node scripts/research/develop-personnel-model.mjs",

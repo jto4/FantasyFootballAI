@@ -300,3 +300,4 @@ Completed work and its evidence live in the archived task records and dated revi
 - [ ] Owner: optionally add an Anthropic API key and run Settings → Test connection; the Claude provider is covered by unit tests, not a live call.
 - [ ] Collect a season of graded projections before letting measured accuracy reorder projection sources; the Home scorecard reports accuracy but does not change source order.
 - [ ] New betting model versions are paused until a source the books don't already price is available (see `decisions.md`).
+- [ ] Re-run `betting:model-audit` and `betting:paper-simulate` at season end; act only if the untouched 2026 holdout interval stays above zero (see `reviews/2026-10-22-betting-model-test.md`).
