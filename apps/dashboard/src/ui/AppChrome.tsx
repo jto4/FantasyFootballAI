@@ -234,12 +234,17 @@ export function AppTopbar({
             disabled={refreshing}
             onClick={onFreshen}
             title="League data is older than your stale-data setting"
+            aria-label={
+              league?.connectionMode === 'snapshot'
+                ? 'League data is out of date. Re-import'
+                : 'League data is out of date. Refresh'
+            }
           >
             {refreshing
               ? 'Refreshing…'
               : league?.connectionMode === 'snapshot'
-                ? 'Out of date · Re-import'
-                : 'Out of date · Refresh'}
+                ? 'Re-import'
+                : 'Refresh'}
           </button>
         )}
       </div>

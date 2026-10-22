@@ -3398,3 +3398,31 @@ kbd {
 .loading-quip {
   font-style: italic;
 }
+
+/* Desktop: the sidebar scrolls when More tools opens past the window, and the top bar keeps
+   only the league, its freshness, search and icon controls. Names stay in labels and titles. */
+@media (min-width: 801px) {
+  .sidebar {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sidebar .brand {
+    padding-bottom: 28px;
+  }
+  .topbar {
+    padding: 0 28px;
+    gap: 12px;
+  }
+  .topbar .topbar-label,
+  .topbar .top-actions .date-label {
+    display: none;
+  }
+  .topbar .theme-switch > span {
+    display: none;
+  }
+  .topbar .theme-switch {
+    width: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+}

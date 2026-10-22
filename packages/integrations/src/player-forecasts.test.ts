@@ -217,3 +217,20 @@ it('keeps signed derived projection fields separate while rejecting negative mod
   value.players[0]!.player.stats[1]!.stats['53'] = -1;
   expect(() => parsePublicPlayerForecasts(value, 2026, source)).toThrow('event count');
 });
+
+it('rounds the publisher’s tiny negative event expectations to zero but rejects real negatives', () => {
+  const tiny = fixture();
+  const week = tiny.players[0]!.player.stats[1]!;
+  // −0.01 receiving touchdowns at 6 points changes the applied total by −0.06.
+  week.stats = { 42: 65.5, 53: 4.5, 43: -0.01 };
+  week.appliedTotal = 10.99;
+  const rows = parsePublicPlayerForecasts(tiny, 2026, source);
+  expect(rows[0]!.stats.receiving_tds).toBe(0);
+  const real = fixture();
+  const bad = real.players[0]!.player.stats[1]!;
+  bad.stats = { 42: 65.5, 53: 4.5, 43: -0.2 };
+  bad.appliedTotal = 9.85;
+  expect(() => parsePublicPlayerForecasts(real, 2026, source)).toThrow(
+    'Invalid projected event count.',
+  );
+});

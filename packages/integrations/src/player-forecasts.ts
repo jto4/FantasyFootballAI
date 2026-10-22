@@ -197,11 +197,13 @@ export function parsePublicPlayerForecasts(
         Object.entries(raw).some(([key, value]) => !/^\d{1,3}$/.test(key) || !numeric(value))
       )
         throw new Error('Invalid projected statistic.');
-      // Derived category fantasy points and unused regression fields may be negative.
-      // Modeled event counts cannot; net yardage may. Never expose unknown numeric IDs.
+      // Derived category fantasy points and unused regression fields may be negative, and the
+      // publisher's model emits tiny negative event expectations (about -0.01 touchdowns).
+      // Those round to zero below; a materially negative event count is still rejected.
+      // Net yardage may be negative. Never expose unknown numeric IDs.
       if (
         Object.keys(fields).some(
-          (key) => !['3', '24', '42'].includes(key) && Number(raw[key] ?? 0) < 0,
+          (key) => !['3', '24', '42'].includes(key) && Number(raw[key] ?? 0) < -0.05,
         )
       )
         throw new Error('Invalid projected event count.');
@@ -221,7 +223,10 @@ export function parsePublicPlayerForecasts(
       )
         throw new Error('Projected statistics do not reconcile.');
       const stats = Object.fromEntries(
-        Object.entries(fields).map(([key, field]) => [field, Number(raw[key] ?? 0)]),
+        Object.entries(fields).map(([key, field]) => {
+          const value = Number(raw[key] ?? 0);
+          return [field, ['3', '24', '42'].includes(key) ? value : Math.max(0, value)];
+        }),
       );
       result.push({
         espnId: String(p.id),
