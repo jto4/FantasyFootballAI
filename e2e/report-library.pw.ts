@@ -105,7 +105,7 @@ test('charts use recorded league values and saved reports keep their original ev
     await page.screenshot({ path: info.outputPath('league-charts.png') });
     await page
       .getByRole('navigation', { name: 'Reports workspace' })
-      .getByRole('button', { name: 'Reports & drafts', exact: true })
+      .getByRole('button', { name: 'Create', exact: true })
       .click();
     await page.getByRole('button', { name: 'Create power rankings', exact: true }).click();
     const composer = page.getByRole('dialog', { name: 'Create a report' });
@@ -160,7 +160,7 @@ test('incomplete scores stay unavailable and schedule conflicts do not overwrite
     await expect(chart.getByRole('img')).toHaveCount(0);
     await page
       .getByRole('navigation', { name: 'Reports workspace' })
-      .getByRole('button', { name: 'Reports & drafts', exact: true })
+      .getByRole('button', { name: 'Create', exact: true })
       .click();
     await page.getByRole('button', { name: 'Set up weekly drafts' }).click();
     await workspace.store.update((state) => {
@@ -300,7 +300,7 @@ test('manual imports offer explicit saved-data drafts and Home explains expired 
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();
     // Schedule is lazy-loaded; wait for its first card before reading the heading order.
     await expect(page.getByRole('heading', { level: 2, name: 'Power rankings' })).toBeVisible();
-    expect((await page.getByRole('heading', { level: 2 }).allTextContents()).slice(0, 2)).toEqual([
+    expect((await page.locator('.schedule-card h2').allTextContents()).slice(0, 2)).toEqual([
       'Power rankings',
       'Matchup preview',
     ]);

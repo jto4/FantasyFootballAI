@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { isPropGameLog, type PropGameLog, type FootballStatKey } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { ResearchChart } from './ResearchChart';
+import { LoadingStatus } from './LoadFeedback';
 import './market-signals.css';
 export function PlayerPropResearch({
   gameId,
@@ -48,7 +49,7 @@ export function PlayerPropResearch({
     <section className="prop-research" aria-label="Player prop research">
       <h3>Player prop research</h3>
       {busy ? (
-        <p role="status">Loading completed game stats…</p>
+        <LoadingStatus message="Loading completed game stats…" />
       ) : error ? (
         <p role="alert">{error}</p>
       ) : !log ? (

@@ -86,7 +86,7 @@ test('defense comparison joins team identities, shows league-scored numbers and 
     await expect(result).toContainText('weekly estimate of 10 points');
     await expect(result).toContainText('weekly estimate of 6 points');
     await page.screenshot({ path: info.outputPath('defense-comparison.png') });
-    const firstNumber = result.getByText(/weekly estimate of 10 points/);
+    const firstNumber = result.getByText(/weekly estimate of 10 points/).first();
     await firstNumber.evaluate((el) =>
       window.scrollTo({
         top: window.scrollY + el.getBoundingClientRect().top - 180,

@@ -1141,7 +1141,7 @@ export function AdvicePage({
         ) : null}
       </div>
       {view === 'signals' && (
-        <Suspense fallback={<p>Loading Market Signals…</p>}>
+        <Suspense fallback={<LoadingStatus message="Loading Market Signals…" />}>
           <MarketSignalsPanel />
         </Suspense>
       )}

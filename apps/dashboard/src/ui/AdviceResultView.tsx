@@ -115,6 +115,20 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
             </p>
           )}
       </header>
+      {result.assessment.reasons.length > 0 && (
+        <section className="advice-verdict" aria-label="Verdict">
+          <p>
+            <span className={`verdict-chip ${result.assessment.verdict}`}>
+              {verdictNames[result.assessment.verdict]}
+            </span>
+          </p>
+          <ul>
+            {result.assessment.reasons.slice(0, 3).map((statement, index) => (
+              <li key={index}>{renderAdviceStatement(statement, metrics)}</li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section className="decision-summary" aria-label="Decision in brief">
         <h3>Decision in brief</h3>
         <div className="decision-summary-grid">
@@ -193,16 +207,26 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           names={playerNames}
         />
       )}
-      <h3>Why this choice</h3>
-      {result.assessment.reasons[0] && (
-        <Statement statement={result.assessment.reasons[0]} metrics={metrics} sources={sources} />
-      )}
-      {result.readiness && (
-        <details className="result-disclosure">
-          <summary>Evidence readiness when this advice was created</summary>
-          <DataReadiness report={result.readiness} />
-        </details>
-      )}
+      {/* The verdict bullets above repeat the reasons as plain text; sources live in here. */}
+      <details className="result-disclosure advice-evidence">
+        <summary>Show the evidence</summary>
+        <h3>Why this choice</h3>
+        <ul>
+          {result.assessment.reasons.map((statement, index) => (
+            <li key={index}>
+              <Statement statement={statement} metrics={metrics} sources={sources} />
+            </li>
+          ))}
+        </ul>
+        <h3>Another option</h3>
+        <Statement statement={result.assessment.alternative} metrics={metrics} sources={sources} />
+        {result.readiness && (
+          <>
+            <h3>Evidence readiness when this advice was created</h3>
+            <DataReadiness report={result.readiness} />
+          </>
+        )}
+      </details>
       <details className="advice-confidence" role="region" aria-label="Evidence confidence">
         <summary>What affects confidence?</summary>
         <strong>{result.confidence.label} evidence confidence</strong>
@@ -216,18 +240,6 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           ))}
         </ul>
       </details>
-      {result.assessment.reasons.length > 1 && (
-        <details className="result-disclosure">
-          <summary>More reasons ({result.assessment.reasons.length - 1})</summary>
-          <ul>
-            {result.assessment.reasons.slice(1).map((statement, index) => (
-              <li key={index}>
-                <Statement statement={statement} metrics={metrics} sources={sources} />
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
       <details className="result-disclosure">
         <summary>
           <h3>What could change the decision</h3> ({result.assessment.risks.length})
@@ -239,10 +251,6 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
             </li>
           ))}
         </ul>
-      </details>
-      <details className="result-disclosure">
-        <summary>Another option</summary>
-        <Statement statement={result.assessment.alternative} metrics={metrics} sources={sources} />
       </details>
       <details className="result-disclosure result-numbers">
         <summary>Numbers & comparisons</summary>

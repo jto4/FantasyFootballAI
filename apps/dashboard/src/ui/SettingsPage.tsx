@@ -24,6 +24,7 @@ import { AutomaticActionsSection } from './AutomaticActionsSection.js';
 import { DeliveryChannelsSection } from './DeliveryChannelsSection.js';
 import { writeImageProviderPreference } from './image-provider.js';
 import { FriendlyError } from './FriendlyError';
+import { SettingsOverview } from './SettingsOverview';
 import { RefreshCw, Save } from 'lucide-react';
 import {
   applyScheduleRecommendations,
@@ -490,6 +491,19 @@ export function SettingsPage({
           {section === 'storage' && <small>Use the Save button in each storage card.</small>}
         </div>
       </div>
+      <SettingsOverview
+        settings={settings}
+        leagues={leagues}
+        configured={(provider) =>
+          secretState.some((item) => item.provider === provider && item.configured)
+        }
+        credentialStoreAvailable={credentialStoreAvailable}
+        onOpen={(key) => {
+          if (backupDirty && !window.confirm('Discard unsaved backup settings?')) return;
+          onSearchSettingClear?.();
+          setSection(key);
+        }}
+      />
       <nav className="settings-tabs" aria-label="Settings sections">
         {(Object.keys(sectionLabels) as SettingsSection[]).map((key) => (
           <button

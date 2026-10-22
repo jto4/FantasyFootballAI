@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import type { AdviceOptions, BetTerms, FootballStatKey, SportsbookQuote } from '@sidekick/core';
 import { LiveSportsbookPrices } from './LiveSportsbookPrices';
 import { PlayerPicker } from './PlayerPicker';
+import { LoadingStatus } from './LoadFeedback';
 
 const PlayerPropResearch = lazy(() =>
   import('./PlayerPropResearch').then((m) => ({ default: m.PlayerPropResearch })),
@@ -206,7 +207,7 @@ export function BetFields({
         </>
       )}
       {betKind === 'player-prop' && (
-        <Suspense fallback={<p>Loading prop research…</p>}>
+        <Suspense fallback={<LoadingStatus message="Loading prop research…" />}>
           <PlayerPropResearch
             gameId={gameId}
             playerId={propPlayer[0] ?? ''}

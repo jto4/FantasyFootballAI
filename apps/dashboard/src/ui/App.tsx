@@ -952,7 +952,7 @@ export function App() {
           )}
           {!stateLoaded && section !== 'Help' ? (
             stateLoading ? (
-              <LoadingStatus message="Loading your leagues, reports, and schedule…" />
+              <LoadingStatus message="Loading your leagues, reports, and schedule…" shape="cards" />
             ) : (
               <LoadError
                 message={stateLoadError || 'Could not load local league data.'}

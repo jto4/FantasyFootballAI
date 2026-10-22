@@ -974,3 +974,124 @@
   min-height: 44px;
   font-size: 12px;
 }
+
+/* Settings: one row of setup health above the section tabs; each chip opens its fix. */
+.settings-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.settings-overview a,
+.settings-overview button {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.settings-overview a:hover,
+.settings-overview button:hover {
+  border-color: var(--accent-border);
+}
+.settings-overview span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.settings-overview strong {
+  font-size: 13px;
+}
+.settings-overview small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.settings-overview svg {
+  flex: none;
+  margin-top: 1px;
+}
+.settings-overview .status-ok {
+  color: var(--green);
+}
+.settings-overview .status-attention {
+  color: var(--warning);
+}
+@media (max-width: 800px) {
+  .settings-overview {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Schedule: the week at a glance; empty days collapse to one muted line. */
+.schedule-week {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.schedule-week h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+.schedule-week ol,
+.schedule-week ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.schedule-week ol > li {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.schedule-week ol > li:first-child {
+  border-top: 0;
+}
+.schedule-week-day {
+  display: grid;
+}
+.schedule-week-day strong {
+  font-size: 13px;
+}
+.schedule-week small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.schedule-week ul {
+  display: grid;
+  gap: 6px;
+}
+.schedule-week ul li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  padding-left: 10px;
+  border-left: 3px solid var(--orange);
+}
+.schedule-week time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.schedule-week-none {
+  padding-top: 2px;
+}
+.schedule-week-empty {
+  margin: 0;
+  color: var(--muted);
+}

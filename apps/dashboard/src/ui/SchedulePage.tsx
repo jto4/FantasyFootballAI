@@ -8,6 +8,7 @@ import {
 import { reportName } from './beginner-flow';
 import { formatTime } from './date-format';
 import { SchedulePlan } from './SchedulePlan';
+import { ScheduleWeek } from './ScheduleWeek';
 import { timezoneLabel } from './timezone-label';
 
 export type { ScheduledRun } from '@sidekick/core';
@@ -74,6 +75,7 @@ export function SchedulePage({
           </button>
         )}
       </div>
+      <ScheduleWeek actions={actions} />
       <div className="schedule-grid">
         {orderedActions.map((action) => {
           const scheduled = isActiveSchedule(action);

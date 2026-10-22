@@ -21,6 +21,7 @@ import {
 import { Dialog } from './Dialog';
 import { formatDateTime } from './date-format';
 import { FriendlyError } from './FriendlyError';
+import { LoadingStatus } from './LoadFeedback';
 import { ReportSharing } from './ReportSharing';
 import { LeagueTrends } from './LeagueTrends';
 import { ReportLibrary } from './ReportLibrary';
@@ -68,7 +69,8 @@ export function ReportsPage({
   onSchedule?: (kind: ReportKind) => void;
   onDeliverySetup?: () => void;
 }) {
-  const [view, setView] = useState<'reports' | 'charts'>('reports');
+  // Until the user picks a tab, show the library once any report exists and Create otherwise.
+  const [chosenView, setView] = useState<'create' | 'library' | 'charts'>();
   const [leagueFilter, setLeagueFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(initialReportId ?? '');
@@ -222,6 +224,11 @@ export function ReportsPage({
     }
   }
   const filtered = history.items;
+  const view =
+    chosenView ??
+    (initialReportId || reports.length > 0 || filtered.length > 0 || history.loading || !league
+      ? 'library'
+      : 'create');
   function editDraft(focusBody = false) {
     if (!report || !canEditReport(report) || saving || sendingReportId) return;
     focusBodyOnEdit.current = focusBody;
@@ -285,12 +292,15 @@ export function ReportsPage({
       </div>
       {league && (
         <nav className="reports-workspace-nav" aria-label="Reports workspace">
+          <button type="button" aria-pressed={view === 'create'} onClick={() => setView('create')}>
+            Create
+          </button>
           <button
             type="button"
-            aria-pressed={view === 'reports'}
-            onClick={() => setView('reports')}
+            aria-pressed={view === 'library'}
+            onClick={() => setView('library')}
           >
-            Reports &amp; drafts
+            Library{reports.length ? ` (${reports.length})` : ''}
           </button>
           <button type="button" aria-pressed={view === 'charts'} onClick={() => setView('charts')}>
             League charts
@@ -307,21 +317,18 @@ export function ReportsPage({
           <LeagueTrends key={`trends:${league.id}`} league={league} />
         </>
       )}
-      <div hidden={view !== 'reports'}>
-        {league && onCreateKind && onSchedule && (
-          <ReportLibrary
-            key={league.id}
-            league={league}
-            settings={settings}
-            busy={generating}
-            onCreate={onCreateKind}
-            onSchedule={onSchedule}
-            onSaved={onSaved}
-          />
-        )}
-        <div className="section-heading">
-          <h2>Saved reports</h2>
-        </div>
+      {view === 'create' && league && onCreateKind && onSchedule && (
+        <ReportLibrary
+          key={league.id}
+          league={league}
+          settings={settings}
+          busy={generating}
+          onCreate={onCreateKind}
+          onSchedule={onSchedule}
+          onSaved={onSaved}
+        />
+      )}
+      <div hidden={view === 'charts'}>
         {jobs
           .filter((job) => job.status !== 'completed')
           .slice(0, 10)
@@ -402,7 +409,9 @@ export function ReportsPage({
             }}
           />
         )}
-        {detailLoading && <p role="status">Loading saved report…</p>}
+        {detailLoading && <LoadingStatus message="Loading saved report…" />}
+      </div>
+      <div hidden={view !== 'library'}>
         <div className="report-filters">
           <label>
             League
@@ -439,7 +448,9 @@ export function ReportsPage({
           {filtered.map((item) => (
             <article className="report-card" key={item.id}>
               <div>
-                <span className="credential-status">{reportStatus(item)}</span>
+                <span className={`report-status-chip ${statusTone(item)}`}>
+                  {reportStatus(item)}
+                </span>
                 <h2>{item.title}</h2>
                 <p>
                   {leagues.find((league) => league.id === item.leagueId)?.displayName ??
@@ -466,7 +477,7 @@ export function ReportsPage({
             </article>
           ))}
         </div>
-        {history.loading && <p role="status">Loading report history…</p>}
+        {history.loading && <LoadingStatus message="Loading report history…" shape="rows" />}
         {history.cursor && (
           <button
             type="button"
@@ -479,7 +490,16 @@ export function ReportsPage({
         )}
         {filtered.length === 0 && !history.loading && !history.error && (
           <p className="empty-activity">
-            No reports match these filters. Choose Create a report to make a new draft.
+            {leagueFilter === 'all' && statusFilter === 'all'
+              ? 'No reports yet.'
+              : 'No reports match these filters.'}{' '}
+            {league && onCreateKind ? (
+              <button type="button" className="text-button" onClick={() => setView('create')}>
+                Create a report →
+              </button>
+            ) : (
+              'Choose Create a report to make a new draft.'
+            )}
           </p>
         )}
       </div>
@@ -868,4 +888,11 @@ export function ReportsPage({
       )}
     </>
   );
+}
+
+function statusTone(report: ReportSummary) {
+  if (report.status === 'sent') return 'sent';
+  if (report.deliveryState === 'failed' || report.deliveryState === 'uncertain') return 'problem';
+  if (report.deliveryState === 'sending') return 'sending';
+  return 'draft';
 }

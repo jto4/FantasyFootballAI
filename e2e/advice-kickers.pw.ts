@@ -78,6 +78,7 @@ test('kicker start/sit uses automatic league scores, shows both alternatives and
     await page.screenshot({ path: info.outputPath('kicker-comparison.png') });
     await result
       .getByText(/This alternative has a weekly estimate of 11 points/)
+      .first()
       .scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath('kicker-numbers.png') });
     const saved = workspace.store.snapshot().adviceResults[0]!;

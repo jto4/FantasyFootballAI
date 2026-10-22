@@ -64,7 +64,9 @@ for (const mode of ['lineup', 'betting'] as const)
       const expected = `The computed comparison is ${new Intl.NumberFormat('en-US', {
         maximumFractionDigits: 2,
       }).format(metric.value)} ${unit}.`;
-      const explanation = result.getByText(expected, { exact: true });
+      const explanation = result
+        .getByRole('region', { name: 'Verdict' })
+        .getByText(expected, { exact: true });
       await expect(explanation).toBeVisible();
       await explanation.scrollIntoViewIfNeeded();
       await page.screenshot({ path: info.outputPath(`${mode}-single-unit.png`) });

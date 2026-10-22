@@ -953,7 +953,7 @@ export function MemoryPage({
             </article>
           );
         })}
-        {profilesLoading && <LoadingStatus message="Loading member profiles…" />}
+        {profilesLoading && <LoadingStatus message="Loading member profiles…" shape="rows" />}
         {profilesError && <LoadError message={profilesError} onRetry={() => void refresh()} />}
         {!profilesLoading && !profilesError && profiles.length === 0 && (
           <div className="empty-state">

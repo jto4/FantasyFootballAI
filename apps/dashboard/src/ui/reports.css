@@ -495,3 +495,102 @@
   opacity: 0.45;
   stroke-width: 1.5;
 }
+
+/* Library: filters share one row and each saved report is a single compact line. */
+.report-filters {
+  flex-wrap: nowrap;
+}
+.report-filters label {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.report-filters select {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+}
+.report-list .report-card {
+  align-items: center;
+  padding: 12px 14px;
+}
+.report-list .report-card > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  align-items: center;
+  min-width: 0;
+}
+.report-list .report-card h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.report-list .report-card > div > p {
+  grid-column: 2;
+  margin: 0;
+  max-height: none;
+  color: var(--muted);
+  font-size: 12px;
+}
+.report-status-chip {
+  grid-row: span 2;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.report-status-chip.draft {
+  border-color: var(--accent-border);
+  color: var(--orange);
+}
+.report-status-chip.sent {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--green);
+}
+.report-status-chip.sending {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.report-status-chip.problem {
+  border-color: var(--pink);
+  background: var(--error-bg);
+  color: var(--pink);
+}
+@media (max-width: 800px) {
+  .report-filters {
+    flex-direction: row;
+  }
+  .report-filters label {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .report-list .report-card {
+    flex-wrap: wrap;
+  }
+  .report-list .report-card > div {
+    grid-template-columns: 1fr;
+  }
+  .report-status-chip {
+    grid-row: auto;
+    justify-self: start;
+  }
+  .report-list .report-card > div > p {
+    grid-column: auto;
+  }
+  .report-list .report-card h2 {
+    white-space: normal;
+  }
+}
