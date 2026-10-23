@@ -3,6 +3,7 @@ import { MarketResearchStore } from './market-research-store.js';
 import { createMarketResearchRouter } from './market-research-routes.js';
 import {
   PublicNflBoxScores,
+  PublicUsageData,
   PublicPredictionMarketData,
   readBoundedJson,
 } from '@sidekick/integrations';
@@ -154,6 +155,8 @@ const publicPropLines = new PublicPropLines(
   async () => (await readCredential('odds-api')) ?? undefined,
 );
 const publicPregameEvidence = new PublicPregameEvidence();
+// Snap counts and depth charts for the prop model; loaded on first use and cached for 12 hours.
+const publicUsageData = new PublicUsageData();
 let footballNewsRefreshTimer: NodeJS.Timeout | undefined;
 let conversationRetentionTimer: NodeJS.Timeout | undefined;
 let blueBubblesAutoSyncTimer: NodeJS.Timeout | undefined;
@@ -487,6 +490,7 @@ app.use(
     props: publicPropLines,
     scoreboard: new PublicNflScoreboard(),
     boxScores: new PublicNflBoxScores(),
+    usage: publicUsageData,
     pregame: publicPregameEvidence,
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,
@@ -509,6 +513,7 @@ app.use(
     store,
     leans: propLeans,
     ledger: propLineLedger,
+    usage: publicUsageData,
   }),
 );
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));

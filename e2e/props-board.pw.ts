@@ -18,7 +18,7 @@ test('the props board compares lines with projections and hands a prop to bet an
     await expect(row).toContainText('Passing yards 265.5');
     await expect(row).toContainText('300 → 300');
     await expect(row).toContainText('Over 3 of 4');
-    await expect(row).toContainText('53% over · fair 295.2');
+    await expect(row).toContainText('54% over · fair 298.2');
     await expect(row).toContainText('Over · slight');
     await expect(board.getByLabel('Lean record')).toContainText('Lean record 0–0');
     await row.getByRole('button', { name: 'Analyze', exact: true }).click();

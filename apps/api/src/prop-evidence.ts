@@ -1,18 +1,16 @@
 import {
-  buildPropModelLeague,
   nflTeamKey,
   playerNameKey,
-  predictProp,
   propLean,
-  propModelSettings,
   propModelStats,
   type BetEvidence,
   type BetTerms,
   type FootballDataSnapshot,
   type FootballGame,
-  type PropModelStat,
   type RosterPlayer,
 } from '@sidekick/core';
+import type { UsageSnapshot } from '@sidekick/integrations';
+import { propModelFor } from './prop-model-runtime.js';
 
 /**
  * Adds the props board's numbers to a player-prop bet's evidence: ESPN's projection, the
@@ -27,6 +25,8 @@ export function addPropEvidence(
     data: FootballDataSnapshot;
     targetGame: FootballGame | undefined;
     season: number;
+    /** Snap counts and depth charts; without them those model features stay off. */
+    usage?: UsageSnapshot | undefined;
   },
 ) {
   const { bet, data, targetGame, season } = input;
@@ -95,33 +95,14 @@ export function addPropEvidence(
     bet.line !== undefined &&
     (propModelStats as readonly string[]).includes(bet.stat)
   ) {
-    const regular = data.players.filter((row) => row.seasonType === 'REG');
-    const ids = new Set(
-      regular
-        .filter(
-          (row) =>
-            playerNameKey(row.name) === playerNameKey(propPlayer.name) &&
-            nflTeamKey(row.team) === nflTeamKey(propPlayer.nflTeam ?? ''),
-        )
-        .map((row) => row.playerId),
-    );
-    const history = ids.size === 1 ? regular.filter((row) => ids.has(row.playerId)) : [];
-    const stat = bet.stat as PropModelStat;
-    const prediction = history.length
-      ? predictProp(
-          {
-            stat,
-            position: propPlayer.position ?? history[0]!.position,
-            team: propPlayer.nflTeam ?? history[0]!.team,
-            game: targetGame,
-            history,
-            line: bet.line,
-            ...(projected !== undefined ? { espnProjection: projected } : {}),
-          },
-          buildPropModelLeague(regular, data.games),
-          propModelSettings[stat],
-        )
-      : undefined;
+    const prediction = propModelFor(data, input.usage).predict({
+      stat: bet.stat,
+      playerName: propPlayer.name,
+      team: propPlayer.nflTeam,
+      game: targetGame,
+      line: bet.line,
+      ...(projected !== undefined ? { espnProjection: projected } : {}),
+    });
     if (prediction) {
       const modelSources = [
         ...(forecast ? [forecast.sourceId] : []),

@@ -5,16 +5,10 @@ import { dirname } from 'node:path';
 import { Router } from 'express';
 import {
   buildPropBoard,
-  buildPropModelLeague,
   defaultMarketWeight,
   fitMarketWeight,
-  nflTeamKey,
-  playerNameKey,
-  predictProp,
   propModelSettings,
   propModelStats,
-  type PlayerGameStats,
-  type PropModelLeague,
   type PropModelStat,
   gradePropLean,
   isUpcomingFootballGame,
@@ -23,7 +17,8 @@ import {
   type PropLeanRecord,
   type PropLine,
 } from '@sidekick/core';
-import type { PublicFootballData, PublicPropLines } from '@sidekick/integrations';
+import type { PublicFootballData, PublicPropLines, PublicUsageData } from '@sidekick/integrations';
+import { propModelFor } from './prop-model-runtime.js';
 import type { LocalStore } from './store.js';
 import type { PropLineLedger } from './prop-line-ledger.js';
 
@@ -86,56 +81,13 @@ function marketWeightFromResults(records: PropLeanRecord[]) {
   return fitMarketWeight(gradedForFit(records), propModelSettings);
 }
 
-type ModelData = Awaited<ReturnType<PublicFootballData['get']>>;
-const models = new WeakMap<
-  ModelData,
-  {
-    league: PropModelLeague;
-    findPlayer: (
-      name: string,
-      team: string | undefined,
-      game: FootballGame,
-    ) => { history: PlayerGameStats[]; position: string; team: string } | undefined;
-  }
->();
-/** Model league and player histories, built once per loaded data snapshot. */
-function modelFor(data: ModelData) {
-  const cached = models.get(data);
-  if (cached) return cached;
-  const rows = data.players.filter((r) => r.seasonType === 'REG');
-  const byId = new Map<string, PlayerGameStats[]>();
-  const byName = new Map<string, Set<string>>();
-  for (const row of rows) {
-    byId.set(row.playerId, [...(byId.get(row.playerId) ?? []), row]);
-    const key = playerNameKey(row.name);
-    byName.set(key, (byName.get(key) ?? new Set()).add(row.playerId));
-  }
-  const built = {
-    league: buildPropModelLeague(rows, data.games),
-    findPlayer: (name: string, team: string | undefined, game: FootballGame) => {
-      const teams = [team, game.home, game.away].filter(Boolean).map((t) => nflTeamKey(t!));
-      // Same name on one of this game's teams; the most recent row decides position and team.
-      const candidates = [...(byName.get(playerNameKey(name)) ?? [])]
-        .map((id) => byId.get(id)!)
-        .map((history) => ({
-          history,
-          latest: [...history].sort((a, b) => b.season - a.season || b.week - a.week)[0]!,
-        }))
-        .filter((c) => teams.includes(nflTeamKey(c.latest.team)));
-      if (candidates.length !== 1) return undefined;
-      const { history, latest } = candidates[0]!;
-      return { history, position: latest.position, team: latest.team };
-    },
-  };
-  models.set(data, built);
-  return built;
-}
-
 export function createPropBoardRouter(deps: {
   data: Pick<PublicFootballData, 'get'>;
   props: Pick<PublicPropLines, 'props'>;
   store: Pick<LocalStore, 'snapshot'>;
   leans: PropLeanStore;
+  /** Snap counts and depth charts for the prop model; without them those features stay off. */
+  usage?: Pick<PublicUsageData, 'get'>;
   /** Optional: every line the board fetches is also kept in the line ledger. */
   ledger?: PropLineLedger;
   now?: () => number;
@@ -188,7 +140,7 @@ export function createPropBoardRouter(deps: {
       );
     deps.ledger?.record(lines, games, at);
     const league = deps.store.snapshot().leagues.find((l) => l.id === req.query.league);
-    const model = modelFor(data);
+    const model = propModelFor(data, await deps.usage?.get(data.season).catch(() => undefined));
     const fitted = marketWeightFromResults(deps.leans.list());
     const rows = buildPropBoard({
       lines,
@@ -196,25 +148,16 @@ export function createPropBoardRouter(deps: {
       forecasts: data.playerForecasts ?? [],
       stats: data.players,
       week,
-      predict: (line, game, team, espnProjection) => {
-        if (!(propModelStats as readonly string[]).includes(line.stat)) return undefined;
-        const player = model.findPlayer(line.playerName, team, game);
-        if (!player && espnProjection === undefined) return undefined;
-        return predictProp(
-          {
-            stat: line.stat as PropModelStat,
-            position: player?.position ?? '',
-            team: player?.team ?? team ?? '',
-            game,
-            history: player?.history ?? [],
-            line: line.line,
-            marketWeight: fitted?.weight ?? defaultMarketWeight,
-            ...(espnProjection !== undefined ? { espnProjection } : {}),
-          },
-          model.league,
-          propModelSettings[line.stat as PropModelStat],
-        );
-      },
+      predict: (line, game, team, espnProjection) =>
+        model.predict({
+          stat: line.stat,
+          playerName: line.playerName,
+          team,
+          game,
+          line: line.line,
+          marketWeight: fitted?.weight ?? defaultMarketWeight,
+          ...(espnProjection !== undefined ? { espnProjection } : {}),
+        }),
       ...(league
         ? {
             rosters: league.teams.map((team) => ({

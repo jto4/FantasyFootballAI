@@ -462,3 +462,25 @@ interception lines need a real price. Each pre-kickoff chance and model mean is 
 graded; once 150 props are graded the weight is refit by log loss and used automatically, and
 the board shows the model's Brier score against the 0.25 coin flip. This replaces the earlier
 gap-based lean, which had no calibration.
+
+## Prop line ledger and usage features (October 23, 2026)
+
+No free source of historical prop prices exists, so the app keeps its own: `prop-lines.sqlite`
+holds, per game, player, stat and book, the first line seen, the last line of each day and the last
+line before kickoff (frozen at kickoff). A background job captures the coming week daily and games
+within two hours of kickoff every 20 minutes; prices appear when an Odds API key is set. Once a few
+weeks accumulate, the prop model can finally be scored against real closing lines.
+
+The prop model gained four opportunity settings, each defaulting to off and fitted the same way as
+before (2025 training with 2024 history, 2026 holdout; `docs/research/prop-model-usage-backtest-2026-10-23.json`):
+snap-share trend (recent ÷ usual, nflverse snap counts), depth-chart change (typical snap share at
+today's rank ÷ at the last game's rank, nflverse depth charts), target-share trend, and an air-yards
+estimate for receiving yards. The fit kept snap share and depth for every stat and left target
+share and air yards at zero. Holdout error fell most for quarterbacks (passing yards 63.9 → 61.3,
+attempts 7.55 → 7.20, completions 5.14 → 4.94) and rushing (21.8 → 21.5); the ESPN blend improved
+for attempts (6.87 → 6.73) and rushing yards (21.1 → 20.8) and was unchanged within noise for
+receiving. Carries now blend 75% ESPN / 25% model. Routes run per player are not in any free
+nflverse file, so snap share stands in for route participation. The app loads three seasons of
+snap counts and the current season's depth chart (about 65 MB) on first use and caches them for
+12 hours; without them those features stay off. The board and bet analysis share one runtime
+(`prop-model-runtime.ts`) so both price a prop identically.

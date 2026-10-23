@@ -131,3 +131,33 @@ it('declines to price players outside the fitted population', () => {
   expect(priced.overChance).toBeGreaterThan(0.5);
   expect(priced.overChance).toBeLessThan(0.6);
 });
+
+it('scales the estimate by snap-share and depth-chart changes when those settings are on', () => {
+  const target = game(4);
+  const league = buildPropModelLeague([], [game(1), game(2), game(3), target]);
+  const withSnaps = (week: number, yards: number, snapShare: number) => ({
+    ...row(week, yards),
+    usage: { snapShare },
+  });
+  const input = {
+    stat: 'receiving_yards' as const,
+    position: 'WR',
+    team: 'SEA',
+    game: target,
+    history: [withSnaps(1, 40, 0.4), withSnaps(2, 40, 0.4), withSnaps(3, 60, 0.8)],
+    depth: { now: 1, atLastGame: 3 },
+  };
+  const norms = { snapShareByRank: { WR: [0.85, 0.77, 0.58] }, yardsPerAirYard: 0.4 };
+  const off = predictPropMean(input, league, defaultPropModelParams, norms)!;
+  expect(off.factors).toMatchObject({ snap: 1, depth: 1 });
+  const on = predictPropMean(
+    input,
+    league,
+    { ...defaultPropModelParams, snapExponent: 1, depthExponent: 1 },
+    norms,
+  )!;
+  // Recent snaps (0.4, 0.8 → 0.6) above the usual weighted share, and a WR3 → WR1 promotion.
+  expect(on.factors.snap).toBeGreaterThan(1);
+  expect(on.factors.depth).toBeCloseTo(0.85 / 0.58);
+  expect(on.mean).toBeGreaterThan(off.mean);
+});

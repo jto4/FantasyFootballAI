@@ -333,12 +333,30 @@ export function parsePlayerGameStats(csv: string, season: number): PlayerGameSta
       stats,
       ...(blockedFieldGoalDistances ? { blockedFieldGoalDistances } : {}),
       ...(madeFieldGoalDistances ? { madeFieldGoalDistances } : {}),
+      ...usageFrom(row),
     });
   }
   if (!result.length) throw new Error('Player stats contained no usable rows.');
   return result;
 }
 
+/** Optional opportunity columns; absent or invalid values stay unknown rather than zero. */
+function usageFrom(row: Record<string, string | undefined>) {
+  const read = (value: string | undefined, min: number, max: number) => {
+    try {
+      return optionalNumber(value, min, max);
+    } catch {
+      return undefined;
+    }
+  };
+  const targetShare = read(row.target_share, 0, 1);
+  const receivingAirYards = read(row.receiving_air_yards, -300, 2_000);
+  const usage = {
+    ...(targetShare !== undefined ? { targetShare } : {}),
+    ...(receivingAirYards !== undefined ? { receivingAirYards } : {}),
+  };
+  return Object.keys(usage).length ? { usage } : {};
+}
 const kickingFields = new Set<string>(kickingStatKeys);
 const defenseFields = new Set<string>(defenseStatKeys);
 function kickDistances(raw: string | undefined, count: number | undefined): number[] | undefined {

@@ -1,7 +1,8 @@
 // Fits and evaluates the player-prop model. Train: 2025 regular season (2024 as history).
 // Holdout: completed 2026 regular-season games, never used for fitting. Prints fitted settings
 // and holdout metrics as JSON. Usage: node scripts/research/prop-model-backtest.mjs [out.json]
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { PublicFootballData } from '../../packages/integrations/dist/index.js';
 import {
   buildPropModelLeague,
@@ -27,9 +28,136 @@ const trainLeague = buildPropModelLeague(
 league.averageAllowed = trainLeague.averageAllowed;
 league.averageTeamPoints = trainLeague.averageTeamPoints;
 
+// Optional usage data from local nflverse files: --usage <dir> with stats_player_week, snap_counts
+// and depth_charts CSVs for 2024–2026 (statsYYYY.csv, snapsYYYY.csv, depthYYYY.csv).
+const usageIndex = process.argv.indexOf('--usage');
+const usageDir = usageIndex > 0 ? process.argv[usageIndex + 1] : undefined;
+const csv = (file) => {
+  const [header, ...lines] = readFileSync(file, 'utf8').split('\n').filter(Boolean);
+  const keys = header.split(',');
+  return lines.map((line) => {
+    const cells = line.split(',');
+    return Object.fromEntries(keys.map((k, i) => [k, cells[i]]));
+  });
+};
+const num = (v) => (v === undefined || v === '' || v === 'NA' ? undefined : Number(v));
+const depthIndex = new Map();
+let usageNorms;
+if (usageDir) {
+  const statUsage = new Map();
+  const snapUsage = new Map();
+  for (const season of [2024, 2025, 2026]) {
+    for (const r of csv(join(usageDir, `stats${season}.csv`)))
+      statUsage.set(`${r.player_id}:${r.game_id}`, {
+        targetShare: num(r.target_share),
+        receivingAirYards: num(r.receiving_air_yards),
+      });
+    for (const r of csv(join(usageDir, `snaps${season}.csv`)))
+      snapUsage.set(
+        `${playerNameKey(r.player)}:${nflTeamKey(r.team)}:${r.game_id}`,
+        num(r.offense_pct),
+      );
+    const skill = (pos) =>
+      ['QB'].includes(pos)
+        ? 'QB'
+        : ['RB', 'HB'].includes(pos)
+          ? 'RB'
+          : ['WR', 'LWR', 'RWR', 'SWR'].includes(pos)
+            ? 'WR'
+            : pos === 'TE'
+              ? 'TE'
+              : undefined;
+    for (const r of csv(join(usageDir, `depth${season}.csv`))) {
+      // 2024 files are weekly (week + depth_team); later files are dated snapshots (dt + pos_rank).
+      const id = r.gsis_id;
+      const pos = skill(r.dt ? r.pos_abb : r.depth_position);
+      const rank = num(r.dt ? r.pos_rank : r.depth_team);
+      if (!id || !pos || !rank) continue;
+      const entry = r.dt ? { at: r.dt, pos, rank } : { season, week: Number(r.week), pos, rank };
+      depthIndex.set(id, [...(depthIndex.get(id) ?? []), entry]);
+    }
+  }
+  for (const r of rows) {
+    const stat = statUsage.get(`${r.playerId}:${r.gameId}`);
+    const snap = snapUsage.get(`${playerNameKey(r.name)}:${nflTeamKey(r.team)}:${r.gameId}`);
+    const usage = {
+      ...(snap !== undefined ? { snapShare: snap } : {}),
+      ...(stat?.targetShare !== undefined && Number.isFinite(stat.targetShare)
+        ? { targetShare: stat.targetShare }
+        : {}),
+      ...(stat?.receivingAirYards !== undefined && Number.isFinite(stat.receivingAirYards)
+        ? { receivingAirYards: stat.receivingAirYards }
+        : {}),
+    };
+    if (Object.keys(usage).length) r.usage = usage;
+  }
+}
+/** Depth rank at a position before a game: weekly charts by week, dated charts by kickoff. */
+function depthRank(playerId, position, game) {
+  const entries = depthIndex.get(playerId);
+  if (!entries || !game) return undefined;
+  const cutoff = game.kickoffAt ?? `${game.date}T23:59:59Z`;
+  const pos = footballPosition(position);
+  const pick = entries.filter(
+    (e) =>
+      e.pos === pos &&
+      (e.at
+        ? e.at < cutoff && e.at.slice(0, 4) >= String(game.season)
+        : e.season === game.season && e.week === game.week),
+  );
+  if (!pick.length) return undefined;
+  if (pick[0].at) {
+    const latest = pick.reduce((a, b) => (a.at > b.at ? a : b)).at;
+    return Math.min(...pick.filter((e) => e.at === latest).map((e) => e.rank));
+  }
+  return Math.min(...pick.map((e) => e.rank));
+}
 const byPlayer = new Map();
 for (const r of rows) byPlayer.set(r.playerId, [...(byPlayer.get(r.playerId) ?? []), r]);
 
+if (usageDir) {
+  // Norms come from training games only (2025), so the holdout never informs them.
+  const train = rows.filter((r) => r.season === 2025 && r.usage);
+  const shares = {};
+  for (const r of train) {
+    const pos = footballPosition(r.position);
+    if (!['QB', 'RB', 'WR', 'TE'].includes(pos) || r.usage.snapShare === undefined) continue;
+    const rank = depthRank(r.playerId, pos, league.games.get(r.gameId));
+    if (!rank || rank > 4) continue;
+    (shares[pos] ??= [[], [], [], []])[rank - 1].push(r.usage.snapShare);
+  }
+  const median = (v) => {
+    const sorted = [...v].sort((a, b) => a - b);
+    return sorted.length
+      ? Math.round(sorted[Math.floor(sorted.length / 2)] * 1000) / 1000
+      : undefined;
+  };
+  const snapShareByRank = Object.fromEntries(
+    Object.entries(shares).map(([pos, byRank]) => {
+      const values = byRank.map(median);
+      // Ranks without data take the next-better rank's share so lookups never fail.
+      for (let i = 1; i < values.length; i++) values[i] ??= values[i - 1];
+      return [pos, values];
+    }),
+  );
+  let yards = 0,
+    air = 0;
+  for (const r of train)
+    if (
+      ['WR', 'TE'].includes(footballPosition(r.position)) &&
+      (r.usage.receivingAirYards ?? 0) > 0
+    ) {
+      yards += r.stats.receiving_yards ?? 0;
+      air += r.usage.receivingAirYards;
+    }
+  usageNorms = { snapShareByRank, yardsPerAirYard: Math.round((yards / air) * 1000) / 1000 };
+  console.error(
+    'usage norms',
+    JSON.stringify(usageNorms),
+    'rows with usage',
+    rows.filter((r) => r.usage).length,
+  );
+}
 // Players a book would post a line for, judged from pre-game history with default settings.
 const eligible = {
   passing_yards: (pos, base) => pos === 'QB' && base >= 150,
@@ -57,11 +185,36 @@ function samples(stat) {
       defaultPropModelParams,
     );
     if (!prior || prior.sampleGames < 3 || !eligible[stat](pos, prior.base)) continue;
-    out.push({ row: r, game, pos, actual, history, holdout: r.season === 2026 });
+    const lastGame = history
+      .filter((h) => h.season * 100 + h.week < r.season * 100 + r.week)
+      .sort((a, b) => b.season * 100 + b.week - (a.season * 100 + a.week))[0];
+    const depth = usageDir
+      ? {
+          now: depthRank(r.playerId, pos, game),
+          atLastGame: lastGame
+            ? depthRank(r.playerId, pos, league.games.get(lastGame.gameId))
+            : undefined,
+        }
+      : undefined;
+    out.push({ row: r, game, pos, actual, history, depth, holdout: r.season === 2026 });
   }
   return out;
 }
 
+const modelPredict = (stat, s, params) =>
+  predictPropMean(
+    {
+      stat,
+      position: s.pos,
+      team: s.row.team,
+      game: s.game,
+      history: s.history,
+      ...(s.depth ? { depth: s.depth } : {}),
+    },
+    league,
+    params,
+    usageNorms,
+  );
 const deviance = (y, mu) => {
   const m = Math.max(mu, 1e-6);
   return 2 * ((y > 0 ? y * Math.log(y / m) : 0) - (y - m));
@@ -69,12 +222,7 @@ const deviance = (y, mu) => {
 function loss(stat, list, params) {
   let sum = 0;
   for (const s of list) {
-    const p = predictPropMean(
-      { stat, position: s.pos, team: s.row.team, game: s.game, history: s.history },
-      league,
-      params,
-    );
-    sum += deviance(s.actual, p.mean);
+    sum += deviance(s.actual, modelPredict(stat, s, params).mean);
   }
   return sum / list.length;
 }
@@ -88,6 +236,14 @@ const grid = {
   opponentExponent: [0, 0.3, 0.6, 1],
   opponentShrinkGames: [3, 6, 12],
   homeFactor: [0.97, 1, 1.03],
+  ...(usageDir
+    ? {
+        snapExponent: [0, 0.3, 0.6, 1],
+        depthExponent: [0, 0.3, 0.6, 1],
+        targetShareExponent: [0, 0.3, 0.6, 1],
+        airYardsWeight: [0, 0.25, 0.5],
+      }
+    : {}),
 };
 function fit(stat, train) {
   let params = { ...defaultPropModelParams };
@@ -169,12 +325,7 @@ for (const stat of propModelStats) {
   const train = all.filter((s) => !s.holdout);
   const holdout = all.filter((s) => s.holdout);
   const { params, trainDeviance } = fit(stat, train);
-  const predict = (s, p = params) =>
-    predictPropMean(
-      { stat, position: s.pos, team: s.row.team, game: s.game, history: s.history },
-      league,
-      p,
-    );
+  const predict = (s, p = params) => modelPredict(stat, s, p);
   const outcome = outcomeModel(
     stat,
     train.map((s) => ({ mean: predict(s).mean, actual: s.actual })),
@@ -367,11 +518,7 @@ if (emitIndex > 0) {
           `${s.row.week}:${playerNameKey(s.row.name)}:${nflTeamKey(s.row.team)}`,
         );
         const espn = f?.stats[stat];
-        const model = predictPropMean(
-          { stat, position: s.pos, team: s.row.team, game: s.game, history: s.history },
-          league,
-          entry.params,
-        ).mean;
+        const model = modelPredict(stat, s, entry.params).mean;
         return espn === undefined
           ? undefined
           : {
@@ -390,8 +537,9 @@ if (emitIndex > 0) {
   writeFileSync(
     process.argv[emitIndex + 1],
     `// Generated by scripts/research/prop-model-backtest.mjs --emit; see docs/decisions.md.\n` +
-      `import type { PropModelSettings } from './prop-model.js';\n\n` +
-      `export const propModelSettings: PropModelSettings = ${JSON.stringify(settings, null, 2)};\n`,
+      `import type { PropModelSettings, PropUsageNorms } from './prop-model.js';\n\n` +
+      `export const propModelSettings: PropModelSettings = ${JSON.stringify(settings, null, 2)};\n\n` +
+      `export const propUsageNorms: PropUsageNorms = ${JSON.stringify(usageNorms ?? { snapShareByRank: {}, yardsPerAirYard: 0.8 }, null, 2)};\n`,
   );
 }
 const out = process.argv[2]?.startsWith('--') ? undefined : process.argv[2];

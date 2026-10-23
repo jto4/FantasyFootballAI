@@ -44,6 +44,7 @@ import type {
   PublicPropLines,
   PublicNflScoreboard,
   PublicNflBoxScores,
+  PublicUsageData,
 } from '@sidekick/integrations';
 import {
   adviceModelChoices,
@@ -79,6 +80,8 @@ export interface AdviceDependencies {
   props?: Pick<PublicPropLines, 'props' | 'books'>;
   scoreboard?: Pick<PublicNflScoreboard, 'current'>;
   boxScores?: Pick<PublicNflBoxScores, 'get'>;
+  /** Snap counts and depth charts for the prop model. */
+  usage?: Pick<PublicUsageData, 'get'>;
   now?: () => number;
 }
 
@@ -618,6 +621,9 @@ export function createAdviceService(deps: AdviceDependencies) {
         data,
         targetGame,
         season,
+        ...(request.bet?.kind === 'player-prop' && deps.usage
+          ? { usage: await deps.usage.get(season).catch(() => undefined) }
+          : {}),
       });
     }
     if (betHistory)

@@ -32,6 +32,14 @@ export interface PropModelParams {
   opponentShrinkGames: number;
   /** Multiplier for home games. */
   homeFactor: number;
+  /** Exponent on recent snap share ÷ the player's usual snap share (role growth or loss). */
+  snapExponent: number;
+  /** Exponent on the typical snap share at today's depth rank ÷ at the last game's rank. */
+  depthExponent: number;
+  /** Exponent on recent target share ÷ usual target share (receiving stats). */
+  targetShareExponent: number;
+  /** Weight of the air-yards estimate (usual air yards × league yards per air yard). */
+  airYardsWeight: number;
 }
 
 export const defaultPropModelParams: PropModelParams = {
@@ -43,7 +51,20 @@ export const defaultPropModelParams: PropModelParams = {
   opponentExponent: 0,
   opponentShrinkGames: 6,
   homeFactor: 1,
+  snapExponent: 0,
+  depthExponent: 0,
+  targetShareExponent: 0,
+  airYardsWeight: 0,
 };
+
+/**
+ * Typical share of offensive snaps by position and depth rank (rank 1 first), and league receiving
+ * yards per air yard; measured offline with the prop model settings.
+ */
+export interface PropUsageNorms {
+  snapShareByRank: Record<string, number[]>;
+  yardsPerAirYard: number;
+}
 
 /** League context built once from completed games: team scoring and what defenses allow. */
 export interface PropModelLeague {
@@ -125,6 +146,8 @@ export interface PropModelInput {
   game: FootballGame;
   /** The player's games (any order); later or same-game rows are ignored. */
   history: PlayerGameStats[];
+  /** Depth-chart rank at the position before this game and as of the player's last game. */
+  depth?: { now?: number; atLastGame?: number };
 }
 
 export interface PropModelPrediction {
@@ -133,7 +156,15 @@ export interface PropModelPrediction {
   base: number;
   /** Effective number of past games behind the base. */
   sampleGames: number;
-  factors: { environment: number; script: number; opponent: number; home: number };
+  factors: {
+    environment: number;
+    script: number;
+    opponent: number;
+    home: number;
+    snap: number;
+    depth: number;
+    targetShare: number;
+  };
 }
 
 /**
@@ -145,6 +176,7 @@ export function predictPropMean(
   input: PropModelInput,
   league: PropModelLeague,
   params: PropModelParams = defaultPropModelParams,
+  norms?: PropUsageNorms,
 ): PropModelPrediction | undefined {
   const position = footballPosition(input.position);
   const team = nflTeamKey(input.team);
@@ -167,7 +199,57 @@ export function predictPropMean(
   // Thin histories borrow from the player's own earlier level rather than a league average,
   // because props are only posted for players with real roles.
   const allSeasons = past.reduce((s, p) => s + p.row.stats[input.stat]!, 0) / past.length;
-  const base = (total + params.shrinkGames * allSeasons) / (weight + params.shrinkGames);
+  let base = (total + params.shrinkGames * allSeasons) / (weight + params.shrinkGames);
+
+  // Usage: compare the player's recent opportunity with the level behind the base estimate.
+  const usual = (read: (row: PlayerGameStats) => number | undefined) => {
+    let sum = 0,
+      w = 0;
+    past.forEach(({ row }, gamesAgo) => {
+      const value = read(row);
+      if (value === undefined || !Number.isFinite(value)) return;
+      const weightNow =
+        0.5 ** (gamesAgo / params.halfLife) *
+        (row.season < input.game.season ? params.priorSeasonWeight : 1);
+      sum += weightNow * value;
+      w += weightNow;
+    });
+    return w ? sum / w : undefined;
+  };
+  const recent = (read: (row: PlayerGameStats) => number | undefined, games: number) => {
+    const values = past
+      .slice(0, games)
+      .map(({ row }) => read(row))
+      .filter((v): v is number => v !== undefined && Number.isFinite(v));
+    return values.length ? values.reduce((a, b) => a + b, 0) / values.length : undefined;
+  };
+  const ratio = (now: number | undefined, then: number | undefined, floor: number) =>
+    now !== undefined && then !== undefined && then > floor ? Math.max(now, floor) / then : 1;
+  const snapRead = (row: PlayerGameStats) => row.usage?.snapShare;
+  const snapFactor = params.snapExponent
+    ? Math.min(3, ratio(recent(snapRead, 2), usual(snapRead), 0.05)) ** params.snapExponent
+    : 1;
+  const ranks = norms?.snapShareByRank[position];
+  const rankShare = (rank?: number) =>
+    rank !== undefined && ranks?.length ? ranks[Math.min(rank, ranks.length) - 1] : undefined;
+  const depthFactor = params.depthExponent
+    ? Math.min(3, ratio(rankShare(input.depth?.now), rankShare(input.depth?.atLastGame), 0.05)) **
+      params.depthExponent
+    : 1;
+  const receiving = input.stat === 'receiving_yards' || input.stat === 'receptions';
+  const shareRead = (row: PlayerGameStats) => row.usage?.targetShare;
+  const shareFactor =
+    receiving && params.targetShareExponent
+      ? Math.min(3, ratio(recent(shareRead, 3), usual(shareRead), 0.02)) **
+        params.targetShareExponent
+      : 1;
+  if (input.stat === 'receiving_yards' && params.airYardsWeight && norms) {
+    const airYards = usual((row) => row.usage?.receivingAirYards);
+    if (airYards !== undefined && airYards > 0)
+      base =
+        (1 - params.airYardsWeight) * base +
+        params.airYardsWeight * airYards * norms.yardsPerAirYard;
+  }
 
   const home = nflTeamKey(input.game.home) === team;
   const spread = input.game.spreadLine;
@@ -206,7 +288,17 @@ export function predictPropMean(
   const opponentFactor = opponentRatio ** params.opponentExponent;
   const homeFactor = home ? params.homeFactor : 1 / params.homeFactor;
   return {
-    mean: Math.max(0, base * environment * script * opponentFactor * homeFactor),
+    mean: Math.max(
+      0,
+      base *
+        environment *
+        script *
+        opponentFactor *
+        homeFactor *
+        snapFactor *
+        depthFactor *
+        shareFactor,
+    ),
     base,
     sampleGames: past.length,
     factors: {
@@ -214,6 +306,9 @@ export function predictPropMean(
       script,
       opponent: opponentFactor,
       home: homeFactor,
+      snap: snapFactor,
+      depth: depthFactor,
+      targetShare: shareFactor,
     },
   };
 }
@@ -229,7 +324,8 @@ export type PropOutcomeModel =
 export type PropModelSettings = Record<
   PropModelStat,
   {
-    params: PropModelParams;
+    /** Missing settings default to defaultPropModelParams (usage features off). */
+    params: Partial<PropModelParams>;
     /** Share of the center taken from ESPN's projection when one exists. */
     espnWeight: number;
     /** Spread around the blended center. */
@@ -309,6 +405,7 @@ export function predictProp(
   input: PropModelInput & { line: number; espnProjection?: number; marketWeight?: number },
   league: PropModelLeague,
   settings: PropModelSettings[PropModelStat],
+  norms?: PropUsageNorms,
 ):
   | {
       mean: number;
@@ -318,7 +415,13 @@ export function predictProp(
       source: 'blend' | 'espn' | 'model';
     }
   | undefined {
-  const model = predictPropMean(input, league, settings.params);
+  // Settings fitted before usage features existed lack them; they default to off.
+  const model = predictPropMean(
+    input,
+    league,
+    { ...defaultPropModelParams, ...settings.params },
+    norms,
+  );
   // Outside the fitted population (a backup's history, a quarterback's scramble yards) there is
   // no model view at all.
   if (!model || model.sampleGames < 3 || !propModelEligible(input.stat, input.position, model.base))

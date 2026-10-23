@@ -95,6 +95,17 @@ export interface PlayerGameStats {
   /** Validated individual distances; aggregate misses exclude blocks in nflverse. */
   blockedFieldGoalDistances?: number[];
   madeFieldGoalDistances?: number[];
+  /** Opportunity measures when the source supplies them; missing values stay unknown. */
+  usage?: PlayerGameUsage;
+}
+
+export interface PlayerGameUsage {
+  /** Share of the team's offensive snaps, 0–1 (nflverse snap counts). */
+  snapShare?: number;
+  /** Share of the team's targets, 0–1. */
+  targetShare?: number;
+  /** Air yards on all targets, catchable or not. */
+  receivingAirYards?: number;
 }
 
 export interface PregameTeamContext {
