@@ -234,7 +234,7 @@ export function createPropBoardRouter(deps: {
       if (!row.kickoffAt || Date.parse(row.kickoffAt) <= now()) continue;
       const key = `${row.gameId}:${row.espnId ?? row.playerName}:${row.stat}`;
       // Before kickoff a prop that no longer leans must not keep an earlier saved lean.
-      if (!row.lean || row.projection === undefined) {
+      if (!row.lean || !row.model) {
         deps.leans.delete(key);
         continue;
       }
@@ -248,7 +248,7 @@ export function createPropBoardRouter(deps: {
         line: row.line,
         side: row.lean.side,
         strength: row.lean.strength,
-        projection: row.projection,
+        projection: row.projection ?? row.model.mean,
         ...(row.model ? { overChance: row.model.overChance, modelMean: row.model.mean } : {}),
         observedAt: at,
       });
