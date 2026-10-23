@@ -8,6 +8,7 @@ import {
 } from '@sidekick/integrations';
 import { createChatRouter } from './chat-routes.js';
 import { createPropBoardRouter, PropLeanStore } from './prop-board-routes.js';
+import { PropLineLedger, startPropLineCapture } from './prop-line-ledger.js';
 import { ChatStore } from './chat-store.js';
 import { resolveConfiguredAI } from './ai-runtime.js';
 import { createImsgRouter } from './imsg-routes.js';
@@ -492,6 +493,14 @@ app.use(
     injuries: nflInjuryReportCache,
   }),
 );
+const propLineLedger = new PropLineLedger(
+  researchJoin(researchDirname(store.path), 'prop-lines.sqlite'),
+);
+const propLineCapture = startPropLineCapture(
+  { data: publicFootballData, props: publicPropLines, ledger: propLineLedger },
+  (error) =>
+    logEvent('warn', 'props.capture.failed', { component: 'advice', errorName: errorName(error) }),
+);
 const propLeans = new PropLeanStore(researchJoin(researchDirname(store.path), 'prop-leans.sqlite'));
 app.use(
   createPropBoardRouter({
@@ -499,6 +508,7 @@ app.use(
     props: publicPropLines,
     store,
     leans: propLeans,
+    ledger: propLineLedger,
   }),
 );
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
@@ -897,6 +907,7 @@ stopApplication = createShutdownAction(
     twilioConversationAutoSyncTask,
     leagueAutoRefresh,
     predictionTracking,
+    propLineCapture,
   ],
   () => logEvent('info', 'api.stopping', { component: 'api', reason: 'shutdown_requested' }),
 );
@@ -906,5 +917,6 @@ process.once('beforeExit', () => {
   marketResearch.close();
   chats.close();
   propLeans.close();
+  propLineLedger.close();
   store.close();
 });

@@ -25,6 +25,7 @@ import {
 } from '@sidekick/core';
 import type { PublicFootballData, PublicPropLines } from '@sidekick/integrations';
 import type { LocalStore } from './store.js';
+import type { PropLineLedger } from './prop-line-ledger.js';
 
 /**
  * Pre-kickoff prop leans and their graded results, kept apart from app state like market
@@ -135,6 +136,8 @@ export function createPropBoardRouter(deps: {
   props: Pick<PublicPropLines, 'props'>;
   store: Pick<LocalStore, 'snapshot'>;
   leans: PropLeanStore;
+  /** Optional: every line the board fetches is also kept in the line ledger. */
+  ledger?: PropLineLedger;
   now?: () => number;
 }) {
   const router = Router();
@@ -183,6 +186,7 @@ export function createPropBoardRouter(deps: {
           }
         }),
       );
+    deps.ledger?.record(lines, games, at);
     const league = deps.store.snapshot().leagues.find((l) => l.id === req.query.league);
     const model = modelFor(data);
     const fitted = marketWeightFromResults(deps.leans.list());
@@ -268,12 +272,24 @@ export function createPropBoardRouter(deps: {
       rows,
       warnings,
       record: summarizePropLeans(deps.leans.list()),
+      ...(deps.ledger ? { ledger: deps.ledger.summary() } : {}),
       model: {
         marketWeight: fitted?.weight ?? defaultMarketWeight,
         fitted: Boolean(fitted),
         gradedForFit: gradedForFit(deps.leans.list()).length,
       },
     });
+  });
+  // Saved line and price history for research, optionally for one game.
+  router.get('/api/props/lines', (req, res) => {
+    const game = req.query.game;
+    if (
+      Object.keys(req.query).some((k) => k !== 'game') ||
+      (game !== undefined && (typeof game !== 'string' || !/^[\w-]{1,80}$/.test(game)))
+    )
+      return res.status(400).json({ error: 'Choose a valid NFL game.' });
+    if (!deps.ledger) return res.json({ items: [] });
+    res.json({ items: deps.ledger.list(game as string | undefined) });
   });
   router.get('/api/props/record', async (_req, res) => {
     try {
