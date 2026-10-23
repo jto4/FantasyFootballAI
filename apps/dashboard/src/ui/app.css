@@ -3511,7 +3511,6 @@ kbd {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  text-transform: capitalize;
   background: color-mix(in srgb, var(--muted) 14%, transparent);
 }
 .run-row.failed .run-status {

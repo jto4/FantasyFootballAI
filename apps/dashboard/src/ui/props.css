@@ -145,3 +145,15 @@
   color: var(--muted);
   line-height: 1.5;
 }
+.props-filters select,
+.props-filters input {
+  min-height: 36px;
+  min-width: 170px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 400;
+}

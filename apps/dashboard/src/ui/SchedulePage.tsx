@@ -183,7 +183,11 @@ export function SchedulePage({
               aria-label={`${kindLabel} run, ${run.status}`}
             >
               <span className={`run-status ${run.status}`}>
-                {replaced ? 'Since replaced' : run.status === 'succeeded' ? 'Done' : run.status}
+                {replaced
+                  ? 'Since replaced'
+                  : run.status === 'succeeded'
+                    ? 'Done'
+                    : run.status.charAt(0).toUpperCase() + run.status.slice(1)}
               </span>
               <div>
                 <h3>{run.calendarEventTitle ?? kindLabel}</h3>
