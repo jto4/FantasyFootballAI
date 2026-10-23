@@ -30,6 +30,7 @@ import { createPortableBackup } from '../apps/api/src/backup-archive.js';
 import { createAdviceRouter } from '../apps/api/src/advice-routes.js';
 import { createChatRouter } from '../apps/api/src/chat-routes.js';
 import { ChatStore } from '../apps/api/src/chat-store.js';
+import { createPropBoardRouter, PropLeanStore } from '../apps/api/src/prop-board-routes.js';
 import { createProjectionRouter } from '../apps/api/src/projection-routes.js';
 import type { NFLInjuryReportRow } from '@sidekick/integrations';
 import { adviceAnswer, adviceCatalog, adviceData, adviceNow } from './advice-fixture';
@@ -421,6 +422,52 @@ export async function apiWorkspace(
       discoverModels: async () => ['gpt-6-luna'],
     }),
   );
+  const propLeans = new PropLeanStore(':memory:');
+  app.use(
+    createPropBoardRouter({
+      data: {
+        get: async () => ({
+          ...structuredClone(adviceFootballData),
+          playerForecasts: [
+            {
+              espnId: '900',
+              name: 'Alex Quarterback',
+              position: 'QB',
+              team: 'BUF',
+              season: 2026,
+              week: 5,
+              issuedWeek: 5,
+              stats: { passing_yards: 300 },
+              sourceId: 'espn-forecasts-2026-0',
+            },
+          ],
+        }),
+      },
+      props: {
+        props: async (game) => ({
+          gameId: game.id,
+          lines: [
+            {
+              id: `espn:${game.id}:900:passing_yards:265.5`,
+              gameId: game.id,
+              playerName: 'Alex Quarterback',
+              team: 'BUF',
+              stat: 'passing_yards',
+              line: 265.5,
+              sportsbook: 'DraftKings',
+              source: 'espn',
+              observedAt: new Date(adviceClock).toISOString(),
+            },
+          ],
+          priced: false,
+          warnings: [],
+        }),
+      },
+      store,
+      leans: propLeans,
+      now: () => adviceClock,
+    }),
+  );
   const chats = new ChatStore(':memory:');
   app.use(
     createChatRouter({
@@ -549,6 +596,7 @@ export async function apiWorkspace(
       });
       marketResearch.close();
       chats.close();
+      propLeans.close();
       store.close();
       await rm(directory, { recursive: true, force: true });
     },

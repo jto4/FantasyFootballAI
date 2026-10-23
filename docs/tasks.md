@@ -15,6 +15,8 @@ Completed work and its evidence live in the archived task records and dated revi
 - [x] Home shows the newest draft per report type once; Reports hides failures a later run replaced; Advice has one tab row with AI options tucked away; Live asks for your team.
 - [x] Chat on an Ask page and a ⌘J side panel, answering from read-only app lookups, with saved and deletable conversations. See `decisions.md`.
 - [x] Live scores players from ESPN's public NFL box scores under each league's rules (offense, kickers, D/ST, two-point tries), so imported leagues update during games. ESPN D/ST and kicker slot overrides are now imported.
+- [x] Props board in Advice: every prop this week with ESPN projection, typical-game estimate, season hit rate, fantasy owner and a graded pre-kickoff lean. Schedule run history and the Settings AI card tidied.
+- [ ] Review the props lean record after 50+ graded leans; drop or retune the strength thresholds if strong leans don't beat 52.4%.
 - [ ] Measure chat answer quality and speed on each AI connection with a fixed question set; Codex rounds take tens of seconds each.
 
 ### Product pass — October 21, 2026

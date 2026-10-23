@@ -6,6 +6,7 @@ import {
   isAdviceRequest,
   isAdviceResult,
   nflTeamKey,
+  playerNameKey,
   starterSlots,
   type AdviceMode,
   type AdviceConnection,
@@ -26,6 +27,9 @@ import { LoadingStatus } from './LoadFeedback';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
+import './props.css';
+import { PropsBoard, type PropHandoff } from './PropsBoard';
+import { clearPropHandoff, peekPropHandoff, stashPropHandoff } from './prop-handoff';
 import { BetFields } from './BetFields';
 import { BetLimit } from './BetLimit';
 import { TradeIdeasPanel, WaiverDayPanel } from './RosterMoves';
@@ -64,7 +68,10 @@ export function AdvicePage({
   const [tradeTeamId, setTradeTeamId] = useState(league?.teams[1]?.id ?? '');
   const [week, setWeek] = useState('');
   const [tradeThroughWeek, setTradeThroughWeek] = useState('18');
-  const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>(initialView);
+  const [view, setView] = useState<'decision' | 'history' | 'props' | 'research' | 'signals'>(
+    initialView,
+  );
+  const [pendingProp, setPendingProp] = useState(peekPropHandoff);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [dropPlayerId, setDropPlayerId] = useState('');
   const [lineupComparison, setLineupComparison] = useState(false);
@@ -220,6 +227,37 @@ export function AdvicePage({
     setStatus('');
   }
   const allPlayers = options?.players ?? [];
+  // A prop picked on the props board fills the bet form once the game's players are loaded.
+  useEffect(() => {
+    if (!pendingProp || !options || mode !== 'betting') return;
+    const game = options.games.find((g) => g.id === pendingProp.gameId);
+    const matches = (options.players ?? []).filter(
+      (p) =>
+        game &&
+        [game.home, game.away].map(nflTeamKey).includes(nflTeamKey(p.nflTeam ?? '')) &&
+        playerNameKey(p.name) === playerNameKey(pendingProp.playerName),
+    );
+    setBetKind('player-prop');
+    setGameId(pendingProp.gameId);
+    setStat(pendingProp.stat);
+    setLine(String(pendingProp.line));
+    setSide(pendingProp.side);
+    setOdds(pendingProp.odds === undefined ? '-110' : String(pendingProp.odds));
+    setOppositeOdds(pendingProp.oppositeOdds === undefined ? '' : String(pendingProp.oppositeOdds));
+    setQuote(undefined);
+    setPropPlayer(matches.length === 1 ? [matches[0]!.id] : []);
+    setView('decision');
+    clearPropHandoff();
+    setPendingProp(undefined);
+  }, [pendingProp, options, mode]);
+  function analyzeProp(pick: PropHandoff) {
+    if (mode === 'betting') {
+      setPendingProp(pick);
+      return;
+    }
+    stashPropHandoff(pick);
+    onNavigate({ section: 'Advice', adviceMode: 'betting', adviceId: '' });
+  }
   const mine = allPlayers.filter((player) => player.teamId === teamId);
   const other = allPlayers.filter((player) => player.teamId === tradeTeamId);
   const commonStartingSpot = starterSlots(league?.settings.roster_positions).slots.some((slot) =>
@@ -775,6 +813,7 @@ export function AdvicePage({
                 setQuote={setQuote}
                 changed={changed}
                 onExploreSignals={() => setView('signals')}
+                onOpenProps={() => setView('props')}
               />
             )}
             <label>
@@ -1074,6 +1113,7 @@ export function AdvicePage({
           [
             ['decision', result ? 'Your decision' : 'New decision'],
             ['history', `Saved advice${history.length ? ` (${history.length})` : ''}`],
+            ['props', 'Player props'],
             ['research', 'Track results'],
             ['signals', 'Market signals'],
           ] as const
@@ -1206,6 +1246,13 @@ export function AdvicePage({
           </>
         ) : null}
       </div>
+      {view === 'props' && (
+        <PropsBoard
+          leagueId={league?.id}
+          myTeamName={league?.teams.find((t) => t.id === (preferredTeamId ?? teamId))?.name}
+          onAnalyze={analyzeProp}
+        />
+      )}
       {view === 'signals' && (
         <Suspense fallback={<LoadingStatus message="Loading Market Signals…" />}>
           <MarketSignalsPanel />

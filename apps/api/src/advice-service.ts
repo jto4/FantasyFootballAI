@@ -35,6 +35,8 @@ import {
   type RosterPlayer,
   capturePredictionRecords,
   liveMatchup,
+  playerNameKey,
+  propLean,
   footballPosition,
   scoreHistoricalGame,
   type PlayerGameStats,
@@ -658,6 +660,64 @@ export function createAdviceService(deps: AdviceDependencies) {
       if (rolling.forecast) betHistory.forecast = rolling.forecast;
       betHistory.metrics.push(...rolling.metrics);
       betHistory.warnings.push(...rolling.warnings);
+      const bet = request.bet!;
+      const propPlayer =
+        bet.kind === 'player-prop'
+          ? loaded.players.find((player) => player.id === bet.playerId)
+          : undefined;
+      const forecast =
+        propPlayer && targetGame
+          ? (data.playerForecasts ?? []).find(
+              (f) =>
+                f.week === targetGame.week &&
+                (propPlayer.espnId
+                  ? f.espnId === propPlayer.espnId
+                  : playerNameKey(f.name) === playerNameKey(propPlayer.name) &&
+                    nflTeamKey(f.team) === nflTeamKey(propPlayer.nflTeam ?? '')),
+            )
+          : undefined;
+      const projected = bet.stat ? forecast?.stats[bet.stat] : undefined;
+      if (forecast && bet.stat && projected !== undefined && bet.line !== undefined) {
+        // The same comparison the props board shows, so the analysis and the board agree.
+        const recent = data.players
+          .filter(
+            (row) =>
+              row.season === season &&
+              row.seasonType === 'REG' &&
+              row.week < targetGame!.week &&
+              playerNameKey(row.name) === playerNameKey(forecast.name),
+          )
+          .map((row) => row.stats[bet.stat!])
+          .filter((v): v is number => v !== undefined);
+        const { lean, median, spread } = propLean(bet.stat, bet.line, projected, recent);
+        betHistory.metrics.push(
+          {
+            id: 'prop-espn-projection',
+            label: 'ESPN projection for this stat (average game)',
+            value: projected,
+            unit: bet.stat,
+            sourceIds: [forecast.sourceId],
+          },
+          {
+            id: 'prop-typical-game',
+            label: 'Projection adjusted to a typical game',
+            value: median,
+            unit: bet.stat,
+            sourceIds: [forecast.sourceId],
+            description:
+              'Most players finish below their own average in most games (2025: receivers topped average receiving yards in 42% of games), so the average is scaled by a measured typical-game ratio before comparing with the line.',
+          },
+          {
+            id: 'prop-lean-score',
+            label: 'Typical game minus line, in usual game-to-game swings',
+            value: lean?.score ?? 0,
+            unit: 'swings',
+            sourceIds: [forecast.sourceId],
+            ...(recent.length ? { sampleSize: recent.length } : {}),
+            description: `Positive favors the over. Usual swing used: ${Math.round(spread * 10) / 10}. ${lean ? `Board lean: ${lean.side} (${lean.strength}).` : 'Too close for a board lean.'} Leans are graded on the props board; none has shown a lasting edge over sportsbooks.`,
+          },
+        );
+      }
     }
     if (betHistory)
       sources.push(

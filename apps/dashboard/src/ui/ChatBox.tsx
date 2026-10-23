@@ -22,6 +22,7 @@ const starters: Record<string, string[]> = {
     'Who should I start at FLEX this week?',
     'Is there a trade that helps both me and someone else?',
     'Which waiver pickup helps my lineup most?',
+    'What are the strongest prop leans this week?',
   ],
 };
 const defaultStarters = [

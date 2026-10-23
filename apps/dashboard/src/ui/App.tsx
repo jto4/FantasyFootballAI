@@ -1127,6 +1127,7 @@ export function App() {
               <SchedulePage
                 actions={state.settings.actions}
                 scheduledRuns={state.scheduledRuns}
+                reports={state.reports}
                 retryingRunId={retryingRunId}
                 generatingKind={generatingKind}
                 onGenerate={(kind) => void createReport(kind)}

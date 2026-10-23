@@ -7,6 +7,7 @@ import {
   readBoundedJson,
 } from '@sidekick/integrations';
 import { createChatRouter } from './chat-routes.js';
+import { createPropBoardRouter, PropLeanStore } from './prop-board-routes.js';
 import { ChatStore } from './chat-store.js';
 import { resolveConfiguredAI } from './ai-runtime.js';
 import { createImsgRouter } from './imsg-routes.js';
@@ -486,6 +487,15 @@ app.use(
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,
     injuries: nflInjuryReportCache,
+  }),
+);
+const propLeans = new PropLeanStore(researchJoin(researchDirname(store.path), 'prop-leans.sqlite'));
+app.use(
+  createPropBoardRouter({
+    data: publicFootballData,
+    props: publicPropLines,
+    store,
+    leans: propLeans,
   }),
 );
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
@@ -1047,5 +1057,6 @@ process.once('SIGTERM', stopApplication);
 process.once('beforeExit', () => {
   marketResearch.close();
   chats.close();
+  propLeans.close();
   store.close();
 });

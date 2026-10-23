@@ -413,3 +413,19 @@ decision above. Conversations live in `chat.sqlite` beside the main store (newes
 each), outside app state, exports and report prompts, and can be deleted from the panel. Answers
 arrive whole, with progress lines while lookups run: the reply format decides between "look up"
 and "answer" only once the model finishes, so token-by-token streaming is not offered.
+
+## Props board: projection leans that grade themselves (October 23, 2026)
+
+Player props get their own Advice tab instead of sitting inside the bet form. Each published line
+is compared with ESPN's weekly projection for that stat. Because ESPN projects an average game
+and most players finish below their own average in most games, the projection is first scaled to
+a typical game with ratios measured from 2025 (for example receiving yards 0.87, rushing yards
+0.93, passing yards 1.0). The gap to the line is divided by the player's usual game-to-game swing:
+the measured 2025 spread for that stat, shrunk toward the player's own history as games
+accumulate. Gaps under 0.15 swings get no lean; 0.3 and 0.5 mark moderate and strong.
+
+This is a transparent comparison, not a calibrated probability, and it is not shown as one. Every
+lean is saved before kickoff (`prop-leans.sqlite`, the last line seen before kickoff wins) and
+graded from nflverse stats afterwards; the board shows the record by strength against the 52.4%
+break-even at −110. The record, not the lean's size, decides whether it deserves trust. Bet
+analysis for a prop receives the same three numbers as evidence so the AI and the board agree.

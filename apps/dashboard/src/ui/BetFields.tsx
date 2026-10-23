@@ -53,6 +53,7 @@ export function BetFields({
   setQuote,
   changed,
   onExploreSignals,
+  onOpenProps,
 }: {
   options: AdviceOptions | null;
   game: AdviceOptions['games'][number] | undefined;
@@ -78,6 +79,8 @@ export function BetFields({
   quote: SportsbookQuote | undefined;
   setQuote: Setter<SportsbookQuote | undefined>;
   changed: () => void;
+  /** Opens the week's props board, which compares every line with projections. */
+  onOpenProps?: () => void;
   onExploreSignals: () => void;
 }) {
   return (
@@ -157,6 +160,11 @@ export function BetFields({
         <button type="button" className="small-button" onClick={onExploreSignals}>
           Explore market signals
         </button>
+        {onOpenProps && (
+          <button type="button" className="small-button" onClick={onOpenProps}>
+            Props board with projections
+          </button>
+        )}
       </div>
       {betKind !== 'player-prop' && (
         <LiveSportsbookPrices

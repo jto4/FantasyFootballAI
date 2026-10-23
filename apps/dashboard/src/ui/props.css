@@ -1,0 +1,147 @@
+/* Player props board in Advice. */
+.props-board-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.props-board-head h2 {
+  margin: 0 0 4px;
+}
+.props-board-head p,
+.props-note,
+.props-record span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.props-record {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.props-record strong {
+  display: block;
+}
+.props-record ul {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.props-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+.props-filters label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.props-scope {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.props-scope button {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.props-scope button[aria-pressed='true'] {
+  border-color: var(--orange);
+  color: var(--ink);
+  font-weight: 600;
+}
+.props-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.props-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.props-table th {
+  position: sticky;
+  top: 0;
+  padding: 9px 12px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.props-table td {
+  padding: 9px 12px;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+}
+.props-table td strong,
+.props-table td small {
+  display: block;
+}
+.props-table td small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.lean-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--muted) 14%, transparent);
+}
+.lean-chip.strong {
+  background: color-mix(in srgb, var(--orange) 24%, transparent);
+  color: var(--ink);
+}
+.lean-chip.moderate {
+  background: color-mix(in srgb, var(--orange) 12%, transparent);
+}
+.fantasy-chip {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+}
+.fantasy-chip.mine {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.props-method {
+  margin-top: 14px;
+  font-size: 13px;
+}
+.props-method summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.props-method p {
+  color: var(--muted);
+  line-height: 1.5;
+}

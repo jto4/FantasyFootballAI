@@ -4,6 +4,7 @@ import {
   type AppSettings,
   type ScheduledRun,
   type LeagueConnection,
+  type ReportSummary,
 } from '@sidekick/core';
 import { reportName } from './beginner-flow';
 import { formatTime } from './date-format';
@@ -26,7 +27,10 @@ export function SchedulePage({
   onRetry,
   settings,
   onEditAction,
+  reports = [],
 }: {
+  /** Saved report summaries, used to mark failed runs a later draft already replaced. */
+  reports?: ReportSummary[];
   actions: AppSettings['actions'];
   scheduledRuns: ScheduledRun[];
   retryingRunId: string;
@@ -155,47 +159,70 @@ export function SchedulePage({
           <h2>Recent scheduled runs</h2>
         </div>
       </div>
-      <div className="report-list">
-        {scheduledRuns.slice(0, 10).map((run) => (
-          <article className="report-card" key={run.id}>
-            <div>
-              <span className={`credential-status ${run.status === 'succeeded' ? 'ready' : ''}`}>
-                {run.status.toUpperCase()}
+      <div className="run-list">
+        {scheduledRuns.slice(0, 10).map((run) => {
+          // A failure that a later draft of the same report replaced no longer needs attention.
+          const replaced =
+            run.status === 'failed' &&
+            reports.some(
+              (r) =>
+                r.kind === run.kind &&
+                Date.parse(r.createdAt) > Date.parse(run.startedAt) &&
+                (!run.leagueResults?.length ||
+                  run.leagueResults.some((result) => result.leagueId === r.leagueId)),
+            );
+          const kindLabel =
+            run.kind.charAt(0).toUpperCase() + run.kind.slice(1).replaceAll('-', ' ');
+          const details = new Set(
+            [run.detail, ...(run.leagueResults ?? []).map((r) => r.detail)].filter(Boolean),
+          );
+          return (
+            <article
+              className={`run-row ${replaced ? 'replaced' : run.status}`}
+              key={run.id}
+              aria-label={`${kindLabel} run, ${run.status}`}
+            >
+              <span className={`run-status ${run.status}`}>
+                {replaced ? 'Since replaced' : run.status === 'succeeded' ? 'Done' : run.status}
               </span>
-              <h3>{run.calendarEventTitle ?? run.kind.replaceAll('-', ' ')}</h3>
-              {run.calendarEventTitle && <small>{run.kind.replaceAll('-', ' ')}</small>}
-              <p>{run.detail ?? 'Scheduled job is running.'}</p>
-              {run.leagueResults && run.leagueResults.length > 0 && (
-                <ul className="scheduled-league-results">
-                  {run.leagueResults.map((result) => (
-                    <li key={result.leagueId}>
-                      <span
-                        className={`credential-status ${result.status === 'succeeded' ? 'ready' : ''}`}
-                      >
-                        {result.status.toUpperCase()}
-                      </span>
-                      <span>
-                        <strong>{result.displayName}</strong>
-                        {result.detail && <small>{result.detail}</small>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {run.status === 'failed' &&
-                run.leagueResults?.some((result) => result.status === 'failed') && (
-                  <button
-                    className="small-button"
-                    disabled={Boolean(retryingRunId)}
-                    onClick={() => onRetry(run)}
-                  >
-                    {retryingRunId === run.id ? 'Retrying…' : 'Retry failed as drafts'}
-                  </button>
+              <div>
+                <h3>{run.calendarEventTitle ?? kindLabel}</h3>
+                {run.calendarEventTitle && <small>{kindLabel}</small>}
+                {(run.leagueResults?.length ?? 0) > 1 && (
+                  <ul className="scheduled-league-results">
+                    {run.leagueResults!.map((result) => (
+                      <li key={result.leagueId}>
+                        <strong>{result.displayName}</strong> · {result.status}
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              <small>{formatTime(run.startedAt)}</small>
-            </div>
-          </article>
-        ))}
+                {replaced ? (
+                  <p>A newer draft of this report was made afterwards.</p>
+                ) : (
+                  [...details].map((detail) => <p key={detail}>{detail}</p>)
+                )}
+                {!details.size && !replaced && run.status === 'running' && (
+                  <p>Scheduled job is running.</p>
+                )}
+              </div>
+              <div className="run-side">
+                <small>{formatTime(run.startedAt)}</small>
+                {!replaced &&
+                  run.status === 'failed' &&
+                  run.leagueResults?.some((result) => result.status === 'failed') && (
+                    <button
+                      className="small-button"
+                      disabled={Boolean(retryingRunId)}
+                      onClick={() => onRetry(run)}
+                    >
+                      {retryingRunId === run.id ? 'Retrying…' : 'Retry failed as drafts'}
+                    </button>
+                  )}
+              </div>
+            </article>
+          );
+        })}
         {scheduledRuns.length === 0 && (
           <div className="empty-activity">Scheduled runs will appear here after a job runs.</div>
         )}

@@ -680,15 +680,20 @@ export function SettingsPage({
       )}
       {section === 'ai' && (
         <>
-          {onGuidedSetup && (
-            <section className="settings-card">
-              <h2>Need help connecting?</h2>
-              <p>Connect and test your AI in a few steps.</p>
-              <button type="button" className="small-button" onClick={onGuidedSetup}>
-                Guided AI setup
-              </button>
-            </section>
-          )}
+          {/* Same readiness rule as the overview card; the walkthrough is for unconnected AI. */}
+          {onGuidedSetup &&
+            !(settings.aiRuntime?.mode === 'anthropic-api'
+              ? secretState.some((item) => item.provider === 'anthropic' && item.configured)
+              : (settings.aiRuntime?.mode ?? 'api') !== 'api' ||
+                secretState.some((item) => item.provider === 'openai' && item.configured)) && (
+              <section className="settings-card">
+                <h2>Need help connecting?</h2>
+                <p>Connect and test your AI in a few steps.</p>
+                <button type="button" className="small-button" onClick={onGuidedSetup}>
+                  Guided AI setup
+                </button>
+              </section>
+            )}
           <AIRuntimeSection
             headingRef={aiHeadingRef}
             runtime={runtime}

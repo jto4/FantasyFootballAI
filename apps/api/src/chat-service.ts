@@ -215,6 +215,37 @@ export const chatTools: Record<string, ChatTool> = {
     label: () => 'Comparing sportsbooks',
     run: gameLookup('/api/advice/books'),
   },
+  prop_board: {
+    description:
+      'This week’s player props across all games: line, ESPN projection, typical-game estimate, season hit rate, the board’s lean, fantasy owner in the league, and the graded lean record so far.',
+    args: {
+      player: 'Optional player name to filter',
+      stat: 'Optional stat, such as receiving_yards',
+    },
+    label: (a) => (a.player ? `Checking ${a.player}’s props` : 'Scanning the props board'),
+    run: async (args, { ctx, local }) => {
+      const board = (await local(
+        `/api/props/board${ctx.league ? `?${query({ league: ctx.league.id })}` : ''}`,
+      )) as { week?: number; rows?: Record<string, unknown>[]; record?: unknown };
+      const player = args.player?.toLowerCase();
+      const rows = (board.rows ?? []).filter(
+        (r) =>
+          (!player || String(r.playerName).toLowerCase().includes(player)) &&
+          (!args.stat || r.stat === args.stat) &&
+          (player || r.lean),
+      );
+      const strength = (r: Record<string, unknown>) =>
+        Math.abs(Number((r.lean as { score?: number } | undefined)?.score ?? 0));
+      return {
+        week: board.week,
+        record: board.record,
+        rows: rows
+          .sort((a, b) => strength(b) - strength(a))
+          .slice(0, 30)
+          .map(({ recent: _recent, id: _id, ...rest }) => rest),
+      };
+    },
+  },
   betting_record: {
     description:
       'The user’s tracked predictions and bets: counts, pending, settled results and calibration.',
