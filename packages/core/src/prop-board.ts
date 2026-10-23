@@ -11,7 +11,10 @@ export type PropLeanStrength = 'slight' | 'moderate' | 'strong';
 export interface PropLean {
   side: 'over' | 'under';
   strength: PropLeanStrength;
-  /** Projection gap divided by the player's typical game-to-game spread for this stat. */
+  /**
+   * With the prop model: its chance for the side minus the break-even rate. Without it: the
+   * projection gap divided by the player's usual game-to-game swing.
+   */
   score: number;
 }
 export interface PropBoardRow {
@@ -42,7 +45,31 @@ export interface PropBoardRow {
   lean?: PropLean;
   /** Fantasy team in the active league that rosters this player. */
   fantasyTeam?: string;
+  /** The prop model's view, when it has enough history for this player and stat. */
+  model?: PropRowModel;
 }
+
+export interface PropRowModel {
+  /** Expected value. */
+  mean: number;
+  /** The model's coin-flip line. */
+  median: number;
+  /** Chance of finishing over this line. */
+  overChance: number;
+  /** Past games behind the estimate. */
+  sampleGames: number;
+  /** Where the center came from: ESPN alone, a tested ESPN/model blend, or the model alone. */
+  source: 'blend' | 'espn' | 'model';
+  /** Chance needed to profit at the side's price (−110 when no price is shown). */
+  breakEven: number;
+  /** Model chance minus break-even for its preferred side; positive means a model pick. */
+  edge: number;
+  side: 'over' | 'under';
+}
+
+/** Break-even win rate for American odds. */
+export const breakEvenRate = (odds: number) =>
+  odds < 0 ? -odds / (-odds + 100) : 100 / (odds + 100);
 
 /**
  * Game-to-game spread as a share of the average, measured as the median across 2025 regular-season
@@ -129,6 +156,21 @@ export function buildPropBoard(input: {
   stats: PlayerGameStats[];
   week: number;
   rosters?: { teamName: string; players: { name: string; nflTeam?: string; espnId?: string }[] }[];
+  /** Prop model for one line; undefined when the player lacks history. */
+  predict?: (
+    line: PropLine,
+    game: FootballGame,
+    team: string | undefined,
+    espnProjection: number | undefined,
+  ) =>
+    | {
+        mean: number;
+        median: number;
+        overChance: number;
+        sampleGames: number;
+        source: 'blend' | 'espn' | 'model';
+      }
+    | undefined;
 }): PropBoardRow[] {
   const season = input.games[0]?.season;
   const forecastById = new Map(
@@ -167,6 +209,24 @@ export function buildPropBoard(input: {
     const projection = forecast?.stats[line.stat];
     const lean =
       projection !== undefined ? propLean(line.stat, line.line, projection, recent) : undefined;
+    const predicted = input.predict?.(line, game, team, projection);
+    let model: PropRowModel | undefined;
+    if (predicted) {
+      const side = predicted.overChance >= 0.5 ? 'over' : 'under';
+      const odds = side === 'over' ? line.overOdds : line.underOdds;
+      const breakEven = breakEvenRate(odds ?? -110);
+      const chance = side === 'over' ? predicted.overChance : 1 - predicted.overChance;
+      model = {
+        mean: round(predicted.mean),
+        median: round(predicted.median),
+        overChance: Math.round(predicted.overChance * 1000) / 1000,
+        sampleGames: predicted.sampleGames,
+        source: predicted.source,
+        breakEven: Math.round(breakEven * 1000) / 1000,
+        edge: Math.round((chance - breakEven) * 1000) / 1000,
+        side,
+      };
+    }
     const fantasyTeam =
       (espnId && owners.get(`id:${espnId}`)) ||
       owners.get(`name:${playerNameKey(line.playerName)}`);
@@ -197,8 +257,26 @@ export function buildPropBoard(input: {
           ? { average: round(recent.reduce((a, b) => a + b, 0) / recent.length) }
           : {}),
         ...(lean ? { spread: round(lean.spread) } : {}),
-        ...(lean?.lean ? { lean: lean.lean } : {}),
+        // TD and interception lines are usually priced far from −110, so without a real price
+        // there is no honest break-even to beat.
+        ...(model &&
+        !(
+          ['passing_tds', 'passing_interceptions'].includes(line.stat) &&
+          (model.side === 'over' ? line.overOdds : line.underOdds) === undefined
+        )
+          ? model.edge > 0
+            ? {
+                lean: {
+                  side: model.side,
+                  strength:
+                    model.edge >= 0.06 ? 'strong' : model.edge >= 0.03 ? 'moderate' : 'slight',
+                  score: model.edge,
+                } satisfies PropLean,
+              }
+            : {}
+          : {}),
         ...(fantasyTeam ? { fantasyTeam } : {}),
+        ...(model ? { model } : {}),
       } satisfies PropBoardRow,
     ];
   });
@@ -215,6 +293,10 @@ export interface PropLeanRecord {
   side: 'over' | 'under';
   strength: PropLeanStrength;
   projection: number;
+  /** The model's chance of the over at the saved line, when the model priced it. */
+  overChance?: number;
+  /** The model's expected value, kept so the market weight can be refit from results. */
+  modelMean?: number;
   observedAt: string;
   result?: { actual: number; outcome: 'win' | 'loss' | 'push'; gradedAt: string };
 }
@@ -257,8 +339,19 @@ export function summarizePropLeans(records: PropLeanRecord[]) {
     };
   };
   const graded = records.filter((r) => r.result);
+  // Brier score of the model's over chance on decided props; 0.25 is a coin flip.
+  const priced = graded.filter((r) => r.overChance !== undefined && r.result!.outcome !== 'push');
+  const brier = priced.length
+    ? priced.reduce((sum, r) => {
+        const over = (r.result!.outcome === 'win') === (r.side === 'over') ? 1 : 0;
+        return sum + (r.overChance! - over) ** 2;
+      }, 0) / priced.length
+    : undefined;
   return {
     pending: records.length - graded.length,
+    ...(brier !== undefined
+      ? { brier: Math.round(brier * 1000) / 1000, pricedGames: priced.length }
+      : {}),
     breakEven: 0.524,
     overall: tally(graded),
     byStrength: Object.fromEntries(

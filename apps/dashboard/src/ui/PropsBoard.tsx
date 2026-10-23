@@ -21,9 +21,12 @@ type Board = {
   games: { id: string; label: string; kickoffAt?: string }[];
   rows: PropBoardRow[];
   warnings: string[];
+  model?: { marketWeight: number; fitted: boolean; gradedForFit: number };
   record: {
     pending: number;
     breakEven: number;
+    brier?: number;
+    pricedGames?: number;
     overall: Tally;
     byStrength: Record<'strong' | 'moderate' | 'slight', Tally>;
   };
@@ -149,6 +152,16 @@ export function PropsBoard({
               Break-even at −110 is {Math.round(board.record.breakEven * 1000) / 10}%.
               {board.record.pending ? ` ${board.record.pending} waiting on games.` : ''}
             </span>
+            <span>
+              {board.record.brier !== undefined
+                ? `Model accuracy (Brier) ${board.record.brier} over ${board.record.pricedGames} props; a coin flip scores 0.25 and lower is better. `
+                : ''}
+              {board.model
+                ? board.model.fitted
+                  ? `The model claims ${Math.round(board.model.marketWeight * 100)}% of its disagreement with the line, fitted from ${board.model.gradedForFit} graded props.`
+                  : `The model claims ${Math.round(board.model.marketWeight * 100)}% of its disagreement with the line until 150 props are graded (${board.model.gradedForFit} so far).`
+                : ''}
+            </span>
           </div>
           <ul>
             {(['strong', 'moderate', 'slight'] as const).map((s) => (
@@ -239,7 +252,12 @@ export function PropsBoard({
                   ESPN proj. → typical
                 </th>
                 <th scope="col">This season</th>
-                <th scope="col">Lean</th>
+                <th
+                  scope="col"
+                  title="The model’s chance of the over and the line it sees as a coin flip"
+                >
+                  Model
+                </th>
                 <th scope="col">
                   <span className="visually-hidden">Actions</span>
                 </th>
@@ -298,12 +316,22 @@ export function PropsBoard({
                     )}
                   </td>
                   <td>
-                    {r.lean ? (
-                      <span className={`lean-chip ${r.lean.strength}`}>
-                        {r.lean.side === 'over' ? 'Over' : 'Under'} · {r.lean.strength}
-                      </span>
+                    {r.model ? (
+                      <>
+                        <strong>
+                          {Math.round(r.model.overChance * 100)}% over · fair {num(r.model.median)}
+                        </strong>
+                        {r.lean ? (
+                          <span className={`lean-chip ${r.lean.strength}`}>
+                            {r.lean.side === 'over' ? 'Over' : 'Under'} · {r.lean.strength} (+
+                            {num(r.lean.score * 100)} pts)
+                          </span>
+                        ) : (
+                          <small>No lean{r.model.edge > 0 ? ' without a real price' : ''}</small>
+                        )}
+                      </>
                     ) : (
-                      <small>No lean</small>
+                      <small>No model view</small>
                     )}
                   </td>
                   <td>
@@ -345,13 +373,20 @@ export function PropsBoard({
         </div>
       )}
       <details className="props-method">
-        <summary>How leans work</summary>
+        <summary>How the model works</summary>
         <p>
-          ESPN projects a player’s average game. Most players land below their own average more
-          often than above it (in 2025, receivers topped their average receiving yards in only 42%
-          of games), so the board first converts the projection to a typical game. It compares that
-          with the line, scaled by how much the player’s numbers usually swing. Small gaps get no
-          lean.
+          The model starts from ESPN’s projection, blended with its own estimate where that tested
+          better (25% for rushing yards, receiving yards and catches). Its own estimate weighs
+          recent games most, then adjusts for the betting total and spread and what the opponent
+          allows to that position. A fitted outcome spread for each stat turns that into a chance of
+          the over. On 2026 games it never saw, actual results landed evenly across its predicted
+          ranges.
+        </p>
+        <p>
+          Sportsbooks know things it doesn’t, like role changes and late injury news, so the line is
+          treated as a coin flip and the model may claim only part of its disagreement. A lean needs
+          the model’s chance to clear break-even (52.4% at −110). Touchdown and interception lines
+          are often priced far from −110, so they get no lean without a real price.
         </p>
         <p>
           Each lean is saved before kickoff and graded after the game. Lines can move, and the

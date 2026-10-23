@@ -125,6 +125,8 @@ export {
 export * from './sportsbook-types.js';
 export * from './prop-lines.js';
 export * from './prop-board.js';
+export * from './prop-model.js';
+export * from './prop-model-settings.js';
 export { validateExpandedTotalTape, type ExpandedTotalTape } from './expanded-total-tape.js';
 export {
   validateExternalTotalTape,

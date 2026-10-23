@@ -157,3 +157,6 @@
   font-size: 13px;
   font-weight: 400;
 }
+.props-table td .lean-chip {
+  margin-top: 4px;
+}

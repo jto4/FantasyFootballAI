@@ -429,3 +429,36 @@ lean is saved before kickoff (`prop-leans.sqlite`, the last line seen before kic
 graded from nflverse stats afterwards; the board shows the record by strength against the 52.4%
 break-even at −110. The record, not the lean's size, decides whether it deserves trust. Bet
 analysis for a prop receives the same three numbers as evidence so the AI and the board agree.
+
+## Prop model: tested center, calibrated spread, anchored to the line (October 23, 2026)
+
+`packages/core/src/prop-model.ts` predicts nine prop stats. Its own estimate is a recency-weighted
+player average (shrunk for thin histories) adjusted for the market's implied team total and
+spread, what the opponent allows to the position, and home field. Settings were fitted per stat
+on 2025 with 2024 as history, then scored on 2026 games it never saw
+(`scripts/research/prop-model-backtest.mjs`, report in
+`docs/research/prop-model-backtest-2026-10-23.json`).
+
+What held up and what didn't:
+
+- ESPN's weekly projection beat the model's own estimate on every stat in the 2026 holdout
+  (receiving yards: 23.2 vs 24.2 mean absolute error; carries 3.4 vs 4.1). Implied total and
+  spread adjustments fitted to zero; opponent adjustment helped passing stats only.
+- A blend fitted on 2026 weeks 1–3 and tested on weeks 4+: ESPN alone for passing stats and
+  carries; 75% ESPN / 25% model for rushing yards (21.1 vs 22.2 error), receiving yards and
+  receptions. Completions have no ESPN projection and use the model alone.
+- Outcome spreads (negative binomial for counts, empirical actual ÷ predicted for yardage)
+  were calibrated on the test weeks: results fell roughly evenly across predicted deciles.
+- Against lines set at ESPN's typical game, the model alone was worse than a coin flip by log
+  loss (overconfident), though it picked rushing-yard sides 189–135. No historical sportsbook
+  prop lines exist, so no edge over real books has been tested.
+
+Shipped design: the center is the tested blend, the fitted spread gives a chance at any line,
+and the line is treated as the market's coin flip with the model claiming only 25% of its
+disagreement, because books price role changes and injury news the model lacks. Players or
+stats outside the fitted population (thin history, quarterback scramble yards) get no model
+view. A lean needs the anchored chance to clear the side's break-even; touchdown and
+interception lines need a real price. Each pre-kickoff chance and model mean is stored and
+graded; once 150 props are graded the weight is refit by log loss and used automatically, and
+the board shows the model's Brier score against the 0.25 coin flip. This replaces the earlier
+gap-based lean, which had no calibration.

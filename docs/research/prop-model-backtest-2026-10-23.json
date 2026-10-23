@@ -1,0 +1,666 @@
+{
+  "trainedOn": "2025 REG (2024 history)",
+  "holdout": "2026 REG completed games",
+  "stats": {
+    "passing_yards": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 2,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 1,
+        "opponentShrinkGames": 6,
+        "homeFactor": 1.03
+      },
+      "outcome": {
+        "kind": "ratio",
+        "quantiles": [
+          0, 0, 0.254, 0.412, 0.541, 0.592, 0.622, 0.648, 0.683, 0.708, 0.749, 0.769, 0.803, 0.828,
+          0.841, 0.869, 0.898, 0.921, 0.939, 0.958, 0.973, 1.005, 1.024, 1.04, 1.066, 1.092, 1.105,
+          1.123, 1.139, 1.183, 1.205, 1.239, 1.266, 1.297, 1.352, 1.39, 1.434, 1.478, 1.565, 1.672,
+          3.172
+        ]
+      },
+      "train": {
+        "n": 492,
+        "deviance": 39.17,
+        "defaultDeviance": 40.21
+      },
+      "holdout": {
+        "n": 176,
+        "maeVsActual": {
+          "model": 63.9,
+          "recencyOnly": 62.61,
+          "seasonAverage": 73.87,
+          "espnTypical": 56.82,
+          "modelEspnBlend": 57.49,
+          "espnGames": 164
+        },
+        "calibrationDeciles": [0.085, 0.08, 0.102, 0.097, 0.085, 0.114, 0.057, 0.131, 0.136, 0.114],
+        "vsNaiveLines": {
+          "lines": 176,
+          "overRate": 0.511,
+          "logLoss": 0.598,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.208,
+          "sideRecord": "120-56",
+          "sideHitRate": 0.682,
+          "confidentRecord": "71-26",
+          "confidentHitRate": 0.732
+        },
+        "vsEspnLines": {
+          "lines": 164,
+          "overRate": 0.476,
+          "logLoss": 0.733,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.265,
+          "sideRecord": "85-79",
+          "sideHitRate": 0.518,
+          "confidentRecord": "57-43",
+          "confidentHitRate": 0.57
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "ratio",
+          "quantiles": [
+            0.056, 0.403, 0.524, 0.583, 0.619, 0.662, 0.678, 0.723, 0.748, 0.763, 0.774, 0.785,
+            0.796, 0.819, 0.828, 0.844, 0.862, 0.891, 0.926, 0.935, 0.964, 0.999, 1.015, 1.035,
+            1.052, 1.058, 1.076, 1.087, 1.103, 1.128, 1.142, 1.19, 1.209, 1.224, 1.242, 1.274,
+            1.376, 1.466, 1.53, 1.62, 1.807
+          ]
+        },
+        "fittedOn": "2026 weeks 1–3 (85)",
+        "testedOn": "2026 weeks 4+ (79)",
+        "test": {
+          "maeEnsembleMedian": 55.68,
+          "maeEspnTypical": 55.28,
+          "shareOverMedian": 0.56,
+          "calibrationDeciles": [
+            0.101, 0.101, 0.063, 0.025, 0.152, 0.127, 0.101, 0.063, 0.165, 0.101
+          ]
+        }
+      }
+    },
+    "completions": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 2,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 1,
+        "opponentShrinkGames": 6,
+        "homeFactor": 1
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 8
+      },
+      "train": {
+        "n": 491,
+        "deviance": 3.17,
+        "defaultDeviance": 3.27
+      },
+      "holdout": {
+        "n": 173,
+        "maeVsActual": {
+          "model": 5.14,
+          "recencyOnly": 4.92,
+          "seasonAverage": 5.54
+        },
+        "calibrationDeciles": [0.04, 0.012, 0.116, 0.116, 0.098, 0.156, 0.168, 0.139, 0.098, 0.058],
+        "vsNaiveLines": {
+          "lines": 173,
+          "overRate": 0.509,
+          "logLoss": 0.648,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.229,
+          "sideRecord": "105-68",
+          "sideHitRate": 0.607,
+          "confidentRecord": "53-26",
+          "confidentHitRate": 0.671
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "count",
+          "size": 0.5
+        },
+        "fittedOn": "2026 weeks 1–3 (0)",
+        "testedOn": "2026 weeks 4+ (0)"
+      }
+    },
+    "attempts": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 2,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 1,
+        "opponentShrinkGames": 6,
+        "homeFactor": 0.97
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 6
+      },
+      "train": {
+        "n": 499,
+        "deviance": 4.64,
+        "defaultDeviance": 4.78
+      },
+      "holdout": {
+        "n": 175,
+        "maeVsActual": {
+          "model": 7.55,
+          "recencyOnly": 7.28,
+          "seasonAverage": 8.34,
+          "espnTypical": 6.67,
+          "modelEspnBlend": 6.81,
+          "espnGames": 164
+        },
+        "calibrationDeciles": [0.046, 0.006, 0.069, 0.103, 0.131, 0.223, 0.131, 0.154, 0.08, 0.057],
+        "vsNaiveLines": {
+          "lines": 175,
+          "overRate": 0.531,
+          "logLoss": 0.646,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.228,
+          "sideRecord": "105-70",
+          "sideHitRate": 0.6,
+          "confidentRecord": "63-23",
+          "confidentHitRate": 0.733
+        },
+        "vsEspnLines": {
+          "lines": 164,
+          "overRate": 0.47,
+          "logLoss": 0.708,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.257,
+          "sideRecord": "90-74",
+          "sideHitRate": 0.549,
+          "confidentRecord": "51-44",
+          "confidentHitRate": 0.537
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "count",
+          "size": 20
+        },
+        "fittedOn": "2026 weeks 1–3 (85)",
+        "testedOn": "2026 weeks 4+ (79)",
+        "test": {
+          "maeEnsembleMedian": 6.87,
+          "maeEspnTypical": 6.91,
+          "shareOverMedian": 0.53,
+          "calibrationDeciles": [
+            0.038, 0.051, 0.114, 0.101, 0.152, 0.076, 0.139, 0.076, 0.139, 0.114
+          ]
+        }
+      }
+    },
+    "passing_tds": {
+      "params": {
+        "halfLife": 20,
+        "priorSeasonWeight": 0.4,
+        "shrinkGames": 3,
+        "envExponent": 0.4,
+        "scriptCoefficient": 0,
+        "opponentExponent": 0,
+        "opponentShrinkGames": 6,
+        "homeFactor": 0.97
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 1000
+      },
+      "train": {
+        "n": 485,
+        "deviance": 1.19,
+        "defaultDeviance": 1.2
+      },
+      "holdout": {
+        "n": 174,
+        "maeVsActual": {
+          "model": 0.9,
+          "recencyOnly": 0.91,
+          "seasonAverage": 1.02,
+          "espnTypical": 0.87,
+          "modelEspnBlend": 0.84,
+          "espnGames": 161
+        },
+        "calibrationDeciles": [
+          0.052, 0.155, 0.069, 0.109, 0.109, 0.109, 0.144, 0.046, 0.092, 0.115
+        ],
+        "vsNaiveLines": {
+          "lines": 174,
+          "overRate": 0.529,
+          "logLoss": 0.601,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.206,
+          "sideRecord": "120-54",
+          "sideHitRate": 0.69,
+          "confidentRecord": "88-28",
+          "confidentHitRate": 0.759
+        },
+        "vsEspnLines": {
+          "lines": 161,
+          "overRate": 0.553,
+          "logLoss": 0.668,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.238,
+          "sideRecord": "93-68",
+          "sideHitRate": 0.578,
+          "confidentRecord": "58-28",
+          "confidentHitRate": 0.674
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "count",
+          "size": 1000
+        },
+        "fittedOn": "2026 weeks 1–3 (83)",
+        "testedOn": "2026 weeks 4+ (78)",
+        "test": {
+          "maeEnsembleMedian": 0.77,
+          "maeEspnTypical": 0.78,
+          "shareOverMedian": 0.33,
+          "calibrationDeciles": [
+            0.051, 0.103, 0.09, 0.077, 0.179, 0.128, 0.128, 0.103, 0.064, 0.077
+          ]
+        }
+      }
+    },
+    "passing_interceptions": {
+      "params": {
+        "halfLife": 20,
+        "priorSeasonWeight": 0.7,
+        "shrinkGames": 0,
+        "envExponent": 0.4,
+        "scriptCoefficient": -0.15,
+        "opponentExponent": 1,
+        "opponentShrinkGames": 6,
+        "homeFactor": 0.97
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 100
+      },
+      "train": {
+        "n": 445,
+        "deviance": 1.05,
+        "defaultDeviance": 1.1
+      },
+      "holdout": {
+        "n": 162,
+        "maeVsActual": {
+          "model": 0.65,
+          "recencyOnly": 0.65,
+          "seasonAverage": 0.66,
+          "espnTypical": 0.65,
+          "modelEspnBlend": 0.65,
+          "espnGames": 146
+        },
+        "calibrationDeciles": [0, 0.043, 0.34, 0.117, 0.019, 0.043, 0.148, 0.123, 0.086, 0.08],
+        "vsNaiveLines": {
+          "lines": 162,
+          "overRate": 0.463,
+          "logLoss": 0.691,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.249,
+          "sideRecord": "84-78",
+          "sideHitRate": 0.519,
+          "confidentRecord": "44-39",
+          "confidentHitRate": 0.53
+        },
+        "vsEspnLines": {
+          "lines": 146,
+          "overRate": 0.514,
+          "logLoss": 0.697,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.252,
+          "sideRecord": "71-75",
+          "sideHitRate": 0.486,
+          "confidentRecord": "36-33",
+          "confidentHitRate": 0.522
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "count",
+          "size": 1000
+        },
+        "fittedOn": "2026 weeks 1–3 (76)",
+        "testedOn": "2026 weeks 4+ (70)",
+        "test": {
+          "maeEnsembleMedian": 0.64,
+          "maeEspnTypical": 0.7,
+          "shareOverMedian": 0.3,
+          "calibrationDeciles": [0, 0.029, 0.457, 0.014, 0, 0.043, 0.2, 0.057, 0.1, 0.1]
+        }
+      }
+    },
+    "rushing_yards": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 3,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 0.3,
+        "opponentShrinkGames": 12,
+        "homeFactor": 1.03
+      },
+      "outcome": {
+        "kind": "ratio",
+        "quantiles": [
+          -0.322, 0, 0.044, 0.112, 0.186, 0.252, 0.289, 0.338, 0.381, 0.42, 0.464, 0.509, 0.536,
+          0.571, 0.621, 0.652, 0.703, 0.745, 0.781, 0.822, 0.859, 0.904, 0.951, 0.99, 1.024, 1.08,
+          1.129, 1.168, 1.224, 1.277, 1.324, 1.38, 1.429, 1.53, 1.656, 1.839, 1.999, 2.237, 2.447,
+          2.914, 5.884
+        ]
+      },
+      "train": {
+        "n": 1101,
+        "deviance": 21.24,
+        "defaultDeviance": 21.39
+      },
+      "holdout": {
+        "n": 372,
+        "maeVsActual": {
+          "model": 21.78,
+          "recencyOnly": 22.33,
+          "seasonAverage": 23.42,
+          "espnTypical": 20.99,
+          "modelEspnBlend": 20.77,
+          "espnGames": 324
+        },
+        "calibrationDeciles": [0.108, 0.11, 0.089, 0.118, 0.102, 0.089, 0.102, 0.081, 0.113, 0.089],
+        "vsNaiveLines": {
+          "lines": 372,
+          "overRate": 0.481,
+          "logLoss": 0.655,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.231,
+          "sideRecord": "240-132",
+          "sideHitRate": 0.645,
+          "confidentRecord": "127-63",
+          "confidentHitRate": 0.668
+        },
+        "vsEspnLines": {
+          "lines": 324,
+          "overRate": 0.41,
+          "logLoss": 0.72,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.256,
+          "sideRecord": "189-135",
+          "sideHitRate": 0.583,
+          "confidentRecord": "109-70",
+          "confidentHitRate": 0.609
+        }
+      },
+      "ensemble": {
+        "espnWeight": 0.75,
+        "outcome": {
+          "kind": "ratio",
+          "quantiles": [
+            -0.163, 0, 0.098, 0.173, 0.228, 0.27, 0.282, 0.299, 0.347, 0.417, 0.454, 0.484, 0.522,
+            0.556, 0.6, 0.642, 0.68, 0.709, 0.74, 0.785, 0.822, 0.835, 0.857, 0.89, 0.927, 0.975,
+            1.046, 1.074, 1.131, 1.187, 1.256, 1.357, 1.4, 1.475, 1.49, 1.56, 1.623, 1.768, 1.95,
+            2.516, 6.768
+          ]
+        },
+        "fittedOn": "2026 weeks 1–3 (168)",
+        "testedOn": "2026 weeks 4+ (156)",
+        "test": {
+          "maeEnsembleMedian": 21.11,
+          "maeEspnTypical": 22.15,
+          "shareOverMedian": 0.46,
+          "calibrationDeciles": [
+            0.122, 0.064, 0.096, 0.135, 0.128, 0.058, 0.109, 0.103, 0.026, 0.16
+          ]
+        }
+      }
+    },
+    "carries": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 1,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 0.3,
+        "opponentShrinkGames": 6,
+        "homeFactor": 1.03
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 8
+      },
+      "train": {
+        "n": 851,
+        "deviance": 2.38,
+        "defaultDeviance": 2.51
+      },
+      "holdout": {
+        "n": 290,
+        "maeVsActual": {
+          "model": 4.06,
+          "recencyOnly": 4.27,
+          "seasonAverage": 4.29,
+          "espnTypical": 3.4,
+          "modelEspnBlend": 3.58,
+          "espnGames": 251
+        },
+        "calibrationDeciles": [
+          0.117, 0.086, 0.093, 0.103, 0.083, 0.128, 0.103, 0.083, 0.124, 0.079
+        ],
+        "vsNaiveLines": {
+          "lines": 290,
+          "overRate": 0.538,
+          "logLoss": 0.659,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.23,
+          "sideRecord": "191-99",
+          "sideHitRate": 0.659,
+          "confidentRecord": "85-38",
+          "confidentHitRate": 0.691
+        },
+        "vsEspnLines": {
+          "lines": 251,
+          "overRate": 0.53,
+          "logLoss": 0.779,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.275,
+          "sideRecord": "133-118",
+          "sideHitRate": 0.53,
+          "confidentRecord": "81-70",
+          "confidentHitRate": 0.536
+        }
+      },
+      "ensemble": {
+        "espnWeight": 1,
+        "outcome": {
+          "kind": "count",
+          "size": 12
+        },
+        "fittedOn": "2026 weeks 1–3 (126)",
+        "testedOn": "2026 weeks 4+ (125)",
+        "test": {
+          "maeEnsembleMedian": 3.34,
+          "maeEspnTypical": 3.32,
+          "shareOverMedian": 0.46,
+          "calibrationDeciles": [0.08, 0.12, 0.136, 0.056, 0.104, 0.144, 0.144, 0.112, 0.032, 0.072]
+        }
+      }
+    },
+    "receiving_yards": {
+      "params": {
+        "halfLife": 5,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 3,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 0.6,
+        "opponentShrinkGames": 12,
+        "homeFactor": 1
+      },
+      "outcome": {
+        "kind": "ratio",
+        "quantiles": [
+          -0.402, 0, 0, 0, 0.054, 0.13, 0.185, 0.234, 0.272, 0.316, 0.357, 0.399, 0.436, 0.488,
+          0.526, 0.568, 0.614, 0.651, 0.681, 0.72, 0.773, 0.818, 0.861, 0.892, 0.943, 0.981, 1.037,
+          1.094, 1.15, 1.221, 1.292, 1.365, 1.452, 1.559, 1.688, 1.811, 1.949, 2.114, 2.361, 2.853,
+          5.856
+        ]
+      },
+      "train": {
+        "n": 2350,
+        "deviance": 22.95,
+        "defaultDeviance": 23.02
+      },
+      "holdout": {
+        "n": 808,
+        "maeVsActual": {
+          "model": 24.19,
+          "recencyOnly": 24.09,
+          "seasonAverage": 25.95,
+          "espnTypical": 23.24,
+          "modelEspnBlend": 23.85,
+          "espnGames": 749
+        },
+        "calibrationDeciles": [
+          0.093, 0.105, 0.093, 0.105, 0.092, 0.084, 0.099, 0.099, 0.101, 0.129
+        ],
+        "vsNaiveLines": {
+          "lines": 808,
+          "overRate": 0.488,
+          "logLoss": 0.658,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.234,
+          "sideRecord": "492-316",
+          "sideHitRate": 0.609,
+          "confidentRecord": "297-164",
+          "confidentHitRate": 0.644
+        },
+        "vsEspnLines": {
+          "lines": 749,
+          "overRate": 0.501,
+          "logLoss": 0.727,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.265,
+          "sideRecord": "385-364",
+          "sideHitRate": 0.514,
+          "confidentRecord": "212-203",
+          "confidentHitRate": 0.511
+        }
+      },
+      "ensemble": {
+        "espnWeight": 0.75,
+        "outcome": {
+          "kind": "ratio",
+          "quantiles": [
+            -0.309, 0, 0, 0.035, 0.122, 0.171, 0.243, 0.299, 0.336, 0.398, 0.444, 0.483, 0.516,
+            0.57, 0.594, 0.633, 0.685, 0.754, 0.801, 0.839, 0.872, 0.91, 0.937, 0.998, 1.026, 1.089,
+            1.167, 1.211, 1.264, 1.317, 1.396, 1.495, 1.595, 1.668, 1.831, 1.966, 2.101, 2.295,
+            2.704, 3.243, 6.387
+          ]
+        },
+        "fittedOn": "2026 weeks 1–3 (383)",
+        "testedOn": "2026 weeks 4+ (366)",
+        "test": {
+          "maeEnsembleMedian": 23.91,
+          "maeEspnTypical": 23.86,
+          "shareOverMedian": 0.48,
+          "calibrationDeciles": [
+            0.107, 0.079, 0.12, 0.098, 0.112, 0.085, 0.068, 0.123, 0.112, 0.096
+          ]
+        }
+      }
+    },
+    "receptions": {
+      "params": {
+        "halfLife": 3,
+        "priorSeasonWeight": 0.2,
+        "shrinkGames": 2,
+        "envExponent": 0,
+        "scriptCoefficient": 0,
+        "opponentExponent": 0.3,
+        "opponentShrinkGames": 6,
+        "homeFactor": 1
+      },
+      "outcome": {
+        "kind": "count",
+        "size": 12
+      },
+      "train": {
+        "n": 2410,
+        "deviance": 1.35,
+        "defaultDeviance": 1.36
+      },
+      "holdout": {
+        "n": 815,
+        "maeVsActual": {
+          "model": 1.75,
+          "recencyOnly": 1.76,
+          "seasonAverage": 1.89,
+          "espnTypical": 1.69,
+          "modelEspnBlend": 1.71,
+          "espnGames": 764
+        },
+        "calibrationDeciles": [
+          0.114, 0.088, 0.112, 0.106, 0.104, 0.087, 0.086, 0.102, 0.085, 0.117
+        ],
+        "vsNaiveLines": {
+          "lines": 815,
+          "overRate": 0.51,
+          "logLoss": 0.632,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.221,
+          "sideRecord": "508-307",
+          "sideHitRate": 0.623,
+          "confidentRecord": "314-135",
+          "confidentHitRate": 0.699
+        },
+        "vsEspnLines": {
+          "lines": 764,
+          "overRate": 0.518,
+          "logLoss": 0.714,
+          "coinFlipLogLoss": 0.693,
+          "brier": 0.259,
+          "sideRecord": "398-366",
+          "sideHitRate": 0.521,
+          "confidentRecord": "223-201",
+          "confidentHitRate": 0.526
+        }
+      },
+      "ensemble": {
+        "espnWeight": 0.75,
+        "outcome": {
+          "kind": "count",
+          "size": 20
+        },
+        "fittedOn": "2026 weeks 1–3 (389)",
+        "testedOn": "2026 weeks 4+ (375)",
+        "test": {
+          "maeEnsembleMedian": 1.77,
+          "maeEspnTypical": 1.79,
+          "shareOverMedian": 0.42,
+          "calibrationDeciles": [
+            0.101, 0.083, 0.101, 0.093, 0.109, 0.093, 0.091, 0.115, 0.083, 0.131
+          ]
+        }
+      }
+    }
+  }
+}

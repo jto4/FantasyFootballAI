@@ -90,9 +90,37 @@ it('joins lines with ESPN projections, this season’s log and fantasy owners', 
     recent: [70, 50, 90, 100],
     overGames: 3,
     average: 77.5,
-    lean: { side: 'over' },
     fantasyTeam: 'Horses',
   });
+  // Without the prop model there is no lean.
+  expect(row!.lean).toBeUndefined();
+});
+
+it('takes the lean from the model’s chance against break-even and skips unpriced TD lines', () => {
+  const line = (stat: 'receiving_yards' | 'passing_tds', overOdds?: number) => ({
+    id: `espn:${game.id}:1:${stat}:0.5`,
+    gameId: game.id,
+    playerName: 'Fictional Receiver',
+    stat,
+    line: 0.5,
+    sportsbook: 'DraftKings',
+    source: 'espn' as const,
+    observedAt: '2026-10-23T00:00:00Z',
+    ...(overOdds !== undefined ? { overOdds } : {}),
+  });
+  const rows = buildPropBoard({
+    lines: [line('receiving_yards'), line('passing_tds'), line('passing_tds', -150)],
+    games: [game],
+    forecasts: [],
+    stats: [],
+    week: 7,
+    predict: () => ({ mean: 1, median: 1, overChance: 0.62, sampleGames: 5, source: 'model' }),
+  });
+  expect(rows[0]!.model).toMatchObject({ side: 'over', breakEven: 0.524, edge: 0.096 });
+  expect(rows[0]!.lean).toMatchObject({ side: 'over', strength: 'strong', score: 0.096 });
+  expect(rows[1]!.lean).toBeUndefined();
+  // At −150 the over needs 60%, so 62% is only a slight lean.
+  expect(rows[2]!.lean).toMatchObject({ strength: 'slight', score: 0.02 });
 });
 
 it('grades a saved lean from the game’s stats and summarizes against break-even', () => {

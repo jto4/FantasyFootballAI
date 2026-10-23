@@ -21,9 +21,21 @@ const game = (id: string, week: number, kickoffAt: string) => ({
 
 it('builds the board for the next week, saves pre-kickoff leans, and grades finished ones', async () => {
   let now = Date.parse('2026-10-23T12:00:00Z');
+  const history = [3, 4, 5, 6].map((week) => ({
+    playerId: 'x',
+    name: 'Fictional Receiver',
+    position: 'WR',
+    team: 'SEA',
+    opponent: 'LA',
+    gameId: `2026_0${week}_LA_SEA`,
+    season: 2026,
+    week,
+    seasonType: 'REG' as const,
+    stats: { receiving_yards: 90 },
+  }));
   const data: FootballDataSnapshot = {
     season: 2026,
-    players: [],
+    players: [...history],
     games: [game('2026_07_KC_SEA', 7, '2026-10-26T00:20:00.000Z')],
     market: [],
     sources: [],
@@ -91,17 +103,24 @@ it('builds the board for the next week, saves pre-kickoff leans, and grades fini
 
   const board = (await (await fetch(`${url}/api/props/board?league=afton`)).json()) as {
     week: number;
+    model: unknown;
     rows: { fantasyTeam?: string; lean?: { side: string } }[];
     record: { pending: number };
   };
   expect(board.week).toBe(7);
-  expect(board.rows[0]).toMatchObject({ fantasyTeam: 'Horses', lean: { side: 'over' } });
+  expect(board.rows[0]).toMatchObject({
+    fantasyTeam: 'Horses',
+    model: { side: 'over', source: 'blend' },
+    lean: { side: 'over' },
+  });
+  expect(board.model).toEqual({ marketWeight: 0.25, fitted: false, gradedForFit: 0 });
   expect(board.record.pending).toBe(1);
 
   // After the game, the stats arrive and the saved lean is graded.
   now = Date.parse('2026-10-27T12:00:00Z');
   data.games = [game('2026_08_KC_SEA', 8, '2026-11-02T00:20:00.000Z')];
   data.players = [
+    ...history,
     {
       playerId: 'x',
       name: 'Fictional Receiver',

@@ -16,7 +16,9 @@ Completed work and its evidence live in the archived task records and dated revi
 - [x] Chat on an Ask page and a ⌘J side panel, answering from read-only app lookups, with saved and deletable conversations. See `decisions.md`.
 - [x] Live scores players from ESPN's public NFL box scores under each league's rules (offense, kickers, D/ST, two-point tries), so imported leagues update during games. ESPN D/ST and kicker slot overrides are now imported.
 - [x] Props board in Advice: every prop this week with ESPN projection, typical-game estimate, season hit rate, fantasy owner and a graded pre-kickoff lean. Schedule run history and the Settings AI card tidied.
-- [ ] Review the props lean record after 50+ graded leans; drop or retune the strength thresholds if strong leans don't beat 52.4%.
+- [x] Prop model: tested ESPN/model blend, calibrated outcome spreads, line-anchored chances, graded and self-refitting market weight. See `decisions.md`.
+- [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
+- [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.
 - [ ] Measure chat answer quality and speed on each AI connection with a fixed question set; Codex rounds take tens of seconds each.
 
 ### Product pass — October 21, 2026
