@@ -1,3 +1,4 @@
+import { asList, asObject } from '@sidekick/core';
 import { nflTeamKey } from '@sidekick/core';
 import { readBoundedJson } from './http.js';
 
@@ -13,30 +14,26 @@ export interface LiveNflGame {
   kickoffAt?: string;
 }
 
-const obj = (x: unknown): Record<string, unknown> =>
-  x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : {};
-const list = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
-
 /** Parses ESPN's public NFL scoreboard; malformed events are skipped, never guessed. */
 export function parseNflScoreboard(value: unknown): {
   week?: number;
   games: LiveNflGame[];
   byeTeams: string[];
 } {
-  const v = obj(value);
-  const week = Number(obj(v.week).number);
-  const games = list(v.events)
+  const v = asObject(value);
+  const week = Number(asObject(v.week).number);
+  const games = asList(v.events)
     .slice(0, 32)
     .flatMap((event) => {
-      const e = obj(event),
-        competition = obj(list(e.competitions)[0]),
-        status = obj(obj(competition.status).type),
+      const e = asObject(event),
+        competition = asObject(asList(e.competitions)[0]),
+        status = asObject(asObject(competition.status).type),
         state = status.state,
-        teams = list(competition.competitors).map(obj);
+        teams = asList(competition.competitors).map(asObject);
       const home = teams.find((t) => t.homeAway === 'home'),
         away = teams.find((t) => t.homeAway === 'away');
       const abbreviation = (t?: Record<string, unknown>) => {
-        const a = obj(t?.team).abbreviation;
+        const a = asObject(t?.team).abbreviation;
         return typeof a === 'string' && /^[A-Z]{2,4}$/.test(a) ? nflTeamKey(a) : undefined;
       };
       const score = (t?: Record<string, unknown>) => {
@@ -68,10 +65,10 @@ export function parseNflScoreboard(value: unknown): {
         } satisfies LiveNflGame,
       ];
     });
-  const byeTeams = list(obj(v.week).teamsOnBye)
+  const byeTeams = asList(asObject(v.week).teamsOnBye)
     .slice(0, 32)
     .flatMap((t) => {
-      const a = obj(t).abbreviation;
+      const a = asObject(t).abbreviation;
       return typeof a === 'string' && /^[A-Z]{2,4}$/.test(a) ? [nflTeamKey(a)] : [];
     });
   return { ...(Number.isInteger(week) && week > 0 && week < 30 ? { week } : {}), games, byeTeams };

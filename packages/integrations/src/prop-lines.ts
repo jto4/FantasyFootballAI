@@ -1,3 +1,4 @@
+import { asList, asObject } from '@sidekick/core';
 import {
   espnPropAthleteIds,
   nflTeamFullName,
@@ -27,9 +28,6 @@ export interface BookLinesSnapshot {
 
 const espnBase = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl';
 const oddsApiBase = 'https://api.the-odds-api.com/v4/sports/americanfootball_nfl';
-const obj = (x: unknown): Record<string, unknown> =>
-  x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : {};
-const list = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
 
 /**
  * Player-prop lines and multi-book game prices.
@@ -100,20 +98,20 @@ export class PublicPropLines {
     if (!game.espnId || !/^\d{9}$/.test(game.espnId))
       throw new Error('NFL game identity is unavailable.');
     const competition = `${espnBase}/events/${game.espnId}/competitions/${game.espnId}`;
-    const odds = obj(await this.json(`${competition}/odds`, 500_000));
-    const provider = list(odds.items)
-      .map((item) => obj(obj(item).provider))
+    const odds = asObject(await this.json(`${competition}/odds`, 500_000));
+    const provider = asList(odds.items)
+      .map((item) => asObject(asObject(item).provider))
       .find((p) => /^\d{1,6}$/.test(String(p.id)) && typeof p.name === 'string');
     if (!provider) return { gameId: game.id, lines: [], priced: false };
     const items: unknown[] = [];
     for (let page = 1; page <= 3; page++) {
-      const data = obj(
+      const data = asObject(
         await this.json(
           `${competition}/odds/${provider.id}/propBets?limit=1000&page=${page}`,
           6_000_000,
         ),
       );
-      items.push(...list(data.items));
+      items.push(...asList(data.items));
       if (!(Number(data.pageCount) > page)) break;
     }
     const ids = espnPropAthleteIds(items).slice(0, 150);
@@ -136,7 +134,7 @@ export class PublicPropLines {
       await Promise.all(
         missing.slice(start, start + 8).map(async (id) => {
           try {
-            const athlete = obj(
+            const athlete = asObject(
               await this.json(`${espnBase}/seasons/${season}/athletes/${id}`, 200_000),
             );
             const name = typeof athlete.fullName === 'string' ? athlete.fullName.trim() : '';
@@ -153,7 +151,7 @@ export class PublicPropLines {
   private async oddsApiEvent(game: FootballGame, key: string): Promise<string | undefined> {
     if (!this.events || this.events.until <= this.now()) {
       // Listing events does not count against the Odds API quota.
-      const value = list(
+      const value = asList(
         await this.json(`${oddsApiBase}/events?apiKey=${encodeURIComponent(key)}`, 1_000_000),
       );
       this.events = { value, until: this.now() + 30 * 60_000 };
@@ -162,7 +160,7 @@ export class PublicPropLines {
       away = nflTeamFullName(game.away),
       kickoff = game.kickoffAt ? Date.parse(game.kickoffAt) : NaN;
     const match = this.events.value
-      .map(obj)
+      .map(asObject)
       .find(
         (e) =>
           e.home_team === home &&

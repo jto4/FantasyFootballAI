@@ -1,3 +1,4 @@
+import { nflSeasonFor } from '@sidekick/core';
 import { freezeForecastProtocol } from './forecast-protocol.js';
 import { randomUUID } from 'node:crypto';
 import {
@@ -182,10 +183,7 @@ export function createAdviceService(deps: AdviceDependencies) {
       ? 'Codex GPT-6.1-Sol · signed-in CLI'
       : 'Claude Opus · signed-in CLI';
   const now = deps.now ?? Date.now;
-  const seasonNow = () => {
-    const date = new Date(now());
-    return date.getUTCMonth() < 2 ? date.getUTCFullYear() - 1 : date.getUTCFullYear();
-  };
+  const seasonNow = () => nflSeasonFor(now());
   function leagueFor(
     request: Pick<AdviceRequest, 'mode' | 'leagueId'>,
   ): LeagueConnection | undefined {

@@ -1,3 +1,4 @@
+import { asList, asObject, asText } from '@sidekick/core';
 import { nflTeamKey, type PlayerGameStats } from '@sidekick/core';
 import { readBoundedJson } from './http.js';
 
@@ -16,25 +17,21 @@ export interface LiveBoxScore {
 }
 type DistanceLists = Pick<PlayerGameStats, 'madeFieldGoalDistances' | 'blockedFieldGoalDistances'>;
 
-const obj = (x: unknown): Record<string, unknown> =>
-  x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : {};
-const list = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
-const str = (x: unknown) => (typeof x === 'string' ? x : '');
 const count = (x: unknown) => {
-  const n = Number(str(x) || x);
+  const n = Number(asText(x) || x);
   return Number.isInteger(n) && n >= 0 && n < 2_000 ? n : undefined;
 };
 const yards = (x: unknown) => {
-  const n = Number(str(x) || x);
+  const n = Number(asText(x) || x);
   return Number.isInteger(n) && n > -1_000 && n < 2_000 ? n : undefined;
 };
 /** "24/31" or "2-11" → [24, 31]. */
 const pair = (x: unknown) => {
-  const match = /^(\d+)[/-](\d+)$/.exec(str(x));
+  const match = /^(\d+)[/-](\d+)$/.exec(asText(x));
   return match ? [Number(match[1]), Number(match[2])] : undefined;
 };
 const team = (x: unknown) => {
-  const abbreviation = str(obj(x).abbreviation);
+  const abbreviation = asText(asObject(x).abbreviation);
   return /^[A-Z]{2,4}$/.test(abbreviation) ? nflTeamKey(abbreviation) : undefined;
 };
 const distance = (text: string) => {
@@ -84,39 +81,44 @@ const offenseKeys = [
  * tries come from the play-by-play. Anything that cannot be attributed is left out and noted.
  */
 export function parseNflBoxScore(value: unknown, espnId: string): LiveBoxScore {
-  const v = obj(value);
-  const competition = obj(list(obj(v.header).competitions)[0]);
-  const rawState = obj(obj(competition.status).type).state;
+  const v = asObject(value);
+  const competition = asObject(asList(asObject(v.header).competitions)[0]);
+  const rawState = asObject(asObject(competition.status).type).state;
   const state = rawState === 'in' || rawState === 'post' ? rawState : 'pre';
   const scores: Record<string, number> = {};
-  for (const competitor of list(competition.competitors)) {
-    const key = team(obj(competitor).team);
-    const score = count(obj(competitor).score);
+  for (const competitor of asList(competition.competitors)) {
+    const key = team(asObject(competitor).team);
+    const score = count(asObject(competitor).score);
     if (key && score !== undefined) scores[key] = score;
   }
   const players: LiveBoxScore['players'] = {};
   const kickers: Record<string, string[]> = {};
   const teamTotals: Record<string, Record<string, unknown>> = {};
-  for (const entry of list(obj(v.boxscore).teams)) {
-    const key = team(obj(entry).team);
+  for (const entry of asList(asObject(v.boxscore).teams)) {
+    const key = team(asObject(entry).team);
     if (!key) continue;
     teamTotals[key] = Object.fromEntries(
-      list(obj(entry).statistics).map((s) => [str(obj(s).name), obj(s).displayValue]),
+      asList(asObject(entry).statistics).map((s) => [
+        asText(asObject(s).name),
+        asObject(s).displayValue,
+      ]),
     );
   }
-  for (const entry of list(obj(v.boxscore).players)) {
-    const key = team(obj(entry).team);
+  for (const entry of asList(asObject(v.boxscore).players)) {
+    const key = team(asObject(entry).team);
     if (!key) continue;
-    for (const category of list(obj(entry).statistics).slice(0, 20)) {
-      const name = str(obj(category).name);
-      const keys = list(obj(category).keys).map(str);
-      for (const athleteEntry of list(obj(category).athletes).slice(0, 80)) {
-        const athlete = obj(obj(athleteEntry).athlete);
-        const id = str(athlete.id);
+    for (const category of asList(asObject(entry).statistics).slice(0, 20)) {
+      const name = asText(asObject(category).name);
+      const keys = asList(asObject(category).keys).map(asText);
+      for (const athleteEntry of asList(asObject(category).athletes).slice(0, 80)) {
+        const athlete = asObject(asObject(athleteEntry).athlete);
+        const id = asText(athlete.id);
         if (!/^\d{1,12}$/.test(id)) continue;
-        const raw = Object.fromEntries(keys.map((k, i) => [k, list(obj(athleteEntry).stats)[i]]));
+        const raw = Object.fromEntries(
+          keys.map((k, i) => [k, asList(asObject(athleteEntry).stats)[i]]),
+        );
         const row = (players[id] ??= {
-          name: str(athlete.displayName).slice(0, 120),
+          name: asText(athlete.displayName).slice(0, 120),
           team: key,
           stats: Object.fromEntries(offenseKeys.map((k) => [k, 0])) as Stats,
         });
@@ -164,17 +166,17 @@ export function parseNflBoxScore(value: unknown, espnId: string): LiveBoxScore {
   }
 
   const drives = [
-    ...list(obj(v.drives).previous),
-    ...(obj(v.drives).current ? [obj(v.drives).current] : []),
+    ...asList(asObject(v.drives).previous),
+    ...(asObject(v.drives).current ? [asObject(v.drives).current] : []),
   ];
   const kicks: Record<string, { made: number[]; missed: number[]; blocked: number[] }> = {};
   const blockedKicksAgainst: Record<string, number> = {};
   for (const drive of drives) {
-    const offense = team(obj(drive).team);
+    const offense = team(asObject(drive).team);
     if (!offense) continue;
-    for (const play of list(obj(drive).plays)) {
-      const type = str(obj(obj(play).type).text);
-      const text = str(obj(play).text);
+    for (const play of asList(asObject(drive).plays)) {
+      const type = asText(asObject(asObject(play).type).text);
+      const text = asText(asObject(play).text);
       const kick = (kicks[offense] ??= { made: [], missed: [], blocked: [] });
       const yardage = distance(text);
       if (/^field goal good$/i.test(type) && yardage) kick.made.push(yardage);
@@ -240,18 +242,18 @@ export function parseNflBoxScore(value: unknown, espnId: string): LiveBoxScore {
   }
 
   let previous: Record<string, number> = {};
-  const home = list(competition.competitors)
-    .map(obj)
+  const home = asList(competition.competitors)
+    .map(asObject)
     .find((c) => c.homeAway === 'home');
-  const away = list(competition.competitors)
-    .map(obj)
+  const away = asList(competition.competitors)
+    .map(asObject)
     .find((c) => c.homeAway === 'away');
   const homeKey = team(home?.team),
     awayKey = team(away?.team);
-  for (const play of list(v.scoringPlays)) {
-    const p = obj(play);
-    const type = str(obj(p.type).text);
-    const text = str(p.text);
+  for (const play of asList(v.scoringPlays)) {
+    const p = asObject(play);
+    const type = asText(asObject(p.type).text);
+    const text = asText(p.text);
     const scorer = team(p.team);
     const now: Record<string, number> = {
       ...(homeKey ? { [homeKey]: count(p.homeScore) ?? 0 } : {}),

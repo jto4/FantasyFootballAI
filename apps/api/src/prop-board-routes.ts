@@ -1,3 +1,4 @@
+import { nflSeasonFor } from '@sidekick/core';
 import Database from 'better-sqlite3';
 import { chmodSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -138,10 +139,7 @@ export function createPropBoardRouter(deps: {
 }) {
   const router = Router();
   const now = deps.now ?? Date.now;
-  const seasonNow = () => {
-    const date = new Date(now());
-    return date.getUTCFullYear() - (date.getUTCMonth() < 2 ? 1 : 0);
-  };
+  const seasonNow = () => nflSeasonFor(now());
   function grade(stats: Parameters<typeof gradePropLean>[1]) {
     const at = new Date(now()).toISOString();
     for (const record of deps.leans.list()) {

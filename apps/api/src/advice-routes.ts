@@ -1,3 +1,4 @@
+import { nflSeasonFor } from '@sidekick/core';
 import { freezeForecastProtocol } from './forecast-protocol.js';
 import { Router } from 'express';
 import { adviceJournal, isAdviceRequest, type AdviceRequest } from '@sidekick/core';
@@ -29,10 +30,9 @@ export function createAdviceRouter(
   let cachedBacktest: MarketBacktest | undefined;
   let testingConnection = false;
   router.get('/api/advice/odds', async (req, res) => {
-    const date = new Date((deps.now ?? Date.now)());
     const season =
       req.query.season === undefined
-        ? date.getUTCFullYear() - (date.getUTCMonth() < 2 ? 1 : 0)
+        ? nflSeasonFor((deps.now ?? Date.now)())
         : Number(req.query.season);
     if (
       Object.keys(req.query).some((k) => !['game', 'season'].includes(k)) ||
@@ -71,10 +71,9 @@ export function createAdviceRouter(
     ['/api/advice/books', 'books'],
   ] as const)
     router.get(path, async (req, res) => {
-      const date = new Date((deps.now ?? Date.now)());
       const season =
         req.query.season === undefined
-          ? date.getUTCFullYear() - (date.getUTCMonth() < 2 ? 1 : 0)
+          ? nflSeasonFor((deps.now ?? Date.now)())
           : Number(req.query.season);
       if (
         Object.keys(req.query).some((k) => !['game', 'season'].includes(k)) ||
@@ -115,80 +114,37 @@ export function createAdviceRouter(
       });
     return res.json({ available: true, protocol });
   });
-  // Deterministic waiver ranking and trade ideas for the chosen team; no AI call.
-  for (const [path, read] of [
-    ['/api/advice/waiver-day', 'waiverDay'],
-    ['/api/advice/trade-ideas', 'tradeIdeas'],
-    ['/api/live', 'live'],
+  // Team-scoped, deterministic and AI-free: waivers, trades, live scores, starter alerts (polled by
+  // the desktop shell for game-day notifications) and the weekly summary Home shows.
+  for (const [path, read, failure] of [
+    ['/api/advice/waiver-day', 'waiverDay', 'This list could not be prepared. Try again shortly.'],
+    [
+      '/api/advice/trade-ideas',
+      'tradeIdeas',
+      'This list could not be prepared. Try again shortly.',
+    ],
+    ['/api/live', 'live', 'This list could not be prepared. Try again shortly.'],
+    ['/api/alerts', 'alerts', 'Alerts are unavailable.'],
+    [
+      '/api/advice/briefing',
+      'briefing',
+      'Your weekly summary could not be prepared. Try again shortly.',
+    ],
   ] as const)
     router.get(path, async (req, res) => {
-      if (
-        Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
-        typeof req.query.league !== 'string' ||
-        typeof req.query.team !== 'string' ||
-        req.query.league.length > 256 ||
-        req.query.team.length > 256
-      )
-        return res.status(400).json({ error: 'Choose a connected league and team.' });
+      const query = leagueTeamQuery(req.query);
+      if (!query) return res.status(400).json({ error: 'Choose a connected league and team.' });
       try {
-        res.json(await service[read](req.query.league, req.query.team));
+        res.json(await service[read](query.league, query.team));
       } catch (error) {
         const missing = error instanceof Error && /not in the connected league/.test(error.message);
         res.status(missing ? 404 : 502).json({
-          error: missing
-            ? 'That team is not in the connected league.'
-            : 'This list could not be prepared. Try again shortly.',
+          error: missing ? 'That team is not in the connected league.' : failure,
         });
       }
     });
-  // Polled by the desktop shell for game-day notifications; deterministic and AI-free.
-  router.get('/api/alerts', async (req, res) => {
-    if (
-      Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
-      typeof req.query.league !== 'string' ||
-      typeof req.query.team !== 'string' ||
-      req.query.league.length > 256 ||
-      req.query.team.length > 256
-    )
-      return res.status(400).json({ error: 'Choose a connected league and team.' });
-    try {
-      res.json(await service.alerts(req.query.league, req.query.team));
-    } catch (error) {
-      const missing = error instanceof Error && /not in the connected league/.test(error.message);
-      res.status(missing ? 404 : 502).json({
-        error: missing ? 'That team is not in the connected league.' : 'Alerts are unavailable.',
-      });
-    }
-  });
-  // Deterministic and AI-free; safe to load whenever Home shows a selected team.
-  router.get('/api/advice/briefing', async (req, res) => {
-    if (
-      Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
-      typeof req.query.league !== 'string' ||
-      typeof req.query.team !== 'string' ||
-      req.query.league.length > 256 ||
-      req.query.team.length > 256
-    )
-      return res.status(400).json({ error: 'Choose a connected league and team.' });
-    try {
-      res.json(await service.briefing(req.query.league, req.query.team));
-    } catch (error) {
-      const missing = error instanceof Error && /not in the connected league/.test(error.message);
-      res.status(missing ? 404 : 502).json({
-        error: missing
-          ? 'That team is not in the connected league.'
-          : 'Your weekly summary could not be prepared. Try again shortly.',
-      });
-    }
-  });
   router.get('/api/advice/weekly', (req, res) => {
-    if (
-      Object.keys(req.query).some((k) => !['league', 'team'].includes(k)) ||
-      typeof req.query.league !== 'string' ||
-      typeof req.query.team !== 'string' ||
-      req.query.league.length > 256 ||
-      req.query.team.length > 256
-    )
+    if (!leagueTeamQuery(req.query))
       return res.status(400).json({ error: 'Choose a connected league and team.' });
     const state = deps.store.snapshot();
     const league = state.leagues.find((l) => l.id === req.query.league);
@@ -245,8 +201,7 @@ export function createAdviceRouter(
     };
     res.on('close', close);
     try {
-      const clock = new Date((deps.now ?? Date.now)());
-      const season = clock.getUTCMonth() < 2 ? clock.getUTCFullYear() - 1 : clock.getUTCFullYear();
+      const season = nflSeasonFor((deps.now ?? Date.now)());
       let data = await deps.data.get(season);
       if (deps.pregame)
         data = await deps.pregame.history(
@@ -537,4 +492,18 @@ export function createAdviceRouter(
     }
   });
   return router;
+}
+
+/** `?league=&team=` with nothing else and bounded lengths, or undefined. */
+function leagueTeamQuery(query: Record<string, unknown>) {
+  const { league, team } = query;
+  if (
+    Object.keys(query).some((key) => key !== 'league' && key !== 'team') ||
+    typeof league !== 'string' ||
+    typeof team !== 'string' ||
+    league.length > 256 ||
+    team.length > 256
+  )
+    return undefined;
+  return { league, team };
 }

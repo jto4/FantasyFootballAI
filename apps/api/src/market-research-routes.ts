@@ -1,3 +1,4 @@
+import { nflSeasonFor } from '@sidekick/core';
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import {
@@ -45,8 +46,7 @@ export function createMarketResearchRouter(deps: MarketResearchDependencies) {
   let busy = false,
     checking = false,
     lastCheck = 0;
-  const seasonNow = () =>
-    new Date(now()).getUTCFullYear() - (new Date(now()).getUTCMonth() < 2 ? 1 : 0);
+  const seasonNow = () => nflSeasonFor(now());
   router.get('/api/market-signals/games', async (_req, res) => {
     try {
       const season = seasonNow(),

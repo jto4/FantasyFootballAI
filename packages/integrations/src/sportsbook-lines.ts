@@ -1,3 +1,4 @@
+import { asObject } from '@sidekick/core';
 import { createHash } from 'node:crypto';
 import {
   isSportsbookQuote,
@@ -11,21 +12,19 @@ import {
   quoteMatchesTerms,
 } from '@sidekick/core';
 import { readBoundedJson } from './http.js';
-const obj = (x: unknown): Record<string, unknown> =>
-  x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : {};
 const array = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
 function identity(value: unknown, game: FootballGame) {
-  const h = obj(obj(value).header),
+  const h = asObject(asObject(value).header),
     competitions = array(h.competitions);
   if (
     h.id !== game.espnId ||
     h.uid !== `s:20~l:28~e:${game.espnId}` ||
-    obj(h.season).year !== game.season ||
-    obj(h.season).type !== 2 ||
+    asObject(h.season).year !== game.season ||
+    asObject(h.season).type !== 2 ||
     competitions.length !== 1
   )
     throw new Error('Unverified NFL market identity.');
-  const c = obj(competitions[0]),
+  const c = asObject(competitions[0]),
     rows = array(c.competitors);
   if (
     c.id !== game.espnId ||
@@ -37,11 +36,11 @@ function identity(value: unknown, game: FootballGame) {
     h.timeValid !== true
   )
     throw new Error('Unverified NFL market time.');
-  const home = rows.filter((r) => obj(r).homeAway === 'home'),
-    away = rows.filter((r) => obj(r).homeAway === 'away');
+  const home = rows.filter((r) => asObject(r).homeAway === 'home'),
+    away = rows.filter((r) => asObject(r).homeAway === 'away');
   if (home.length !== 1 || away.length !== 1) throw new Error('Ambiguous NFL market teams.');
-  const a = obj(home[0]),
-    b = obj(away[0]);
+  const a = asObject(home[0]),
+    b = asObject(away[0]);
   if (
     !/^[1-9]\d{0,2}$/.test(String(a.id)) ||
     !/^[1-9]\d{0,2}$/.test(String(b.id)) ||
@@ -49,11 +48,11 @@ function identity(value: unknown, game: FootballGame) {
   )
     throw new Error('Unverified NFL team IDs.');
   if (
-    nflTeamKey(String(obj(a.team).abbreviation)) !== nflTeamKey(game.home) ||
-    nflTeamKey(String(obj(b.team).abbreviation)) !== nflTeamKey(game.away)
+    nflTeamKey(String(asObject(a.team).abbreviation)) !== nflTeamKey(game.home) ||
+    nflTeamKey(String(asObject(b.team).abbreviation)) !== nflTeamKey(game.away)
   )
     throw new Error('Mismatched NFL market teams.');
-  return { competition: c, home: a, away: b, status: obj(c.status) };
+  return { competition: c, home: a, away: b, status: asObject(c.status) };
 }
 function price(value: unknown): number | undefined {
   if (typeof value !== 'string' || !/^[-+]?\d{3,6}$/.test(value)) return;
@@ -77,18 +76,18 @@ export function parseSportsbookQuotes(
 ): SportsbookQuote[] {
   const { competition, home, away, status } = identity(value, game);
   if (
-    obj(status.type).state !== 'pre' ||
-    obj(status.type).completed !== false ||
+    asObject(status.type).state !== 'pre' ||
+    asObject(status.type).completed !== false ||
     !isUpcomingFootballGame(game, observedAt)
   )
     return [];
   const result: SportsbookQuote[] = [],
     providers = new Set<string>();
-  const books = array(obj(value).pickcenter);
+  const books = array(asObject(value).pickcenter);
   if (books.length > 10) throw new Error('Too many market providers.');
   for (const item of books) {
-    const row = obj(item),
-      p = obj(row.provider),
+    const row = asObject(item),
+      p = asObject(row.provider),
       providerId = String(p.id ?? '');
     if (
       !/^\d{1,8}$/.test(providerId) ||
@@ -100,8 +99,8 @@ export function parseSportsbookQuotes(
       throw new Error('Ambiguous market provider.');
     providers.add(providerId);
     if (
-      String(obj(row.homeTeamOdds).teamId) !== String(home.id) ||
-      String(obj(row.awayTeamOdds).teamId) !== String(away.id)
+      String(asObject(row.homeTeamOdds).teamId) !== String(home.id) ||
+      String(asObject(row.awayTeamOdds).teamId) !== String(away.id)
     )
       continue;
     for (const [kind, field, sides] of [
@@ -109,9 +108,9 @@ export function parseSportsbookQuotes(
       ['spread', 'pointSpread', ['home', 'away']],
       ['total', 'total', ['over', 'under']],
     ] as const) {
-      const market = obj(row[field]),
-        first = obj(obj(market[sides[0]]).close),
-        second = obj(obj(market[sides[1]]).close);
+      const market = asObject(row[field]),
+        first = asObject(asObject(market[sides[0]]).close),
+        second = asObject(asObject(market[sides[1]]).close);
       const firstOdds = price(first.odds),
         secondOdds = price(second.odds);
       const firstLine = kind === 'moneyline' ? undefined : line(first.line, kind === 'total'),
@@ -161,8 +160,8 @@ export function parseFinalFootballResult(
 ): FinalFootballResult | undefined {
   const { home, away, status } = identity(value, game);
   if (
-    obj(status.type).state !== 'post' ||
-    obj(status.type).completed !== true ||
+    asObject(status.type).state !== 'post' ||
+    asObject(status.type).completed !== true ||
     Date.parse(game.kickoffAt!) >= Date.parse(observedAt)
   )
     return;
@@ -317,8 +316,8 @@ export class PublicSportsbookLines {
 export function verifiedPregameTeams(value: unknown, game: FootballGame, asOf: string) {
   const result = identity(value, game);
   if (
-    obj(result.status.type).state !== 'pre' ||
-    obj(result.status.type).completed !== false ||
+    asObject(result.status.type).state !== 'pre' ||
+    asObject(result.status.type).completed !== false ||
     !isUpcomingFootballGame(game, asOf)
   )
     throw new Error('Pregame evidence is unavailable for a started game.');

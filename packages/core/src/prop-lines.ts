@@ -1,3 +1,4 @@
+import { asList, asObject } from './untrusted.js';
 import type { FootballStatKey } from './advice-types.js';
 import { americanOdds, nflTeamKey } from './advice-math.js';
 
@@ -55,9 +56,6 @@ export const oddsApiPropMarkets: Readonly<Record<string, FootballStatKey>> = {
   player_receptions: 'receptions',
 };
 
-const obj = (x: unknown): Record<string, unknown> =>
-  x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : {};
-const list = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
 const text = (x: unknown, max = 80) =>
   typeof x === 'string' && x.trim() && x.length <= max ? x.trim() : undefined;
 const propLine = (x: unknown) =>
@@ -70,7 +68,7 @@ const price = (x: unknown) =>
     : undefined;
 
 export function isPropLine(value: unknown): value is PropLine {
-  const v = obj(value);
+  const v = asObject(value);
   return (
     typeof v.id === 'string' &&
     v.id.length <= 200 &&
@@ -92,10 +90,10 @@ export function isPropLine(value: unknown): value is PropLine {
 export function espnPropAthleteIds(items: unknown[]): string[] {
   const ids = new Set<string>();
   for (const item of items) {
-    const ref = obj(obj(item).athlete).$ref;
+    const ref = asObject(asObject(item).athlete).$ref;
     const id =
       typeof ref === 'string' ? /\/athletes\/(\d{1,10})(?:\?|$)/.exec(ref)?.[1] : undefined;
-    if (id && espnPropStats[String(obj(obj(item).type).name)]) ids.add(id);
+    if (id && espnPropStats[String(asObject(asObject(item).type).name)]) ids.add(id);
   }
   return [...ids];
 }
@@ -111,10 +109,10 @@ export function parseEspnPropBets(
 ): PropLine[] {
   const seen = new Map<string, PropLine>();
   for (const item of items) {
-    const row = obj(item),
-      stat = espnPropStats[String(obj(row.type).name)],
-      line = propLine(obj(obj(row.current).target).value),
-      ref = obj(row.athlete).$ref,
+    const row = asObject(item),
+      stat = espnPropStats[String(asObject(row.type).name)],
+      line = propLine(asObject(asObject(row.current).target).value),
+      ref = asObject(row.athlete).$ref,
       athleteId =
         typeof ref === 'string' ? /\/athletes\/(\d{1,10})(?:\?|$)/.exec(ref)?.[1] : undefined,
       person = athleteId ? names.get(athleteId) : undefined;
@@ -142,20 +140,20 @@ export function parseOddsApiProps(
   context: { gameId: string; observedAt: string },
 ): PropLine[] {
   const lines: PropLine[] = [];
-  for (const bookmaker of list(obj(value).bookmakers).slice(0, 40)) {
-    const book = obj(bookmaker),
+  for (const bookmaker of asList(asObject(value).bookmakers).slice(0, 40)) {
+    const book = asObject(bookmaker),
       sportsbook = text(book.title);
     if (!sportsbook) continue;
-    for (const market of list(book.markets).slice(0, 40)) {
-      const m = obj(market),
+    for (const market of asList(book.markets).slice(0, 40)) {
+      const m = asObject(market),
         stat = oddsApiPropMarkets[String(m.key)];
       if (!stat) continue;
       const pairs = new Map<
         string,
         { player: string; line: number; over?: number; under?: number }
       >();
-      for (const outcome of list(m.outcomes).slice(0, 400)) {
-        const o = obj(outcome),
+      for (const outcome of asList(m.outcomes).slice(0, 400)) {
+        const o = asObject(outcome),
           player = text(o.description),
           line = propLine(o.point),
           odds = price(o.price),
@@ -191,15 +189,15 @@ export function parseOddsApiLines(
   teams: { home: string; away: string; homeName: string; awayName: string },
   observedAt: string,
 ): BookLine[] {
-  const v = obj(value);
+  const v = asObject(value);
   if (v.home_team !== teams.homeName || v.away_team !== teams.awayName) return [];
   const rows: BookLine[] = [];
-  for (const bookmaker of list(v.bookmakers).slice(0, 40)) {
-    const book = obj(bookmaker),
+  for (const bookmaker of asList(v.bookmakers).slice(0, 40)) {
+    const book = asObject(bookmaker),
       sportsbook = text(book.title);
     if (!sportsbook) continue;
-    for (const market of list(book.markets)) {
-      const m = obj(market),
+    for (const market of asList(book.markets)) {
+      const m = asObject(market),
         kind =
           m.key === 'h2h'
             ? 'moneyline'
@@ -209,8 +207,8 @@ export function parseOddsApiLines(
                 ? 'total'
                 : undefined;
       if (!kind) continue;
-      for (const outcome of list(m.outcomes).slice(0, 4)) {
-        const o = obj(outcome),
+      for (const outcome of asList(m.outcomes).slice(0, 4)) {
+        const o = asObject(outcome),
           odds = price(o.price),
           side =
             kind === 'total'
