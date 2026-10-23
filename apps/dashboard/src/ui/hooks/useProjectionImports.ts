@@ -5,6 +5,7 @@ import {
   isProjectionSummaryList,
   type ProjectionSummary,
 } from '../memory-page-data.js';
+import { confirmAction } from '../ConfirmDialog';
 
 /** Owner-imported projection CSV sets for the Imports page. Points stay unconfirmed until marked. */
 export function useProjectionImports(
@@ -61,9 +62,10 @@ export function useProjectionImports(
     );
     if (
       existing &&
-      !window.confirm(
-        `Replace ${existing.count} projections from ${existing.sourceName} with the selected file? Other source sets will be kept.`,
-      )
+      !(await confirmAction('Other source sets will be kept.', {
+        title: `Replace ${existing.count} projections from ${existing.sourceName}?`,
+        confirmLabel: 'Replace',
+      }))
     )
       return;
     setBusy(true);
@@ -103,7 +105,14 @@ export function useProjectionImports(
 
   async function deleteProjections(source: ProjectionSummary) {
     try {
-      if (!window.confirm(`Delete ${source.count} projections from ${source.sourceName}?`)) return;
+      if (
+        !(await confirmAction('Other source sets will be kept.', {
+          title: `Delete ${source.count} projections from ${source.sourceName}?`,
+          confirmLabel: 'Delete',
+          tone: 'danger',
+        }))
+      )
+        return;
       const response = await requestResponse(
         `/api/projections/${encodeURIComponent(source.leagueId)}/source/${encodeURIComponent(source.sourceId)}`,
         {

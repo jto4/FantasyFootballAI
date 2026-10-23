@@ -6,6 +6,7 @@ import { Download, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import type { AppSettings } from '@sidekick/core';
 import { normalizeActionSettings } from '@sidekick/core';
 import { EmptyStatus, LoadError, LoadingStatus } from './LoadFeedback.js';
+import { confirmAction } from './ConfirmDialog';
 
 type SafetyBackup = { name: string; createdAt: string; size: number };
 type Props = {
@@ -92,7 +93,14 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
   }
 
   async function deleteSafetyBackup(name: string) {
-    if (!window.confirm(`Permanently delete safety backup ${name}?`)) return;
+    if (
+      !(await confirmAction('This can’t be undone.', {
+        title: `Permanently delete safety backup ${name}?`,
+        confirmLabel: 'Delete backup',
+        tone: 'danger',
+      }))
+    )
+      return;
     try {
       const response = await requestResponse(`/api/backups/${encodeURIComponent(name)}`, {
         method: 'DELETE',
@@ -118,9 +126,10 @@ export function LocalBackupSection({ onNotice, onRestored, onSettingsRestored }:
     }
     const confirmed =
       validateOnly ||
-      window.confirm(
-        'Restore this backup? Current settings, leagues, reports, member memory, scheduled history, and generated images will be replaced. Automatic actions will return to draft mode; custom AI endpoints and local CLI runtimes will return to the default until you review and save those settings. A safety copy of the current database will be kept in the local backups folder.',
-      );
+      (await confirmAction(
+        'Current settings, leagues, reports, member memory, scheduled history, and generated images will be replaced. Automatic actions will return to draft mode; custom AI endpoints and local CLI runtimes will return to the default until you review and save those settings. A safety copy of the current database will be kept in the local backups folder.',
+        { title: 'Restore this backup?', confirmLabel: 'Restore backup', tone: 'danger' },
+      ));
     if (!confirmed) return;
 
     setBackupBusy(true);

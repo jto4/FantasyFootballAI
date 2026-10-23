@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { isAdviceJournalReport, type AdviceJournalReport } from '@sidekick/core';
 import { requestJson, requestResponse } from './api-client';
 import { adviceTitle, isAdviceMode } from './advice-navigation';
+import { ErrorNotice } from './ErrorNotice';
 const methodNames: Record<string, string> = {
   imported: 'Imported projections',
   'historical-baseline': 'Historical scoring baseline',
@@ -84,7 +85,7 @@ export function AdviceJournal({ disabled }: { disabled: boolean }) {
         Reload journal
       </button>
       {busy && <p role="status">Checking the local journal…</p>}
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {report && (
         <>
           <h3>Fantasy decision comparisons</h3>

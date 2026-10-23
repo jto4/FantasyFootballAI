@@ -12,6 +12,7 @@ import { reportName, scheduleSummary } from './beginner-flow';
 import { requestJson } from './api-client';
 import { FriendlyError } from './FriendlyError';
 import { isAppState } from './app-state';
+import { confirmAction, discardOptions } from './ConfirmDialog';
 
 export type SchedulePrefill = {
   kind: ActionSetting['kind'];
@@ -72,8 +73,13 @@ export function ScheduleEditor({
     onDirtyChange(dirty);
     return () => onDirtyChange(false);
   }, [dirty, onDirtyChange]);
-  function close() {
-    if (!busy && (!dirty || window.confirm('Discard unsaved schedule changes?'))) onClose();
+  async function close() {
+    if (busy) return;
+    if (
+      !dirty ||
+      (await confirmAction('Your schedule changes haven’t been saved.', discardOptions))
+    )
+      onClose();
   }
   async function save() {
     if (busy || !dirty) return;
@@ -106,9 +112,10 @@ export function ScheduleEditor({
       action.enabled &&
       action.schedule.enabled &&
       action.channel !== 'dashboard' &&
-      !window.confirm(
-        `Save automatic delivery? ${reportName(action.kind)} can send to ${recipient} without your review. The schedule summary shows the time and leagues.`,
-      )
+      !(await confirmAction(
+        `${reportName(action.kind)} can send to ${recipient} without your review. The schedule summary shows the time and leagues.`,
+        { title: 'Save automatic delivery?', confirmLabel: 'Save automatic delivery' },
+      ))
     )
       return;
     setBusy(true);

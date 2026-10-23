@@ -6,5 +6,6 @@ docs/research/model-v16-drive-provenance.json
 
 # Compiled bundles and local installer artifacts are checked through their sources.
 **/dist/
+**/dist-states/
 **/coverage/
 apps/desktop/out/

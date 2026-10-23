@@ -11,6 +11,7 @@ import {
 } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
+import { ErrorNotice } from './ErrorNotice';
 const odds = (n: number) => (n > 0 ? `+${n}` : String(n));
 export function LiveSportsbookPrices({
   game,
@@ -103,7 +104,7 @@ export function LiveSportsbookPrices({
           offered by your sportsbook.
         </p>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {snapshot && (
         <>
           <p>Checked {snapshot.observedAt ? formatDateTime(snapshot.observedAt) : 'just now'}.</p>

@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 23 (UI states): no false all-clear on Home, one error style with retry and support
+  details, in-app confirmations, elapsed time on long waits, a UI state gallery with screenshot
+  tests, and development-only API fault injection.
 - October 23 (latest): matchup win probability and likely ranges (calibrated on 2026), a
   forecast-wind adjustment (fitted on 2025, confirmed on 2026), and game-day inactive alerts with a
   bench replacement.
@@ -37,6 +40,7 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
 ### Ask Sidekick chat and UI tidy — October 22, 2026
 
 - [ ] Close the gap to ESPN's accuracy (5.50 vs 5.28 points on the same games). Calibration, an early-season blend and QB-specific changes were tested and did not help; next candidates are teammate correlation in win probability, an in-game win chance from the game clock, a returning-teammate adjustment, using vacated carries in prop leans, and target redistribution once more injury seasons are available.
+- [ ] Replace the two remaining `window.prompt` calls (email subject and reply-to when sending a saved report) with in-app fields, and move the remaining string-only error displays (settings sections, imports) onto `ErrorNotice` with retry.
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
 - [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.

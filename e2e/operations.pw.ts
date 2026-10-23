@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 function runtimeErrors(page: Page) {
   const errors: string[] = [];
@@ -69,15 +70,15 @@ test('bookmark, reload, Back, and Forward recover a saved report and protect uns
     await page
       .getByRole('textbox', { name: 'Report body' })
       .fill('Unsaved text survives a rejected Back action.');
-    page.once('dialog', (dialog) => void dialog.dismiss());
     await page.goBack();
+    await answerConfirm(page, false);
     await expect(page.getByRole('textbox', { name: 'Report body' })).toHaveValue(
       'Unsaved text survives a rejected Back action.',
     );
     await expect(page).toHaveURL(savedUrl);
     await page.screenshot({ path: info.outputPath('url-review.png') });
-    page.once('dialog', (dialog) => void dialog.accept());
     await page.goBack();
+    await answerConfirm(page, true);
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await page.goForward();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -98,7 +99,7 @@ test('cancels a running job and recovers an older pending request beyond recent 
     await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
-    await expect(page.getByText('Generation running', { exact: true })).toBeVisible();
+    await expect(page.getByText('Writing the report', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Cancel generation', exact: true }).click();
     await expect(page.getByText('Generation cancelled', { exact: true })).toBeVisible();
     workspace.release();

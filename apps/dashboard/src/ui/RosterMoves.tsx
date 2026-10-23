@@ -1,6 +1,7 @@
 import { record, type TradeIdea, type WaiverDay } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
+import { ErrorNotice } from './ErrorNotice';
 
 const points = (n: number) =>
   `${n >= 0 ? '+' : ''}${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n)}`;
@@ -31,12 +32,19 @@ export function WaiverDayPanel({
   team: string;
   onUse: (candidateId: string, dropId?: string) => void;
 }) {
-  const { data, error, loading } = useReport('/api/advice/waiver-day', league, team, isWaiverDay);
+  const { data, error, loading, reload } = useReport(
+    '/api/advice/waiver-day',
+    league,
+    team,
+    isWaiverDay,
+  );
   return (
     <section className="roster-moves" aria-label="Waiver day">
       <h3>Waiver day</h3>
-      {loading && <LoadingStatus message="Ranking free agents for your roster…" shape="rows" />}
-      {error && <p role="alert">{error}</p>}
+      {loading && (
+        <LoadingStatus message="Ranking free agents for your roster…" shape="rows" showElapsed />
+      )}
+      {error && <ErrorNotice error={error} onRetry={reload} />}
       {data && (
         <>
           {data.weakSpots.length > 0 && (
@@ -115,12 +123,23 @@ export function TradeIdeasPanel({
   team: string;
   onUse: (idea: TradeIdea) => void;
 }) {
-  const { data, error, loading } = useReport('/api/advice/trade-ideas', league, team, isTradeIdeas);
+  const { data, error, loading, reload } = useReport(
+    '/api/advice/trade-ideas',
+    league,
+    team,
+    isTradeIdeas,
+  );
   return (
     <section className="roster-moves" aria-label="Trade ideas">
       <h3>Trade ideas</h3>
-      {loading && <LoadingStatus message="Looking for trades that help both teams…" shape="rows" />}
-      {error && <p role="alert">{error}</p>}
+      {loading && (
+        <LoadingStatus
+          message="Looking for trades that help both teams…"
+          shape="rows"
+          showElapsed
+        />
+      )}
+      {error && <ErrorNotice error={error} onRetry={reload} />}
       {data && (
         <>
           {data.warnings.map((w) => (

@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { record, type PredictionPerformance, type MarketBacktest } from '@sidekick/core';
 import { requestJson, requestResponse } from './api-client';
+import { ErrorNotice } from './ErrorNotice';
+import { confirmAction } from './ConfirmDialog';
 const numeric = (x: unknown) => typeof x === 'number' && Number.isFinite(x);
 const shortText = (x: unknown, n = 300) => typeof x === 'string' && x.length <= n;
 const interval = (x: unknown) =>
@@ -184,9 +186,11 @@ export function AdvicePerformance({ disabled = false }: { disabled?: boolean }) 
   }
   async function clear() {
     if (
-      !window.confirm(
-        'Clear the local prediction track record? Export it first to keep a copy. Saved advice is kept.',
-      )
+      !(await confirmAction('Export it first to keep a copy. Saved advice is kept.', {
+        title: 'Clear the prediction track record?',
+        confirmLabel: 'Clear track record',
+        tone: 'danger',
+      }))
     )
       return;
     setBusy('clear');
@@ -261,7 +265,7 @@ export function AdvicePerformance({ disabled = false }: { disabled?: boolean }) 
             : 'Checking the saved track record…'}
         </p>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {report && (
         <>
           <p>

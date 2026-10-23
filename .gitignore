@@ -13,3 +13,4 @@ apps/desktop/out/
 # iCloud Drive conflict copies such as "file 2.ts"; see scripts/icloud-safe.mjs.
 * [2-9]
 * [2-9].*
+dist-states/

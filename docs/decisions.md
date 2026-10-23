@@ -567,3 +567,23 @@ raises an alert and shows on Home even when that week's nflverse report has no d
 (previously the report's blank designation hid it). Re-emitting the backtest with wind also
 adopted a 50/50 quarterback blend with the recent average under the existing rule (weight chosen
 on weeks 1–3, kept only because it also won on weeks 4+).
+
+### UI states: no false all-clear, one error style, in-app confirmations — October 23, 2026
+
+Home's "Do this next" card said "You're set for this week" while the starter alerts were still
+loading or had failed, so a starter ruled out could look fine. It now says it is still checking,
+or that the check failed with a retry, and gives the all-clear only after both the alerts and the
+weekly briefing have loaded.
+
+Errors share one presentation (`ErrorNotice`): a plain sentence, a retry where the data can be
+reloaded, and the request reference, error code and raw browser text folded into "Details for
+support". Raw network text such as "Failed to fetch" is translated. Confirmations use an in-app
+dialog (`confirmAction`) instead of `window.confirm`, whose native sheet shows the page origin,
+can't be styled and blocks the window; Cancel takes the first focus and Escape cancels. Leaving a
+page with unsaved edits now waits for that answer and replays the same navigation, including
+browser Back/Forward. Long waits (advice analysis, report generation, prop and roster loads,
+chat) show elapsed time, the usual duration and Cancel where the work can be cancelled.
+
+Hard-to-reach states are kept visible by a development-only gallery (`states.html`) with
+screenshot tests, and by development-only API fault injection (`SIDEKICK_FAULTS`); see
+`docs/setup.md`.

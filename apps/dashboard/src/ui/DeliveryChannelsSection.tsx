@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { Copy } from 'lucide-react';
 import type { AppSettings, LeagueConnection } from '@sidekick/core';
 import { LoadError, LoadingStatus } from './LoadFeedback.js';
+import { confirmAction } from './ConfirmDialog';
 
 type AutoSyncStatus = {
   enabled: boolean;
@@ -373,13 +374,14 @@ export function DeliveryChannelsSection({
           data-search-target="chat-auto-send"
           checked={settings.chatRepliesAutoSend === true}
           disabled={settings.chatRepliesEnabled !== true}
-          onChange={(event) => {
+          onChange={async (event) => {
             const enabled = event.target.checked;
             if (
               enabled &&
-              !window.confirm(
-                'Enable automatic chat replies? Generated replies can be sent to the configured group conversation without your review. Confirm the selected league and group before saving.',
-              )
+              !(await confirmAction(
+                'Generated replies can be sent to the configured group conversation without your review. Confirm the selected league and group before saving.',
+                { title: 'Enable automatic chat replies?', confirmLabel: 'Enable' },
+              ))
             )
               return;
             setSettings((current) => ({ ...current, chatRepliesAutoSend: enabled }));

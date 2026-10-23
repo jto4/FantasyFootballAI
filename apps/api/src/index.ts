@@ -8,6 +8,7 @@ import {
   readBoundedJson,
 } from '@sidekick/integrations';
 import { createChatRouter } from './chat-routes.js';
+import { devFaults } from './dev-faults.js';
 import { createPropBoardRouter, PropLeanStore } from './prop-board-routes.js';
 import { PropLineLedger, startPropLineCapture } from './prop-line-ledger.js';
 import { ChatStore } from './chat-store.js';
@@ -212,6 +213,14 @@ const { generateAndSaveReport } = createReportService({
   delivery: deliveryService,
 });
 const app = createLocalHttpApp(() => port, isDevelopment);
+// Fault injection exists only in development; see dev-faults.ts and docs/setup.md.
+if (isDevelopment) {
+  const faults = devFaults(process.env.SIDEKICK_FAULTS);
+  app.use(faults.router);
+  app.use(faults.middleware);
+  if (faults.rules().length)
+    console.warn(`Simulating API faults (development only): ${process.env.SIDEKICK_FAULTS}`);
+}
 let stopApplication: () => void = () => undefined;
 app.use(
   createStateRouter({

@@ -24,6 +24,7 @@ import { AdviceHistory } from './AdviceHistory';
 import { useAdviceHistory } from './hooks/useAdviceHistory';
 import { AdviceResultView } from './AdviceResultView';
 import { LoadingStatus } from './LoadFeedback';
+import { WaitStatus } from './WaitStatus';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
@@ -37,6 +38,7 @@ import { PlayerPicker } from './PlayerPicker';
 import { AdvicePerformance } from './AdvicePerformance';
 import { AdviceJournal } from './AdviceJournal';
 import { DataReadiness } from './DataReadiness';
+import { confirmAction } from './ConfirmDialog';
 
 const MarketSignalsPanel = lazy(() =>
   import('./MarketSignalsPanel').then((m) => ({ default: m.MarketSignalsPanel })),
@@ -60,7 +62,7 @@ export function AdvicePage({
   resultId?: string;
   preferredTeamId?: string | undefined;
   onTeamSelect?: (id: string) => void;
-  onNavigate: (destination: SearchDestination, check?: boolean) => boolean;
+  onNavigate: (destination: SearchDestination, check?: boolean) => boolean | Promise<boolean>;
   onDirtyChange: (dirty: boolean) => void;
 }) {
   const league = leagues.find((item) => item.id === leagueId) ?? leagues[0];
@@ -104,6 +106,7 @@ export function AdvicePage({
   const [resultLoading, setResultLoading] = useState(Boolean(resultId));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [busySince, setBusySince] = useState(0);
   const [readiness, setReadiness] = useState<{ key: string; report: AdviceDataReadiness } | null>(
     null,
   );
@@ -410,6 +413,7 @@ export function AdvicePage({
       controller = new AbortController();
     analysis.current = { id, controller, started: false };
     setBusy(true);
+    setBusySince(Date.now());
     setError('');
     setStatus('Analyzing the evidence, then reviewing the recommendation…');
     try {
@@ -513,7 +517,15 @@ export function AdvicePage({
     }
   }
   async function deleteResult() {
-    if (!result || !window.confirm('Delete this saved advice?')) return;
+    if (
+      !result ||
+      !(await confirmAction('The analysis and its evidence will be removed from this computer.', {
+        title: 'Delete this saved advice?',
+        confirmLabel: 'Delete',
+        tone: 'danger',
+      }))
+    )
+      return;
     setError('');
     try {
       await requestResponse(`/api/advice/${result.id}`, { method: 'DELETE' });
@@ -1055,16 +1067,7 @@ export function AdvicePage({
           Cancel connection test
         </button>
       )}
-      {busy && (
-        <button
-          className="small-button"
-          type="button"
-          disabled={canceling}
-          onClick={() => void cancel()}
-        >
-          {canceling ? 'Canceling…' : 'Cancel analysis'}
-        </button>
-      )}
+
       {!!options?.warnings.length && (
         <details>
           <summary>Public data notices ({options.warnings.length})</summary>
@@ -1197,7 +1200,19 @@ export function AdvicePage({
             </button>
           </div>
         )}
-        {status && <p role="status">{status}</p>}
+        {busy ? (
+          <WaitStatus
+            label={status || 'Analyzing…'}
+            since={busySince}
+            typical="usually under a minute (two AI calls)"
+            slowAfterSeconds={120}
+            onCancel={() => void cancel()}
+            cancelLabel="Cancel analysis"
+            canceling={canceling}
+          />
+        ) : (
+          status && <p role="status">{status}</p>
+        )}
         {resultLoading ? (
           <LoadingStatus message="Opening saved advice…" />
         ) : result ? (

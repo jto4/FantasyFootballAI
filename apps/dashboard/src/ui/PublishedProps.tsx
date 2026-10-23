@@ -8,6 +8,7 @@ import {
 } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
+import { ErrorNotice } from './ErrorNotice';
 
 export type PropPick = {
   playerId: string;
@@ -53,6 +54,7 @@ export function PublishedProps({
     data: snapshot,
     error,
     loading,
+    reload,
   } = useApi(
     game
       ? `/api/advice/props?${new URLSearchParams({ game: game.id, season: String(season) })}`
@@ -88,8 +90,8 @@ export function PublishedProps({
     <section className="published-props" aria-label="Published player props">
       <h3>Pick a published prop</h3>
       {!game && <p>Choose an upcoming NFL game first.</p>}
-      {loading && <LoadingStatus message="Loading prop lines…" shape="rows" />}
-      {error && <p role="alert">{error}</p>}
+      {loading && <LoadingStatus message="Loading prop lines…" shape="rows" showElapsed />}
+      {error && <ErrorNotice error={error} onRetry={reload} />}
       {snapshot && (
         <>
           <p className="published-props-note">

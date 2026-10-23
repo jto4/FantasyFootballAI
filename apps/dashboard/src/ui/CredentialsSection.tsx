@@ -3,6 +3,7 @@ import { Download, ShieldCheck, Trash2 } from 'lucide-react';
 import { credentialStatusLabel } from './credential-status.js';
 import { EmptyStatus, LoadError, LoadingStatus } from './LoadFeedback.js';
 import { ConnectionFields } from './ConnectionFields';
+import { confirmAction } from './ConfirmDialog';
 
 export type SecretState = { provider: string; configured: boolean }[];
 export type LocalImage = { id: string; createdAt: string; size: number; mimeType: string };
@@ -245,10 +246,15 @@ export function CredentialsSection({
                     <button
                       type="button"
                       className="small-button danger"
-                      onClick={() => {
+                      onClick={async () => {
                         if (
-                          window.confirm(
-                            `Remove ${secret.name}? This connection will stop working until you add access details again.`,
+                          await confirmAction(
+                            'This connection will stop working until you add access details again.',
+                            {
+                              title: `Remove ${secret.name}?`,
+                              confirmLabel: 'Remove',
+                              tone: 'danger',
+                            },
                           )
                         )
                           onRemoveSecret(secret.id);

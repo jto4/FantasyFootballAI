@@ -29,6 +29,24 @@ Install Node.js 22 LTS (22.13 minimum; use `.nvmrc`) and npm, clone the reposito
 
 Use **Stop app** at the bottom of the dashboard sidebar to stop the API, scheduled jobs, and development dashboard process. Confirm the prompt to exit. Start again with `npm run dev` from the repository directory.
 
+### UI states and simulated failures
+
+- `npm run dev` also serves a gallery of hard-to-reach UI states at
+  `http://127.0.0.1:5173/states.html`: error messages, loading and long-wait indicators,
+  confirmations, Home's top card while checks load or fail, and the matchup win chance. It uses
+  fictional data and stubbed API answers, and is never part of the app build.
+- `npm run test:ui-states` screenshots every gallery state in light and dark appearance and
+  compares them with `e2e-states/__screenshots__/` (macOS renders). After an intended visual
+  change, run it with `-- --update-snapshots` and review the image diffs before committing.
+- To see failures in the real app during `npm run dev`, set `SIDEKICK_FAULTS` before starting
+  it, for example `SIDEKICK_FAULTS="fail:/api/alerts=502;slow:/api/advice/briefing=8000"`.
+  Rules are `fail:<path>=<status>`, `slow:<path>=<ms>`, `drop:<path>` (connection closed) and
+  `flaky:<path>=<share>`, matched by path prefix. Change them without restarting from the
+  browser console:
+  `fetch('/api/dev/faults', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ spec: 'drop:/api/live' }) })`;
+  an empty spec turns them off. Fault injection is installed only in development mode; the
+  packaged app and the background service never load it.
+
 ## Local production-style launch
 
 After `npm ci`, run `npm start` from the repository directory. This builds the

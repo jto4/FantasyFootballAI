@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import type { SavedReport } from '@sidekick/core';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 function errors(page: Page) {
   const failures: string[] = [];
@@ -66,11 +67,8 @@ test('a delayed draft save cannot replace another report or display feedback in 
     await expect(review).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(review.getByRole('button', { name: 'Close report review' })).toBeFocused();
-    page.once('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('continue in the background');
-      await dialog.accept();
-    });
     await review.getByRole('button', { name: 'Close report review' }).click();
+    await answerConfirm(page, true, 'continue in the background');
     await expect(review).toBeHidden();
     await page
       .locator('.report-card, .report-table tbody tr')
@@ -193,12 +191,12 @@ test('keyboard review skips collapsed metadata and keeps an edited field clear o
     expect(inputBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
     await input.fill('Unsaved fictional title');
     await page.screenshot({ path: info.outputPath('keyboard-editor.png') });
-    page.once('dialog', (dialog) => dialog.dismiss());
     await page.keyboard.press('Escape');
+    await answerConfirm(page, false);
     await expect(input).toHaveValue('Unsaved fictional title');
     await expect(review).toBeVisible();
-    page.once('dialog', (dialog) => dialog.accept());
     await close.click();
+    await answerConfirm(page, true);
     await expect(review).toBeHidden();
     expect(workspace.sends).toHaveLength(0);
     expect(failures).toEqual([]);

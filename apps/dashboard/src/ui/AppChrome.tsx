@@ -197,7 +197,7 @@ export function AppTopbar({
   serviceStatus: ServiceStatus;
   verificationMode: boolean;
   onLeagueChange: (leagueId: string) => void;
-  onSearchNavigate: (destination: SearchDestination) => boolean;
+  onSearchNavigate: (destination: SearchDestination) => boolean | Promise<boolean>;
 }) {
   const stale = league ? isStale(league, staleAfterHours) : false;
   return (

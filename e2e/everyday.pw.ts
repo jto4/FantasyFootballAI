@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 async function search(page: Page, query: string) {
   await page.getByRole('button', { name: 'Search the app' }).click();
@@ -26,16 +27,11 @@ test('task navigation asks once before discarding settings edits and does not sa
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByRole('button', { name: 'Voice', exact: true }).click();
     await page.getByLabel('Topics to avoid', { exact: true }).fill('Unsaved private topic');
-    const prompts: string[] = [];
-    page.on('dialog', (dialog) => {
-      prompts.push(dialog.message());
-      void dialog.accept();
-    });
     await search(page, 'stop sending emails');
     await page.getByRole('option', { name: /Stop automatic report delivery/ }).click();
+    await answerConfirm(page, true, 'discard your unsaved edits');
     const preview = page.getByRole('dialog', { name: 'Stop automatic messages?' });
     await expect(preview).toBeVisible();
-    expect(prompts).toHaveLength(1);
     expect(workspace.store.settingsSnapshot().excludedTopics).not.toBe('Unsaved private topic');
     await preview.getByRole('button', { name: 'Cancel', exact: true }).click();
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -213,8 +209,8 @@ test('search prefills an inline schedule, preserves unsaved edits, and saves onl
       editor.getByRole('combobox', { name: 'Weekly power rankings delivery policy' }),
     ).toHaveValue('draft');
     expect(workspace.store.settingsSnapshot()).toEqual(before);
-    page.once('dialog', (dialog) => void dialog.dismiss());
     await editor.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await answerConfirm(page, false);
     await expect(editor).toBeVisible();
     await editor.getByRole('button', { name: 'Save schedule', exact: true }).click();
     await expect(editor).toBeHidden();
@@ -235,8 +231,8 @@ test('search prefills an inline schedule, preserves unsaved edits, and saves onl
     await editor.getByRole('button', { name: 'Save schedule' }).scrollIntoViewIfNeeded();
     await expect(editor.getByRole('button', { name: 'Save schedule' })).toBeInViewport();
     await page.screenshot({ path: info.outputPath('schedule-editor.png') });
-    page.once('dialog', (dialog) => void dialog.accept());
     await editor.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await answerConfirm(page, true);
     expect(workspace.sends).toHaveLength(0);
     expect(errors).toEqual([]);
   } finally {

@@ -3,6 +3,7 @@ import { record, type PropBoardRow } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
+import { ErrorNotice } from './ErrorNotice';
 
 export type PropHandoff = {
   gameId: string;
@@ -79,7 +80,11 @@ export function PropsBoard({
   const [stat, setStat] = useState('');
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<'all' | 'leans' | 'fantasy' | 'mine'>('leans');
-  const { data: board, error } = useApi(
+  const {
+    data: board,
+    error,
+    reload,
+  } = useApi(
     `/api/props/board${leagueId ? `?${new URLSearchParams({ league: leagueId })}` : ''}`,
     isBoard,
     {
@@ -216,9 +221,9 @@ export function PropsBoard({
           ))}
         </div>
       </div>
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} onRetry={reload} />}
       {!board && !error && (
-        <LoadingStatus message="Pulling every prop for the week…" shape="cards" />
+        <LoadingStatus message="Pulling every prop for the week…" shape="cards" showElapsed />
       )}
       {board?.warnings.map((w) => (
         <p key={w} className="notice">

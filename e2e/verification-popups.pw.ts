@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 for (const verification of [false, true])
   test(`${verification ? 'test' : 'normal'} profile Stop respects its confirmation policy`, async ({
@@ -22,6 +23,7 @@ for (const verification of [false, true])
           body: JSON.stringify({ status: 'stopping' }),
         });
       });
+      // Native dialogs must never appear; the app asks in its own dialog.
       page.on('dialog', (dialog) => {
         prompts.push(dialog.message());
         void dialog.dismiss();
@@ -58,8 +60,8 @@ for (const verification of [false, true])
         expect(prompts).toEqual([]);
         expect(shutdowns).toBe(1);
       } else {
-        expect(prompts).toHaveLength(1);
-        expect(prompts[0]).toContain('Stop Sunday Sidekick?');
+        await answerConfirm(page, false, 'Stop Sunday Sidekick?');
+        expect(prompts).toEqual([]);
         expect(shutdowns).toBe(0);
         await expect(stop).toBeEnabled();
       }

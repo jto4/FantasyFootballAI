@@ -3,6 +3,7 @@ import { scheduleRecommendations } from '@sidekick/core';
 import { scheduleSummary } from './beginner-flow';
 import { timezoneLabel } from './timezone-label';
 import { useState } from 'react';
+import { confirmAction } from './ConfirmDialog';
 
 const actionNames: Record<string, string> = {
   'offseason-update': 'Offseason updates',
@@ -158,18 +159,21 @@ export function AutomaticActionsSection({
                     aria-label={`${actionNames[action.kind]} delivery policy`}
                     disabled={action.dataMode === 'saved'}
                     value={action.mode}
-                    onChange={(event) => {
+                    onChange={async (event) => {
+                      const mode = event.target.value as 'draft' | 'automatic';
                       if (
-                        event.target.value === 'automatic' &&
+                        mode === 'automatic' &&
                         confirmAutomatic &&
-                        !window.confirm(
-                          `Enable automatic delivery for ${actionNames[action.kind]}? When this report is scheduled, it can send through the configured ${action.channel === 'sms' ? 'text message' : action.channel} destination without your review. Check the recipient in Delivery & access before saving.`,
-                        )
+                        !(await confirmAction(
+                          `When this report is scheduled, it can send through the configured ${action.channel === 'sms' ? 'text message' : action.channel} destination without your review. Check the recipient in Delivery & access before saving.`,
+                          {
+                            title: `Enable automatic delivery for ${actionNames[action.kind]}?`,
+                            confirmLabel: 'Enable automatic delivery',
+                          },
+                        ))
                       )
                         return;
-                      onActionChange(action.kind, {
-                        mode: event.target.value as 'draft' | 'automatic',
-                      });
+                      onActionChange(action.kind, { mode });
                     }}
                   >
                     <option value="draft">Review before send</option>

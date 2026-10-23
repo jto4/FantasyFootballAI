@@ -40,22 +40,29 @@ export function WeeklyHome({
   >([]);
   const [decisionError, setDecisionError] = useState('');
   const [briefing, setBriefing] = useState<WeeklyBriefing>();
+  const [briefingError, setBriefingError] = useState<unknown>();
+  const [briefingAttempt, setBriefingAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
     setBriefing(undefined);
-    // Deterministic and AI-free; a failure simply leaves the roster-based cards below.
+    setBriefingError(undefined);
+    // Deterministic and AI-free; on failure the roster-based cards below still show, and the
+    // top card says the check failed instead of claiming all is well.
     if (league && teamId)
       void requestJson(
         `/api/advice/briefing?${new URLSearchParams({ league: league.id, team: teamId })}`,
         isWeeklyBriefing,
         { signal: controller.signal },
+        60_000,
       )
         .then((data) => {
           if (!controller.signal.aborted) setBriefing(data);
         })
-        .catch(() => undefined);
+        .catch((failure: unknown) => {
+          if (!controller.signal.aborted) setBriefingError(failure ?? 'The weekly check failed.');
+        });
     return () => controller.abort();
-  }, [league?.id, league?.lastSyncedAt, teamId]);
+  }, [league?.id, league?.lastSyncedAt, teamId, briefingAttempt]);
   useEffect(() => {
     const controller = new AbortController();
     setDecisions([]);
@@ -126,6 +133,8 @@ export function WeeklyHome({
               leagueId={league.id}
               teamId={teamId}
               briefing={briefing}
+              briefingError={briefingError}
+              onRetryBriefing={() => setBriefingAttempt((n) => n + 1)}
               stale={freshness === 'stale'}
               onAdvice={onAdvice}
               onRefresh={onRefresh}

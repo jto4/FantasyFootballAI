@@ -4,6 +4,7 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      '**/dist-states/**',
       '**/node_modules/**',
       '**/.bundle/**',
       '**/out/**',

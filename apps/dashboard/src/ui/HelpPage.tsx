@@ -9,7 +9,7 @@ export function HelpPage({
   onSample,
 }: {
   articleId?: string;
-  onNavigate: (destination: SearchDestination) => boolean;
+  onNavigate: (destination: SearchDestination) => boolean | Promise<boolean>;
   onSample: () => void;
 }) {
   const [filter, setFilter] = useState('');

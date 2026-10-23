@@ -12,6 +12,8 @@ import {
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
+import { describeError } from './error-text';
+import { ConfirmHost, confirmAction, discardOptions } from './ConfirmDialog';
 import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
@@ -98,12 +100,7 @@ export function App() {
   const [reportDirty, setReportDirty] = useState(false);
   const [settingsNavigationKey, setSettingsNavigationKey] = useState(0);
   const [searchFocusRevision, setSearchFocusRevision] = useState(0);
-  const { route, update: updateRoute } = useWorkspaceRoute(() => {
-    if (
-      (settingsDirty || reportDirty || scheduleDirty || adviceDirty) &&
-      !window.confirm('Discard unsaved changes before leaving this page?')
-    )
-      return false;
+  const clearUnsaved = () => {
     if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
     setSettingsDirty(false);
     setReportDirty(false);
@@ -111,7 +108,18 @@ export function App() {
     setAdviceDirty(false);
     setScheduleEditor(null);
     setDeliveryTask(null);
-    return true;
+  };
+  const { route, update: updateRoute } = useWorkspaceRoute(() => {
+    if (!(settingsDirty || reportDirty || scheduleDirty || adviceDirty)) {
+      clearUnsaved();
+      return true;
+    }
+    return confirmAction('Your edits on this page haven’t been saved.', discardOptions).then(
+      (ok) => {
+        if (ok) clearUnsaved();
+        return ok;
+      },
+    );
   });
   const { section, leagueId: activeLeagueId, reportId: initialReviewId } = route;
   useEffect(() => {
@@ -198,16 +206,19 @@ export function App() {
   const [noticeInfo, setNoticeInfo] = useState({ message: '', detail: '', action: '' });
   const notice = noticeInfo.message;
   function setNotice(value: string | ((current: string) => string)) {
-    setNoticeInfo((current) =>
-      typeof value === 'function'
-        ? { ...current, message: value(current.message) }
-        : { message: value, detail: '', action: '' },
-    );
+    setNoticeInfo((current) => {
+      if (typeof value === 'function') return { ...current, message: value(current.message) };
+      if (!value) return { message: '', detail: '', action: '' };
+      // Raw network text and request references move into the support details.
+      const { message, detail } = describeError(value);
+      return { message, detail: detail ?? '', action: '' };
+    });
   }
   function showFailure(message: string, error: unknown, action = 'retry') {
+    const described = describeError(error, '');
     setNoticeInfo({
       message,
-      detail: error instanceof Error ? error.message : typeof error === 'string' ? error : '',
+      detail: [described.message, described.detail].filter(Boolean).join(' · '),
       action,
     });
   }
@@ -407,9 +418,13 @@ export function App() {
       run.leagueResults?.filter((result) => result.status === 'failed').length ?? 0;
     if (!failedCount || retryingRunId) return;
     if (
-      !window.confirm(
-        `Retry ${failedCount} failed league result(s) as drafts? This creates reports for review and will not send messages.`,
-      )
+      !(await confirmAction(
+        `This creates ${failedCount} report draft${failedCount === 1 ? '' : 's'} for review and will not send messages.`,
+        {
+          title: `Retry ${failedCount} failed league result${failedCount === 1 ? '' : 's'}?`,
+          confirmLabel: 'Retry as drafts',
+        },
+      ))
     )
       return;
     setRetryingRunId(run.id);
@@ -473,7 +488,10 @@ export function App() {
       return;
     }
     if (settingsDirty || reportDirty) {
-      if (!window.confirm('Discard unsaved changes before creating a report?')) return;
+      if (
+        !(await confirmAction('Creating a report will discard your unsaved edits.', discardOptions))
+      )
+        return;
       if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
       setSettingsDirty(false);
       setReportDirty(false);
@@ -532,9 +550,14 @@ export function App() {
     const disconnectedLeague = state.leagues.find((item) => item.id === id);
     if (!disconnectedLeague) return;
     if (
-      !window.confirm(
-        `Disconnect ${disconnectedLeague.displayName}? This removes its saved league snapshot, imported projections, and calendar events. Existing reports and member profiles will remain.`,
-      )
+      !(await confirmAction(
+        'This removes its saved league snapshot, imported projections, and calendar events. Existing reports and member profiles will remain.',
+        {
+          title: `Disconnect ${disconnectedLeague.displayName}?`,
+          confirmLabel: 'Disconnect',
+          tone: 'danger',
+        },
+      ))
     )
       return;
     setDisconnectingLeagueId(id);
@@ -610,8 +633,13 @@ export function App() {
     const retryUncertain = report?.deliveryState === 'uncertain';
     if (retryUncertain) {
       const usesResendIdempotency = report?.deliveryAttempts?.at(-1)?.channel === 'email';
-      const confirmed = window.confirm(
+      const confirmed = await confirmAction(
         `The provider may already have delivered this message. Check its delivery history first. ${usesResendIdempotency ? 'Resend reuses this request key for 24 hours; after that, a retry may send a duplicate. The retry uses the original saved recipient, subject, and text. ' : 'This SMS retry has no provider idempotency key and may send a duplicate. '}Retry only if you confirmed it was not delivered.`,
+        {
+          title: 'Retry a delivery that may have gone through?',
+          confirmLabel: 'Retry delivery',
+          tone: 'danger',
+        },
       );
       if (!confirmed) return;
     }
@@ -671,9 +699,10 @@ export function App() {
   async function stopApplication() {
     const confirmed =
       verificationMode ||
-      window.confirm(
-        'Stop Sunday Sidekick? This stops the local service and scheduled jobs. If you installed the background service, start it with npm run service -- start. Otherwise run npm start or npm run dev.',
-      );
+      (await confirmAction(
+        'This stops the local service and scheduled jobs. If you installed the background service, start it with npm run service -- start. Otherwise run npm start or npm run dev.',
+        { title: 'Stop Sunday Sidekick?', confirmLabel: 'Stop app', tone: 'danger' },
+      ));
     if (!confirmed) return;
 
     setServiceStatus('stopping');
@@ -757,12 +786,19 @@ export function App() {
     setSetupInProgress(true);
     setSetupWizardOpen(true);
   }
-  function searchNavigate(destination: SearchDestination, check = true) {
+  async function searchNavigate(destination: SearchDestination, check = true) {
+    // Ask here (not in the route guard) so the task below opens only after an answer.
     const reviewedDiscard = Boolean(
-      check && destination.task && (settingsDirty || reportDirty || scheduleDirty || adviceDirty),
+      check && (settingsDirty || reportDirty || scheduleDirty || adviceDirty),
     );
     if (reviewedDiscard) {
-      if (!window.confirm('Discard unsaved changes before opening this task?')) return false;
+      const ok = await confirmAction(
+        destination.task
+          ? 'Opening this task will discard your unsaved edits.'
+          : 'Your edits on this page haven’t been saved.',
+        discardOptions,
+      );
+      if (!ok) return false;
       if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
       setSettingsDirty(false);
       setReportDirty(false);
@@ -973,10 +1009,13 @@ export function App() {
                 key={settingsNavigationKey}
                 settings={state.settings}
                 leagues={state.leagues}
-                onGuidedSetup={() => {
+                onGuidedSetup={async () => {
                   if (
                     !settingsDirty ||
-                    window.confirm('Discard unsaved settings before guided setup?')
+                    (await confirmAction(
+                      'Guided setup will discard your unsaved settings.',
+                      discardOptions,
+                    ))
                   ) {
                     if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
                     setSettingsDirty(false);
@@ -1269,6 +1308,7 @@ export function App() {
         </Suspense>
       )}
       {shortcuts.helpOpen && <KeyboardShortcutsDialog onClose={shortcuts.closeHelp} />}
+      <ConfirmHost />
       {composerKind && league && (
         <ReportComposer
           key={`${league.id}:${composerKind}`}

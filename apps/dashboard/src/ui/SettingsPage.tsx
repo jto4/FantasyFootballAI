@@ -38,6 +38,7 @@ import {
   type AppSettings,
   type LeagueConnection,
 } from '@sidekick/core';
+import { confirmAction, discardOptions } from './ConfirmDialog';
 
 type SettingsPageProps = {
   settings: AppSettings;
@@ -500,8 +501,12 @@ export function SettingsPage({
           secretState.some((item) => item.provider === provider && item.configured)
         }
         credentialStoreAvailable={credentialStoreAvailable}
-        onOpen={(key) => {
-          if (backupDirty && !window.confirm('Discard unsaved backup settings?')) return;
+        onOpen={async (key) => {
+          if (
+            backupDirty &&
+            !(await confirmAction('Your backup settings haven’t been saved.', discardOptions))
+          )
+            return;
           onSearchSettingClear?.();
           setSection(key);
         }}
@@ -513,8 +518,12 @@ export function SettingsPage({
             key={key}
             aria-current={section === key ? 'page' : undefined}
             className={section === key ? 'small-button active' : 'small-button'}
-            onClick={() => {
-              if (backupDirty && !window.confirm('Discard unsaved backup settings?')) return;
+            onClick={async () => {
+              if (
+                backupDirty &&
+                !(await confirmAction('Your backup settings haven’t been saved.', discardOptions))
+              )
+                return;
               onSearchSettingClear?.();
               setSection(key);
             }}
@@ -541,8 +550,17 @@ export function SettingsPage({
           This section changed in another window. Your edits are still here.{' '}
           <button
             type="button"
-            onClick={() => {
-              if (window.confirm('Reload this section and discard its unsaved edits?'))
+            onClick={async () => {
+              if (
+                await confirmAction(
+                  'Reloading shows the saved version and discards your edits here.',
+                  {
+                    ...discardOptions,
+                    title: 'Reload this section?',
+                    confirmLabel: 'Reload section',
+                  },
+                )
+              )
                 void reloadSection(conflict).catch((error) =>
                   setMessage(error instanceof Error ? error.message : 'Could not reload section.'),
                 );

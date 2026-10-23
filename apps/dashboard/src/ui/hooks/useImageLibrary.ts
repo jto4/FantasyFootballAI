@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { LocalImage, SecretState } from '../CredentialsSection';
 import { readImageProviderPreference } from '../image-provider';
+import { confirmAction } from '../ConfirmDialog';
 export function useImageLibrary(secretState: SecretState, setMessage: (message: string) => void) {
   const [imagePrompt, setImagePrompt] = useState('');
   const [imageProvider, setImageProvider] = useState<'openai' | 'stability'>(() =>
@@ -95,7 +96,14 @@ export function useImageLibrary(secretState: SecretState, setMessage: (message: 
   }
 
   async function removeLocalImage(id: string) {
-    if (!window.confirm('Permanently delete this image from the local data folder?')) return;
+    if (
+      !(await confirmAction('It will be removed from the local data folder.', {
+        title: 'Permanently delete this image?',
+        confirmLabel: 'Delete image',
+        tone: 'danger',
+      }))
+    )
+      return;
     const response = await fetch(`/api/images/${encodeURIComponent(id)}`, { method: 'DELETE' });
     if (!response.ok) {
       setMessage('Could not delete that local image.');

@@ -274,3 +274,9 @@
   border-bottom: 1px solid var(--line);
   text-align: left;
 }
+.chat-elapsed {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}

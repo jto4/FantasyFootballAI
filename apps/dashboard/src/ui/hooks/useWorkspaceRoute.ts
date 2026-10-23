@@ -65,8 +65,11 @@ export function workspaceHash(route: Route): string {
   return `#/${page}${params.size ? `?${params}` : ''}`;
 }
 
-/** Hash routes work in the static desktop bundle and preserve native browser history. */
-export function useWorkspaceRoute(canLeave: () => boolean) {
+/**
+ * Hash routes work in the static desktop bundle and preserve native browser history. `canLeave`
+ * may answer later (an in-app confirmation): navigation is held, then replayed if it resolves true.
+ */
+export function useWorkspaceRoute(canLeave: () => boolean | Promise<boolean>) {
   const [route, setRoute] = useState<Route>(() => {
     const parsed = readWorkspaceRoute();
     if (!parsed.leagueId) {
@@ -93,6 +96,7 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
       : 0,
   );
   const reverting = useRef(false);
+  const approved = useRef(false);
   useEffect(() => {
     history.replaceState(
       { ...history.state, sidekickIndex: index.current },
@@ -105,7 +109,20 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
         reverting.current = false;
         return;
       }
-      if (!guard.current()) {
+      const allowed = approved.current ? true : guard.current();
+      approved.current = false;
+      if (allowed !== true) {
+        // A pending confirmation replays the same back/forward step once it is accepted.
+        const target = readWorkspaceRoute();
+        const step = Number.isInteger(nextIndex) ? nextIndex - index.current : 0;
+        if (allowed instanceof Promise)
+          void allowed.then((ok) => {
+            if (!ok) return;
+            if (step) {
+              approved.current = true;
+              history.go(step);
+            } else update(target, false, false);
+          });
         if (Number.isInteger(nextIndex) && nextIndex !== index.current) {
           reverting.current = true;
           history.go(index.current - nextIndex);
@@ -136,7 +153,16 @@ export function useWorkspaceRoute(canLeave: () => boolean) {
       delete next.adviceView;
     }
     if (JSON.stringify(next) === JSON.stringify(current.current)) return true;
-    if (check && !guard.current()) return false;
+    if (check) {
+      const allowed = guard.current();
+      if (allowed instanceof Promise) {
+        void allowed.then((ok) => {
+          if (ok) update(patch, replace, false);
+        });
+        return false;
+      }
+      if (!allowed) return false;
+    }
     startAtTop.current = next.section !== current.current.section && !next.settingId;
     current.current = next;
     if (!replace) index.current++;

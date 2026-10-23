@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { isLeagueConnection, parseLeagueInput, type LeagueConnection } from '@sidekick/core';
 import { requestJson } from './api-client';
+import { ErrorNotice } from './ErrorNotice';
 export function EspnSnapshotImport({
   leagueInput,
   season,
@@ -97,7 +98,7 @@ export function EspnSnapshotImport({
       >
         Import league snapshot
       </button>
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
     </details>
   );
 }

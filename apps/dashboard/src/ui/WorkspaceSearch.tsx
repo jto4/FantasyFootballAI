@@ -31,7 +31,7 @@ export function WorkspaceSearch({
 }: {
   leagues: LeagueConnection[];
   reports: ReportSummary[];
-  onNavigate: (destination: SearchDestination) => boolean;
+  onNavigate: (destination: SearchDestination) => boolean | Promise<boolean>;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -79,7 +79,7 @@ export function WorkspaceSearch({
     setOpen(false);
   }
   function choose(item: SearchItem) {
-    if (onNavigate(item.destination)) close();
+    void Promise.resolve(onNavigate(item.destination)).then((ok) => ok && close());
   }
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -267,7 +267,7 @@ export function WorkspaceSearch({
                 type="button"
                 className="text-button"
                 onClick={() => {
-                  if (onNavigate({ section: 'Help' })) close();
+                  void Promise.resolve(onNavigate({ section: 'Help' })).then((ok) => ok && close());
                 }}
               >
                 Open Help & FAQ

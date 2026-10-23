@@ -14,6 +14,7 @@ import {
   type SavedMemory,
 } from './memory-page-data.js';
 import { useProjectionImports } from './hooks/useProjectionImports';
+import { confirmAction } from './ConfirmDialog';
 type MemberProfileEdit = {
   name: string;
   styleNotes: string;
@@ -350,9 +351,14 @@ export function MemoryPage({
   async function deleteAllProfiles() {
     try {
       if (
-        !window.confirm(
-          'Delete every member profile and its imported source messages? This cannot be undone.',
-        )
+        !(await confirmAction(
+          'Every member profile and its imported source messages will be deleted. This can’t be undone.',
+          {
+            title: 'Delete all member memory?',
+            confirmLabel: 'Delete everything',
+            tone: 'danger',
+          },
+        ))
       )
         return;
       const response = await requestResponse('/api/memory', { method: 'DELETE' });

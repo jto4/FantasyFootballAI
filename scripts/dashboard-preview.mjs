@@ -2,7 +2,11 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-const root = fileURLToPath(new URL('../apps/dashboard/dist/', import.meta.url));
+// Optional: --states serves the development UI state gallery build on port 4202.
+const states = process.argv.includes('--states');
+const root = fileURLToPath(
+  new URL(states ? '../apps/dashboard/dist-states/' : '../apps/dashboard/dist/', import.meta.url),
+);
 const contentTypes = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -13,7 +17,8 @@ const contentTypes = {
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://127.0.0.1').pathname);
-    const path = resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
+    const index = states ? '/states.html' : '/index.html';
+    const path = resolve(root, '.' + (pathname === '/' ? index : pathname));
     if (!path.startsWith(root.endsWith(sep) ? root : root + sep)) {
       response.writeHead(403);
       response.end();
@@ -30,6 +35,6 @@ const server = createServer(async (request, response) => {
     response.end('Not found');
   }
 });
-server.listen(4201, '127.0.0.1');
+server.listen(states ? 4202 : 4201, '127.0.0.1');
 for (const signal of ['SIGINT', 'SIGTERM'])
   process.on(signal, () => server.close(() => process.exit(0)));

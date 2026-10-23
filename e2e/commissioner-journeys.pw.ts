@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { initialAppState } from '../apps/dashboard/src/ui/app-state';
 import type { SavedReport } from '@sidekick/core';
+import { answerConfirm } from './confirm';
 
 async function workspace(page: Page, connected = true) {
   const state = structuredClone(initialAppState);
@@ -267,18 +268,18 @@ test('unsaved settings and draft edits warn before leaving', async ({ page }) =>
   await workspace(page);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('combobox', { name: 'MODEL', exact: true }).fill('unsaved-model');
-  page.once('dialog', (dialog) => dialog.dismiss());
   await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await answerConfirm(page, false);
   await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-  page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Home', exact: true }).click();
+  await answerConfirm(page, true);
   await page.getByText('League standings & news', { exact: true }).click();
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
   await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await page.getByRole('button', { name: 'Edit draft', exact: true }).click();
   await page.getByRole('textbox', { name: 'Report body' }).fill('Unfinished edit');
-  page.once('dialog', (dialog) => dialog.dismiss());
   await page.getByRole('button', { name: 'Close report review' }).click();
+  await answerConfirm(page, false);
   await expect(page.getByRole('textbox', { name: 'Report body' })).toHaveValue('Unfinished edit');
 });
 

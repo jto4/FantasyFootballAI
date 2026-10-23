@@ -11,6 +11,7 @@ import {
 } from './chat-client';
 import { formatDateTime } from './date-format';
 import './chat.css';
+import { formatElapsed, useElapsed } from './WaitStatus';
 
 const starters: Record<string, string[]> = {
   Live: [
@@ -247,7 +248,10 @@ export function ChatBox({
                   <p>{pending}</p>
                 </article>
                 <article className="chat-message assistant thinking" aria-busy="true">
-                  <p>{steps.length ? `${steps[steps.length - 1]}…` : 'Thinking…'}</p>
+                  <p>
+                    {steps.length ? `${steps[steps.length - 1]}…` : 'Thinking…'}
+                    <ThinkingTime />
+                  </p>
                   {steps.length > 1 && (
                     <small className="chat-sources">{steps.slice(0, -1).join(' · ')}</small>
                   )}
@@ -304,4 +308,15 @@ export function ChatBox({
       </div>
     </section>
   );
+}
+
+/** Elapsed time on the thinking bubble; signed-in CLI rounds can take tens of seconds each. */
+function ThinkingTime() {
+  const seconds = useElapsed();
+  return seconds >= 3 ? (
+    <span className="chat-elapsed" aria-hidden="true">
+      {' '}
+      {formatElapsed(seconds)}
+    </span>
+  ) : null;
 }

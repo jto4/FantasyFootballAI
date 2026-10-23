@@ -3,6 +3,7 @@ import { useApi } from './hooks/useApi';
 import { ResearchChart } from './ResearchChart';
 import { LoadingStatus } from './LoadFeedback';
 import './market-signals.css';
+import { ErrorNotice } from './ErrorNotice';
 export function PlayerPropResearch({
   gameId,
   playerId,
@@ -18,6 +19,7 @@ export function PlayerPropResearch({
     data: log,
     error,
     loading: busy,
+    reload,
   } = useApi(
     gameId && playerId
       ? `/api/player-props/log?${new URLSearchParams({ game: gameId, player: playerId, stat })}`
@@ -31,9 +33,9 @@ export function PlayerPropResearch({
     <section className="prop-research" aria-label="Player prop research">
       <h3>Player prop research</h3>
       {busy ? (
-        <LoadingStatus message="Loading completed game stats…" />
+        <LoadingStatus message="Loading completed game stats…" showElapsed />
       ) : error ? (
-        <p role="alert">{error}</p>
+        <ErrorNotice error={error} onRetry={reload} />
       ) : !log ? (
         <p>Choose a game and player to see recent stats.</p>
       ) : (

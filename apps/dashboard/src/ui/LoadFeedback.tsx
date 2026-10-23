@@ -1,3 +1,5 @@
+import { ErrorNotice } from './ErrorNotice';
+import { formatElapsed, useElapsed } from './WaitStatus';
 const quips = [
   'Checking the injury report twice.',
   'Bribing the projections.',
@@ -17,9 +19,12 @@ function quip(message: string) {
 export function LoadingStatus({
   message,
   shape = 'lines',
+  showElapsed = false,
 }: {
   message: string;
   shape?: 'lines' | 'rows' | 'cards';
+  /** For loads that can take tens of seconds: show a ticking timer so it never looks stuck. */
+  showElapsed?: boolean;
 }) {
   const count = shape === 'lines' ? 3 : shape === 'rows' ? 4 : 3;
   return (
@@ -32,22 +37,26 @@ export function LoadingStatus({
       <p>
         {message}
         <span className="loading-quip"> {quip(message)}</span>
+        {showElapsed && <Elapsed />}
       </p>
     </div>
   );
 }
 
 export function LoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="notice" role="alert">
-      {message}{' '}
-      <button className="small-button" type="button" onClick={onRetry}>
-        Try again
-      </button>
-    </div>
-  );
+  return <ErrorNotice error={message} onRetry={onRetry} />;
 }
 
 export function EmptyStatus({ message }: { message: string }) {
   return <p className="schedule-explainer">{message}</p>;
+}
+
+function Elapsed() {
+  const seconds = useElapsed();
+  return seconds >= 3 ? (
+    <span className="loading-elapsed" aria-hidden="true">
+      {' '}
+      · {formatElapsed(seconds)}
+    </span>
+  ) : null;
 }

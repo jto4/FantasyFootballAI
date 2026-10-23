@@ -3,6 +3,7 @@ import { record, type LeagueConnection, type LiveMatchup, type LiveSide } from '
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
+import { ErrorNotice } from './ErrorNotice';
 
 type LiveReport = {
   leagueName: string;
@@ -152,7 +153,7 @@ export function LivePage({
       ) : !report && !error ? (
         <LoadingStatus message="Loading your matchup…" shape="cards" />
       ) : null}
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {report?.imported && (
         <p className="notice live-notice">
           {report.leagueName} is an imported league, so scores come from NFL box scores instead of

@@ -1,6 +1,7 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
 import { seedAdvice, rollingAdviceData, adviceCatalog, adviceAnswer } from './advice-fixture';
+import { answerConfirm } from './confirm';
 
 function runtimeErrors(page: Page) {
   const errors: string[] = [];
@@ -677,13 +678,13 @@ test('Home, search, Help, unsaved navigation and saved deletion are connected', 
     await expect(page.locator('#help-advice')).toContainText('no new key');
     await page.locator('#help-advice').getByRole('button', { name: 'Open Advice' }).click();
     await page.getByLabel('Anything else to consider? (optional)').fill('Unsaved football context');
-    page.once('dialog', (dialog) => dialog.dismiss());
     await page.getByRole('button', { name: 'Reports', exact: true }).click();
+    await answerConfirm(page, false);
     await expect(page.getByLabel('Anything else to consider? (optional)')).toHaveValue(
       'Unsaved football context',
     );
-    page.once('dialog', (dialog) => dialog.accept());
     await page.getByRole('button', { name: 'Reports', exact: true }).click();
+    await answerConfirm(page, true);
     await page.keyboard.press('Control+k');
     const search = page.getByRole('dialog').getByRole('combobox');
     await search.fill('Set my lineup');
@@ -694,11 +695,11 @@ test('Home, search, Help, unsaved navigation and saved deletion are connected', 
     ).toBeEnabled();
     await page.getByRole('button', { name: 'Analyze my choices', exact: true }).click();
     await expect(page.getByRole('article', { name: 'Advice result' })).toBeVisible();
-    page.once('dialog', (dialog) => dialog.dismiss());
     await page.getByRole('button', { name: 'Delete saved advice', exact: true }).click();
+    await answerConfirm(page, false);
     expect(workspace.store.snapshot().adviceResults).toHaveLength(1);
-    page.once('dialog', (dialog) => dialog.accept());
     await page.getByRole('button', { name: 'Delete saved advice', exact: true }).click();
+    await answerConfirm(page, true);
     await expect(page.getByRole('article', { name: 'Advice result' })).toHaveCount(0);
     await expect.poll(() => workspace.store.snapshot().adviceResults!.length).toBe(0);
     await page.screenshot({ path: info.outputPath('advice-navigation.png') });

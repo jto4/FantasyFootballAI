@@ -34,6 +34,7 @@
     "dev:api": "npm --workspace @sidekick/api run dev",
     "dev:web": "npm --workspace @sidekick/dashboard run dev",
     "build": "node scripts/build.mjs",
+    "test:ui-states": "playwright test -c playwright.states.config.mjs",
     "perf:smoke": "npm run build && node scripts/performance-smoke.mjs",
     "desktop:make": "npm run build && npm run make --workspace @sidekick/desktop",
     "desktop:update-lock": "npm run build && node scripts/desktop-package.mjs --update-lock",

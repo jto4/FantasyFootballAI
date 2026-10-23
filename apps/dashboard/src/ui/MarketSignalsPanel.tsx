@@ -11,6 +11,7 @@ import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
 import { ResearchChart } from './ResearchChart';
 import './market-signals.css';
+import { ErrorNotice } from './ErrorNotice';
 const isRecords = (x: unknown): x is { records: MarketResearchRecord[] } =>
   !!x &&
   typeof x === 'object' &&
@@ -193,7 +194,7 @@ export function MarketSignalsPanel() {
         Use the current sportsbook total to get an exact baseline match. No automatic collection
         runs in the background.
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {notice && <p role="status">{notice}</p>}
       {snapshot && (
         <>

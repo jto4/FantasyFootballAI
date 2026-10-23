@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
 import { settingTargets } from '../apps/dashboard/src/ui/search-catalog';
+import { answerConfirm } from './confirm';
 
 function captureErrors(page: Page) {
   const errors: string[] = [];
@@ -118,24 +119,24 @@ test('search preserves edits when navigation is rejected and actually discards t
       .getByRole('textbox', { name: 'Writing style', exact: true })
       .fill('Unsaved private wording');
     await search(page, 'email address');
-    page.once('dialog', (dialog) => void dialog.dismiss());
     await page
       .getByRole('listbox', { name: 'Search results' })
       .getByRole('option')
       .filter({ has: page.getByText('Email recipient', { exact: true }) })
       .click();
+    await answerConfirm(page, false);
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.getByRole('textbox', { name: 'Writing style', exact: true })).toHaveValue(
       'Unsaved private wording',
     );
     await search(page, 'email address');
-    page.once('dialog', (dialog) => void dialog.accept());
     await page
       .getByRole('listbox', { name: 'Search results' })
       .getByRole('option')
       .filter({ has: page.getByText('Email recipient', { exact: true }) })
       .click();
+    await answerConfirm(page, true);
     await expect(page.getByLabel('EMAIL RECIPIENT', { exact: true })).toBeFocused();
     await page.getByRole('button', { name: 'Voice', exact: true }).click();
     await expect(page.getByRole('textbox', { name: 'Writing style', exact: true })).not.toHaveValue(

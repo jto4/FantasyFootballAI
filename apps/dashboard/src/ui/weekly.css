@@ -418,3 +418,14 @@ p.weekly-answer {
 .next-up.calm {
   border-left-color: var(--green);
 }
+.next-up.pending {
+  border-left-color: var(--line);
+}
+.next-up.pending h3 {
+  color: var(--muted);
+}
+.next-up-detail {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}

@@ -28,6 +28,8 @@ import { ReportSharing } from './ReportSharing';
 import { LeagueTrends } from './LeagueTrends';
 import { ReportLibrary } from './ReportLibrary';
 import { LeagueVisuals } from './LeagueVisuals';
+import { confirmAction, discardOptions } from './ConfirmDialog';
+import { WaitStatus } from './WaitStatus';
 
 export type SendPreview = {
   revision: number;
@@ -182,14 +184,17 @@ export function ReportsPage({
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
-  function closeReview() {
+  async function closeReview() {
     if (
       (saving || dirty) &&
-      !window.confirm(
+      !(await confirmAction(
         saving
-          ? 'Your save is still finishing. Close this review? It will continue in the background.'
-          : 'Discard unsaved draft edits?',
-      )
+          ? 'Your save is still finishing. It will continue in the background.'
+          : 'Your draft edits haven’t been saved.',
+        saving
+          ? { title: 'Close this review?', confirmLabel: 'Close review', cancelLabel: 'Stay' }
+          : discardOptions,
+      ))
     )
       return false;
     setSelectedId('');
@@ -386,7 +391,16 @@ export function ReportsPage({
             >
               <div>
                 <h2>{job.kind.charAt(0).toUpperCase() + job.kind.slice(1).replaceAll('-', ' ')}</h2>
-                <p role="status">Generation {job.status}</p>
+                {job.status === 'queued' || job.status === 'running' ? (
+                  <WaitStatus
+                    label={job.status === 'queued' ? 'Waiting to start' : 'Writing the report'}
+                    since={job.startedAt ?? job.createdAt}
+                    typical="usually 1–3 minutes"
+                    slowAfterSeconds={300}
+                  />
+                ) : (
+                  <p role="status">Generation {job.status}</p>
+                )}
                 {job.error && <p>{job.error}</p>}
               </div>
               {(job.status === 'queued' || job.status === 'running') && (
@@ -615,14 +629,14 @@ export function ReportsPage({
         <Dialog
           titleId="report-review-title"
           className="report-review-modal saved-report-review"
-          onClose={closeReview}
+          onClose={() => void closeReview()}
         >
           <header className="report-review-header">
             <button
               type="button"
               className="modal-close"
               aria-label="Close report review"
-              onClick={closeReview}
+              onClick={() => void closeReview()}
             >
               ×
             </button>
@@ -737,8 +751,12 @@ export function ReportsPage({
                   type="button"
                   className="small-button"
                   disabled={saving}
-                  onClick={() => {
-                    if (!dirty || window.confirm('Discard unsaved draft edits?')) setEditing(false);
+                  onClick={async () => {
+                    if (
+                      !dirty ||
+                      (await confirmAction('Your draft edits haven’t been saved.', discardOptions))
+                    )
+                      setEditing(false);
                   }}
                 >
                   Cancel editing
@@ -906,8 +924,8 @@ export function ReportsPage({
                       <button
                         type="button"
                         className="text-button"
-                        onClick={() => {
-                          if (closeReview()) onDeliverySetup();
+                        onClick={async () => {
+                          if (await closeReview()) onDeliverySetup();
                         }}
                       >
                         Set up delivery

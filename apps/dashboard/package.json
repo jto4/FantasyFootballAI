@@ -6,6 +6,7 @@
     "dev": "vite --host 127.0.0.1",
     "test": "vitest run",
     "build": "tsc -b && vite build",
+    "build:states": "vite build --mode states",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

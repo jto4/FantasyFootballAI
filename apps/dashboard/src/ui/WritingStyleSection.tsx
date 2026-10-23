@@ -6,6 +6,7 @@ import {
   type AppSettings,
   type WritingStylePreset,
 } from '@sidekick/core';
+import { confirmAction } from './ConfirmDialog';
 
 type MessageChannel = (typeof supportedMessageChannels)[number];
 type WritingStyleSectionProps = {
@@ -181,11 +182,13 @@ export function WritingStyleSection({
             type="button"
             className="small-button danger"
             aria-label={`Delete saved style ${preset.name}`}
-            onClick={() => {
+            onClick={async () => {
               if (
-                window.confirm(
-                  `Delete saved style ${preset.name}? Your current writing style will be kept.`,
-                )
+                await confirmAction('Your current writing style will be kept.', {
+                  title: `Delete saved style ${preset.name}?`,
+                  confirmLabel: 'Delete',
+                  tone: 'danger',
+                })
               )
                 onDeleteCustomPreset(preset.name);
             }}

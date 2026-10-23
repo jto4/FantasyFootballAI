@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { requestJson } from './api-client';
 import { isDiagnostics, type Diagnostics } from './operations-data';
+import { ErrorNotice } from './ErrorNotice';
 const advice: Record<string, string> = {
   credentials: 'Check the configured credential in Settings.',
   timeout: 'Check provider availability before starting a new request.',
@@ -62,7 +63,7 @@ export function DiagnosticsSection() {
       >
         Download diagnostics
       </button>
-      {error && <p role="alert">{error}</p>}
+      {error && <ErrorNotice error={error} />}
       {snapshot && (
         <>
           <p role="status">

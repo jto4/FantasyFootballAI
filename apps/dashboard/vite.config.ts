@@ -2,8 +2,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  // `--mode states` builds only the development UI state gallery, never the app.
+  ...(mode === 'states'
+    ? {
+        build: {
+          outDir: 'dist-states',
+          rollupOptions: {
+            input: { states: fileURLToPath(new URL('states.html', import.meta.url)) },
+          },
+        },
+      }
+    : {}),
   resolve: {
     alias: {
       '@sidekick/core': fileURLToPath(new URL('../../packages/core/src/index.ts', import.meta.url)),
@@ -20,4 +31,4 @@ export default defineConfig({
     },
     proxy: { '/api': 'http://127.0.0.1:4173' },
   },
-});
+}));

@@ -70,7 +70,11 @@ export function Dialog({
     return () => {
       observer.disconnect();
       unlockBackgroundScroll();
-      if (previous instanceof HTMLElement && previous.isConnected)
+      // Return focus only if it is still inside this dialog (or lost): a navigation that already
+      // focused its destination keeps it.
+      const active = document.activeElement;
+      const lost = !active || active === document.body || Boolean(dialog?.contains(active));
+      if (lost && previous instanceof HTMLElement && previous.isConnected)
         previous.focus({ preventScroll: true });
     };
   }, []);

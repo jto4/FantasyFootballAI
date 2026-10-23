@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 test('generation survives browser reload and saves one editable draft in SQLite', async ({
   page,
@@ -13,7 +14,7 @@ test('generation survives browser reload and saves one editable draft in SQLite'
     await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
-    await expect(page.getByText('Generation running', { exact: true })).toBeVisible();
+    await expect(page.getByText('Writing the report', { exact: true })).toBeVisible();
     const request = workspace.store.snapshot().generationJobs![0]!;
     await page.reload();
     workspace.release();
@@ -87,9 +88,9 @@ test('uncertain email retry retains original envelope after Settings destination
     await workspace.store.update((state) => {
       state.settings.emailRecipient = 'changed@example.test';
     });
-    page.on('dialog', (dialog) => void dialog.accept());
     await page.getByRole('button', { name: 'Check and retry delivery' }).click();
     await page.getByRole('button', { name: /^Send email to / }).click();
+    await answerConfirm(page, true, 'may already have delivered');
     await expect(page.getByRole('dialog')).toContainText('Sent');
     expect(workspace.sends).toHaveLength(2);
     expect(workspace.sends[1]).toEqual(workspace.sends[0]);

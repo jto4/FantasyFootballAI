@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { AdviceSummary } from './advice-data';
 import { adviceTitle } from './advice-navigation';
 import { formatDateTime } from './date-format';
+import { ErrorNotice } from './ErrorNotice';
 
 /** The Saved advice list; opening an item navigates to it without calling the AI again. */
 export function AdviceHistory({
@@ -22,7 +23,7 @@ export function AdviceHistory({
     <section hidden={hidden} className="advice-history" aria-labelledby="advice-history-title">
       <h2 id="advice-history-title">Saved advice</h2>
       <p>Saved locally. Opening a result does not call the AI again.</p>
-      {historyError && <p role="alert">{historyError}</p>}
+      {historyError && <ErrorNotice error={historyError} />}
       <button className="text-button" type="button" onClick={onRefresh}>
         Refresh saved advice
       </button>

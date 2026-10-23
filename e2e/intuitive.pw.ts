@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { apiWorkspace } from './api-fixture';
+import { answerConfirm } from './confirm';
 
 function errors(page: Page) {
   const failures: string[] = [];
@@ -145,10 +146,10 @@ test('voice previews, schedule presets, explicit automation consent, and sticky 
     await expect(
       action.getByRole('combobox', { name: 'Weekly power rankings delivery policy' }),
     ).toHaveValue('draft');
-    page.once('dialog', (dialog) => void dialog.dismiss());
     await action
       .getByRole('combobox', { name: 'Weekly power rankings delivery policy' })
       .selectOption('automatic');
+    await answerConfirm(page, false);
     await expect(
       action.getByRole('combobox', { name: 'Weekly power rankings delivery policy' }),
     ).toHaveValue('draft');
