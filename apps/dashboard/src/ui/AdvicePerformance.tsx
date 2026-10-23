@@ -117,6 +117,7 @@ const scoreNumber = (x: number) =>
   new Intl.NumberFormat(undefined, { maximumFractionDigits: 5 }).format(x);
 const methods: Record<string, string> = {
   'public-projection-v1': 'Public forecasts',
+  'sidekick-model-v1': 'Sidekick projections',
   'rolling-form-v1': 'Form and workload forecasts',
   'rolling-baseline-v1': 'Historical scoring forecasts',
   'historical-baseline': 'Historical baseline',

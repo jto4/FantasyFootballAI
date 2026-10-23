@@ -376,8 +376,8 @@ async function focusedWorkspace() {
       recommendedPlayerIds: ['wr'],
       reasons: [
         {
-          text: 'Compare the receiver baseline {{wr:baseline}} with the backup baseline {{bench:baseline}}.',
-          metricIds: ['wr:baseline', 'bench:baseline'],
+          text: 'Compare the receiver baseline {{wr:projected}} with the backup baseline {{bench:projected}}.',
+          metricIds: ['wr:projected', 'bench:projected'],
           sourceIds: ['stats-2026'],
         },
       ],
@@ -443,8 +443,8 @@ it('rejects a final single-spot answer without visible numbers for its alternati
     const answer = JSON.parse(w.focusedAnswer());
     answer.reasons = [
       {
-        text: 'The receiver baseline is {{wr:baseline}}.',
-        metricIds: ['wr:baseline'],
+        text: 'The receiver baseline is {{wr:projected}}.',
+        metricIds: ['wr:projected'],
         sourceIds: [],
       },
     ];
@@ -830,8 +830,8 @@ function benchAnswer() {
     recommendedPlayerIds: ['qb', 'bench'],
     reasons: [
       {
-        text: 'Choose the bench receiver at {{bench:baseline}} over the questionable receiver at {{wr:baseline}} while availability remains uncertain.',
-        metricIds: ['bench:baseline', 'wr:baseline'],
+        text: 'Choose the bench receiver at {{bench:projected}} over the questionable receiver at {{wr:projected}} while availability remains uncertain.',
+        metricIds: ['bench:projected', 'wr:projected'],
         sourceIds: ['stats-2026'],
       },
     ],
@@ -851,17 +851,18 @@ it('saves the model’s legal bench alternative with its own total and an explic
   expect(isAdviceResult(result)).toBe(true);
   expect(result.assessment.recommendedPlayerIds).toEqual(['qb', 'bench']);
   expect(result.assessment.verdict).toBe('lean');
-  expect(result.lineup.points).toBe(22);
+  // Recent games weigh more in the projection, so totals land within a point of the plain averages.
+  expect(result.lineup.points).toBeCloseTo(22, 0);
   expect(result.lineup.assignments.map((row: { playerId: string }) => row.playerId).sort()).toEqual(
     ['bench', 'qb'],
   );
-  expect(result.alternativeLineup.points).toBe(25);
+  expect(result.alternativeLineup.points).toBeCloseTo(25, 0);
   expect(
     result.metrics.find((metric: { id: string }) => metric.id === 'lineup-selection-change').value,
-  ).toBe(-3);
+  ).toBeCloseTo(result.lineup.points - result.alternativeLineup.points);
   expect(
     result.metrics.find((metric: { id: string }) => metric.id === 'lineup-selected').value,
-  ).toBe(22);
+  ).toBe(result.lineup.points);
   expect(result.confidence.score).toBeLessThanOrEqual(59);
   expect(result.warnings.join(' ')).toContain('tradeoff has not been quantified');
   expect(w.calls[0]!.prompt).toContain('bench');
@@ -1436,7 +1437,7 @@ it('fits a large roster without dropping comparison players or primary estimates
     result.players.every(
       (player) =>
         player.projectedPoints !== undefined &&
-        player.metrics.some((metric) => metric.id.endsWith(':baseline')),
+        player.metrics.some((metric) => metric.id.endsWith(':projected')),
     ),
   ).toBe(true);
   expect(result.warnings.join(' ')).toContain('secondary historical/team metrics were omitted');

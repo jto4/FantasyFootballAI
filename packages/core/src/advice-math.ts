@@ -1,6 +1,7 @@
 import { defenseScoreValue } from './defense-scoring.js';
 import type { LeagueConnection } from './domain-types.js';
 import { weeklyGameWithheldWarning } from './advice-warnings.js';
+import { isInactiveFootballStatus } from './player-availability.js';
 import {
   espnKickingRules,
   kickingScoreValue,
@@ -167,6 +168,7 @@ export function scoreHistoricalGame(
     ...league.scoring,
     ...(position === 'DST' || position === 'K' ? league.positionScoring?.[position] : undefined),
   };
+  if (league.platform === 'espn' && position === 'DST') row = espnDefenseRow(row, scoring);
   for (const [key, weight] of Object.entries(scoring)) {
     if (!Number.isFinite(weight)) {
       unsupported.push(key);
@@ -233,11 +235,17 @@ export function scoreHistoricalGame(
   };
 }
 
+/**
+ * Comparable form of a player name. Generational suffixes are dropped because sources disagree
+ * on them ("Aaron Jones Sr." in leagues, "Aaron Jones" in NFL stats); callers still check team,
+ * position and uniqueness before joining.
+ */
 export function playerNameKey(name: string): string {
   return name
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .replace(/[,.]?\s+(jr|sr|ii|iii|iv|v)\.?\s*$/, '')
     .replace(/[^a-z0-9]/g, '');
 }
 
@@ -730,4 +738,70 @@ export function startedStarterIds(
       .filter((p) => starters.has(p.id) && p.warnings.includes(weeklyGameWithheldWarning))
       .map((p) => p.id),
   );
+}
+
+/**
+ * nflverse team defense rows give combined defensive and return touchdowns, while ESPN scores each
+ * kind separately. When the league weights every kind in a group equally the split does not
+ * change the score, so the combined count is credited to one kind; otherwise the split stays
+ * unknown. Two-point returns and one-point safeties are not in the data and count as none.
+ */
+function espnDefenseRow(row: PlayerGameStats, scoring: Record<string, number>): PlayerGameStats {
+  const stats = { ...row.stats };
+  const equal = (keys: string[]) => new Set(keys.map((k) => scoring[k] ?? 0)).size === 1;
+  if (
+    stats.dst_interception_return_tds === undefined &&
+    stats.dst_touchdowns !== undefined &&
+    equal(['103', '104'])
+  ) {
+    stats.dst_interception_return_tds = stats.dst_touchdowns;
+    stats.dst_fumble_return_tds = 0;
+  }
+  if (
+    stats.dst_kickoff_return_tds === undefined &&
+    stats.dst_special_teams_touchdowns !== undefined &&
+    equal(['101', '102', '93'])
+  ) {
+    stats.dst_kickoff_return_tds = stats.dst_special_teams_touchdowns;
+    stats.dst_punt_return_tds = 0;
+    stats.dst_blocked_kick_return_tds = 0;
+  }
+  stats.dst_two_point_returns ??= 0;
+  stats.dst_one_point_safeties ??= 0;
+  return { ...row, stats };
+}
+
+/**
+ * Starters the lineup math must keep seated: those whose games have begun, plus active starters
+ * with no estimate. Missing data is never a reason to bench someone; players ruled out or on a
+ * bye are not kept, so the optimizer can still replace them.
+ */
+export function keptStarterIds(
+  league: Pick<LeagueConnection, 'matchups'>,
+  teamId: string,
+  week: number | undefined,
+  evidence: Pick<
+    PlayerAdviceEvidence,
+    'id' | 'warnings' | 'projectedPoints' | 'status' | 'weeklyGameStatus'
+  >[],
+) {
+  const started = startedStarterIds(league, teamId, week, evidence);
+  const starters = new Set(
+    (league.matchups ?? [])
+      .filter((m) => week === undefined || m.week === week)
+      .flatMap((m) => m.teams.filter((t) => t.teamId === teamId).flatMap((t) => t.starters ?? [])),
+  );
+  const unknown = new Set(
+    evidence
+      .filter(
+        (p) =>
+          starters.has(p.id) &&
+          !started.has(p.id) &&
+          p.projectedPoints === undefined &&
+          p.weeklyGameStatus !== 'bye' &&
+          !isInactiveFootballStatus(p.status),
+      )
+      .map((p) => p.id),
+  );
+  return { started, unknown, all: new Set([...started, ...unknown]) };
 }

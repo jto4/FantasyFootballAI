@@ -17,17 +17,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 1,
     outcome: {
-      kind: 'ratio',
-      quantiles: [
-        0.056, 0.414, 0.51, 0.581, 0.615, 0.662, 0.685, 0.724, 0.749, 0.774, 0.786, 0.794, 0.82,
-        0.845, 0.881, 0.913, 0.925, 0.932, 0.945, 0.966, 0.994, 1.01, 1.031, 1.051, 1.061, 1.069,
-        1.088, 1.102, 1.138, 1.166, 1.192, 1.218, 1.235, 1.256, 1.276, 1.332, 1.384, 1.424, 1.514,
-        1.613, 1.807,
-      ],
-    },
-    modelOnlyOutcome: {
       kind: 'ratio',
       quantiles: [
         0, 0, 0.269, 0.408, 0.508, 0.602, 0.631, 0.652, 0.669, 0.706, 0.733, 0.759, 0.791, 0.819,
@@ -52,12 +42,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 0,
     outcome: {
-      kind: 'count',
-      size: 12,
-    },
-    modelOnlyOutcome: {
       kind: 'count',
       size: 12,
     },
@@ -77,12 +62,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 1,
     outcome: {
-      kind: 'count',
-      size: 20,
-    },
-    modelOnlyOutcome: {
       kind: 'count',
       size: 8,
     },
@@ -102,12 +82,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 1,
     outcome: {
-      kind: 'count',
-      size: 1000,
-    },
-    modelOnlyOutcome: {
       kind: 'count',
       size: 1000,
     },
@@ -127,12 +102,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 1,
     outcome: {
-      kind: 'count',
-      size: 1000,
-    },
-    modelOnlyOutcome: {
       kind: 'count',
       size: 1000,
     },
@@ -152,17 +122,7 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 0.75,
     outcome: {
-      kind: 'ratio',
-      quantiles: [
-        -0.162, 0, 0.102, 0.16, 0.215, 0.25, 0.28, 0.306, 0.354, 0.418, 0.461, 0.497, 0.542, 0.582,
-        0.616, 0.65, 0.671, 0.701, 0.729, 0.755, 0.79, 0.827, 0.849, 0.885, 0.92, 0.977, 1.029,
-        1.09, 1.125, 1.174, 1.266, 1.313, 1.354, 1.483, 1.544, 1.648, 1.775, 1.947, 2.103, 2.726,
-        6.681,
-      ],
-    },
-    modelOnlyOutcome: {
       kind: 'ratio',
       quantiles: [
         -0.312, 0, 0.047, 0.117, 0.189, 0.254, 0.295, 0.345, 0.389, 0.42, 0.467, 0.506, 0.543, 0.58,
@@ -187,21 +147,16 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 0.75,
     outcome: {
-      kind: 'count',
-      size: 12,
-    },
-    modelOnlyOutcome: {
       kind: 'count',
       size: 8,
     },
   },
   receiving_yards: {
     params: {
-      halfLife: 8,
+      halfLife: 20,
       priorSeasonWeight: 0.4,
-      shrinkGames: 3,
+      shrinkGames: 0,
       envExponent: 0,
       scriptCoefficient: 0,
       opponentExponent: 0.3,
@@ -209,25 +164,16 @@ export const propModelSettings: PropModelSettings = {
       homeFactor: 1,
       snapExponent: 0.3,
       depthExponent: 0.3,
-      targetShareExponent: 0,
+      targetShareExponent: 0.3,
       airYardsWeight: 0,
     },
-    espnWeight: 0.75,
     outcome: {
       kind: 'ratio',
       quantiles: [
-        -0.326, 0, 0, 0.036, 0.104, 0.165, 0.233, 0.297, 0.352, 0.397, 0.446, 0.485, 0.513, 0.554,
-        0.594, 0.635, 0.682, 0.736, 0.774, 0.821, 0.871, 0.907, 0.943, 0.982, 1.042, 1.117, 1.183,
-        1.241, 1.304, 1.361, 1.443, 1.534, 1.607, 1.662, 1.792, 1.954, 2.053, 2.248, 2.65, 3.252,
-        7.707,
-      ],
-    },
-    modelOnlyOutcome: {
-      kind: 'ratio',
-      quantiles: [
-        -0.413, 0, 0, 0, 0.056, 0.136, 0.187, 0.237, 0.28, 0.319, 0.361, 0.401, 0.438, 0.483, 0.526,
-        0.573, 0.61, 0.649, 0.687, 0.721, 0.77, 0.815, 0.857, 0.901, 0.946, 0.986, 1.042, 1.096,
-        1.157, 1.22, 1.292, 1.355, 1.447, 1.576, 1.683, 1.804, 1.942, 2.147, 2.384, 2.893, 5.979,
+        -0.415, 0, 0, 0, 0.057, 0.135, 0.189, 0.236, 0.278, 0.324, 0.364, 0.402, 0.437, 0.483,
+        0.526, 0.572, 0.615, 0.649, 0.687, 0.724, 0.771, 0.819, 0.855, 0.901, 0.953, 0.989, 1.046,
+        1.104, 1.172, 1.23, 1.288, 1.369, 1.454, 1.589, 1.693, 1.803, 1.929, 2.114, 2.371, 2.858,
+        6.189,
       ],
     },
   },
@@ -246,14 +192,49 @@ export const propModelSettings: PropModelSettings = {
       targetShareExponent: 0,
       airYardsWeight: 0,
     },
-    espnWeight: 0.75,
     outcome: {
       kind: 'count',
       size: 12,
     },
-    modelOnlyOutcome: {
+  },
+  rushing_tds: {
+    params: {
+      halfLife: 20,
+      priorSeasonWeight: 0.6,
+      shrinkGames: 3,
+      envExponent: 0.4,
+      scriptCoefficient: 0,
+      opponentExponent: 0,
+      opponentShrinkGames: 6,
+      homeFactor: 1.03,
+      snapExponent: 0,
+      depthExponent: 0.3,
+      targetShareExponent: 0,
+      airYardsWeight: 0,
+    },
+    outcome: {
       kind: 'count',
-      size: 12,
+      size: 3,
+    },
+  },
+  receiving_tds: {
+    params: {
+      halfLife: 8,
+      priorSeasonWeight: 1,
+      shrinkGames: 2,
+      envExponent: 0.4,
+      scriptCoefficient: 0,
+      opponentExponent: 0,
+      opponentShrinkGames: 6,
+      homeFactor: 0.97,
+      snapExponent: 0.6,
+      depthExponent: 0,
+      targetShareExponent: 0,
+      airYardsWeight: 0,
+    },
+    outcome: {
+      kind: 'count',
+      size: 6,
     },
   },
 };
@@ -265,5 +246,5 @@ export const propUsageNorms: PropUsageNorms = {
     TE: [0.76, 0.48, 0.31, 0.15],
     RB: [0.62, 0.32, 0.1, 0.04],
   },
-  yardsPerAirYard: 0.371,
+  yardsPerAirYard: 0.856,
 };

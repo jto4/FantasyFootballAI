@@ -214,7 +214,7 @@ it('uses verified GSIS identity to resolve matching names without mixing player 
     data: { ...data, players: ambiguous },
   })[0]!;
   expect(evidence.metrics.find((metric) => metric.id.endsWith(':sample'))?.value).toBe(4);
-  expect(evidence.projectedPoints).toBe(11.5);
+  expect(evidence.projectedPoints).toBeCloseTo(11.5, 0);
   expect(evidence.warnings.join(' ')).not.toContain('Multiple NFL players');
 });
 
@@ -239,11 +239,13 @@ it('uses an explicit Sleeper mapping for Yahoo/ESPN/NFL decisions without compar
   ).toEqual([]);
 });
 
-it('builds a transparently labeled historical baseline with supporting sample/workload stats and market activity', () => {
+it('projects the week with the app’s own model, with supporting sample/workload stats and market activity', () => {
   const evidence = buildPlayerEvidence(input)[0]!;
   expect(evidence.historicalPoints).toEqual([13, 12, 11, 10]);
-  expect(evidence.projectedPoints).toBe(11.5);
-  expect(evidence.projectionMethod).toBe('historical-baseline');
+  // Recent games weigh more, so a rising 10 → 13 trend projects a little above the plain 11.5.
+  expect(evidence.projectedPoints).toBeGreaterThan(11.5);
+  expect(evidence.projectedPoints).toBeLessThan(13);
+  expect(evidence.projectionMethod).toBe('sidekick-model-v1');
   expect(evidence.metrics.find((metric) => metric.id.endsWith(':targets'))).toMatchObject({
     value: 8,
     sampleSize: 4,
@@ -253,7 +255,7 @@ it('builds a transparently labeled historical baseline with supporting sample/wo
     sourceIds: ['market-add'],
   });
   expect(evidence.metrics.find((metric) => metric.id.endsWith(':market-drops'))).toBeUndefined();
-  expect(evidence.warnings.join(' ')).toContain('assumes the previous role continues');
+  expect(evidence.warnings.join(' ')).toContain('assume the player is active');
 });
 
 it('uses a median of scoring-matched, uniquely matched sources and respects week/league/scope', () => {
@@ -286,7 +288,7 @@ it('refuses ambiguous historical identities, duplicate import rows and name-only
     ...input,
     projections: [projection(), projection()],
   })[0]!;
-  expect(duplicate.projectionMethod).toBe('historical-baseline');
+  expect(duplicate.projectionMethod).toBe('sidekick-model-v1');
   expect(duplicate.warnings.join(' ')).toContain('Duplicate player rows');
   const nameOnly = projection();
   delete nameOnly.playerId;

@@ -11,8 +11,24 @@ export const propModelStats = [
   'carries',
   'receiving_yards',
   'receptions',
+  'rushing_tds',
+  'receiving_tds',
 ] as const satisfies readonly FootballStatKey[];
 export type PropModelStat = (typeof propModelStats)[number];
+/**
+ * Rare scoring events projected with default settings (a recency-weighted rate) rather than a
+ * fitted model; enough for fantasy expected points.
+ */
+export const fantasyExtraStats = [
+  'rushing_fumbles_lost',
+  'receiving_fumbles_lost',
+  'sack_fumbles_lost',
+  'passing_2pt_conversions',
+  'rushing_2pt_conversions',
+  'receiving_2pt_conversions',
+] as const satisfies readonly FootballStatKey[];
+export type ModelStat = PropModelStat | (typeof fantasyExtraStats)[number];
+const modelStats: readonly ModelStat[] = [...propModelStats, ...fantasyExtraStats];
 
 /** Tunable settings for one stat; fitted offline (scripts/research/prop-model-backtest.mjs). */
 export interface PropModelParams {
@@ -69,9 +85,9 @@ export interface PropUsageNorms {
 /** League context built once from completed games: team scoring and what defenses allow. */
 export interface PropModelLeague {
   /** gameId → team → position → stat totals for players of that position on that team. */
-  produced: Map<string, Map<string, Map<string, Partial<Record<PropModelStat, number>>>>>;
+  produced: Map<string, Map<string, Map<string, Partial<Record<ModelStat, number>>>>>;
   /** Average per team-game for each position and stat. */
-  averageAllowed: Map<string, Partial<Record<PropModelStat, number>>>;
+  averageAllowed: Map<string, Partial<Record<ModelStat, number>>>;
   /** Average points a team scores per game. */
   averageTeamPoints: number;
   games: Map<string, FootballGame>;
@@ -97,25 +113,25 @@ export function buildPropModelLeague(
     byTeam.set(team, byPosition);
     const totals = byPosition.get(position) ?? {};
     byPosition.set(position, totals);
-    for (const stat of propModelStats) {
+    for (const stat of modelStats) {
       const value = row.stats[stat];
       if (value !== undefined && Number.isFinite(value)) totals[stat] = (totals[stat] ?? 0) + value;
     }
   }
-  const sums = new Map<string, { n: number; totals: Partial<Record<PropModelStat, number>> }>();
+  const sums = new Map<string, { n: number; totals: Partial<Record<ModelStat, number>> }>();
   for (const byTeam of produced.values())
     for (const byPosition of byTeam.values())
       for (const [position, totals] of byPosition) {
         const entry = sums.get(position) ?? { n: 0, totals: {} };
         entry.n++;
-        for (const stat of propModelStats)
+        for (const stat of modelStats)
           entry.totals[stat] = (entry.totals[stat] ?? 0) + (totals[stat] ?? 0);
         sums.set(position, entry);
       }
   const averageAllowed: PropModelLeague['averageAllowed'] = new Map(
     [...sums].map(([position, { n, totals }]) => [
       position,
-      Object.fromEntries(propModelStats.map((s) => [s, (totals[s] ?? 0) / n])),
+      Object.fromEntries(modelStats.map((s) => [s, (totals[s] ?? 0) / n])),
     ]),
   );
   const scored = games.filter(
@@ -139,7 +155,7 @@ export function buildPropModelLeague(
 }
 
 export interface PropModelInput {
-  stat: PropModelStat;
+  stat: ModelStat;
   position: string;
   team: string;
   /** The game being predicted; only data from before it is used. */
@@ -320,18 +336,13 @@ export function predictPropMean(
 export type PropOutcomeModel =
   { kind: 'count'; size: number } | { kind: 'ratio'; quantiles: number[] };
 
-/** Fitted settings per stat: model settings, ESPN blend weight and outcome spreads. */
+/** Fitted settings per stat: model settings and the outcome spread around the model's mean. */
 export type PropModelSettings = Record<
   PropModelStat,
   {
     /** Missing settings default to defaultPropModelParams (usage features off). */
     params: Partial<PropModelParams>;
-    /** Share of the center taken from ESPN's projection when one exists. */
-    espnWeight: number;
-    /** Spread around the blended center. */
     outcome: PropOutcomeModel;
-    /** Spread around the model alone, for players without an ESPN projection. */
-    modelOnlyOutcome: PropOutcomeModel;
   }
 >;
 
@@ -398,23 +409,15 @@ export function modelMedian(mean: number, outcome: PropOutcomeModel) {
 }
 
 /**
- * Full prediction for a prop: the center blends the model with ESPN's projection by the tested
- * weight for that stat, and the fitted outcome spread turns it into a chance of going over.
+ * Full prediction for a prop: the model's mean, the fair line from its fitted outcome spread, and
+ * the chance of the over at the given line after anchoring to the market.
  */
 export function predictProp(
-  input: PropModelInput & { line: number; espnProjection?: number; marketWeight?: number },
+  input: PropModelInput & { stat: PropModelStat; line: number; marketWeight?: number },
   league: PropModelLeague,
   settings: PropModelSettings[PropModelStat],
   norms?: PropUsageNorms,
-):
-  | {
-      mean: number;
-      median: number;
-      overChance: number;
-      sampleGames: number;
-      source: 'blend' | 'espn' | 'model';
-    }
-  | undefined {
+): { mean: number; median: number; overChance: number; sampleGames: number } | undefined {
   // Settings fitted before usage features existed lack them; they default to off.
   const model = predictPropMean(
     input,
@@ -426,29 +429,16 @@ export function predictProp(
   // no model view at all.
   if (!model || model.sampleGames < 3 || !propModelEligible(input.stat, input.position, model.base))
     return undefined;
-  const espn = input.espnProjection;
-  let mean: number, outcome: PropOutcomeModel, source: 'blend' | 'espn' | 'model';
-  if (espn !== undefined && settings.espnWeight > 0) {
-    const weight = settings.espnWeight;
-    mean = weight * espn + (1 - weight) * model.mean;
-    outcome = settings.outcome;
-    source = weight === 1 ? 'espn' : 'blend';
-  } else {
-    mean = model.mean;
-    outcome = settings.modelOnlyOutcome;
-    source = 'model';
-  }
   return {
-    mean,
-    median: modelMedian(mean, outcome),
+    mean: model.mean,
+    median: modelMedian(model.mean, settings.outcome),
     overChance: anchoredOverChance(
       input.line,
-      mean,
-      outcome,
+      model.mean,
+      settings.outcome,
       input.marketWeight ?? defaultMarketWeight,
     ),
     sampleGames: model.sampleGames,
-    source,
   };
 }
 
@@ -474,6 +464,10 @@ export function propModelEligible(stat: PropModelStat, position: string, base: n
       return ['RB', 'WR', 'TE'].includes(pos) && base >= 20;
     case 'receptions':
       return ['RB', 'WR', 'TE'].includes(pos) && base >= 2;
+    case 'rushing_tds':
+      return ['QB', 'RB'].includes(pos) && base >= 0.15;
+    case 'receiving_tds':
+      return ['RB', 'WR', 'TE'].includes(pos) && base >= 0.1;
   }
 }
 

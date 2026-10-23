@@ -97,7 +97,7 @@ test('defense comparison joins team identities, shows league-scored numbers and 
     await page.screenshot({ path: info.outputPath('defense-numbers.png') });
     const saved = workspace.store.snapshot().adviceResults[0]!;
     expect(saved.players.map((p) => p.position)).toEqual(['DST', 'DST']);
-    expect(saved.players.every((p) => p.projectionMethod === 'historical-baseline')).toBe(true);
+    expect(saved.players.every((p) => p.projectionMethod === 'sidekick-model-v1')).toBe(true);
     expect(saved.players.every((p) => p.metrics.some((m) => m.id.endsWith(':dst_sacks')))).toBe(
       true,
     );

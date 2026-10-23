@@ -11,7 +11,7 @@ import {
   adviceConfidence,
   optimizeLineup,
   playerNameKey,
-  startedStarterIds,
+  keptStarterIds,
   starterSlots,
 } from './advice-math.js';
 import { replacementBaselines } from './draft-replacement.js';
@@ -207,16 +207,21 @@ export function buildFantasyAdvicePlan(
     warnings.push(...slots.warnings);
   } else if (request.mode === 'lineup') {
     const activeRoster = roster.filter((player) => !isInactiveFootballStatus(player.status));
-    const locked = startedStarterIds(
+    const kept = keptStarterIds(
       league,
       team.id,
       request.week ?? (league.settings.currentWeek as number | undefined),
       activeRoster,
     );
+    const locked = kept.all;
     plan.lineup = optimizeLineup(activeRoster, league.settings.roster_positions, locked);
-    for (const id of locked)
+    for (const id of kept.started)
       warnings.push(
         `${byId.get(id)?.name ?? id}'s game has already started, so they are locked in the starting lineup. Only recommend changes for players whose games have not kicked off.`,
+      );
+    for (const id of kept.unknown)
+      warnings.push(
+        `${byId.get(id)?.name ?? id} has no projection this week, so they stay in the lineup rather than being benched for missing data.`,
       );
     if (!completeRoster)
       warnings.push(
@@ -346,12 +351,12 @@ export function buildFantasyAdvicePlan(
       );
     if (request.candidateIds?.some((id) => !selected.some((player) => player.id === id)))
       throw new Error('At least one selected waiver player is already rostered in this snapshot.');
-    const waiverLocked = startedStarterIds(
+    const waiverLocked = keptStarterIds(
       league,
       team.id,
       request.week ?? (league.settings.currentWeek as number | undefined),
       roster,
-    );
+    ).all;
     plan.lineup = optimizeLineup(active(roster), league.settings.roster_positions, waiverLocked);
     const baseline = plan.lineup.complete && completeRoster ? plan.lineup.points : undefined;
     if (baseline !== undefined)

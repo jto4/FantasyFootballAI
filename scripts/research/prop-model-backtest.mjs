@@ -3,7 +3,10 @@
 // and holdout metrics as JSON. Usage: node scripts/research/prop-model-backtest.mjs [out.json]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PublicFootballData } from '../../packages/integrations/dist/index.js';
+import {
+  PublicFootballData,
+  PublicPlayerForecasts,
+} from '../../packages/integrations/dist/index.js';
 import {
   buildPropModelLeague,
   defaultPropModelParams,
@@ -169,6 +172,8 @@ const eligible = {
   carries: (pos, base) => ['QB', 'RB'].includes(pos) && base >= 6,
   receiving_yards: (pos, base) => ['RB', 'WR', 'TE'].includes(pos) && base >= 20,
   receptions: (pos, base) => ['RB', 'WR', 'TE'].includes(pos) && base >= 2,
+  rushing_tds: (pos, base) => ['QB', 'RB'].includes(pos) && base >= 0.15,
+  receiving_tds: (pos, base) => ['RB', 'WR', 'TE'].includes(pos) && base >= 0.1,
 };
 
 function samples(stat) {
@@ -311,7 +316,9 @@ function outcomeModel(stat, fitted) {
 }
 
 const forecasts = new Map();
-for (const f of data.playerForecasts ?? [])
+// ESPN's forecasts are a benchmark here only; the app does not use them.
+const espnBenchmark = (await new PublicPlayerForecasts().get(2026)).playerForecasts ?? [];
+for (const f of espnBenchmark)
   forecasts.set(`${f.week}:${playerNameKey(f.name)}:${nflTeamKey(f.team)}`, f);
 
 const half = (x) => Math.floor(x) + 0.5;
@@ -504,35 +511,14 @@ for (const stat of propModelStats) {
     bestWeight,
   );
 }
-// Production settings: the validated blend weight, with the outcome spread refit on every 2026
-// game that has an ESPN projection (the method passed its weeks 4+ test first).
+// Production settings: the model's fitted settings and its outcome spread from training. The app
+// does not use ESPN; the ensemble numbers above are only a benchmark.
 const emitIndex = process.argv.indexOf('--emit');
 if (emitIndex > 0) {
   const settings = {};
   for (const stat of propModelStats) {
     const entry = report.stats[stat];
-    const all = samples(stat).filter((s) => s.holdout);
-    const pairs = all
-      .map((s) => {
-        const f = forecasts.get(
-          `${s.row.week}:${playerNameKey(s.row.name)}:${nflTeamKey(s.row.team)}`,
-        );
-        const espn = f?.stats[stat];
-        const model = modelPredict(stat, s, entry.params).mean;
-        return espn === undefined
-          ? undefined
-          : {
-              mean: entry.ensemble.espnWeight * espn + (1 - entry.ensemble.espnWeight) * model,
-              actual: s.actual,
-            };
-      })
-      .filter(Boolean);
-    settings[stat] = {
-      params: entry.params,
-      espnWeight: pairs.length >= 60 ? entry.ensemble.espnWeight : 0,
-      outcome: pairs.length >= 60 ? outcomeModel(stat, pairs) : entry.outcome,
-      modelOnlyOutcome: entry.outcome,
-    };
+    settings[stat] = { params: entry.params, outcome: entry.outcome };
   }
   writeFileSync(
     process.argv[emitIndex + 1],

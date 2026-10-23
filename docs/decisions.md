@@ -484,3 +484,31 @@ nflverse file, so snap share stands in for route participation. The app loads th
 snap counts and the current season's depth chart (about 65 MB) on first use and caches them for
 12 hours; without them those features stay off. The board and bet analysis share one runtime
 (`prop-model-runtime.ts`) so both price a prop identically.
+
+## Own projections; ESPN projections removed (October 23, 2026)
+
+At the owner's request the app no longer uses ESPN projections anywhere: public ESPN weekly
+forecasts are not downloaded, league imports no longer save ESPN's league-scored projections (and
+saved ones are ignored and removed on the next import), and the prop model no longer blends with
+ESPN. ESPN's forecasts remain only as an offline benchmark in the research scripts.
+
+Weekly fantasy estimates now come from the app's own model (`sidekick-model-v1`). Skill players:
+the prop stat models, extended to rushing and receiving touchdowns (fitted the same way) and rare
+events (fumbles, two-point plays) at default settings, give an expected value for every scoring
+stat, which is scored with the league's own rules; leagues with rules the model cannot price
+(first downs, bonuses) fall back to the 8-game average. Kickers and D/ST: a recency-weighted
+average of their scored history plus the betting market's view of the game (fitted: D/ST gains 0.4
+points per point the opponent's implied total is below average; kicker totals had no effect).
+nflverse defensive TDs are combined, so under ESPN rules they are credited when every TD kind in
+the group scores the same (true in Afton); otherwise D/ST stays unscored.
+
+Backtest on 2026 games (`scripts/research/fantasy-projection-backtest.mjs`,
+`docs/research/fantasy-projection-backtest-2026-10-23.json`), fantasy-relevant QB/RB/WR/TE under
+Afton's rules: mean absolute error 5.53 points for the app's model, 5.68 for the 8-game average and
+5.30 for ESPN (benchmark only); of same-week, same-position pairs the higher projection scored more
+64.3% of the time, against 62.3% and 66.3%. So the app's projections beat a plain average but trail
+ESPN, most for quarterbacks. A blend with the recent average was tested per position (weight chosen
+on weeks 1–3) and adopted only if it also won on weeks 4+; none did. Kickers 3.93 vs 4.06 and D/ST
+3.95 vs 4.29 (half PPR; Afton D/ST 4.27 vs 4.75). Season and remaining-season intervals keep the
+existing automatic forecast. The prop board's projection, typical game and gap now come from the
+model's mean and median; the old ESPN gap lean is gone.

@@ -400,6 +400,7 @@ function isPlayer(value: unknown): boolean {
         'rolling-form-v1',
         'rolling-baseline-v1',
         'public-projection-v1',
+        'sidekick-model-v1',
       ].includes(String(v)),
     ) &&
     list(player.projectionSourceIds, maximumAdviceSources) &&

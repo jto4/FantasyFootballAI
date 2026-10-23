@@ -291,7 +291,8 @@ export interface PlayerAdviceEvidence {
     | 'historical-baseline'
     | 'rolling-form-v1'
     | 'rolling-baseline-v1'
-    | 'public-projection-v1';
+    | 'public-projection-v1'
+    | 'sidekick-model-v1';
   projectionSourceIds: string[];
   /** Verified complete team schedule has no game in the requested week. */
   weeklyGameStatus?: 'bye';

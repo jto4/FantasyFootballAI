@@ -290,13 +290,8 @@ it('loads bounded fixed URLs, coalesces requests, merges add/drop counts and reu
   const [one, two] = await Promise.all([data.get(2026), data.get(2026)]);
   expect(one).toBe(two);
   expect(one.players).toHaveLength(3);
-  expect(one.playerForecasts).toHaveLength(1);
-  expect(one.playerForecasts?.[0]).toMatchObject({
-    espnId: '12345',
-    week: 5,
-    stats: { receptions: 5, receiving_yards: 50 },
-    sourceId: 'espn-forecasts-2026-0',
-  });
+  // ESPN forecasts are no longer loaded; the app makes its own projections.
+  expect(one.playerForecasts).toBeUndefined();
   expect(one.market).toEqual([{ sleeperId: 'sleeper-1', adds: 12, drops: 3, lookbackHours: 24 }]);
   expect(
     one.sources.every(
@@ -305,14 +300,14 @@ it('loads bounded fixed URLs, coalesces requests, merges add/drop counts and reu
     ),
   ).toBe(true);
   await data.get(2026);
-  expect(calls).toHaveLength(14);
+  // The five ESPN forecast pages are no longer requested; the app makes its own projections.
+  expect(calls).toHaveLength(9);
   expect(
     calls.every(
       ({ url }) =>
         url.startsWith('https://github.com/nflverse/') ||
         url.startsWith('https://api.sleeper.app/') ||
-        url.startsWith('https://api.sleeper.com/') ||
-        url.startsWith('https://lm-api-reads.fantasy.espn.com/'),
+        url.startsWith('https://api.sleeper.com/'),
     ),
   ).toBe(true);
   expect(

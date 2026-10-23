@@ -6,6 +6,7 @@ import {
   analyzeBetHistory,
   historicalPlayerGames,
   optimizeLineup,
+  playerNameKey,
   startedStarterIds,
   scoreHistoricalGame,
   wilsonInterval,
@@ -560,4 +561,52 @@ it('scores ESPN D/ST and kickers from slot overrides, with base offense rules ig
   });
   // 3 + 4 + 5 for the kicks, −1 for the miss, 3 PATs at the base value.
   expect(kicker).toEqual({ points: 14, unsupported: [], missing: [] });
+});
+
+it('credits combined nflverse defensive TDs under ESPN rules only when the TD kinds score the same', () => {
+  const row = {
+    playerId: 'dst:PHI',
+    name: 'PHI team defense',
+    position: 'DST',
+    team: 'PHI',
+    opponent: 'DAL',
+    gameId: 'g',
+    season: 2025,
+    week: 1,
+    seasonType: 'REG' as const,
+    stats: {
+      dst_points_allowed: 20,
+      dst_yards_allowed: 300,
+      dst_sacks: 2,
+      dst_interceptions: 1,
+      dst_fumble_recoveries: 0,
+      dst_blocked_kicks: 0,
+      dst_safeties: 0,
+      dst_touchdowns: 1,
+      dst_special_teams_touchdowns: 0,
+    },
+  };
+  const rules = { '99': 1, '95': 2, '103': 6, '104': 6, '101': 6, '102': 6, '93': 6 };
+  const equal = scoreHistoricalGame(
+    { platform: 'espn', scoring: {}, positionScoring: { DST: rules } },
+    row,
+  );
+  expect(equal).toEqual({ points: 2 + 2 + 6, unsupported: [], missing: [] });
+  // When interception and fumble return TDs score differently, the split is unknown.
+  const split = scoreHistoricalGame(
+    { platform: 'espn', scoring: {}, positionScoring: { DST: { ...rules, '104': 4 } } },
+    row,
+  );
+  expect(split.points).toBeUndefined();
+});
+
+it('matches player names across sources that disagree on generational suffixes', () => {
+  expect(playerNameKey('Aaron Jones Sr.')).toBe(playerNameKey('Aaron Jones'));
+  expect(playerNameKey('Travis Etienne Jr.')).toBe('travisetienne');
+  expect(playerNameKey('Michael Penix Jr')).toBe('michaelpenix');
+  expect(playerNameKey('Kenneth Walker III')).toBe('kennethwalker');
+  expect(playerNameKey('Joe Burrow')).toBe('joeburrow');
+  // A last name that merely ends in those letters is untouched.
+  expect(playerNameKey('Davante Adams')).toBe('davanteadams');
+  expect(playerNameKey('Josh Downs')).toBe('joshdowns');
 });

@@ -23,6 +23,8 @@ Completed work and its evidence live in the archived task records and dated revi
 - [x] Props board in Advice: every prop this week with ESPN projection, typical-game estimate, season hit rate, fantasy owner and a graded pre-kickoff lean. Schedule run history and the Settings AI card tidied.
 - [x] Prop model: tested ESPN/model blend, calibrated outcome spreads, line-anchored chances, graded and self-refitting market weight. See `decisions.md`.
 - [x] Prop line ledger (daily lines and prices, last line before kickoff) and snap-share and depth-chart features in the prop model. See `decisions.md`.
+- [x] Own weekly fantasy projections for every position (stat models scored with league rules; K/D/ST from scored history and the betting total); ESPN projections removed from the app. See `decisions.md`.
+- [ ] Close the gap to ESPN's accuracy (5.53 vs 5.30 points): quarterback projections first, then a better early-season prior than last season's games.
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
 - [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.

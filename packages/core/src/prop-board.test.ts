@@ -3,7 +3,6 @@ import type { FootballGame, PlayerGameStats } from './advice-types.js';
 import {
   buildPropBoard,
   gradePropLean,
-  propLean,
   summarizePropLeans,
   type PropLeanRecord,
 } from './prop-board.js';
@@ -31,24 +30,7 @@ const log = (week: number, receiving_yards: number, season = 2026): PlayerGameSt
   stats: { receiving_yards },
 });
 
-it('adjusts the projection to a typical game before comparing with the line', () => {
-  // 80 average → 69.6 typical receiving yards.
-  const lean = propLean('receiving_yards', 60.5, 80, []);
-  expect(lean.median).toBeCloseTo(69.6);
-  // 9.1 yards over a 48.7-yard usual swing (70% of the typical game).
-  expect(lean.lean).toMatchObject({ side: 'over', strength: 'slight', score: 0.19 });
-  // The same average against a 66.5 line no longer leans once skew is removed.
-  expect(propLean('receiving_yards', 66.5, 80, []).lean).toBeUndefined();
-  // A steady quarterback's own spread narrows the swing, so the same gap leans harder.
-  const steady = [270, 280, 290, 300, 285, 295];
-  expect(propLean('passing_yards', 265.5, 290, steady).lean).toMatchObject({
-    side: 'over',
-    strength: 'moderate',
-  });
-  expect(propLean('passing_yards', 265.5, 290, []).lean).toMatchObject({ strength: 'slight' });
-});
-
-it('joins lines with ESPN projections, this season’s log and fantasy owners', () => {
+it('joins lines with the model projection, this season’s log and fantasy owners', () => {
   const [row] = buildPropBoard({
     lines: [
       {
@@ -63,19 +45,7 @@ it('joins lines with ESPN projections, this season’s log and fantasy owners', 
       },
     ],
     games: [game],
-    forecasts: [
-      {
-        espnId: '4426515',
-        name: 'Fictional Receiver',
-        position: 'WR',
-        team: 'SEA',
-        season: 2026,
-        week: 7,
-        issuedWeek: 7,
-        stats: { receiving_yards: 95 },
-        sourceId: 'espn-forecasts-2026-0',
-      },
-    ],
+    predict: () => ({ mean: 95, median: 82.7, overChance: 0.7, sampleGames: 6 }),
     stats: [log(1, 70), log(2, 50), log(3, 90), log(5, 100), log(7, 300), log(4, 999, 2025)],
     week: 7,
     rosters: [{ teamName: 'Horses', players: [{ name: 'Fictional Receiver', espnId: '4426515' }] }],
@@ -92,8 +62,7 @@ it('joins lines with ESPN projections, this season’s log and fantasy owners', 
     average: 77.5,
     fantasyTeam: 'Horses',
   });
-  // Without the prop model there is no lean.
-  expect(row!.lean).toBeUndefined();
+  expect(row!.lean).toMatchObject({ side: 'over', strength: 'strong' });
 });
 
 it('takes the lean from the model’s chance against break-even and skips unpriced TD lines', () => {
@@ -111,10 +80,9 @@ it('takes the lean from the model’s chance against break-even and skips unpric
   const rows = buildPropBoard({
     lines: [line('receiving_yards'), line('passing_tds'), line('passing_tds', -150)],
     games: [game],
-    forecasts: [],
     stats: [],
     week: 7,
-    predict: () => ({ mean: 1, median: 1, overChance: 0.62, sampleGames: 5, source: 'model' }),
+    predict: () => ({ mean: 1, median: 1, overChance: 0.62, sampleGames: 5 }),
   });
   expect(rows[0]!.model).toMatchObject({ side: 'over', breakEven: 0.524, edge: 0.096 });
   expect(rows[0]!.lean).toMatchObject({ side: 'over', strength: 'strong', score: 0.096 });

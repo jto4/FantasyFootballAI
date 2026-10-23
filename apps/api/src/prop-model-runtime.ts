@@ -68,7 +68,6 @@ function build(data: FootballDataSnapshot, usage?: UsageSnapshot) {
     game: FootballGame;
     line: number;
     marketWeight?: number;
-    espnProjection?: number;
   }) => {
     if (!(propModelStats as readonly string[]).includes(input.stat)) return undefined;
     const player = findPlayer(input.playerName, input.team, input.game);
@@ -90,7 +89,6 @@ function build(data: FootballDataSnapshot, usage?: UsageSnapshot) {
         line: input.line,
         depth,
         ...(input.marketWeight !== undefined ? { marketWeight: input.marketWeight } : {}),
-        ...(input.espnProjection !== undefined ? { espnProjection: input.espnProjection } : {}),
       },
       league,
       propModelSettings[input.stat as PropModelStat],

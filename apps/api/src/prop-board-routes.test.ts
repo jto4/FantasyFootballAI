@@ -110,7 +110,7 @@ it('builds the board for the next week, saves pre-kickoff leans, and grades fini
   expect(board.week).toBe(7);
   expect(board.rows[0]).toMatchObject({
     fantasyTeam: 'Horses',
-    model: { side: 'over', source: 'blend' },
+    model: { side: 'over' },
     lean: { side: 'over' },
   });
   expect(board.model).toEqual({ marketWeight: 0.25, fitted: false, gradedForFit: 0 });

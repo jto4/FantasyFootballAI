@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { normalizeEspnLeague, espnSnapshotWeeklyProjections } from '@sidekick/integrations';
+import { normalizeEspnLeague } from '@sidekick/integrations';
 import { isLeagueConnection } from '@sidekick/core';
 import {
   isValidEspnSeason,
@@ -89,18 +89,15 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
             error:
               'The snapshot contains duplicate player ownership. Save a complete current ESPN response.',
           });
-        const forecasts = espnSnapshotWeeklyProjections(raw, league, at);
         await store.update((state) => {
           const previous = state.leagues.find((l) => l.id === id);
           league.connectedAt = previous?.connectedAt ?? at;
           league.displayName = previous?.displayName ?? league.displayName;
           state.leagues = [...state.leagues.filter((l) => l.id !== id), league];
-          state.playerProjections = [
-            ...state.playerProjections.filter(
-              (p) => p.leagueId !== id || !p.sourceId?.startsWith('espn-browser:'),
-            ),
-            ...forecasts,
-          ];
+          // The app makes its own projections, so ESPN's saved from earlier imports are removed.
+          state.playerProjections = state.playerProjections.filter(
+            (p) => p.leagueId !== id || !p.sourceId?.startsWith('espn-browser:'),
+          );
         });
         return res.status(201).json(league);
       } catch {

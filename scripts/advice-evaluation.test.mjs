@@ -140,22 +140,6 @@ async function fixtureResult(testCase, dropComparison = 'complete', matchups) {
   return { result, passes, contexts, prompts };
 }
 
-test('rookie public forecasts pass both stages and persist without fabricated history or firm picks', async () => {
-  const testCase = adviceEvaluationCases.find((c) => c.id === 'rookie-public-forecast');
-  const { result, contexts, passes } = await fixtureResult(testCase);
-  assert.equal(passes.length, 2);
-  for (const context of contexts) {
-    const rookie = context.players.find((p) => p.id === 'w3');
-    assert.equal(rookie.projectedPoints, 12);
-    assert.equal(rookie.projectionMethod, 'public-projection-v1');
-    assert.deepEqual(rookie.historicalPoints, []);
-  }
-  assert.equal(result.assessment.verdict, 'hold');
-  assert.ok(result.confidence.score <= 69);
-  assert.deepEqual(result.assessment.recommendedPlayerIds, []);
-  assert.equal(isAdviceResult(result), true);
-});
-
 test('rookie draft capital survives both passes and persistence without becoming a missing player forecast', async () => {
   const testCase = adviceEvaluationCases.find((c) => c.id === 'rookie-missing-forecast');
   const { result, passes, contexts } = await fixtureResult(testCase);
@@ -191,7 +175,7 @@ test('kicker comparison computes both baselines from history, includes blocked-k
   assert.equal(contexts.length, 2);
   for (const context of contexts)
     for (const player of context.players) {
-      assert.equal(player.projectionMethod, 'historical-baseline');
+      assert.equal(player.projectionMethod, 'sidekick-model-v1');
       assert.equal(player.projectedPoints, player.id === 'k1' ? 11 : 7);
       assert.ok(player.metrics.some((m) => m.id.endsWith(':fg_blocked') && m.value === 1));
       assert.ok(player.warnings.some((warning) => warning.includes('weather')));

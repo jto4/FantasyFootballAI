@@ -91,6 +91,8 @@ export function createWeeklyService(
   shared: { now: () => number; load: AdviceLoader },
 ) {
   const { now, load } = shared;
+  // Snap counts and depth charts for the projection model; projections still work without them.
+  const usageFor = (season: number) => deps.usage?.get(season).catch(() => undefined);
   async function briefing(leagueId: string, teamId: string): Promise<WeeklyBriefing> {
     const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
     if (!leagueRow?.teams.some((team) => team.id === teamId))
@@ -120,6 +122,7 @@ export function createWeeklyService(
       }),
     );
     const evidence = buildPlayerEvidence({
+      usage: await usageFor(loaded.season),
       league,
       players: loaded.players,
       projections: deps.store
@@ -319,7 +322,7 @@ export function createWeeklyService(
   /** Preloads public stats and the player catalog so Advice opens without a cold download. */
   /**
    * Records this week's projection for every player on the selected roster so the accuracy
-   * scorecard fills without saved advice. With imported projections, ESPN's public projection is
+   * scorecard fills without saved advice. With imported projections, the app's own projection is
    * recorded alongside them for comparison. Ids are stable per league/week/source/player, so
    * repeated briefings add nothing, and only players whose game has not started are recorded.
    */
@@ -335,14 +338,15 @@ export function createWeeklyService(
     const sets: { tag: string; players: PlayerAdviceEvidence[] }[] = [
       { tag: 'league', players: evidence.filter((p) => mine.has(p.id)) },
     ];
-    // Only players whose league projection came from an import need a separate public record.
+    // Only players whose league projection came from an import need a separate model record.
     const imported = new Set(
       evidence.filter((p) => mine.has(p.id) && p.projectionMethod === 'imported').map((p) => p.id),
     );
     if (imported.size)
       sets.push({
-        tag: 'public',
+        tag: 'model',
         players: buildPlayerEvidence({
+          usage: await usageFor(loaded.season),
           league,
           players: loaded.players.filter((p) => imported.has(p.id)),
           projections: [],
@@ -462,6 +466,7 @@ export function createWeeklyService(
       if (evidence.status) player.status = evidence.status;
     }
     const evidence = buildPlayerEvidence({
+      usage: await usageFor(loaded.season),
       league,
       players: loaded.players,
       projections: deps.store

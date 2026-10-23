@@ -1,6 +1,6 @@
 import type { LineupEstimate, PlayerAdviceEvidence } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
-import { optimizeLineup, playerNameKey, startedStarterIds } from './advice-math.js';
+import { keptStarterIds, optimizeLineup, playerNameKey } from './advice-math.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 
 export interface WaiverDay {
@@ -83,8 +83,8 @@ export function rankWaivers(
   const { of, rosteredIds, rosteredNames } = rosters(league, evidence);
   const mine = of(teamId);
   const warnings: string[] = [];
-  // Starters already playing this week are locked in place on the platform.
-  const locked = startedStarterIds(league, teamId, league.matchups?.[0]?.week, mine);
+  // Starters already playing are locked on the platform, and unknown ones are never benched.
+  const locked = keptStarterIds(league, teamId, league.matchups?.[0]?.week, mine).all;
   const current = points(league, mine, locked);
   if (current?.missing)
     warnings.push(

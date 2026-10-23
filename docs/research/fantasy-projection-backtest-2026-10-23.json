@@ -1,0 +1,238 @@
+{
+  "afton": {
+    "scoring": "Afton (ESPN rules)",
+    "games": 1015,
+    "maeAll": {
+      "ours": 5.5,
+      "baseline": 5.7
+    },
+    "sameGamesWithEspn": {
+      "n": 933,
+      "mae": {
+        "ours": 5.53,
+        "baseline": 5.68,
+        "espn": 5.3
+      },
+      "pairwiseOrder": {
+        "ours": 0.643,
+        "baseline": 0.623,
+        "espn": 0.663
+      }
+    },
+    "byPosition": {
+      "QB": {
+        "n": 157,
+        "ours": 6.45,
+        "baseline": 6.21,
+        "espn": 6.08
+      },
+      "RB": {
+        "n": 248,
+        "ours": 5.57,
+        "baseline": 5.96,
+        "espn": 5.44
+      },
+      "WR": {
+        "n": 359,
+        "ours": 5.34,
+        "baseline": 5.48,
+        "espn": 5.15
+      },
+      "TE": {
+        "n": 169,
+        "ours": 4.99,
+        "baseline": 5.18,
+        "espn": 4.7
+      }
+    },
+    "blend": {
+      "QB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 0.25,
+        "testMae": {
+          "blend": 5.94,
+          "model": 5.88,
+          "baseline": 6.04
+        },
+        "testGames": 83
+      },
+      "RB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.68,
+          "model": 5.68,
+          "baseline": 5.79
+        },
+        "testGames": 136
+      },
+      "WR": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.27,
+          "model": 5.27,
+          "baseline": 5.48
+        },
+        "testGames": 188
+      },
+      "TE": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.07,
+          "model": 5.07,
+          "baseline": 5.09
+        },
+        "testGames": 90
+      }
+    }
+  },
+  "halfPpr": {
+    "scoring": "Half PPR",
+    "games": 1015,
+    "maeAll": {
+      "ours": 5.5,
+      "baseline": 5.7
+    },
+    "sameGamesWithEspn": {
+      "n": 933,
+      "mae": {
+        "ours": 5.53,
+        "baseline": 5.68,
+        "espn": 5.3
+      },
+      "pairwiseOrder": {
+        "ours": 0.643,
+        "baseline": 0.623,
+        "espn": 0.663
+      }
+    },
+    "byPosition": {
+      "QB": {
+        "n": 157,
+        "ours": 6.45,
+        "baseline": 6.21,
+        "espn": 6.08
+      },
+      "RB": {
+        "n": 248,
+        "ours": 5.57,
+        "baseline": 5.96,
+        "espn": 5.44
+      },
+      "WR": {
+        "n": 359,
+        "ours": 5.34,
+        "baseline": 5.48,
+        "espn": 5.15
+      },
+      "TE": {
+        "n": 169,
+        "ours": 4.99,
+        "baseline": 5.18,
+        "espn": 4.7
+      }
+    },
+    "blend": {
+      "QB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 0.25,
+        "testMae": {
+          "blend": 5.94,
+          "model": 5.88,
+          "baseline": 6.04
+        },
+        "testGames": 83
+      },
+      "RB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.68,
+          "model": 5.68,
+          "baseline": 5.79
+        },
+        "testGames": 136
+      },
+      "WR": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.27,
+          "model": 5.27,
+          "baseline": 5.48
+        },
+        "testGames": 188
+      },
+      "TE": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.07,
+          "model": 5.07,
+          "baseline": 5.09
+        },
+        "testGames": 90
+      }
+    }
+  },
+  "specialTeams": {
+    "halfPpr": {
+      "K": {
+        "train": 514,
+        "test": 179,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0
+        },
+        "maeTest": {
+          "ours": 3.93,
+          "baseline8": 4.06
+        }
+      },
+      "DST": {
+        "train": 544,
+        "test": 188,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0.4
+        },
+        "maeTest": {
+          "ours": 3.95,
+          "baseline8": 4.29
+        }
+      }
+    },
+    "afton": {
+      "K": {
+        "train": 514,
+        "test": 179,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0
+        },
+        "maeTest": {
+          "ours": 0,
+          "baseline8": 0
+        }
+      },
+      "DST": {
+        "train": 544,
+        "test": 188,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0.4
+        },
+        "maeTest": {
+          "ours": 4.27,
+          "baseline8": 4.75
+        }
+      }
+    }
+  }
+}

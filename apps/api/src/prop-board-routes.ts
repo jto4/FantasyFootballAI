@@ -145,10 +145,9 @@ export function createPropBoardRouter(deps: {
     const rows = buildPropBoard({
       lines,
       games,
-      forecasts: data.playerForecasts ?? [],
       stats: data.players,
       week,
-      predict: (line, game, team, espnProjection) =>
+      predict: (line, game, team) =>
         model.predict({
           stat: line.stat,
           playerName: line.playerName,
@@ -156,7 +155,6 @@ export function createPropBoardRouter(deps: {
           game,
           line: line.line,
           marketWeight: fitted?.weight ?? defaultMarketWeight,
-          ...(espnProjection !== undefined ? { espnProjection } : {}),
         }),
       ...(league
         ? {
@@ -200,8 +198,6 @@ export function createPropBoardRouter(deps: {
     }
     grade(data.players);
     if (!games.length) warnings.push('No upcoming regular-season games were found.');
-    else if (!data.playerForecasts?.length)
-      warnings.push('ESPN weekly projections are unavailable, so leans can’t be shown.');
     res.json({
       season: data.season,
       ...(games.length ? { week } : {}),

@@ -121,13 +121,11 @@ it('declines to price players outside the fitted population', () => {
       team: 'SEA',
       game: target,
       history: [row(1, 60), row(2, 60), row(3, 60)],
-      line: 50.5,
-      espnProjection: 70,
+      line: 40.5,
     },
     league,
     propModelSettings.receiving_yards,
   )!;
-  expect(priced.source).toBe('blend');
   expect(priced.overChance).toBeGreaterThan(0.5);
   expect(priced.overChance).toBeLessThan(0.6);
 });

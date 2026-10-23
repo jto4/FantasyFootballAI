@@ -128,6 +128,8 @@ export function createAdviceService(deps: AdviceDependencies) {
       : 'Claude Opus · signed-in CLI';
   const now = deps.now ?? Date.now;
   const seasonNow = () => nflSeasonFor(now());
+  // Snap counts and depth charts for the projection model; projections still work without them.
+  const usageFor = (season: number) => deps.usage?.get(season).catch(() => undefined);
   function leagueFor(
     request: Pick<AdviceRequest, 'mode' | 'leagueId'>,
   ): LeagueConnection | undefined {
@@ -305,6 +307,7 @@ export function createAdviceService(deps: AdviceDependencies) {
           : ('week' as const);
     const evidence = loaded.league
       ? buildPlayerEvidence({
+          usage: await usageFor(loaded.season),
           league: loaded.league,
           players,
           projections: deps.store
@@ -570,6 +573,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     );
     const evidence = league
       ? buildPlayerEvidence({
+          usage: await usageFor(loaded.season),
           league,
           players: loaded.players,
           projections,

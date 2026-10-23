@@ -62,7 +62,7 @@ const tallyText = (t: Tally) =>
   `${t.wins}–${t.losses}${t.pushes ? `–${t.pushes}` : ''}${t.winRate !== undefined ? ` (${Math.round(t.winRate * 100)}%)` : ''}`;
 
 /**
- * Every published prop this week next to ESPN's projection and the player's game log. Leans are
+ * Every published prop this week next to the app's own projection and the player's game log. Leans are
  * saved before kickoff and graded afterwards, so the record shows whether they deserve trust.
  */
 export function PropsBoard({
@@ -120,7 +120,7 @@ export function PropsBoard({
             Player props{board?.week !== undefined ? ` · Week ${board.week}` : ''}
           </h2>
           <p>
-            Every published line next to ESPN’s projection and this season’s game log. Research
+            Every published line next to our own projection and this season’s game log. Research
             only: a lean is a comparison, not a promise.
           </p>
         </div>
@@ -238,8 +238,11 @@ export function PropsBoard({
               <tr>
                 <th scope="col">Player</th>
                 <th scope="col">Prop</th>
-                <th scope="col" title="ESPN’s projection, then adjusted to a typical game">
-                  ESPN proj. → typical
+                <th
+                  scope="col"
+                  title="Our projected average, then the typical game (the model’s median)"
+                >
+                  Our proj. → typical
                 </th>
                 <th scope="col">This season</th>
                 <th
@@ -365,11 +368,10 @@ export function PropsBoard({
       <details className="props-method">
         <summary>How the model works</summary>
         <p>
-          The model starts from ESPN’s projection, blended with its own estimate where that tested
-          better (25% for rushing yards, receiving yards and catches). Its own estimate weighs
-          recent games most, then adjusts for the betting total and spread and what the opponent
-          allows to that position. A fitted outcome spread for each stat turns that into a chance of
-          the over. On 2026 games it never saw, actual results landed evenly across its predicted
+          The app makes its own projection: recent games weigh most, then it adjusts for snap share
+          and depth-chart changes, the betting total and spread, what the opponent allows to that
+          position, and home field. A fitted outcome spread for each stat turns that into a chance
+          of the over. On 2026 games it never saw, actual results landed evenly across its predicted
           ranges.
         </p>
         <p>

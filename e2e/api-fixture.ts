@@ -426,22 +426,7 @@ export async function apiWorkspace(
   app.use(
     createPropBoardRouter({
       data: {
-        get: async () => ({
-          ...structuredClone(adviceFootballData),
-          playerForecasts: [
-            {
-              espnId: '900',
-              name: 'Alex Quarterback',
-              position: 'QB',
-              team: 'BUF',
-              season: 2026,
-              week: 5,
-              issuedWeek: 5,
-              stats: { passing_yards: 300 },
-              sourceId: 'espn-forecasts-2026-0',
-            },
-          ],
-        }),
+        get: async () => structuredClone(adviceFootballData),
       },
       props: {
         props: async (game) => ({

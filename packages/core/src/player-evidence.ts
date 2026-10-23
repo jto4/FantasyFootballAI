@@ -19,7 +19,15 @@ import {
 import { isProjectionPeriod } from './projection-period.js';
 import { prepareFantasyForecast } from './fantasy-forecast.js';
 import { prepareNFLDraftEvidence } from './nfl-draft-evidence.js';
-import { preparePublicPlayerForecast } from './public-player-forecast.js';
+import {
+  projectFantasyPoints,
+  projectSpecialTeamsPoints,
+  projectionContext,
+  teamGame,
+  type UsageInput,
+} from './fantasy-projection.js';
+import { fantasyModelWeight, specialTeamsSettings } from './fantasy-projection-settings.js';
+import { propModelSettings, propUsageNorms } from './prop-model-settings.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 import { weeklyGameWithheldWarning } from './advice-warnings.js';
 
@@ -33,7 +41,15 @@ export interface PlayerEvidenceInput {
   throughWeek?: number;
   scope: 'week' | 'season' | 'remaining-season';
   asOf: string;
+  /** Snap counts and depth charts for the projection model; features stay off without them. */
+  usage?: UsageInput | undefined;
 }
+
+/** Saved ESPN projections (from older league imports) are never used; the app projects its own. */
+const isEspnProjection = (row: PlayerProjection) =>
+  row.sourceId?.startsWith('espn-browser:') === true ||
+  /\bespn\b/i.test(row.sourceName) ||
+  /(^|\.)espn\.com/i.test(row.sourceUrl ?? '');
 
 /** Assemble source-linked facts before the model sees them; never ask AI to calculate points. */
 export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvidence[] {
@@ -41,7 +57,8 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
     input.scope === 'week' ? undefined : prepareFantasyForecast(input.league, input.data, input);
   const history = historicalPlayerGames(input.data, input);
   const draftEvidence = prepareNFLDraftEvidence(input.data, input.league, input, history);
-  const publicForecast = preparePublicPlayerForecast(input.league, input.data, input);
+  const projection =
+    input.scope === 'week' ? projectionContext(input.data, input.usage) : undefined;
   const byName = new Map<string, PlayerGameStats[]>();
   for (const row of history) {
     const key = playerNameKey(row.name);
@@ -52,6 +69,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
   const projections = input.projections.filter(
     (row) =>
       row.leagueId === input.league.id &&
+      !isEspnProjection(row) &&
       row.scoringMatched === true &&
       (row.period === undefined || isProjectionPeriod(row.period)) &&
       (row.period === undefined || row.period.season === input.season) &&
@@ -280,22 +298,38 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
     const matched = [...groups.values()].flatMap((group) =>
       group.length === 1 && Number.isFinite(group[0]!.projectedPoints) ? [group[0]!] : [],
     );
-    const publicEstimate = matched.length
-      ? undefined
-      : publicForecast(
-          player,
-          input.scope,
-          input.scope === 'season' ? 18 : (input.throughWeek ?? 18),
-        );
-    if (
-      !matched.length &&
-      !publicEstimate &&
-      input.data.playerForecasts !== undefined &&
-      ['QB', 'RB', 'WR', 'TE'].includes(evidence.position ?? '')
-    )
-      evidence.warnings.push(
-        'No complete, uniquely matched public weekly forecast covers this exact interval under supported scoring and fresh schedule/source data. Supported historical estimates or matching imports may still supply a comparison.',
-      );
+    // The app's own weekly projection: stat models for skill players, scored history for K/DST.
+    const game =
+      projection && player.nflTeam
+        ? teamGame(input.data.games, input.season, input.week, player.nflTeam)
+        : undefined;
+    const own =
+      !matched.length && projection && game && rows.length
+        ? evidence.position === 'K' || evidence.position === 'DST'
+          ? completeScoring
+            ? projectSpecialTeamsPoints(
+                evidence.position,
+                player.nflTeam!,
+                game,
+                rows.map((row, i) => ({ gameId: row.gameId, points: scoreResults[i]!.points! })),
+                projection,
+                specialTeamsSettings[evidence.position],
+              )
+            : undefined
+          : projectFantasyPoints(
+              input.league,
+              {
+                playerId: rows[0]!.playerId,
+                position: evidence.position ?? rows[0]!.position,
+                team: player.nflTeam!,
+                game,
+                history: projection.byPlayer.get(rows[0]!.playerId) ?? rows,
+              },
+              projection,
+              propModelSettings,
+              propUsageNorms,
+            )
+        : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
       evidence.warnings.push('Duplicate player rows in an imported source were excluded.');
     if (matched.length) {
@@ -377,74 +411,64 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
         evidence.warnings.push(
           'At least one imported estimate is old or has an invalid/future date. Refresh it before deciding.',
         );
-    } else if (publicEstimate) {
-      evidence.projectedPoints = publicEstimate.points;
-      evidence.projectionScope = input.scope;
+    } else if (own) {
+      // Blend with the recent fantasy average only where that tested better (see settings).
+      const weight =
+        evidence.position && evidence.position in fantasyModelWeight
+          ? fantasyModelWeight[evidence.position as keyof typeof fantasyModelWeight]
+          : 1;
+      const recentAverage = completeScoring
+        ? mean(evidence.historicalPoints.slice(0, 8))
+        : undefined;
+      evidence.projectedPoints =
+        weight < 1 && recentAverage !== undefined
+          ? weight * own.points + (1 - weight) * recentAverage
+          : own.points;
+      evidence.projectionScope = 'week';
       evidence.projectionPeriod = {
         season: input.season,
-        fromWeek: input.scope === 'season' ? 1 : input.week,
-        throughWeek:
-          input.scope === 'week'
-            ? input.week
-            : input.scope === 'season'
-              ? 18
-              : (input.throughWeek ?? 18),
+        fromWeek: input.week,
+        throughWeek: input.week,
       };
-      evidence.projectionMethod = 'public-projection-v1';
-      evidence.projectionSourceIds = publicEstimate.sourceIds;
-      const unit =
-        input.scope === 'week'
-          ? 'points/week'
-          : input.scope === 'season'
-            ? 'points/season'
-            : 'remaining points';
+      evidence.projectionMethod = 'sidekick-model-v1';
+      // Cite the recent games behind the estimate (as the 8-game baseline did) plus the schedule;
+      // answers can cite only a few sources per statement.
+      evidence.projectionSourceIds = [
+        ...new Set([...rows.slice(0, 8).flatMap(footballRowSourceIds), 'games']),
+      ];
       metric(
         'projected',
-        'Public weekly forecasts scored for your league',
-        publicEstimate.points,
-        unit,
+        'Sidekick weekly projection for your league scoring',
+        own.points,
+        'points/week',
         {
-          sourceIds: publicEstimate.sourceIds,
-          sampleSize: publicEstimate.futureGames,
+          sourceIds: evidence.projectionSourceIds,
+          sampleSize: own.sampleGames,
           description:
-            'Exact scheduled weeks; matching imports take priority. Publisher expectations, not recorded performance or prospectively validated predictions.',
+            'The app’s own model: recent production weighted toward the latest games, adjusted for snap share, depth chart, the betting total and spread, the opponent and home field, then scored with your league’s rules. Backtested on 2026 games it was not fitted on; not a guarantee.',
         },
       );
-      for (const [suffix, label, value, metricUnit] of [
-        ['forecast-games', 'Scheduled future games', publicEstimate.futureGames, 'games'],
-        ['forecast-recorded', 'Recorded points included', publicEstimate.recordedPoints, 'points'],
-        [
-          'forecast-future',
-          'Public forecast future points',
-          publicEstimate.futurePoints,
-          'future points',
-        ],
-        ['forecast-issued-week', 'Publisher current NFL week', publicEstimate.issuedWeek, 'week'],
-      ] as const)
-        metric(suffix, label, value, metricUnit, { sourceIds: publicEstimate.sourceIds });
-      for (const [stat, label, metricUnit] of [
+      const ownStats =
+        'stats' in own ? (own.stats as Partial<Record<FootballStatKey, number>>) : {};
+      for (const [stat, label, unit] of [
         ['passing_yards', 'Projected passing yards', 'yards'],
         ['passing_tds', 'Projected passing touchdowns', 'touchdowns'],
+        ['passing_interceptions', 'Projected interceptions', 'interceptions'],
         ['carries', 'Projected carries', 'carries'],
         ['rushing_yards', 'Projected rushing yards', 'yards'],
         ['rushing_tds', 'Projected rushing touchdowns', 'touchdowns'],
-        ['targets', 'Projected targets', 'targets'],
         ['receptions', 'Projected receptions', 'receptions'],
         ['receiving_yards', 'Projected receiving yards', 'yards'],
         ['receiving_tds', 'Projected receiving touchdowns', 'touchdowns'],
       ] as const) {
-        const value = publicEstimate.stats[stat];
-        if (value !== undefined && value !== 0)
-          metric(`forecast-${stat}`, label, value, metricUnit, {
-            sourceIds: publicEstimate.forecastSourceIds,
-            sampleSize: publicEstimate.futureGames,
-            description:
-              'Publisher expected total over the future games in this comparison; fractional counts are expectations, not recorded outcomes.',
+        const value = ownStats[stat];
+        if (value !== undefined && value >= 0.05)
+          metric(`model-${stat}`, label, Math.round(value * 10) / 10, unit, {
+            sourceIds: evidence.projectionSourceIds,
           });
       }
       evidence.warnings.push(
-        'ESPN public weekly forecasts use your supported league scoring and verified future games. They have not been prospectively validated here; current playing time, injuries and role may change. Keep the choice tentative.',
-        'Source dates record retrieval, not the publisher’s last update. An in-season full-season total includes recorded points and cannot establish what was knowable before the draft. Historical rookie comparisons remain separate context.',
+        'Sidekick projections assume the player is active. Injuries, late role changes and weather news after the last data refresh are not included.',
       );
     } else if (input.scope !== 'week') {
       const estimate = forecast?.(

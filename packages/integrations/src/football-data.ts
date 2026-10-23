@@ -11,7 +11,6 @@ import { readBoundedJson, readBoundedText } from './http.js';
 import { csvRecords } from './football-csv.js';
 import { PublicTeamDefenseData } from './team-defense-data.js';
 import { nflDraftPicksUrl, parseNFLDraftPicks } from './nfl-draft-data.js';
-import { PublicPlayerForecasts } from './player-forecasts.js';
 
 const releaseRoot = 'https://github.com/nflverse/nflverse-data/releases/download';
 const ttlMs = 6 * 60 * 60 * 1_000;
@@ -31,13 +30,11 @@ export class PublicFootballData {
   >();
   private inFlight = new Map<number, Promise<FootballDataSnapshot>>();
   private readonly defenses: PublicTeamDefenseData;
-  private readonly forecasts: PublicPlayerForecasts;
   constructor(
     private readonly fetcher: typeof fetch = fetch,
     private readonly now = Date.now,
   ) {
     this.defenses = new PublicTeamDefenseData(fetcher, now);
-    this.forecasts = new PublicPlayerForecasts(fetcher, now);
   }
 
   async get(season: number): Promise<FootballDataSnapshot> {
@@ -141,7 +138,6 @@ export class PublicFootballData {
     season: number,
     cachedGames?: FootballGame[],
   ): Promise<FootballDataSnapshot & { refreshFailed?: boolean }> {
-    const forecastsPending = season >= 2021 ? this.forecasts.get(season) : undefined;
     const years = [season, season - 1, season - 2].filter((year) => year >= 2010);
     const resources = [
       ...years.map((year) => ({
@@ -238,16 +234,8 @@ export class PublicFootballData {
     result.players.push(...defense.players);
     result.sources.push(...defense.sources);
     result.warnings.push(...defense.warnings);
-    const forecasts = await forecastsPending;
-    if (forecasts) {
-      result.playerForecasts = forecasts.playerForecasts;
-      result.sources.push(...forecasts.sources);
-      result.warnings.push(...forecasts.warnings);
-    }
-    return {
-      ...result,
-      refreshFailed: defense.refreshFailed || Boolean(forecasts?.warnings.length),
-    };
+    // The app makes its own projections; ESPN forecasts are only a research benchmark now.
+    return { ...result, refreshFailed: defense.refreshFailed };
   }
 }
 

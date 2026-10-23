@@ -6,6 +6,7 @@ const methodNames: Record<string, string> = {
   imported: 'Imported projections',
   'historical-baseline': 'Historical scoring baseline',
   'public-projection-v1': 'Public projections',
+  'sidekick-model-v1': 'Sidekick projections',
   'rolling-form-v1': 'Form and workload forecasts',
   'rolling-baseline-v1': 'Historical scoring forecasts',
   'market-context-v3': 'Game context model',

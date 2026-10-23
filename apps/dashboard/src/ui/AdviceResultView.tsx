@@ -412,13 +412,15 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
                     `Weeks ${player.projectionPeriod.fromWeek}–${player.projectionPeriod.throughWeek}, ${player.projectionPeriod.season} · `}
                   {player.projectionMethod === 'imported'
                     ? 'scoring-confirmed import'
-                    : player.projectionMethod === 'public-projection-v1'
-                      ? 'public weekly forecast · your league scoring'
-                      : player.projectionMethod === 'rolling-form-v1'
-                        ? 'automatic form, workload & opponent estimate'
-                        : player.projectionMethod === 'rolling-baseline-v1'
-                          ? 'automatic historical scoring estimate'
-                          : 'simple historical baseline'}
+                    : player.projectionMethod === 'sidekick-model-v1'
+                      ? 'Sidekick projection · your league scoring'
+                      : player.projectionMethod === 'public-projection-v1'
+                        ? 'public weekly forecast · your league scoring'
+                        : player.projectionMethod === 'rolling-form-v1'
+                          ? 'automatic form, workload & opponent estimate'
+                          : player.projectionMethod === 'rolling-baseline-v1'
+                            ? 'automatic historical scoring estimate'
+                            : 'simple historical baseline'}
                 </p>
               )}
               <MetricTable metrics={player.metrics} sources={sources} />

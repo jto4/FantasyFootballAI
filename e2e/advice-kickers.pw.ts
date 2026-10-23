@@ -83,8 +83,8 @@ test('kicker start/sit uses automatic league scores, shows both alternatives and
     await page.screenshot({ path: info.outputPath('kicker-numbers.png') });
     const saved = workspace.store.snapshot().adviceResults[0]!;
     expect(saved.players.map((p) => p.projectionMethod)).toEqual([
-      'historical-baseline',
-      'historical-baseline',
+      'sidekick-model-v1',
+      'sidekick-model-v1',
     ]);
     expect(saved.players.map((p) => p.projectedPoints).sort((a, b) => a! - b!)).toEqual([7, 11]);
     expect(

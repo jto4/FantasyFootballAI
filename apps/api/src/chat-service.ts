@@ -217,7 +217,7 @@ export const chatTools: Record<string, ChatTool> = {
   },
   prop_board: {
     description:
-      'This week’s player props across all games: line, ESPN projection, typical-game estimate, season hit rate, the board’s lean, fantasy owner in the league, and the graded lean record so far.',
+      'This week’s player props across all games: line, the app’s projection, typical-game estimate, season hit rate, the board’s lean, fantasy owner in the league, and the graded lean record so far.',
     args: {
       player: 'Optional player name to filter',
       stat: 'Optional stat, such as receiving_yards',

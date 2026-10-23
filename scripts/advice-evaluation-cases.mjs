@@ -30,25 +30,6 @@ const definitions = [
 // or copied from the computed policy. They test decision process, not NFL accuracy.
 export const adviceEvaluationCases = [
   {
-    id: 'rookie-public-forecast',
-    rookie: true,
-    publicForecast: true,
-    request: {
-      mode: 'waivers',
-      candidateIds: ['w3'],
-      question:
-        'Should I add this rookie for an immediate weekly starting upgrade over my saved receivers? Compare the supplied public weekly forecast under our scoring with both owned receiver estimates. Explain projected catches and yards, confidence, future role uncertainty and alternatives. Public expectations are not observed NFL history or a success probability.',
-    },
-    expected: {
-      verdicts: ['hold'],
-      picks: [],
-      metric: 'w3:projected',
-      value: 12,
-      supportMetrics: ['w3:projected', 'w1:projected', 'w4:projected'],
-      fixedMetrics: { 'w3:forecast-receptions': 5, 'w3:forecast-receiving_yards': 70 },
-    },
-  },
-  {
     id: 'rookie-missing-forecast',
     rookie: true,
     request: {
@@ -79,8 +60,8 @@ export const adviceEvaluationCases = [
       picks: ['BUF'],
       metric: 'start-sit-gap',
       value: 4,
-      supportMetrics: ['BUF:baseline', 'MIA:baseline'],
-      fixedMetrics: { 'BUF:baseline': 10, 'MIA:baseline': 6 },
+      supportMetrics: ['BUF:projected', 'MIA:projected'],
+      fixedMetrics: { 'BUF:projected': 10, 'MIA:projected': 6 },
     },
   },
   {
@@ -97,8 +78,8 @@ export const adviceEvaluationCases = [
       picks: ['k1'],
       metric: 'start-sit-gap',
       value: 4,
-      supportMetrics: ['k1:baseline', 'k2:baseline'],
-      fixedMetrics: { 'k1:baseline': 11, 'k2:baseline': 7 },
+      supportMetrics: ['k1:projected', 'k2:projected'],
+      fixedMetrics: { 'k1:projected': 11, 'k2:projected': 7 },
     },
   },
   {
@@ -707,34 +688,6 @@ export function evaluationWorkspace(testCase) {
       status: 'available',
       retrievedAt: stamp,
     });
-  }
-  if (testCase.publicForecast) {
-    catalog.get('w3').espnId = '12345';
-    data.sources.push({
-      id: 'espn-forecasts-2026-0',
-      name: 'Fictional public weekly forecasts',
-      status: 'available',
-      retrievedAt: stamp,
-    });
-    data.playerForecasts = [
-      {
-        espnId: '12345',
-        name: 'Harper Receiver',
-        position: 'WR',
-        team: 'BUF',
-        season: 2026,
-        week: 5,
-        issuedWeek: 5,
-        sourceId: 'espn-forecasts-2026-0',
-        stats: {
-          passing_yards: 0,
-          rushing_yards: 0,
-          receptions: 5,
-          receiving_yards: 70,
-          targets: 8,
-        },
-      },
-    ];
   }
   const injuries = {
     sourceUrl: 'https://example.test/fictional-injuries',

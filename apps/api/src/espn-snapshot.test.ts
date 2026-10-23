@@ -95,8 +95,8 @@ it('imports validated browser data, discards unrelated account fields, persists 
     await store.close();
     await store.load();
     expect(store.snapshot().leagues[0]?.connectionMode).toBe('snapshot');
-    expect(store.snapshot().playerProjections).toHaveLength(1);
-    expect(store.snapshot().playerProjections[0]?.projectedPoints).toBe(2);
+    // The app makes its own projections; ESPN's in the snapshot are not saved.
+    expect(store.snapshot().playerProjections).toHaveLength(0);
     expect((await send({ ...raw, teams: [raw.teams[0], raw.teams[0]] })).status).toBe(400);
   } finally {
     await new Promise<void>((r, j) => server.close((e) => (e ? j(e) : r())));

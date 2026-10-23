@@ -1,10 +1,5 @@
 import { nflTeamKey, playerNameKey } from './advice-math.js';
-import type {
-  FootballGame,
-  FootballStatKey,
-  PlayerGameStats,
-  PublicPlayerForecast,
-} from './advice-types.js';
+import type { FootballGame, FootballStatKey, PlayerGameStats } from './advice-types.js';
 import type { PropLine } from './prop-lines.js';
 
 export type PropLeanStrength = 'slight' | 'moderate' | 'strong';
@@ -30,9 +25,9 @@ export interface PropBoardRow {
   sportsbook: string;
   overOdds?: number;
   underOdds?: number;
-  /** ESPN's projection for this stat this week. */
+  /** The app's projected average for this stat this week. */
   projection?: number;
-  /** ESPN's projection adjusted to a typical game (see propMedianRatio). */
+  /** The projected typical game: the model's median, where over and under are a coin flip. */
   typicalGame?: number;
   /** Typical game minus line. */
   gap?: number;
@@ -40,8 +35,6 @@ export interface PropBoardRow {
   recent: number[];
   overGames: number;
   average?: number;
-  /** Typical game-to-game spread used to size the lean. */
-  spread?: number;
   lean?: PropLean;
   /** Fantasy team in the active league that rosters this player. */
   fantasyTeam?: string;
@@ -58,8 +51,6 @@ export interface PropRowModel {
   overChance: number;
   /** Past games behind the estimate. */
   sampleGames: number;
-  /** Where the center came from: ESPN alone, a tested ESPN/model blend, or the model alone. */
-  source: 'blend' | 'espn' | 'model';
   /** Chance needed to profit at the side's price (−110 when no price is shown). */
   breakEven: number;
   /** Model chance minus break-even for its preferred side; positive means a model pick. */
@@ -70,28 +61,6 @@ export interface PropRowModel {
 /** Break-even win rate for American odds. */
 export const breakEvenRate = (odds: number) =>
   odds < 0 ? -odds / (-odds + 100) : 100 / (odds + 100);
-
-/**
- * Game-to-game spread as a share of the average, measured as the median across 2025 regular-season
- * players with eight or more games. Used as the prior for each player's own spread.
- */
-export const propSpreadRatio: Partial<Record<FootballStatKey, number>> = {
-  passing_yards: 0.34,
-  completions: 0.3,
-  attempts: 0.3,
-  passing_tds: 0.85,
-  passing_interceptions: 1.13,
-  rushing_yards: 0.61,
-  carries: 0.55,
-  receiving_yards: 0.7,
-  receptions: 0.57,
-};
-const priorWeight = 4;
-
-function standardDeviation(values: number[]) {
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  return Math.sqrt(values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1));
-}
 
 /**
  * Typical-game (median) to average ratios measured across 2025 regular-season games for players
@@ -110,49 +79,16 @@ export const propMedianRatio: Partial<Record<FootballStatKey, number>> = {
   passing_interceptions: 0.9,
 };
 
-/** Lean from the projected typical game versus the line; none when the gap is small. */
-export function propLean(
-  stat: FootballStatKey,
-  line: number,
-  projection: number,
-  recent: number[],
-): { lean?: PropLean; spread: number; median: number } {
-  const median = projection * (propMedianRatio[stat] ?? 1);
-  const center = Math.max(median, line, stat.endsWith('_yards') ? 10 : 0.5);
-  const prior = (propSpreadRatio[stat] ?? 0.6) * center;
-  // A player's own spread counts more as games accumulate; four games weigh as much as the prior.
-  const spread =
-    recent.length >= 3
-      ? Math.sqrt(
-          (recent.length * standardDeviation(recent) ** 2 + priorWeight * prior ** 2) /
-            (recent.length + priorWeight),
-        )
-      : prior;
-  const score = (median - line) / spread;
-  const size = Math.abs(score);
-  if (size < 0.15) return { spread, median };
-  return {
-    spread,
-    median,
-    lean: {
-      side: score > 0 ? 'over' : 'under',
-      strength: size >= 0.5 ? 'strong' : size >= 0.3 ? 'moderate' : 'slight',
-      score: Math.round(score * 100) / 100,
-    },
-  };
-}
-
 const round = (n: number) => Math.round(n * 10) / 10;
 
 /**
- * Joins published prop lines with ESPN's weekly stat projection and this season's game log. The
- * lean is a transparent comparison, not a calibrated probability: it is tracked and graded so its
- * record, not its confidence, decides whether it deserves attention.
+ * Joins published prop lines with the app's own stat projection and this season's game log. Leans
+ * come from the prop model's line-anchored chance; each is tracked and graded so its record, not
+ * its confidence, decides whether it deserves attention.
  */
 export function buildPropBoard(input: {
   lines: PropLine[];
   games: FootballGame[];
-  forecasts: PublicPlayerForecast[];
   stats: PlayerGameStats[];
   week: number;
   rosters?: { teamName: string; players: { name: string; nflTeam?: string; espnId?: string }[] }[];
@@ -161,21 +97,9 @@ export function buildPropBoard(input: {
     line: PropLine,
     game: FootballGame,
     team: string | undefined,
-    espnProjection: number | undefined,
-  ) =>
-    | {
-        mean: number;
-        median: number;
-        overChance: number;
-        sampleGames: number;
-        source: 'blend' | 'espn' | 'model';
-      }
-    | undefined;
+  ) => { mean: number; median: number; overChance: number; sampleGames: number } | undefined;
 }): PropBoardRow[] {
   const season = input.games[0]?.season;
-  const forecastById = new Map(
-    input.forecasts.filter((f) => f.week === input.week).map((f) => [f.espnId, f]),
-  );
   const logs = new Map<string, PlayerGameStats[]>();
   for (const row of input.stats) {
     if (row.season !== season || row.week >= input.week || row.seasonType !== 'REG') continue;
@@ -192,24 +116,18 @@ export function buildPropBoard(input: {
     const game = input.games.find((g) => g.id === line.gameId);
     if (!game) return [];
     const espnId = /^espn:[^:]+:(\d{1,12}):/.exec(line.id)?.[1];
-    const forecast = espnId ? forecastById.get(espnId) : undefined;
-    const team =
-      (forecast?.team && nflTeamKey(forecast.team)) ||
-      (line.team ? nflTeamKey(line.team) : undefined);
-    const log =
-      (team && logs.get(`${playerNameKey(line.playerName)}:${team}`)) ||
-      [game.home, game.away]
-        .map((t) => logs.get(`${playerNameKey(line.playerName)}:${nflTeamKey(t)}`))
-        .find(Boolean) ||
-      [];
+    // Sportsbook lines rarely name the team, so it comes from whichever of the game's teams the
+    // player has a game log with.
+    const team = [line.team, game.home, game.away]
+      .filter((t): t is string => Boolean(t))
+      .map(nflTeamKey)
+      .find((t) => logs.has(`${playerNameKey(line.playerName)}:${t}`));
+    const log = (team && logs.get(`${playerNameKey(line.playerName)}:${team}`)) || [];
     const recent = [...log]
       .sort((a, b) => a.week - b.week)
       .map((row) => row.stats[line.stat])
       .filter((v): v is number => v !== undefined && Number.isFinite(v));
-    const projection = forecast?.stats[line.stat];
-    const lean =
-      projection !== undefined ? propLean(line.stat, line.line, projection, recent) : undefined;
-    const predicted = input.predict?.(line, game, team, projection);
+    const predicted = input.predict?.(line, game, team);
     let model: PropRowModel | undefined;
     if (predicted) {
       const side = predicted.overChance >= 0.5 ? 'over' : 'under';
@@ -221,7 +139,6 @@ export function buildPropBoard(input: {
         median: round(predicted.median),
         overChance: Math.round(predicted.overChance * 1000) / 1000,
         sampleGames: predicted.sampleGames,
-        source: predicted.source,
         breakEven: Math.round(breakEven * 1000) / 1000,
         edge: Math.round((chance - breakEven) * 1000) / 1000,
         side,
@@ -244,11 +161,11 @@ export function buildPropBoard(input: {
         sportsbook: line.sportsbook,
         ...(line.overOdds !== undefined ? { overOdds: line.overOdds } : {}),
         ...(line.underOdds !== undefined ? { underOdds: line.underOdds } : {}),
-        ...(projection !== undefined && lean
+        ...(predicted
           ? {
-              projection: round(projection),
-              typicalGame: round(lean.median),
-              gap: round(lean.median - line.line),
+              projection: round(predicted.mean),
+              typicalGame: round(predicted.median),
+              gap: round(predicted.median - line.line),
             }
           : {}),
         recent,
@@ -256,7 +173,6 @@ export function buildPropBoard(input: {
         ...(recent.length
           ? { average: round(recent.reduce((a, b) => a + b, 0) / recent.length) }
           : {}),
-        ...(lean ? { spread: round(lean.spread) } : {}),
         // TD and interception lines are usually priced far from −110, so without a real price
         // there is no honest break-even to beat.
         ...(model &&
