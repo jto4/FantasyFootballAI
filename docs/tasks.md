@@ -6,25 +6,34 @@ Use [release status](release-status.md) for readiness and release gates,
 behavior, not public release readiness. Prior detailed implementation evidence is retained in
 the archived task records ([through 2026-09-28](reviews/2026-09-28-task-history.md), [through 2026-10-18](reviews/2026-10-18-task-history.md)).
 
-Completed work and its evidence live in the archived task records and dated reviews. This file lists only open items, grouped under the section that introduced them. When an item is finished, move its evidence into a dated review and delete it here.
+Open items are grouped under the section that introduced them. When an item is finished, delete
+it and add a short line to "Completed (summary)"; add a dated review only when
+[the docs guide](README.md) calls for one.
+
+## Completed (summary)
+
+Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
+
+- October 23 (later): running backs gain carries when a teammate back is ruled out (fitted on
+  2025, confirmed on 2026); markdown docs consolidated, 17 model reviews into one history file.
+- October 23: desktop right-click menu (edit, copy, links, spelling; Inspect in development
+  builds); starters whose games have begun are locked in lineup, waiver and Waiver day math, the
+  AI lineup analysis and chat; own weekly projections for every position (`sidekick-model-v1`)
+  with ESPN projections removed; prop line ledger (`prop-lines.sqlite`) and snap-share and
+  depth-chart prop features.
+- October 22: Ask Sidekick chat (Ask page and ⌘J panel) from read-only lookups; live scoring from
+  ESPN's public NFL box scores under each league's rules; props board in Advice with a backtested
+  prop model, calibrated spreads and graded pre-kickoff leans; published prop lines fill the prop
+  form (ESPN lines without a key, other books with an optional Odds API key); Home, Reports, Advice
+  and Live tidy-ups.
+- Earlier: see the archived task records linked above and the
+  [betting model history](reviews/2026-10-betting-model-history.md).
 
 ## Open work
 
-### Game-lock and app review — October 23, 2026
-
-- [x] Desktop right-click menu (edit, copy, links, spelling; Inspect in development builds).
-- [x] Starters whose games have begun are locked in lineup, waiver and Waiver day math, the AI lineup analysis, and chat; the matchup projection adds points so far to remaining estimates. Home's top card only pushes waiver claims worth 2+ points.
-
 ### Ask Sidekick chat and UI tidy — October 22, 2026
 
-- [x] Home shows the newest draft per report type once; Reports hides failures a later run replaced; Advice has one tab row with AI options tucked away; Live asks for your team.
-- [x] Chat on an Ask page and a ⌘J side panel, answering from read-only app lookups, with saved and deletable conversations. See `decisions.md`.
-- [x] Live scores players from ESPN's public NFL box scores under each league's rules (offense, kickers, D/ST, two-point tries), so imported leagues update during games. ESPN D/ST and kicker slot overrides are now imported.
-- [x] Props board in Advice: every prop this week with ESPN projection, typical-game estimate, season hit rate, fantasy owner and a graded pre-kickoff lean. Schedule run history and the Settings AI card tidied.
-- [x] Prop model: tested ESPN/model blend, calibrated outcome spreads, line-anchored chances, graded and self-refitting market weight. See `decisions.md`.
-- [x] Prop line ledger (daily lines and prices, last line before kickoff) and snap-share and depth-chart features in the prop model. See `decisions.md`.
-- [x] Own weekly fantasy projections for every position (stat models scored with league rules; K/D/ST from scored history and the betting total); ESPN projections removed from the app. See `decisions.md`.
-- [ ] Close the gap to ESPN's accuracy (5.53 vs 5.30 points): quarterback projections first, then a better early-season prior than last season's games.
+- [ ] Close the gap to ESPN's accuracy (5.50 vs 5.28 points on the same games). Calibration, an early-season blend and QB-specific changes were tested and did not help; next candidates are a returning-teammate adjustment, using vacated carries in prop leans, and target redistribution once more injury seasons are available.
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
 - [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.
@@ -221,7 +230,7 @@ Completed work and its evidence live in the archived task records and dated revi
 - [ ] Establish consistent sportsbook superiority on substantial new pre-kickoff
       predictions with complete dated injuries and confirmed starters. Reused
       archives and current-season reconstructions cannot establish this.
-      [Evidence](reviews/2026-10-12-model-v6-comparison.md).
+      [Evidence](reviews/2026-10-betting-model-history.md).
 
 ### Loss diagnosis and alternate tree model — October 13, 2026
 
@@ -312,7 +321,6 @@ Completed work and its evidence live in the archived task records and dated revi
 ### Market Signals and player props — October 15, 2026
 
 - [ ] Gather independent multi-week/season prospective outcomes before considering promotion. Owner: model research; no current sportsbook-edge claim.
-- [x] Published prop lines fill the prop form (ESPN lines without a key; two-sided prices and other books with an optional Odds API key). No key was purchased or provisioned during implementation; the Odds API path is verified with fixtures only.
 
 ### Betting price tools, scorecard and Claude API — October 22, 2026
 

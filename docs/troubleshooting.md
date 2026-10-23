@@ -57,8 +57,9 @@ service details, see the [setup guide](setup.md).
 - **A league is missing or looks stale:** open the Leagues page and refresh it. Check the
   connector's authentication, sync timestamp, and reported error. Unknown or stale data is
   labeled; the report does not silently treat unavailable evidence as current.
-- **A report has no projections or lineup estimate:** confirm a compatible, current
-  projection source is imported and that the league's scoring and starter data are recognized.
+- **A report has no projections or lineup estimate:** the app's own weekly projections need
+  public NFL data, at least three prior games per player and recognized league scoring and
+  starter data. Import a scoring-confirmed projection CSV to cover rookies or unsupported rules.
   Estimates are withheld when required player, scoring, or lineup evidence is incomplete.
 
 ## News, email, SMS, and iMessage

@@ -62,6 +62,7 @@ import { createWeeklyService } from './weekly-service.js';
 import { appendPredictionRecords } from './prediction-ledger.js';
 import { addPropEvidence } from './prop-evidence.js';
 import { draftContext, rosterContext } from './advice-context.js';
+import { projectionUsage } from './projection-usage.js';
 export type { LineupAlerts, WeeklyBriefing, MatchupSide } from './weekly-service.js';
 
 export interface AdviceDependencies {
@@ -128,8 +129,7 @@ export function createAdviceService(deps: AdviceDependencies) {
       : 'Claude Opus · signed-in CLI';
   const now = deps.now ?? Date.now;
   const seasonNow = () => nflSeasonFor(now());
-  // Snap counts and depth charts for the projection model; projections still work without them.
-  const usageFor = (season: number) => deps.usage?.get(season).catch(() => undefined);
+  const usageFor = projectionUsage(deps);
   function leagueFor(
     request: Pick<AdviceRequest, 'mode' | 'leagueId'>,
   ): LeagueConnection | undefined {

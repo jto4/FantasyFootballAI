@@ -412,16 +412,14 @@ Explicit draft/waiver shortlists retain selected players without estimates so th
 model and saved UI can explain gaps; incomplete comparisons cannot become picks.
 Closed saved-profile schemas and source closure retain provenance through budgeting.
 
-Public individual offensive forecasts sit behind a separate typed integration and
-`FootballDataSnapshot.playerForecasts`; they never enter observed `players` history.
-ESPN's fixed public default universe is read without credentials using bounded,
-coalesced weekly pages. Exact provider identity/period/team and complete publisher
-formula checks precede normalization of sparse expected zeroes. Season aggregates
-are ignored. Core composes exact verified future games under supported league rules,
-adds recorded production separately only in full-season scope, and gives matching
-imports priority. Cached outages retain retrieval dates and trigger short retries.
-The saved public method is always tentative, with expected statistics protected in
-evidence budgeting. This source does not validate future playing time or accuracy.
+Weekly player projections are the app's own (`sidekick-model-v1`,
+`packages/core/src/fantasy-projection.ts`). Skill players get expected values for every scoring
+stat from the prop stat models (`prop-model.ts`) and are scored with the league's rules; unsupported
+rules fall back to the recent average. Kickers and D/ST use a recency-weighted average of their
+scored history plus the betting total. Matching owner-confirmed imports keep priority. The app no
+longer downloads ESPN weekly forecasts or saves ESPN league projections; the ESPN forecast adapter
+in `packages/integrations/src/player-forecasts.ts` is used only by offline benchmarks in
+`scripts/research/`. See [decisions](decisions.md), "Own projections; ESPN projections removed".
 
 ### Sportsbook prices and prediction performance
 
@@ -445,7 +443,7 @@ and future outcomes. Four exact-content model contexts and bounded LRU correctio
 origins reuse public data only. New/legacy forecast methods and their stated
 baselines are validated separately, preserved in saved history and tracked in
 separate prospective groups. See [advice.md](advice.md) and the
-[model comparison](reviews/2026-10-12-model-v2-comparison.md).
+[betting model history](reviews/2026-10-betting-model-history.md).
 
 ### V3 game-market context
 
@@ -478,7 +476,7 @@ Totals use the regularized joint health/weather correction when enough earlier
 eligible cases exist, otherwise v3; moneyline/spread remain v3. Fits exclude the
 entire target week. Method identities, source coverage and paired book tests are
 retained in results; existing qualification gates are unchanged. See the
-[v4 review](reviews/2026-10-12-model-v4-comparison.md) for source timing assumptions.
+[betting model history](reviews/2026-10-betting-model-history.md) for source timing assumptions.
 
 ## Personnel source observations and research isolation
 
@@ -494,208 +492,18 @@ The core preserves descriptive official reports and role/efficiency context but
 masks the rejected official injury feature class in production. The explicit
 research flag is confined to local model construction and never enabled by HTTP
 request bodies. No new v5 ledger method is deployed; v3/v4 dispatch and all
-qualification gates remain. [Evidence](reviews/2026-10-12-personnel-data-comparison.md).
+qualification gates remain. [Evidence](reviews/2026-10-betting-model-history.md).
 
-## Richer personnel research
+## Betting model research (v6–v18, not in production)
 
-Current typed personnel evidence includes shrunken earlier-game passing/rushing
-EPA, team-relative QB performance, separate offensive-line/skill absence roles
-and injury-related practice/Doubtful roles. Prior weeks, completed scores, exact
-game/team/GSIS joins and the 24-hour availability allowance bound inputs. Missing
-practice observations/matches and stale Out charts withhold measurements. These
-facts are descriptive in Advice and preserve all production probabilities.
-
-The separate `rich-personnel-model` module is used only by local research commands.
-It fits ridge corrections to earlier out-of-week production logits, with optional
-past-only shrinkage toward the book and bounded caches. Candidate grids freeze on
-older data, and audits verify snapshot/development hashes; recent snapshots must
-preserve every historical row. The v6 experiment improves aggregate error slightly
-but fails consistency/uncertainty checks, so HTTP callers and ledger methods remain
-on v3/v4. [Evidence](reviews/2026-10-12-model-v6-comparison.md).
-
-## Alternate sportsbook model research
-
-The isolated boosted-market module fits deterministic shallow Newton trees to
-paired-book logits, replacing rather than stacking the retained linear corrections.
-Only earlier NFL weeks supply labels, residual features and optional adaptive book
-weights. Training-only quantile splits, minimum leaf/training sizes, numeric/data
-bounds, capped logit corrections and bounded caches contain model work. CLI
-selection removes later rows before preparation and audit checks frozen inputs
-and parameters; saved code hashes identify the implementation. HTTP and production forecasting keep v3/v4.
-
-Paired Brier diagnostics attribute loss to correction variance versus outcome
-alignment and distinguish inherited, weather and personnel layers. Post-hoc
-season/line/coverage subgroups cannot authorize tuning or placement. Forward
-outcomes live in sidecars keyed by the original issued-record hash, preserving
-forecast issuance/probabilities. [Evidence](reviews/2026-10-13-model-v7-comparison.md).
-
-## Totals hybrid seasonal research
-
-The isolated seasonal-hybrid module preserves current v3 moneyline/spread
-probabilities and dispatches totals to the fixed depth-two, 730-day market tree.
-An optional ridge intercept calibrates earlier out-of-week total forecasts with
-weekly decay and explicit season carry/reset. Optional book blending learns from
-earlier calibrated predictions and labels, excluding the full target week.
-Inputs/settings are cloned, identities and probabilities validated, and shifts,
-rows and caches bounded. Local CLI selection/audit checks frozen context hashes,
-parameters and specifications; there is no HTTP option or ledger method.
-
-Older selection rejects enabled seasonal recalibration; the plain hybrid improves
-aggregate reused archive error but fails uncertainty/current-season tests. Live
-v3/v4 dispatch remains. [Evidence](reviews/2026-10-13-model-v8-hybrid-comparison.md).
-
-## Online totals-expert research
-
-The expert-totals module mixes book, slow/fast totals trees and production totals
-with convex weights learned only from completed earlier NFL weeks. Weekly mean
-Brier updates, fixed share to a nonuniform prior, and explicit season resets/carry
-allow recovery when expert reliability changes. Data/settings and returned weights
-are isolated; numeric values, rows, identities and caches are bounded. Research
-CLI selection removes later rows before preparation and checks frozen context/
-parameter/specification identities on audit. Moneyline/spread call the same v3
-calculation exactly, and live v3/v4 dispatch remains unchanged.
-
-A fixed-weight explanatory control distinguishes reduced correction strength
-from actual learned adaptation gains; neither is selected from later results.
-The v9 online mixture reduces current totals loss but still trails book/production
-and loses older selection. [Evidence](reviews/2026-10-13-model-v9-expert-comparison.md).
-
-## Team-stat matchup totals research
-
-A separate typed integration validates and bounds public weekly team-stat CSVs;
-raw snapshots remain outside the repository with source hashes/provenance saved
-for research. Historic franchise aliases are local to this join and do not change
-production score ratings. The core research module fits shrunken offense/defense
-effects on prior-week per-play EPA, play counts, first downs and explosive plays,
-with an explicit lag, support flag and missing-history fallback. These counts
-are a volume proxy, not measured neutral-script pace; revised EPA/stat vintages
-are not certified historical pregame snapshots.
-
-Totals-only tree/ridge candidates condition book corrections on matchup features.
-Older selection removes later game/stat rows before preparation. Frozen CLIs
-audit the separately best new-feature candidate and the selected plain hybrid,
-with identical controls and exact production moneyline/spread output. New archive
-gains and current feature-free ablation gains do not overcome the fixed mixture's
-current performance; production dispatch remains v3/v4. No HTTP toggle, credentials,
-ledger write or deployment path is added.
-[Evidence](reviews/2026-10-13-model-v10-matchup-comparison.md).
-
-## Prediction-market external totals research
-
-Public prediction-market reads live behind a typed integrations adapter with
-fixed origins, bounded response/page/rate limits and no trading credentials.
-Exact NFL full-game half-point contracts must match team/date/kickoff identity
-and exist before the cutoff. Kalshi candle midpoint and Polymarket aggregate
-transaction prices remain distinct observation types. Settled-market resolution
-points can masquerade as old prices; reject all ambiguous terminal points and
-all price windows that overlap the cutoff. Completed trades need local time
-filtering, correct taker direction and an explicit pagination-completion gate.
-
-The core research model fits only earlier-week residuals to production totals,
-with separate price/flow/headline/combined families and past-only shrunken wallet
-directional-information weights. Current holder/leaderboard snapshots cannot
-establish historical skill or positions. Headline scoring-language features
-require independent dated captured coverage; this is not general public opinion.
-No HTTP or production-dispatch path is added. Explicit capture, frozen replay,
-sealed pregame records and independent outcome-sidecar CLIs are separate from
-the owner Advice journal. Public normalized context/tapes are saved compressed
-with hashes; raw responses remain outside the repository.
-[Evidence](reviews/2026-10-13-model-v11-external-markets.md).
-
-The separate historical research adapter handles archived Kalshi endpoints,
-legacy dollar strings and verified older Polymarket totals/title variants. Older
-CLOB minute samples must finish before cutoff; terminal prices remain excluded.
-An optional seven-day earlier-execution window extends the frozen one-day tape
-without changing the v11 contract or algorithm. Earlier windows have independent
-validation/completion gates and cannot be imputed from current holdings.
-
-The expanded research totals adapter compares book/production offsets and fits
-bounded residual corrections weekly over two prior seasons. Large execution
-weights are capped; wallet weights require relevant earlier resolved games and
-shrinkage. Local acquisition, initial development, coverage-only revision and
-hash-checked audit CLIs preserve distinct evidence. Production dispatch and
-earlier numerical forecasts remain unchanged.
-[Evidence](reviews/2026-10-13-model-v12-historical-totals.md).
-
-The separate seasonal external adapter reuses frozen as-of feature vectors and
-fits a recency-weighted sportsbook-offset likelihood. Optional weakened prior
-seasons decay further as current-season weeks pass; the selected research setting
-resets fitting and feedback each season. A bounded probability mixture evaluates
-earlier forecasts fitted at their own origins, avoiding optimistic in-sample
-feedback. Poor/insufficient evidence returns book exactly. Feature construction,
-existing adapters/models, live dispatch and earlier numeric records remain fixed.
-Development and hash-checked audit scripts report active and fallback cases
-separately. [Evidence](reviews/2026-10-13-model-v13-seasonal-external-totals.md).
-
-The fixed directional research wrapper validates full source vectors, then removes
-coverage and unsigned relative-volume columns before fitting or forecasting. A
-separate fixed price-only policy also removes all trade-flow/wallet columns.
-Source eligibility/freshness/completion guards remain active; they cannot become
-directional coefficients. Both policies reuse frozen seasonal math and retrain
-earlier prequential feedback on the retained predictors. New replay artifacts
-seal parent settings/audit and report active and practically negligible changes
-without changing production dispatch or issued forecasts.
-[Evidence](reviews/2026-10-13-model-v14-directional-totals.md).
-
-The canonical Kalshi research parser treats outcome-side and book-side as the
-same directional exposure bit, rejects contradictory pairs, and carries explicit
-block-trade state. The preserved legacy parser incorrectly combined those fields;
-its v11–v14 Kalshi signed inputs are known defective. New normalized tapes must
-carry verified canonical provenance before the robust feature builder accepts them.
-
-The robust totals builder measures recent pressure changes relative to the same
-contract's prior three hours, aggregates wallet/minute or anonymous minute before
-caps and size classification, and uses distinct-minute evidence gates. Identified
-wallets can contribute equal-wallet pressure, never inferred inventory or skill.
-A fixed alternate policy requires contemporaneous matching price movement.
-Fitting/feedback reuse the existing seasonal engine; separate source-fix-only
-comparison, durable repair patch and exact replay isolate data repair from changed
-signals. Existing live dispatch and issued numerical records remain unchanged.
-[Evidence](reviews/2026-10-13-model-v15-robust-trade-flow.md).
-
-A separate research-only drive adapter validates bounded nflverse PBP and retains
-selected raw fields for offline derivation. Repaired fixed drives identify scoring
-opportunities; original drive IDs deduplicate clocks. Missing/invalid numerical
-metadata makes a game unavailable. Prior completed weeks with a 48-hour lag feed
-opponent-adjusted efficiency, scoring/opportunity and clock-consumption profiles;
-coverage gates support without becoming a directional feature. Latest source
-revisions are not certified historical publication vintages.
-
-The research residual learner predicts final total minus archived book line,
-then applies a bounded probability correction and earlier-origin forecast
-feedback with weakened prior-season carryover. Optional corrected flow columns
-are a separately refitted ablation. Frozen development selection and hash-checked
-audit preserve all matched cases and exact non-total production delegation.
-No production dispatch or issued forecasts are changed.
-[Evidence](reviews/2026-10-13-model-v16-drive-totals.md).
-
-A separate research feedback adapter consumes immutable raw totals forecasts
-fitted at their own origins. It leaves football features, residual fitting and
-non-total production calculations fixed. Feedback has an independent bounded
-current-season window and decay, with either season reset or a capped preceding-
-season seed that fades out by Week 5. Evidence gates require distinct weeks and
-effective games; a correction cap limits variance. Zero trust still observes
-subsequent raw forecast outcomes so abstention cannot prevent recovery.
-
-Development selection and hash-checked audits retain all eight declared variants,
-paired book/parent/raw comparisons and exact fallback counts. New machine records
-are canonically formatted before sealing; old research bytes remain unchanged.
-This adapter is not routed to live predictions.
-[Evidence](reviews/2026-10-13-model-v17-recent-feedback.md).
-
-A separate research stability wrapper consumes the same immutable raw forecasts
-and inherited recent feedback contributions. It discounts alignment by weekly
-cluster variability or the weakest leave-week-out slope, with pooled or separate
-Over/Under heads. Three-week evidence and existing effective-game/time guards
-remain active; direction is known from the pregame source forecast. Returned
-reliability and internal policy are frozen against caller mutation.
-
-The new feedback selector uses the earlier 2021–2022 cohort, while retaining
-explicit warnings about later-selected inherited settings and revised historical
-inputs. All six variants and unchanged source/non-total comparisons are sealed.
-The wrapper is rejected as a replacement after later-season regressions and is
-not routed to live forecasts.
-[Evidence](reviews/2026-10-13-model-v18-stable-feedback.md).
+Research models live in separate core modules (`rich-personnel-model`, boosted-market,
+seasonal-hybrid, expert-totals, matchup-totals and the external/drive totals adapters) and are run
+only by local scripts in `scripts/research/`. They have no HTTP option, ledger method or production
+dispatch: live forecasts stay on v3 (moneyline/spread) and v4 (totals). Prediction-market reads
+(Kalshi, Polymarket) use a typed, keyless, bounded integrations adapter; settled-market resolution
+points are rejected because they can masquerade as old prices, and wallet addresses are hashed.
+Frozen settings and audits are hash-checked. None of these versions beat the sportsbook; see the
+[betting model history](reviews/2026-10-betting-model-history.md).
 
 Advice calculation review: `draft-replacement.ts` uses bounded min-cost flow for
 joint league-wide starting demand, with at most 384 starting assignments and
@@ -829,6 +637,14 @@ duplicate, wrong-team/opponent and uncompleted games, with a 24-hour availabilit
 allowance. The existing prop analysis, frequency comparison and outcome ledger
 remain in use; model formulas and game-market dispatch are unchanged. Live prop
 quotes are not supplied by the current feed; exact lines/prices remain manual.
+
+## Side stores for props and chat
+
+Like `market-research.sqlite`, these SQLite files sit beside the main database and outside app
+state: `prop-lines.sqlite` (first, daily and last-before-kickoff prop lines and prices per book),
+`prop-leans.sqlite` (pre-kickoff prop leans and their grades) and `chat.sqlite` (Ask Sidekick
+conversations, newest 50, deletable from the panel and kept out of exports and report prompts).
+Chat lookups go through the API's own loopback GET routes; see [decisions](decisions.md).
 
 ## Authorized ESPN browser snapshots
 

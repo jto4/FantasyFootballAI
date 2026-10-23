@@ -344,7 +344,7 @@ is not a historical pregame feature. Exclude covered/retractable venues.
 Current dated ESPN labels can supply missing team-level injury context, excluding
 IR, with the unverified historical vendor bridge disclosed. Missing inputs stay
 unknown and do not establish health or market advantage. Preserve old saved model
-methods and unchanged action gates. [Evidence](reviews/2026-10-12-model-v4-comparison.md).
+methods and unchanged action gates. [Evidence](reviews/2026-10-betting-model-history.md).
 
 ## Preserve prediction quality when better sources do not improve it
 
@@ -386,7 +386,7 @@ and reviewed. Do not add any non-loopback listener until then.
 ## Price checking over new betting models (October 22, 2026)
 
 Eighteen forecast versions were evaluated against sportsbook prices; none beat the books
-consistently (see `docs/advice.md` and `docs/reviews/`). New model versions are paused until a
+consistently (see the [betting model history](reviews/2026-10-betting-model-history.md)). New model versions are paused until a
 data source the books don't already price is available. Betting work now favors tools that are
 measurable today: published prop lines, other books' prices with the margin removed, a
 closing-price record for each saved selection (closing line value), weekly running paper results
@@ -416,6 +416,9 @@ and "answer" only once the model finishes, so token-by-token streaming is not of
 
 ## Props board: projection leans that grade themselves (October 23, 2026)
 
+_Superseded in part: the ESPN projection and gap-based lean below were replaced by the prop model
+and then by the app's own projections (see the last two entries)._
+
 Player props get their own Advice tab instead of sitting inside the bet form. Each published line
 is compared with ESPN's weekly projection for that stat. Because ESPN projects an average game
 and most players finish below their own average in most games, the projection is first scaled to
@@ -431,6 +434,9 @@ break-even at −110. The record, not the lean's size, decides whether it deserv
 analysis for a prop receives the same three numbers as evidence so the AI and the board agree.
 
 ## Prop model: tested center, calibrated spread, anchored to the line (October 23, 2026)
+
+_The ESPN blend described here was removed on October 23; see "Own projections; ESPN projections
+removed"._
 
 `packages/core/src/prop-model.ts` predicts nine prop stats. Its own estimate is a recency-weighted
 player average (shrunk for thin histories) adjusted for the market's implied team total and
@@ -464,6 +470,8 @@ the board shows the model's Brier score against the 0.25 coin flip. This replace
 gap-based lean, which had no calibration.
 
 ## Prop line ledger and usage features (October 23, 2026)
+
+_The ESPN blend figures here predate its removal; see the next entry._
 
 No free source of historical prop prices exists, so the app keeps its own: `prop-lines.sqlite`
 holds, per game, player, stat and book, the first line seen, the last line of each day and the last
@@ -512,3 +520,20 @@ on weeks 1–3) and adopted only if it also won on weeks 4+; none did. Kickers 3
 3.95 vs 4.29 (half PPR; Afton D/ST 4.27 vs 4.75). Season and remaining-season intervals keep the
 existing automatic forecast. The prop board's projection, typical game and gap now come from the
 model's mean and median; the old ESPN gap lean is gone.
+
+### Teammates ruled out, and what did not help — October 23, 2026
+
+Running backs now get extra carries when a teammate back is listed Out or Doubtful on the nflverse
+injury report (the feed the advice flow already loads). The vacated share is the ruled-out backs'
+part of the team's running-back carries over its last three games, so a back who already missed
+those games changes nothing. Rushing stats scale by `(1 / (1 − share))^0.75`, the share capped at
+0.6; the exponent was fitted on 2025 and adopted because it also won on 2026 (RMSE 7.28 → 6.55 on
+the 27 affected 2026 games; 69 in 2025). The same adjustment for targets fitted to zero, so
+receivers are unchanged. Prop leans do not use it yet.
+
+Tested and not adopted: a per-position linear calibration (least squares left 2026 RMSE unchanged;
+the absolute-error version only moved projections toward the median, understating expected
+points), a separate early-season blend with the recent average (fitted weight 1), and QB-specific
+changes (per stat the model already matches or beats the 8-game average; the total gap of 0.05
+points to it is noise). Current backtest: 5.49 mean absolute error against 5.70 for the 8-game
+average (`docs/research/fantasy-projection-backtest-2026-10-23.json`).

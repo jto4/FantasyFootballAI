@@ -425,7 +425,7 @@ new pregame context; subsequent spread/total calls took approximately 169 ms and
 concurrent test load. These are scoped observations on this machine, not provider
 latency promises. Provider enrichment has a combined 60-second budget, individual
 bounded timeouts/responses and six-hour history caching; the historical worker
-retains a separate 120-second limit. See the [context review](reviews/2026-10-12-model-v4-comparison.md).
+retains a separate 120-second limit. See the [betting model history](reviews/2026-10-betting-model-history.md).
 
 ## Personnel research versus production work
 

@@ -17,6 +17,29 @@ import { attachSnapShares, propDepth, type DepthEntry } from './prop-usage.js';
 export interface UsageInput {
   snaps: Map<string, number>;
   depth: Map<string, DepthEntry[]>;
+  /** `season:week:playerId` for players listed Out or Doubtful on that week's injury report. */
+  ruledOut?: Set<string>;
+}
+
+/** Keys for players listed Out or Doubtful, from nflverse injury report rows. */
+export function ruledOutKeys(
+  rows: {
+    gsisId?: string;
+    season: number;
+    week: number;
+    seasonType?: string;
+    reportStatus: string;
+  }[],
+): Set<string> {
+  const keys = new Set<string>();
+  for (const row of rows)
+    if (
+      row.gsisId &&
+      row.seasonType !== 'POST' &&
+      /^(out|doubtful)$/i.test(row.reportStatus.trim())
+    )
+      keys.add(`${row.season}:${row.week}:${row.gsisId}`);
+  return keys;
 }
 
 /** Settings for kicker and D/ST projections, fitted offline like the stat models. */
@@ -36,7 +59,10 @@ export interface ProjectionContext {
   league: PropModelLeague;
   /** Regular-season rows by nflverse player ID, with snap shares attached when available. */
   byPlayer: Map<string, PlayerGameStats[]>;
+  /** Regular-season rows by `gameId:team`. */
+  byTeamGame: Map<string, PlayerGameStats[]>;
   depth: Map<string, DepthEntry[]>;
+  ruledOut: Set<string>;
 }
 
 /** The model league and player histories for one data snapshot, built once and reused. */
@@ -51,11 +77,18 @@ export function projectionContext(
     usage?.snaps ?? new Map(),
   );
   const byPlayer = new Map<string, PlayerGameStats[]>();
-  for (const row of rows) byPlayer.set(row.playerId, [...(byPlayer.get(row.playerId) ?? []), row]);
+  const byTeamGame = new Map<string, PlayerGameStats[]>();
+  for (const row of rows) {
+    byPlayer.set(row.playerId, [...(byPlayer.get(row.playerId) ?? []), row]);
+    const key = `${row.gameId}:${nflTeamKey(row.team)}`;
+    byTeamGame.set(key, [...(byTeamGame.get(key) ?? []), row]);
+  }
   const value = {
     league: buildPropModelLeague(rows, data.games),
     byPlayer,
+    byTeamGame,
     depth: usage?.depth ?? new Map(),
+    ruledOut: usage?.ruledOut ?? new Set<string>(),
   };
   contexts.set(data, { ...(usage ? { usage } : {}), value });
   return value;
@@ -72,6 +105,55 @@ export function teamGame(games: FootballGame[], season: number, week: number, te
       (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
   );
 }
+
+/**
+ * Share of the team's running-back carries over its last three games (same season) that belonged
+ * to other running backs now ruled Out or Doubtful. A back who already missed those games has no
+ * share, because the remaining backs' recent stats already reflect his absence.
+ */
+export function vacatedCarryShare(
+  context: ProjectionContext,
+  playerId: string,
+  team: string,
+  game: FootballGame,
+): number {
+  if (!context.ruledOut.size) return 0;
+  const key = nflTeamKey(team);
+  const order = (g: FootballGame) => g.season * 100 + g.week;
+  const recent = [...context.league.games.values()]
+    .filter(
+      (g) =>
+        g.season === game.season &&
+        g.seasonType === 'REG' &&
+        order(g) < order(game) &&
+        (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
+    )
+    .sort((a, b) => order(b) - order(a))
+    .slice(0, 3);
+  let total = 0,
+    vacated = 0;
+  for (const g of recent)
+    for (const row of context.byTeamGame.get(`${g.id}:${key}`) ?? []) {
+      if (footballPosition(row.position) !== 'RB') continue;
+      const carries = row.stats.carries ?? 0;
+      total += carries;
+      if (
+        row.playerId !== playerId &&
+        context.ruledOut.has(`${game.season}:${game.week}:${row.playerId}`)
+      )
+        vacated += carries;
+    }
+  // Capped so a whole backfield being out cannot multiply a projection without bound.
+  return total ? Math.min(0.6, vacated / total) : 0;
+}
+
+const rushingStats = [
+  'carries',
+  'rushing_yards',
+  'rushing_tds',
+  'rushing_2pt_conversions',
+  'rushing_fumbles_lost',
+] as const;
 
 /**
  * Expected value of every fantasy-scoring stat for one player in one game, from the fitted stat
@@ -112,6 +194,8 @@ export function projectFantasyPoints(
   context: ProjectionContext,
   settings: PropModelSettings,
   norms?: PropUsageNorms,
+  /** Running backs: exponent on 1 / (1 − vacated carry share); 0 turns the adjustment off. */
+  vacatedCarryExponent = 0,
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
@@ -124,6 +208,17 @@ export function projectFantasyPoints(
   );
   const projected = projectPlayerStats({ ...input, depth }, context, settings, norms);
   if (!projected) return undefined;
+  const vacated =
+    position === 'RB' && vacatedCarryExponent
+      ? vacatedCarryShare(context, input.playerId, input.team, input.game)
+      : 0;
+  if (vacated > 0) {
+    const factor = (1 / (1 - vacated)) ** vacatedCarryExponent;
+    for (const stat of rushingStats) {
+      const value = projected.stats[stat];
+      if (value !== undefined) projected.stats[stat] = value * factor;
+    }
+  }
   // Stats the model does not project (first downs, bonuses) leave scoring unsupported, not zero.
   const scored = scoreHistoricalGame(scoring, {
     playerId: input.playerId,
@@ -143,6 +238,7 @@ export function projectFantasyPoints(
         points: Math.round(scored.points * 100) / 100,
         stats: projected.stats,
         sampleGames: projected.sampleGames,
+        vacatedCarryShare: vacated,
       };
 }
 

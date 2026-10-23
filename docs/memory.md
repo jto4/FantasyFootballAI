@@ -334,15 +334,11 @@ dedicated documents. Update `docs/decisions.md` when a durable architectural cho
   and saved result. Missing comparison coverage lowers confidence and prevents a
   supported selection; it must not silently remove the candidate. Scoring-confirmed
   imports retain priority over automatic NFL-history estimates and draft context.
-- Public ESPN individual forecasts are separate typed expected-stat rows, never
-  observed history. Reconcile exact weekly source/identity and full publisher scoring
-  before filling sparse mapped expectations with zero. Derived unused scoring values
-  may be negative; modeled event counts cannot. Use exact verified future weeks,
-  never prorate ambiguous season aggregates or subtract historical scores from them.
-  Full-season recorded points require unique complete credited rows; remaining points
-  exclude started games and respect the final week. Matching imports retain priority.
-  Public forecasts can cover pre-NFL rookies but stay tentative; retrieval dates are
-  not publisher update dates and historical rookie cohorts remain separate context.
+- Weekly projections are the app's own (`sidekick-model-v1`): stat models scored with the
+  league's rules, and scored history plus the betting total for K and D/ST. The app does not use
+  ESPN projections; ESPN forecasts are only an offline benchmark in `scripts/research/`. Older
+  saved results may still name `public-projection-v1` and stay readable. Remaining points exclude
+  started games and respect the final week. Matching imports retain priority.
 
 - Current sportsbook quotes must remain separate from archived schedule odds.
   Accept only verified public pregame event/team/time identities and complete
@@ -416,137 +412,19 @@ strictly earlier NFL weeks. Reused audits do not authorize a production change
 merely because aggregate error is slightly lower; retain method/action gates until
 the stated evidence requirements are satisfied.
 
-Research models may correct paired sportsbook logits with nonlinear trees, but
-all thresholds and fits require earlier NFL weeks. Blending/abstention rules must
-use prior out-of-week predictions, and exact sportsbook fallback is a tie rather
-than an advantage. Analyze paired Brier correction variance/alignment to distinguish
-weak signals, inherited bias and excessive correction strength. Post-hoc subgroup
-findings and aggregate older-data selection gains cannot establish a deployment
-edge. Preserve issued numeric predictions and attach independently fetched final
-outcomes in a sidecar; markets from one game remain one correlated game cluster.
+Betting-model research rules (v6–v18 are summarized in
+[the model history](reviews/2026-10-betting-model-history.md); new versions are paused):
 
-Hybrid model experiments should preserve unaffected market probabilities exactly.
-Seasonal calibration must use earlier out-of-week probabilities and completed
-outcomes, with explicit prior-season carry rather than hidden season assumptions.
-Book blending must evaluate those calibrations at their original earlier cutoffs,
-not use in-sample refits. A synthetic regime-change test establishes adaptation
-behavior, not real accuracy. If enabled adaptation loses older selection, keep it
-as a separately frozen research comparison rather than choosing it from later
-audit performance.
-
-When average calibration is already close but game-level corrections move the
-wrong way, an intercept shift cannot repair ranking. Expert mixtures can reduce
-correction strength and adapt to reliability changes, but compare learned weights
-with the same fixed prior to distinguish adaptive benefit from simple shrinkage.
-A current-sample improvement cannot override earlier frozen selection, and slightly
-lower all-market error cannot establish that the changed totals market beats book.
-Keep other-market probabilities and issued prediction/outcome records unchanged.
-
-Team-stat totals experiments must normalize historical franchise names only in
-their research joins, validate reciprocal team/game identities and preserve
-missing measures. Per-play efficiency, game play volume and neutral-script tempo
-are different quantities. Fit each training game's matchup inputs at its original
-cutoff; the target/same-week/future stats cannot contribute. A publication lag
-does not certify historical data revision or EPA-model vintage. Compare added
-features with an otherwise identical feature-free learner and the unchanged
-mixture; improving one control or mean calibration does not establish a useful
-incremental sportsbook edge.
-
-Prediction-market totals signals require exact line/game/settlement joins and
-pre-cutoff contract creation. A historical price endpoint may include a settled
-payout clamped to the requested end; reject ambiguous terminal points and only
-use fully completed pre-cutoff windows. Market-wide trade APIs may ignore time
-filters, so locally filter executions and require a completed bounded walk for
-flow. Normalize outcome/taker direction rather than interpreting all purchases
-as votes for Over. Whale size is not skill: evaluate relevant earlier game
-directions against the paired book, shrink small histories, and do not use current
-leaderboards/holders retrospectively. Current headline text also needs a recorded
-capture timestamp before its forecast cutoff. Preserve normalized public inputs
-for reproducibility and seal new predictions before independent outcome scoring.
-
-Older prediction-market sources can change endpoint, price-unit and title schemas.
-Verify exact settlement semantics and outcome orientation when extending history;
-never relax an exact line to gain coverage. A retained archived contract is not
-proof of retained execution history. Complete bounded trade walks and separately
-validated earlier windows are needed before historical wallet features can be
-used. Cold-start or missing-data returns of the sportsbook probability are ties,
-not edge. Preserve initial evidence when source-coverage QA revises inputs, and
-keep selected model settings fixed after an audit has been inspected.
-
-Seasonal feedback must evaluate earlier forecasts fitted before their own labels,
-not in-sample fitted probabilities. A change to rolling history or seasonal carry
-needs an explicit reset/decay policy and exact current-week exclusion. Report
-both active forecast accuracy and exact-book fallback counts: an adapter can
-reduce historical losses by abstaining without learning a better conditional
-predictor. Diagnosis-informed reused seasons remain reused evidence even if the
-new settings are frozen before replay.
-
-Separate data-availability guards from predictive coverage indicators. Removing
-a predictor must not relax time, identity, line or completed-history gates. Validate
-the complete source vector before masking malformed removed values. Refit both
-model coefficients and earlier-forecast feedback after a feature ablation;
-holding old weights fixed is only diagnostic. Report the size of departures
-from the book as well as counts: tiny nonzero probability changes can effectively
-copy the baseline without adding predictive information.
-
-Kalshi's canonical taker outcome-side and book-side are two vocabularies for the
-same exposure: yes/bid versus no/ask. They must agree; combining them as outcome
-plus BUY/SELL fabricates direction. Polymarket token/outcome plus BUY/SELL are
-separate fields with different semantics. Use the versioned canonical parser for
-new Kalshi research and reject unmarked legacy tapes. Old v11–v14 signed Kalshi
-inputs contain this known defect; preserve issued records and disclose it rather
-than retroactively rewriting predictions. A source fix needs raw identity/hash
-joins and a separate corrected-only model control before claiming feature gains.
-
-Flow magnitude is not trader skill. Aggregate before clipping or classifying
-large activity so split fills cannot gain influence; use distinct temporal
-coverage and an earlier same-contract baseline. Anonymous time buckets do not
-identify independent traders. Report practical probability departures as well
-as nominal wins, particularly when feedback makes a new model nearly copy book.
-
-A small final correction can reflect feature scale, ridge shrinkage and feedback
-regularization as well as poor incremental information. Diagnose raw and final
-corrections separately; removing a gate is a new predictor requiring validation.
-Scoring-margin targets preserve outcome severity but need scale calibration and
-variance control. Compare a football-only model to football-plus-flow with both
-fits and earlier-origin feedback recomputed. A feature can help raw forecasts
-while worsening final forecasts through changed feedback.
-
-Drive repairs can merge original possessions, so scoring-drive identity and
-clock metadata identity need separate deduplication. Possession clock per play
-is clock consumption, not wall-clock snap tempo; touchdown/field-goal drive
-points are a scoring proxy. Preserve selected raw fields and transformation
-hashes for reproducibility. Prior-week lags do not certify historical availability
-of revised data, and retrospective development winners remain reused evidence.
-
-Feedback calibration needs its own memory horizon; sharing a long model-training
-window can allocate trust poorly as a season changes. Raw predictor losses and
-feedback-allocation losses must be decomposed separately. Older data can dampen
-trust as well as slow it, so its effective mass alone is not causal evidence of
-harm. Limit prior-season seed influence and let it expire explicitly. A shorter
-window and a correction cap address different risks and require separate controls.
-
-When returning book, continue observing raw forecasts fitted at their own origins
-for future feedback. Otherwise abstention can create selective feedback and block
-recovery. A mixture between book and an Over-biased source cannot manufacture an
-Under prediction; improved feedback is not a repair of every source-model error.
-Format new research records before hashing/sealing and preserve existing byte
-formats. Aggregate historical point gains remain reused evidence, especially when
-full seasons lose and only a few current-season week clusters are available.
-
-Short recent feedback can activate after one lucky week without stable evidence.
-Inspect weekly alignment contributions and omission diagnostics, and distinguish
-negative alignment from variance cost. Separate directional heads can prevent
-evidence transfer when correction regimes differ, but sparse heads can suppress
-useful forecasts. A weekly uncertainty penalty is a reliability heuristic, not
-a certified probability of predictive skill.
-
-Stricter abstention can lower weak-season loss while worsening other seasons.
-Report suppressed gains, active/fallback counts and full matched samples; book
-ties are not wins. New feedback selection on earlier years does not make an
-inherited predictor historically untouched when its settings were selected in
-later rounds. Preserve failed candidates and their frozen evidence rather than
-constructing a post-hoc per-season winner.
+- All fits, thresholds, blending and feedback use only strictly earlier NFL weeks; feedback
+  evaluates earlier forecasts at their own cutoffs. Freeze settings before replaying later seasons.
+- Exact sportsbook fallback is a tie, not an advantage. Aggregate or subgroup gains on reused
+  seasons do not justify deployment; a consistent, interval-backed edge is required.
+- Keep unaffected markets numerically identical, preserve issued predictions and failed
+  candidates with their frozen evidence, and attach outcomes in separate sidecars.
+- Prediction-market inputs need exact line/game/settlement joins, fully completed pre-cutoff
+  windows and canonical trade direction (Kalshi outcome-side and book-side are the same bit).
+  Settled resolution points are not historical prices. Large trades are not skill, and headline
+  volume is not sentiment.
 
 Dashboard appearance defaults to white independently of the OS theme. Dark mode
 uses a pure black canvas and neutral charcoal surfaces, without blue-tinted
@@ -653,9 +531,8 @@ and matching current-season team; preserve explicit conflicting IDs and missing 
 - Authorized browser-saved ESPN snapshots are a manual data source, distinct from
   provider credentials. Store normalized league/football evidence only, preserve
   imported provenance, never set provider freshness from import time, and prevent
-  silent scheduled refresh. Publisher weekly forecasts require exact identity,
-  period and two independent scoring arithmetic checks; they do not make numeric
-  ESPN scoring rules supported by the historical estimator. Reopen storage in
+  silent scheduled refresh. ESPN's league-scored projections are not saved
+  from imports (earlier saved ones are removed on the next import). Reopen storage in
   regression tests before claiming imports persist.
 - Native imsg `any;` GUIDs require an exact unique current iMessage-service match
   before send. Receipt acceptance plus outgoing-history matching does not prove

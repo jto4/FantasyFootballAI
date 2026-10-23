@@ -336,16 +336,12 @@ missing-history explanation; the result requests more evidence. Search **rookie
 college NFL draft** for the FAQ and **Add rookie projections** to open the actual
 projection import form. NFL draft facts alone do not establish role or fantasy value.
 
-Public offensive forecasts can give a rookie an individual estimate before NFL
-history exists, when identity, supported league scoring and exact future schedule
-coverage are available. Player details label **public weekly forecast · your league
-scoring** and show expected yards/catches/workload alongside future games, future
-points and separately recorded points. Forecast counts can be fractional. Matching
-imports keep priority; forecasts, missing data and role uncertainty remain explicit,
-and the advice stays tentative. Search **ESPN public weekly forecasts** opens a
-shared FAQ with an actual Advice button. The rookie and trade FAQs explain this
-source, exact week intervals, and why an in-season total cannot grade draft-time
-knowledge. These forecasts do not change report/schedule AI settings or require keys.
+Weekly estimates are the app's own projections. Player details label **Sidekick projection ·
+your league scoring** and show expected yards/catches/workload alongside future games, future
+points and separately recorded points; counts can be fractional. Players need three prior games,
+so a rookie without NFL history has no automatic estimate until an import supplies one. Matching
+imports keep priority, and the advice stays tentative. The app no longer uses ESPN projections;
+older saved results may still show **public weekly forecast**.
 
 See the [weekly-decision workflow review](reviews/2026-10-13-weekly-decision-workflows.md)
 for the weekly Home, team-before-AI setup, evidence readiness, clearer results,

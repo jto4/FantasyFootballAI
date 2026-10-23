@@ -2,7 +2,7 @@
 
 ## Scope and readiness
 
-This document defines the product direction. [Release status](release-status.md) owns current readiness and release gates; [tasks](tasks.md) owns active implementation work; [support matrix](support-matrix.md) retains provider and operating-system verification evidence. Historical implementation evidence is retained in [the archived task record](reviews/2026-09-28-task-history.md).
+This document defines the product direction. [Release status](release-status.md) owns current readiness and release gates; [tasks](tasks.md) owns active implementation work; [support matrix](support-matrix.md) retains provider and operating-system verification evidence. Historical implementation evidence is retained in the archived task records ([through 2026-09-28](reviews/2026-09-28-task-history.md), [through 2026-10-18](reviews/2026-10-18-task-history.md)).
 
 ## Product goal
 
@@ -19,38 +19,8 @@ selected data.
 
 ## Dashboard design direction
 
-The dashboard now applies the linked post's visual direction:
-[Bakers Studio, “wave + gradient”](https://x.com/studiobakers/status/2101998189889122451?s=46).
-Visible frames show a warm cream canvas, soft pastel gradients, quiet floating surfaces,
-and editorial serif type. The implementation adapts that mood without copying the layout.
-See `docs/design/dashboard-visual-direction.md`.
-
-The result is a warm editorial fantasy-football league desk that keeps core tasks,
-matchups, rankings, reports, and news fast to scan. The linked reference is inspiration,
-not a layout to copy. Generated hero background artwork is bundled locally.
-
-Design goals:
-
-- Establish a cohesive visual system for the dashboard shell and league views, with a
-  warm off-white base, editorial display type, neutral surfaces, thin rules, and restrained
-  clay and pastel accents.
-- Keep scores, controls, and dense league information stable and legible; respect reduced
-  motion in remaining animated controls.
-- Make the next league event, this week's matchups, recent reports, and news easy to find.
-- Keep draft, matchup, ranking, and news pages related in style while making their
-  purpose and hierarchy distinct.
-- Design responsive layouts and consistent empty, loading, error, connected, and
-  disconnected states.
-- Respect reduced-motion preferences, keyboard navigation, and contrast requirements.
-
-Design acceptance criteria:
-
-- The redesign follows visible frames from the reference and records its adaptation.
-- The finished dashboard has a cohesive warm identity without harming text contrast or
-  data scanability.
-- League tasks remain easy to locate on desktop and narrow screens; motion never blocks
-  content or controls and respects `prefers-reduced-motion`.
-- A visual review checks the implemented pages and key states against the agreed brief.
+A quiet, white-by-default editorial dashboard with an optional dark mode. See [the visual direction](design/dashboard-visual-direction.md) and
+decision 018 in [decisions](decisions.md).
 
 ## Product capabilities
 
@@ -60,16 +30,10 @@ Design acceptance criteria:
   account access. Do not bypass login, access controls, or platform restrictions.
 - Normalize league scoring, roster, team, schedule, and transaction data into shared
   domain types, while retaining platform-specific capabilities and limitations.
-- Sleeper rosters now retain player IDs and resolve names, positions, NFL teams, and status
-  through a bounded player catalog download. The catalog is shared in memory and refreshed
-  no more than once per day; an outage preserves the league connection with IDs and roster
-  sizes. The 2026-09-28 public-catalog smoke measured a 14,661,302-byte decoded response and
-  12,229 normalized players; the 20 MB cap now accommodates this current catalog, and known
-  player IDs/names/positions passed. Standings combine `fpts` with the documented two-digit
-  `fpts_decimal` component, so
-  power rankings retain fractional points. [Sleeper documents roster points fields and the
-  catalog as roughly 5 MB, and requests no more than daily
-  retrieval](https://docs.sleeper.com/#players).
+- Sleeper rosters retain player IDs and resolve names, positions, NFL teams, and status
+  through a bounded player catalog download, refreshed at most daily. An outage keeps the
+  league connection with IDs and roster sizes. Standings combine `fpts` and `fpts_decimal`.
+  [Sleeper players API](https://docs.sleeper.com/#players).
 - Sleeper draft reviews now include pick records for the league's linked draft, with pick
   number, round, roster, keeper marker, and player metadata. The connector also falls back
   to the league's season-matched most recent draft when the league record has no draft ID.
@@ -176,19 +140,32 @@ Design acceptance criteria:
 - Allow sharp, uncensored league banter as configured by the owner, with explicit topic
   exclusions and channel-specific send controls.
 
+### Advice, betting, and chat
+
+- Advice covers draft planning and review, start/sit, trades, waivers, and game and player-prop
+  bets, with numbers, sources, confidence, and risks. See [advice](advice.md).
+- Weekly projections are the app's own (`sidekick-model-v1`); ESPN projections are not used.
+- Betting tools favor what can be measured: published prop lines and book prices, closing line
+  value, graded pre-kickoff prop leans, and paper results. No betting edge has been shown, so
+  no stake sizing is offered and new game-model versions are paused.
+- Ask Sidekick answers questions from read-only app lookups and cannot send, bet, or change
+  settings or lineups.
+- Live shows matchup scoring from ESPN's public box scores under each league's rules; starters
+  whose games have begun are locked in lineup and waiver math.
+
 ### Channels and delivery controls
 
 - Support dashboard drafts, Resend email, and Twilio SMS with clear delivery status.
-- [x] Allow reviewed Resend sends to specify a thread Message-ID and matching subject;
-      validate both before creating outgoing headers.
-- [x] Add owner-triggered Resend inbox polling and per-message local import. The loopback-only
-      dashboard lists at most 50 bounded message headers, fetches a selected body only after an owner
-      action, strips quoted history, deduplicates by Resend message ID, merges into a sender profile,
-      honors per-message retention, and never derives an outbound recipient or sends a reply. Focused
-      router tests cover local-only import, duplicate detection, memory and AI opt-ins, consent
-      revocation during runtime setup, inference, and persistence, and sanitized credential/provider
-      failures; provider adapter tests cover response bounds and malformed data.
-- [~] Add iMessage through the documented BlueBubbles bridge; outbound group delivery,
+- Allow reviewed Resend sends to specify a thread Message-ID and matching subject;
+  validate both before creating outgoing headers.
+- Add owner-triggered Resend inbox polling and per-message local import. The loopback-only
+  dashboard lists at most 50 bounded message headers, fetches a selected body only after an owner
+  action, strips quoted history, deduplicates by Resend message ID, merges into a sender profile,
+  honors per-message retention, and never derives an outbound recipient or sends a reply. Focused
+  router tests cover local-only import, duplicate detection, memory and AI opt-ins, consent
+  revocation during runtime setup, inference, and persistence, and sanitized credential/provider
+  failures; provider adapter tests cover response bounds and malformed data.
+- Add iMessage through the documented BlueBubbles bridge; outbound group delivery,
   owner-triggered history sync, optional interval polling, and revocable webhook URLs are
   available with an owner-managed Mac bridge, secure credentials, HTTPS requirements, existing
   review/automatic-send controls, and existing memory/privacy controls. Webhook events are
@@ -212,14 +189,14 @@ Design acceptance criteria:
 
 - Keep league state, reports, imports, and member memory on the owner's device by
   default. Document exactly what data each external provider receives.
-- [x] Make raw-import AI analysis and member-note use in AI prompts explicit opt-ins;
-      preserve both options as disabled for legacy installations.
+- Make raw-import AI analysis and member-note use in AI prompts explicit opt-ins;
+  preserve both options as disabled for legacy installations.
 - Store API keys, fantasy platform credentials, and channel credentials in the operating
   system credential manager. Never put secrets in JSON state, exports, logs, screenshots,
   or source control.
 - Bind the service to loopback by default, restrict browser Origins, and do not add
   network access without authentication and a reviewed threat model.
-- [~] Encrypt or otherwise protect local backups where practical: downloaded portable `.ssb`
+- Encrypt or otherwise protect local backups where practical: downloaded portable `.ssb`
   archives encrypt the database and generated images with AES-256-GCM and a per-file
   scrypt-derived key; older ZIP and SQLite backups remain restorable. Local pre-restore and
   pre-upgrade safety copies use private filesystem permissions but are not passphrase-encrypted.

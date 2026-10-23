@@ -22,6 +22,7 @@ import { projectionSourceId } from './projections.js';
 
 import type { AdviceDependencies, AdviceLoader } from './advice-service.js';
 import { appendPredictionRecords } from './prediction-ledger.js';
+import { projectionUsage } from './projection-usage.js';
 
 export interface LineupAlerts {
   leagueId: string;
@@ -91,8 +92,7 @@ export function createWeeklyService(
   shared: { now: () => number; load: AdviceLoader },
 ) {
   const { now, load } = shared;
-  // Snap counts and depth charts for the projection model; projections still work without them.
-  const usageFor = (season: number) => deps.usage?.get(season).catch(() => undefined);
+  const usageFor = projectionUsage(deps);
   async function briefing(leagueId: string, teamId: string): Promise<WeeklyBriefing> {
     const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
     if (!leagueRow?.teams.some((team) => team.id === teamId))
@@ -240,7 +240,7 @@ export function createWeeklyService(
     if (!known && considered.length)
       notes.push(
         league.connectionMode === 'snapshot'
-          ? `No week ${week} point estimates yet. Import an updated ESPN page, or connect ESPN access for automatic refresh, to load this week’s projections.`
+          ? `No week ${week} point estimates yet. Import an updated ESPN page so Sidekick knows this week’s roster, or connect ESPN access for automatic refresh.`
           : `No week ${week} point estimates yet. Refresh the league or import projections to compare starters.`,
       );
     else if (!optimal?.complete)

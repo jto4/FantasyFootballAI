@@ -7,7 +7,7 @@ Use this page to find the right project context and keep the records in sync.
 - [`../AGENTS.md`](../AGENTS.md) — repository-wide instructions, code conventions, commands,
   and the owner's requirement not to run automated security scans.
 - [`release-status.md`](release-status.md) — current readiness and remaining release gates.
-- [`implementation-plan.md`](implementation-plan.md) — product scope and future direction.
+- [`implementation-plan.md`](implementation-plan.md) — product scope and direction.
 - [`tasks.md`](tasks.md) — active implementation checklist; dated evidence lives in review records.
 - [`support-matrix.md`](support-matrix.md) — what has been implemented versus verified on a
   real provider or operating system.
@@ -16,89 +16,106 @@ Use this page to find the right project context and keep the records in sync.
 
 ## Reference
 
-- [`reviews/2026-10-21-advice-data-pass.md`](reviews/2026-10-21-advice-data-pass.md) — Advice warm-up, grouped readiness sources, ESPN live-refresh path, undated injury feed and iCloud findings.
-- [`reviews/2026-10-18-afton-ux-pass.md`](reviews/2026-10-18-afton-ux-pass.md) — real-league walkthrough, store isolation and first-launch fixes, plain copy, gpt-6-luna default.
-- [`reviews/2026-10-18-optimization.md`](reviews/2026-10-18-optimization.md) — lazy pages, dead CSS, research separation, file splits and open-only task list.
-
-- [`reviews/2026-10-15-saved-data-reports.md`](reviews/2026-10-15-saved-data-reports.md) — explicit scheduled drafts from recent saved data, real-clock Afton report and shared readiness checks.
-
-- [`reviews/2026-10-15-owner-verification.md`](reviews/2026-10-15-owner-verification.md) — active private ESPN import, weekly forecast arithmetic, native imsg and owner usability verification.
-
-- [`reviews/2026-10-15-market-signals.md`](reviews/2026-10-15-market-signals.md) — separate market research charts/ledger, real public-data checks, player-prop game logs and remaining limits.
-
-- [`reviews/2026-10-14-quiet-verification.md`](reviews/2026-10-14-quiet-verification.md) — test-only memory credentials, Chromium mock Keychain and popup-free teardown; ordinary protections retained.
-
-- [`reviews/2026-10-14-compact-workflows.md`](reviews/2026-10-14-compact-workflows.md) — shorter Home, separate Advice views, expandable result evidence and focused Settings; rendered review and regression coverage.
-
-- [`reviews/2026-10-13-latest-installer.md`](reviews/2026-10-13-latest-installer.md) — latest macOS ARM installer, packaged six-workflow advice checks, child credential isolation and restart history fixes.
-
-- [`reviews/2026-10-13-real-advice-quality.md`](reviews/2026-10-13-real-advice-quality.md) — all six workflows with real football data, native model review, availability/identity fixes and independent arithmetic checks.
-
-- [`reviews/2026-10-13-weekly-decision-workflows.md`](reviews/2026-10-13-weekly-decision-workflows.md) — weekly Home, clearer decisions, readiness, frozen prospective cohorts, fantasy journal, team setup and isolated packaged verification.
-
-- [`reviews/2026-10-13-imsg-support.md`](reviews/2026-10-13-imsg-support.md) — local Messages CLI delivery, selected-chat sync, consent and provider isolation, setup and verification.
-
-- [`advice.md`](advice.md) — fantasy/betting advisor workflow, evidence, API/history/UI and remaining model/forecast verification.
-- [`reviews/2026-10-13-codex-compatibility.md`](reviews/2026-10-13-codex-compatibility.md) — native CLI compatibility, captured-request isolation proof and fresh six-workflow model quality.
-- [`reviews/2026-10-13-advice-model-review.md`](reviews/2026-10-13-advice-model-review.md) — all six workflows, researched allocation/validation fixes, add/drop comparisons, and model-quality limits.
-
-- [`research/usability-test-plan.md`](research/usability-test-plan.md) — ready-to-run commissioner study; participant sessions are pending.
-- [`managed-ai-design.md`](managed-ai-design.md) — proposed managed service, authentication, billing, and threat model; not deployed.
-- [`usability.md`](usability.md) — guided setup, everyday navigation, report review, presets, and settings feedback.
-
+- [`advice.md`](advice.md) — fantasy and betting advice: evidence, own weekly projections,
+  game-market model, props, prices and remaining verification.
 - [`setup.md`](setup.md) — source setup, credentials, providers, data handling, and operations.
 - [`troubleshooting.md`](troubleshooting.md) — common install, provider, scheduling, delivery,
   recovery, and MCP issues.
 - [`architecture.md`](architecture.md) — service boundaries, integrations, storage, and data
   flow.
 - [`decisions.md`](decisions.md) — durable architectural choices and why they were made.
+- [`usability.md`](usability.md) — guided setup, everyday navigation, report review, presets, and
+  settings feedback.
+- [`search.md`](search.md) — finding settings with everyday words, keyboard navigation, and local
+  report-title lookup.
+- [`operations.md`](operations.md) — durable requests, navigation, diagnostics, scheduled
+  encrypted backups, and packaged GUI verification.
 - [`mcp.md`](mcp.md) — MCP server behavior and client configuration.
 - [`performance.md`](performance.md) — repeatable local performance smoke measurements and
   their limits.
-- [`operations.md`](operations.md) — durable requests, navigation, diagnostics, scheduled
-  encrypted backups, and packaged GUI verification.
-- [`search.md`](search.md) — finding settings with everyday words, keyboard navigation, and local report-title lookup.
+- [`release-install.md`](release-install.md) and [`release-process.md`](release-process.md) —
+  building, installing and publishing release artifacts.
 - [`maintenance-review.md`](maintenance-review.md) — quarterly manual code, security, and
   refactoring review checklist used by the GitHub reminder workflow.
-- [`reviews/2026-10-14-real-report-quality.md`](reviews/2026-10-14-real-report-quality.md) — native default reports, real clock-driven generation, source/arithmetic audit and exact corrected installer.
-- [`reviews/2026-10-14-report-library.md`](reviews/2026-10-14-report-library.md) — default reports, scoped automatic drafts, numeric charts and exact rebuilt preview checks.
-- [`release-install.md`](release-install.md) — building and installing release artifacts.
+- [`managed-ai-design.md`](managed-ai-design.md) — proposed managed service, authentication,
+  billing, and threat model; not deployed.
 - [`design/dashboard-visual-direction.md`](design/dashboard-visual-direction.md) — dashboard
   design goals and reference limitations.
-- [`reviews/2026-10-13-appearance.md`](reviews/2026-10-13-appearance.md) — white default, optional dark mode, device-local persistence, and rendered desktop/mobile verification.
-- [`reviews/2026-10-02-workflow-reliability.md`](reviews/2026-10-02-workflow-reliability.md) — durable workflow changes, validation, and manual review.
-- [`reviews/2026-10-04-main-integration.md`](reviews/2026-10-04-main-integration.md) — fresh local and hosted source/package validation for main integration.
-- [`reviews/2026-10-07-dialog-reliability.md`](reviews/2026-10-07-dialog-reliability.md) — dialog, scrolling, narrow-content, and delayed report-refresh QA.
-- [`reviews/2026-10-09-advisor-completion.md`](reviews/2026-10-09-advisor-completion.md) — advisor requirement audit, final native-model/public-data/browser evidence and limits.
-- [`reviews/2026-10-11-live-prices-and-performance.md`](reviews/2026-10-11-live-prices-and-performance.md) — live sportsbook compatibility, outcome ledger and measured archive results.
-- [`reviews/2026-10-12-model-v2-comparison.md`](reviews/2026-10-12-model-v2-comparison.md) — frozen game-model improvement and matched sportsbook/legacy comparison.
-- [`reviews/2026-10-12-model-v3-comparison.md`](reviews/2026-10-12-model-v3-comparison.md) — context/blend model retest and consistency limits.
-- [`reviews/2026-10-12-model-v4-comparison.md`](reviews/2026-10-12-model-v4-comparison.md) — dated injury/quarterback/forecast-weather additions, matched retest and coverage limits.
-- [`reviews/2026-10-12-personnel-data-comparison.md`](reviews/2026-10-12-personnel-data-comparison.md) — better dated personnel sources, rejected candidates and preserved production accuracy.
-- [`reviews/2026-10-12-model-v6-comparison.md`](reviews/2026-10-12-model-v6-comparison.md) — richer QB EPA/practice-role candidates, frozen archive/current-season retests and unchanged production model.
-- [`reviews/2026-10-13-model-v7-comparison.md`](reviews/2026-10-13-model-v7-comparison.md) — loss attribution, alternate boosted-tree retest and first preserved v6 forward result.
-- [`reviews/2026-10-13-model-v8-hybrid-comparison.md`](reviews/2026-10-13-model-v8-hybrid-comparison.md) — requested totals hybrid, seasonal correction comparison and preserved non-total forecasts.
-- [`reviews/2026-10-13-model-v9-expert-comparison.md`](reviews/2026-10-13-model-v9-expert-comparison.md) — 2026 totals ranking-loss diagnosis, online expert adaptation and fixed-weight control.
-- [`reviews/2026-10-13-model-v10-matchup-comparison.md`](reviews/2026-10-13-model-v10-matchup-comparison.md) — fixed-mixture loss attribution, opponent-adjusted efficiency/volume signals and frozen totals retest.
-- [`reviews/2026-10-13-model-v11-external-markets.md`](reviews/2026-10-13-model-v11-external-markets.md) — real prediction-market price/flow ingestion, settlement-leak guard, separate headline proxy and sealed Week 6 forecasts.
-- [`reviews/2026-10-13-model-v12-historical-totals.md`](reviews/2026-10-13-model-v12-historical-totals.md) — expanded historical contracts/trades, conservative totals correction and four-season comparison; late 2025 still loses.
-- [`reviews/2026-10-13-model-v13-seasonal-external-totals.md`](reviews/2026-10-13-model-v13-seasonal-external-totals.md) — late-2025 loss decomposition, recency/reset calibration and prequential feedback; lower excess loss, still no consistent edge.
-- [`reviews/2026-10-13-model-v14-directional-totals.md`](reviews/2026-10-13-model-v14-directional-totals.md) — fixed coverage/volume removal and stricter price-only retest; much smaller late-2025 loss, no sportsbook edge.
-- [`reviews/2026-10-13-model-v15-robust-trade-flow.md`](reviews/2026-10-13-model-v15-robust-trade-flow.md) — discovered/corrected Kalshi direction bug affecting earlier research, robust centered flow and retest; no proven edge.
-- [`reviews/`](reviews/) — dated manual code and release-workflow review records.
+- [`research/usability-test-plan.md`](research/usability-test-plan.md) — ready-to-run
+  commissioner study; participant sessions are pending.
+- `research/` — JSON research outputs (betting model versions, prop and projection backtests)
+  referenced from the reviews and decisions.
 
-- [`reviews/2026-10-13-model-v16-drive-totals.md`](reviews/2026-10-13-model-v16-drive-totals.md) — corrected-flow shrinkage diagnosis, retained prior PBP, football residual totals model and four-season paired replay; research only.
+## Dated reviews
 
-- [`reviews/2026-10-13-model-v17-recent-feedback.md`](reviews/2026-10-13-model-v17-recent-feedback.md) — fixed-source totals feedback diagnosis, short-memory/reset/cap comparison and frozen retest; aggregate point gains, no consistent edge.
+[`reviews/`](reviews/) holds dated release, live-provider and model-quality records. Newest
+first; September security and packaging reviews are listed in the folder.
 
-- [`reviews/2026-10-13-model-v18-stable-feedback.md`](reviews/2026-10-13-model-v18-stable-feedback.md) — weak-season diagnosis, weekly stability/directional feedback and earlier-cohort selection; rejected after later-season regressions.
+- [`reviews/2026-10-22-betting-model-test.md`](reviews/2026-10-22-betting-model-test.md) —
+  production game model versus the book on an untouched 2026 holdout, plus paper returns.
+- [`reviews/2026-10-21-advice-data-pass.md`](reviews/2026-10-21-advice-data-pass.md) — Advice
+  warm-up, grouped readiness sources, ESPN live-refresh path, undated injury feed and iCloud
+  findings.
+- [`reviews/2026-10-18-afton-ux-pass.md`](reviews/2026-10-18-afton-ux-pass.md) — real-league
+  walkthrough, store isolation and first-launch fixes, plain copy, gpt-6-luna default.
+- [`reviews/2026-10-18-optimization.md`](reviews/2026-10-18-optimization.md) — lazy pages, dead
+  CSS, research separation, file splits and open-only task list.
+- [`reviews/2026-10-18-task-history.md`](reviews/2026-10-18-task-history.md) and
+  [`reviews/2026-09-28-task-history.md`](reviews/2026-09-28-task-history.md) — short records of
+  completed work archived from `tasks.md`.
+- [`reviews/2026-10-15-saved-data-reports.md`](reviews/2026-10-15-saved-data-reports.md) —
+  scheduled drafts from recent saved data and a real-clock Afton report.
+- [`reviews/2026-10-15-owner-verification.md`](reviews/2026-10-15-owner-verification.md) —
+  private ESPN import, native imsg and owner usability verification.
+- [`reviews/2026-10-15-market-signals.md`](reviews/2026-10-15-market-signals.md) — Market
+  Signals research charts and ledger, real public-data checks, player-prop game logs.
+- [`reviews/2026-10-14-quiet-verification.md`](reviews/2026-10-14-quiet-verification.md) —
+  test-only memory credentials, mock Keychain and popup-free teardown.
+- [`reviews/2026-10-14-compact-workflows.md`](reviews/2026-10-14-compact-workflows.md) — shorter
+  Home, separate Advice views and focused Settings.
+- [`reviews/2026-10-14-real-report-quality.md`](reviews/2026-10-14-real-report-quality.md) —
+  default reports, clock-driven generation and source/arithmetic audit.
+- [`reviews/2026-10-14-report-library.md`](reviews/2026-10-14-report-library.md) — default
+  reports, scoped automatic drafts and numeric charts.
+- [`reviews/2026-10-13-latest-installer.md`](reviews/2026-10-13-latest-installer.md) — macOS ARM
+  installer, packaged six-workflow advice checks and child credential isolation.
+- [`reviews/2026-10-13-real-advice-quality.md`](reviews/2026-10-13-real-advice-quality.md) — all
+  six workflows with real football data and independent arithmetic checks.
+- [`reviews/2026-10-13-weekly-decision-workflows.md`](reviews/2026-10-13-weekly-decision-workflows.md)
+  — weekly Home, readiness, prospective cohorts and fantasy journal.
+- [`reviews/2026-10-13-imsg-support.md`](reviews/2026-10-13-imsg-support.md) — local Messages CLI
+  delivery, selected-chat sync and consent.
+- [`reviews/2026-10-13-codex-compatibility.md`](reviews/2026-10-13-codex-compatibility.md) —
+  native CLI compatibility, request isolation and six-workflow model quality.
+- [`reviews/2026-10-13-advice-model-review.md`](reviews/2026-10-13-advice-model-review.md) — all
+  six workflows, allocation/validation fixes and model-quality limits.
+- [`reviews/2026-10-13-appearance.md`](reviews/2026-10-13-appearance.md) — white default,
+  optional dark mode and device-local persistence.
+- [`reviews/2026-10-betting-model-history.md`](reviews/2026-10-betting-model-history.md) — one
+  table for game-model versions v1–v18 (October 11–13): what each tried and how it compared with
+  the sportsbook.
+- [`reviews/2026-10-11-live-prices-and-performance.md`](reviews/2026-10-11-live-prices-and-performance.md)
+  — live sportsbook prices, outcome ledger and archive results.
+- [`reviews/2026-10-09-advisor-completion.md`](reviews/2026-10-09-advisor-completion.md) — advisor
+  requirement audit and native-model/public-data evidence.
+- [`reviews/2026-10-07-dialog-reliability.md`](reviews/2026-10-07-dialog-reliability.md) — dialog,
+  scrolling, narrow-content and report-refresh QA.
+- [`reviews/2026-10-05-local-operations.md`](reviews/2026-10-05-local-operations.md) and
+  [`reviews/2026-10-05-task-search-help.md`](reviews/2026-10-05-task-search-help.md) — durable
+  operations, tasks, search and help.
+- [`reviews/2026-10-04-main-integration.md`](reviews/2026-10-04-main-integration.md) — local and
+  hosted source/package validation for main integration.
+- [`reviews/2026-10-02-workflow-reliability.md`](reviews/2026-10-02-workflow-reliability.md) and
+  [`reviews/2026-10-02-commissioner-workflows.md`](reviews/2026-10-02-commissioner-workflows.md) —
+  durable workflow and commissioner changes.
 
 ## Keeping project context current
 
 Keep documentation proportional to the change. Most changes need only a code comment where
 behavior is non-obvious and, when they close or open work, an edit to `tasks.md`.
 
-- `tasks.md` lists open work only. Add a short item for a known gap and delete it when done.
+- `tasks.md` lists open work plus a short "Completed (summary)". Add a short item for a known
+  gap; when it is done, delete it and add a one-line summary.
 - `decisions.md` records durable architecture choices and why; `memory.md` keeps stable
   invariants (privacy, evidence and safety rules) in a line or two each, never dated status.
 - `support-matrix.md` changes only from recorded tests, live checks or native platform runs; a

@@ -9,6 +9,9 @@ export const fantasyModelWeight: Record<'QB' | 'RB' | 'WR' | 'TE', number> = {
   TE: 1,
 };
 
+/** Running backs: exponent on 1 / (1 − carry share of backs ruled out); 0 means off. */
+export const vacatedCarryExponent = 0.75;
+
 export const specialTeamsSettings: Record<'K' | 'DST', SpecialTeamsParams> = {
   K: {
     halfLife: 20,

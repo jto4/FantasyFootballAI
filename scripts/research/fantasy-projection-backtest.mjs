@@ -1,6 +1,7 @@
 // Scores the app's own weekly fantasy projections on 2026 games the stat models never saw, against
 // an 8-game average and (benchmark only) ESPN's forecasts, under two scoring systems. Fits the
-// kicker and D/ST settings on 2025 and tests them on 2026.
+// kicker and D/ST settings on 2025 and tests them on 2026, and the running-back adjustment for
+// teammates ruled out (needs nflverse injuries_{season}.csv saved as inj{season}.csv).
 // Usage: node scripts/research/fantasy-projection-backtest.mjs <nflverse dir> <espn settings.json> [out.json] [--emit]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -8,6 +9,7 @@ import {
   PublicFootballData,
   PublicPlayerForecasts,
   parseDepthCharts,
+  parseNFLInjuryReports,
   parsePersonnelSnaps,
 } from '../../packages/integrations/dist/index.js';
 import {
@@ -18,6 +20,7 @@ import {
   projectSpecialTeamsPoints,
   projectionContext,
   propModelSettings,
+  ruledOutKeys,
   propUsageNorms,
   scoreHistoricalGame,
   snapKey,
@@ -39,7 +42,13 @@ for (const season of [2024, 2025, 2026]) {
   ))
     depth.set(id, [...(depth.get(id) ?? []), ...entries]);
 }
-const context = projectionContext(data, { snaps, depth });
+const ruledOut = new Set();
+for (const season of [2025, 2026])
+  for (const key of ruledOutKeys(
+    parseNFLInjuryReports(readFileSync(join(usageDir, `inj${season}.csv`), 'utf8'), season),
+  ))
+    ruledOut.add(key);
+const context = projectionContext(data, { snaps, depth, ruledOut });
 
 // Afton's real ESPN rules (with D/ST and kicker overrides) and a standard half-PPR league.
 const items = JSON.parse(readFileSync(espnSettingsFile, 'utf8')).settings.scoringSettings
@@ -141,6 +150,7 @@ function evaluate(league, name) {
       context,
       propModelSettings,
       propUsageNorms,
+      vacated.exponent,
     );
     if (actual === undefined || !ours) continue;
     const f = espn.get(`${row.week}:${playerNameKey(row.name)}:${nflTeamKey(row.team)}`);
@@ -305,6 +315,50 @@ function specialTeams(league) {
   return { fitted, report };
 }
 
+// Running backs whose teammates are ruled out: exponent fitted on 2025, tested on 2026, by RMSE.
+function vacatedCarries(league) {
+  const cases = [];
+  for (const row of data.players) {
+    if (row.season < 2025 || row.seasonType !== 'REG' || footballPosition(row.position) !== 'RB')
+      continue;
+    const game = context.league.games.get(row.gameId);
+    const history = context.byPlayer.get(row.playerId) ?? [];
+    if (!game || history.filter((h) => order(h) < order(row)).length < 3) continue;
+    const actual = score(league, row);
+    const at = (exponent) =>
+      projectFantasyPoints(
+        league,
+        { playerId: row.playerId, position: 'RB', team: row.team, game, history },
+        context,
+        propModelSettings,
+        propUsageNorms,
+        exponent,
+      );
+    const base = at(0);
+    if (actual === undefined || !base || base.points < 3) continue;
+    if (!at(1)?.vacatedCarryShare) continue;
+    cases.push({ season: row.season, actual, at });
+  }
+  const rmse = (list, exponent) =>
+    Math.sqrt(list.reduce((s, c) => s + (c.actual - c.at(exponent).points) ** 2, 0) / list.length);
+  const train = cases.filter((c) => c.season === 2025);
+  const test = cases.filter((c) => c.season === 2026);
+  let best = 0;
+  for (const e of [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5])
+    if (rmse(train, e) < rmse(train, best)) best = e;
+  // Adopted only if it also beats no adjustment on the 2026 games.
+  const adopted = test.length && rmse(test, best) < rmse(test, 0) ? best : 0;
+  const r = (x) => Math.round(x * 100) / 100;
+  return {
+    exponent: adopted,
+    chosenOn2025: best,
+    train: train.length,
+    test: test.length,
+    testRmse: { adjusted: r(rmse(test, best)), unadjusted: r(rmse(test, 0)) },
+  };
+}
+
+const vacated = vacatedCarries(afton);
 const special = specialTeams(halfPpr);
 const aftonSpecial = specialTeams(afton);
 const aftonResult = evaluate(afton, 'Afton (ESPN rules)');
@@ -312,6 +366,7 @@ const result = {
   afton: aftonResult,
   halfPpr: evaluate(halfPpr, 'Half PPR'),
   specialTeams: { halfPpr: special.report, afton: aftonSpecial.report },
+  vacatedCarries: { afton: vacated },
 };
 console.log(JSON.stringify(result, null, 2));
 if (outFile && !outFile.startsWith('--')) writeFileSync(outFile, JSON.stringify(result, null, 2));
@@ -326,6 +381,8 @@ if (process.argv.includes('--emit'))
           Object.entries(aftonResult.blend).map(([pos, b]) => [pos, b.modelWeight]),
         ),
       )};\n\n` +
+      `/** Running backs: exponent on 1 / (1 − carry share of backs ruled out); 0 means off. */\n` +
+      `export const vacatedCarryExponent = ${vacated.exponent};\n\n` +
       `export const specialTeamsSettings: Record<'K' | 'DST', SpecialTeamsParams> = ${JSON.stringify(
         {
           K: special.fitted.K ?? {

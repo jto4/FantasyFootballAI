@@ -26,7 +26,11 @@ import {
   teamGame,
   type UsageInput,
 } from './fantasy-projection.js';
-import { fantasyModelWeight, specialTeamsSettings } from './fantasy-projection-settings.js';
+import {
+  fantasyModelWeight,
+  specialTeamsSettings,
+  vacatedCarryExponent,
+} from './fantasy-projection-settings.js';
 import { propModelSettings, propUsageNorms } from './prop-model-settings.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 import { weeklyGameWithheldWarning } from './advice-warnings.js';
@@ -328,6 +332,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               projection,
               propModelSettings,
               propUsageNorms,
+              vacatedCarryExponent,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -467,8 +472,21 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             sourceIds: evidence.projectionSourceIds,
           });
       }
+      const vacated = (own as { vacatedCarryShare?: number }).vacatedCarryShare ?? 0;
+      if (vacated)
+        metric(
+          'vacated-carries',
+          'Share of recent team running-back carries from backs ruled out this week',
+          Math.round(vacated * 100),
+          'percent',
+          {
+            sourceIds: evidence.projectionSourceIds,
+            description:
+              'Teammates listed Out or Doubtful on the NFL injury report; their recent carries raise this back’s rushing projection (fitted on 2025, checked on 2026).',
+          },
+        );
       evidence.warnings.push(
-        'Sidekick projections assume the player is active. Injuries, late role changes and weather news after the last data refresh are not included.',
+        'Sidekick projections assume the player is active. Running backs get extra carries when a teammate back is listed Out or Doubtful; other injuries, late role changes and weather news after the last data refresh are not included.',
       );
     } else if (input.scope !== 'week') {
       const estimate = forecast?.(

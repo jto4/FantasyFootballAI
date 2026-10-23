@@ -282,9 +282,8 @@ In Settings → AI → Advanced AI options, choose **Codex account · GPT-6.1-So
 
 In Connect league, choose ESPN and enter the league/year. Expand **Use my signed-in
 browser instead**, open the supplied data link in that browser, and save **Page
-Source** to a JSON file. Import the file. The app keeps normalized league data and
-weekly forecasts only when exact scoring arithmetic can verify them; account/member
-contacts are discarded. No login cookies are copied. This is a manual snapshot:
+Source** to a JSON file. Import the file. The app keeps normalized league data; ESPN's
+projections are not saved (the app makes its own), and account/member contacts are discarded. No login cookies are copied. This is a manual snapshot:
 **Import updated roster** replaces it, and automatic refresh needs a configured
 provider connection. The import date is not a verified provider-update time.
 

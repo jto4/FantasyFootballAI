@@ -6,6 +6,11 @@ public, device-verified desktop release.
 
 ## Current source
 
+Source changes after this review (October 22–23: Ask Sidekick chat, props
+board and prop model, prop line ledger, live box-score scoring, own weekly projections, locked
+starters, desktop right-click menu) are not recorded here as installer-verified; see the
+completed summary in [tasks](tasks.md).
+
 The current macOS ARM preview includes the real-data report fixes: eligibility-safe matchup sums,
 season-aware news/catalog/projection context, renamed-league/sync evidence retention, actual draft
 status, two-decimal scores/year labels, commissioner overrides and compact missing-chart states.
@@ -144,7 +149,7 @@ and broader platform/provider checks remain required for expanded claims. See
 
 The October 12 game-model source adds opponent/venue-adjusted ratings and disclosed
 sportsbook-input corrections, improving the old model while the book still has
-slightly lower aggregate error. The dated [comparison](reviews/2026-10-12-model-v2-comparison.md)
+slightly lower aggregate error. The dated [comparison](reviews/2026-10-betting-model-history.md)
 records mixed market differences and unproven prospective profit. No owner service
 restart, installer publication or release occurs; broader platform/source checks
 and substantial prospective outcomes remain required for expanded claims.

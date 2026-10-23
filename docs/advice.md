@@ -837,49 +837,21 @@ or real delivery was used. Player-specific pre-NFL rookie forecasts remain open,
 alongside current personnel, deeper comparisons, scoring breadth, media relevance
 and prospective fantasy/betting checks. The original advisor goal stays active.
 
-## Public individual player forecasts
+## Weekly player projections (`sidekick-model-v1`)
 
-`packages/integrations/src/player-forecasts.ts` reads the public ESPN default
-football projection universe without cookies, a league-owner identifier, or a key.
-The source is linked to [ESPN player projections](https://fantasy.espn.com/football/players/projections).
-This undocumented response is validated against season/current period, exact weekly
-projection IDs, player/team/position identity, and the publisher's complete scoring
-formula including position overrides. Changed or inconsistent formats fail closed.
-Five fixed pages of at most 100 players have six-megabyte page bounds, three
-concurrent reads, a shared 45-second deadline, six-hour caching and five-minute
-failure backoff. Outages retain actual original retrieval dates; conflicting
-pagination withholds all affected player/week forecasts.
+Weekly estimates are the app's own; it no longer uses ESPN projections anywhere. For QB/RB/WR/TE,
+the prop stat models (recent production, snap share, depth chart, betting total and spread,
+opponent, home field) give an expected value for every scoring stat, which is scored with the
+league's rules. Leagues with rules the model cannot price (first downs, bonuses) fall back to the
+8-game average. Kickers and D/ST use a recency-weighted average of their scored history plus the
+betting total. Players need three prior games; matching scoring-confirmed imports keep priority.
+Projections are tentative, show expected statistics, and are never a success probability.
 
-Only explicit weekly source projections are used. In-season aggregate totals may
-cover an ambiguous interval and are never prorated or reduced by past scores.
-Sparse categories in a reconciled publisher forecast mean expected zero for the
-mapped statistic; this does not change missing observed NFL statistics into zero.
-Derived category scoring values and unused projection fields can be negative;
-modeled event counts cannot. Fractional event counts are expectations. Unsupported
-first-down/bonus/platform rules and missing forecasts remain unknown.
-
-`packages/core/src/public-player-forecast.ts` joins an explicit ESPN identity or a
-unique name/position only when no explicit ID exists, verifies the current NFL team,
-and scores the raw expectations using supported actual league rules. Matching
-scoring-confirmed imports take priority, then public individual forecasts, then
-supported historical estimates. A weekly estimate requires one verified future game.
-Season/remaining estimates require a complete unique 17-game regular-season schedule
-and each exact future week's forecast. Remaining value excludes verified started
-games, respects the selected final week and includes no past production. Full-season
-value separately adds uniquely matched, scoring-complete recorded games; missing
-credited rows withhold it. Preseason rookies need no NFL history when future weekly
-forecasts cover their season. The feed's current scoring period and retrieval date
-cannot establish what was known at a past draft.
-
-Saved `public-projection-v1` results show projected workload/yards/catches/TDs,
-future games/points, recorded points and source period. Primary expected statistics
-survive evidence budgeting. Forecasts have no prospective error evaluation here;
-policy permits only tentative choices and caps evidence confidence. Neither the
-forecast nor confidence is a success probability. Source dates indicate retrieval,
-not an independently verified publisher update. Follow-up improvements include richer current role/availability evidence, broader
-scoring coverage, deeper comparisons, media relevance and prospective fantasy/
-betting validation. Search **ESPN public weekly forecasts**
-for Help and its direct Advice button.
+The 2026 backtest (`scripts/research/fantasy-projection-backtest.mjs`) puts mean absolute error
+at 5.53 points versus 5.68 for the 8-game average and 5.30 for ESPN, which is kept only as an
+offline benchmark. Older saved results may still show `public-projection-v1` (ESPN forecasts) and
+remain readable. Rookies without NFL history get no automatic estimate; use a scoring-confirmed
+import. See [decisions](decisions.md), "Own projections; ESPN projections removed".
 
 ## Current sportsbook prices and forward performance
 
@@ -955,118 +927,36 @@ returns do not establish profitability. Forward validation requires future
 pre-kickoff analyses and complete subsequent outcomes. Search/Help explains both
 fetching and results tracking with direct Advice actions.
 
-## Opponent-adjusted market model v2
+## Game-market model (v2–v4)
 
-The earlier paired-price game method was
-`market-regularized-v2`; saved v2 results retain that method. Recency-weighted ridge offense/defense ratings account for
-opponent strength and a learned home effect, removed at explicit neutral sites.
-A regularized logistic correction starts from the sportsbook no-vig probability,
-using book calibration and the score-model residual. The sportsbook is an input;
-improving the old scores-only model does not establish independent market edge.
-Score, residual and correction fitting use earlier NFL weeks. Each validation game
-uses its own archived handicap/total and both prices. Live forecasts exclude
-outcomes after issuance. Current injuries, quarterback changes, weather and market
-movement are not quantitatively adjusted.
+Paired-price game forecasts use the sportsbook's no-vig probability as an explicit input and learn
+small regularized corrections from earlier NFL weeks only:
 
-The frozen parameter procedure was selected on 2016–2021 development data before
-retesting 2022–2025. [The dated comparison](reviews/2026-10-12-model-v2-comparison.md)
-records 7.27% lower aggregate probability error than v1 over 3,221 matched non-push
-outcomes. It still slightly trails the book overall; recent totals remain worse,
-and favorable isolated intervals do not establish consistent advantage or profit.
-Those historical outcomes already existed and prior v1 recent results were seen;
-future recorded validation remains separate. No hypothetical selections pass the
-paired book-improvement/calibration/price gates in this study.
+- `market-regularized-v2`: opponent offense/defense ratings and a home effect (removed at neutral
+  sites). Saved v2 results keep that method.
+- `market-context-v3` (current moneyline and spread): adds rest, season phase, line context and
+  earlier team errors against each game's own line; moneyline corrections blend toward the book
+  using earlier out-of-week losses.
+- `health-weather-total-v4` (current totals, with at least 200 earlier eligible cases, otherwise
+  v3): adds dated offensive/defensive absences, the previous QB's Out/Doubtful status, captured
+  depth-chart QB changes and regional wind/cold/rain forecasts. Undated injury rows, observed
+  game weather and covered venues are excluded; missing context stays unknown.
 
-Advice shows new, previous and book errors plus weekly paired uncertainty with
-adequate decimal precision. Existing `rolling-residual-v1` results remain readable
-and retain their method. Missing paired current odds or thin archive coverage can
-retain the legacy calculation; its frequency baseline cannot substantiate an
-actionable game-market edge. Props retain the separate legacy numerical path.
-Forward records separate methods and never recompute old advice. Run
-`npm run betting:market-evaluate -- --compare` for the four most recent completed
-seasons; the default button still checks the two most recent completed seasons.
+Official NFL injury articles, prior snap roles and QB efficiency are shown as descriptive context
+only; as numeric corrections they made older-season error worse. None of these versions, nor the
+v5–v18 research models, beat the sportsbook consistently. See the
+[betting model history](reviews/2026-10-betting-model-history.md).
 
-## Market context and adaptive moneyline correction v3
+Research commands (they never save advice or place a wager):
 
-Supported paired-price game forecasts introduced `market-context-v3`; current
-moneyline/spread and totals without usable v4 context retain it. It retains
-v2's opponent/venue score ratings and regularized book correction, adding derived
-rest differences, combined rest, season phase, the selected market line (or
-moneyline curvature), and earlier team scoring errors against each game's own
-archived line. Rest is inferred from earlier completed regular-season dates,
-defaults to seven days without a prior appearance, and caps at fourteen days.
-Team errors are clipped, decay with a 120-day half-life and shrink toward zero.
-No postgame starter or observed weather field is treated as pre-kickoff knowledge.
-
-Moneyline corrections additionally blend toward the book using earlier
-out-of-week candidate forecasts and a fixed ridge penalty. The blending weight
-can be zero; this is disclosed reliance on the book, not an independent edge.
-Spread/total rules and the moneyline blending choice were selected from nine
-older-season candidate structures and eighteen prediction rules, with no betting
-return objective. Later-season results remain mixed. No threshold or current
-forecast tuning is accepted through HTTP.
-
-The reused 2022–2025 audit slightly improves pooled Brier versus v2 and the book,
-but the paired interval includes zero and most individual season/market cases do
-not beat the book. Existing action/calibration/price gates are unchanged. Saved
-v1/v2 advice is readable and never regraded; new ledger entries retain v3's method.
-The historical comparison also reports matched v2 error in its uncertainty details.
-See [the v3 evidence](reviews/2026-10-12-model-v3-comparison.md).
-
-`npm run betting:model-audit` prints matched model/v3/v2/book errors and log loss for four completed
-seasons, a separate untouched current-season holdout, pooled weekly-cluster intervals, and consistency counts. Individual
-intervals are nominal; twelve season/market simultaneous comparisons use a
-Bonferroni normal approximation. Add `-- --snapshot <schedules.csv>` to replay a
-bounded local public archive snapshot instead of fetching current data.
-`npm run betting:model-develop -- --snapshot <schedules.csv>` reproduces the fixed
-older development grid, discarding all rows after 2021 before model preparation.
-These are research commands; they never save advice or place a wager. Frozen
-selection and candidate results are in `docs/research/model-v3-*.json`. Archived
-publication timing and book identity remain unavailable, and these reused
-historical outcomes are not a prospective or untouched validation sample.
-
-## Dated health and forecast-weather context v4
-
-Supported totals now use `health-weather-total-v4`; moneyline/spread retain v3.
-A regularized past-week fit adds dated offensive/defensive absences, the previous
-quarterback's reported Out/Doubtful status, captured rank-one chart changes and
-regional wind/cold/rain forecasts. At least 200 earlier eligible paired-price
-cases are required. Missing context stays unknown; no fixed injury point deduction
-or confirmed-starter claim is made. Current ESPN dated injury labels can supply
-a team-level alternative to undated NFLverse rows; their equivalence to historical
-NFLverse reports remains unverified. IR is excluded.
-
-Historical 2025/2026 injury archives omit publication timestamps and are excluded
-from dated features. Dated depth-chart capture is available from 2025; earlier
-undated charts are excluded. Outdoor regional weather uses 48-hour JMA forecasts
-with a conservative 36-hour availability boundary, not postgame observed weather.
-Covered/retractable venues and unknown locations receive no weather adjustment.
-
-The reused matched 2022–2025 retest improves pooled error only slightly. Totals
-improve versus v3 in three seasons and worsen in 2024; only five of twelve
-season/market cells beat the book. Paired uncertainty includes zero and no paper
-pick qualifies. See [v4 results and coverage](reviews/2026-10-12-model-v4-comparison.md).
-`betting:model-audit` now defaults to context enrichment; `-- --contexts <public-games.json>`
-replays a bounded validated snapshot. `betting:context-develop -- --contexts <public-games.json>`
-reproduces all five older-season candidate procedures. Saved v1/v2/v3 advice is
-preserved and totals record their distinct v4 identity. Help/search explains the
-source and participation limits.
-
-## Better personnel sources and rejected corrections
-
-Official NFL weekly articles now supply partial dated injury context from 2025
-onward, using the latest modification before the prediction cutoff and linking
-the actual article. Prior snap roles and shrunken quarterback passing efficiency
-are shown as supporting context, with strict earlier-week/game identity and
-missing-match rules. The captured chart/last starter remains unconfirmed.
-
-Six new corrections all worsened older development error. Feeding new official
-counts into v4 also raised recent measured error, so these numerical effects
-remain disabled. Production retains v3/v4; official source coverage is descriptive
-and does not qualify quantitative injury correction. The retained 2022–2025
-errors reproduce exactly. See the [personnel comparison](reviews/2026-10-12-personnel-data-comparison.md).
-`betting:personnel-develop` and `betting:personnel-audit` reproduce the explicit
-local research trials; no HTTP tuning or new v5 method is enabled.
+- `npm run betting:model-audit` prints matched model/v3/v2/book errors and log loss for four
+  completed seasons plus an untouched current-season holdout. `-- --snapshot <schedules.csv>` or
+  `-- --contexts <public-games.json>` replays a bounded local snapshot.
+- `npm run betting:model-develop -- --snapshot <schedules.csv>` and
+  `npm run betting:context-develop -- --contexts <public-games.json>` reproduce older-season
+  selection; `betting:personnel-develop` and `betting:personnel-audit` reproduce the rejected
+  personnel trials.
+- `npm run betting:market-evaluate -- --compare` checks the four most recent completed seasons.
 
 ## Advice review and calculation improvements — October 13, 2026
 
@@ -1224,9 +1114,9 @@ as zero: lineups with an unestimated slot are compared only with lineups missing
 League imports carry no FAAB budget or waiver order.
 
 **Weekly projection records.** Each weekly summary (Home or the alert check) records this week's
-projection for every player on the selected roster before kickoff, plus ESPN's public projection
-for players whose estimate came from an import, so the Home scorecard compares sources without
-saved advice. Record ids are stable per league, week, source and player.
+projection for every player on the selected roster before kickoff, plus the app's own model
+projection for players whose estimate came from an import, so the Home scorecard compares sources
+without saved advice. Record ids are stable per league, week, source and player.
 
 ## Live, playoff odds, freshness and "Do this next" — October 22, 2026
 
@@ -1235,8 +1125,11 @@ each starter's NFL game state from ESPN's public scoreboard (cached one minute; 
 same feed), a projected final that adds estimates only for starters who have not kicked off,
 and a rough win chance (normal approximation, 45% spread per unplayed estimate; not calibrated).
 A score from an earlier week is withheld rather than shown under the current week. Connected
-leagues now refresh during live games whenever their last sync is older than 10 minutes;
-imported leagues cannot update scores and say so. `GET /api/live?league=&team=`.
+leagues refresh during live games whenever their last sync is older than 10 minutes. Live also
+scores players from ESPN's public NFL box scores under each league's rules (offense, kickers,
+D/ST, two-point tries), so imported leagues update during games too. Starters whose games have
+begun are locked in lineup, waiver and Waiver day math, the AI lineup analysis and chat, and the
+matchup projection adds points so far to remaining estimates. `GET /api/live?league=&team=`.
 
 **Playoff odds** (Reports → League charts) simulate the rest of the regular season 5,000 times
 with a fixed seed. Strength is each team's weekly average pulled toward the league average by
@@ -1247,3 +1140,19 @@ schedule use random pairings and say so.
 **Top bar** shows "Out of date · Refresh/Re-import" once league data is older than the stale
 setting. **Home** leads with one "Do this next" card: a starter problem, stale data, a better
 lineup, a waiver pickup, or "You're set" with the next kickoff.
+
+## Props board, prop model and line ledger — October 22–23, 2026
+
+**Advice → Player props** lists every published prop this week with the app's projection, a
+typical-game estimate, season hit rate, fantasy owner and a lean. The prop model
+(`packages/core/src/prop-model.ts`) was fitted on 2025 and tested on unseen 2026 games; its
+chance at a line is anchored to the line and claims only part of its disagreement. Every lean is
+saved before kickoff and graded afterwards, and the board shows the record against the 52.4%
+break-even. `prop-lines.sqlite` keeps the first, daily and last-before-kickoff line and price per
+book so the model can later be scored against real closing lines. Bet analysis uses the same
+runtime as the board. Details and backtest numbers: [decisions](decisions.md), "Props board",
+"Prop model" and "Prop line ledger" entries.
+
+**Ask Sidekick** (the Ask page and the ⌘J panel) answers from the same data through read-only
+lookups and never gives the AI's own betting probability; see [decisions](decisions.md), "Chat
+runs its own lookup loop".

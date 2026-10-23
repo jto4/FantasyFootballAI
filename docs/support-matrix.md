@@ -595,44 +595,12 @@ checks pass. Browser plugin absent, repository Playwright used; other browsers,
 real devices and human usability remain open. Changes are local/uncommitted and
 all owned model/test processes are terminal; no owner-service restart or release.
 
-## Public individual forecasts — October 9, 2026
+## Public individual forecasts — October 9, 2026 (removed)
 
-Implemented keyless public ESPN weekly expected-stat rows for supported QB/RB/WR/TE
-league scoring, separated from observed NFL history. Strict scope/identity/formula
-checks, five fixed bounded pages, partial-cache dates, short retries and duplicate
-pagination guards precede use. Imports keep priority. Core composes exact future
-weeks with verified unique schedules; full-season estimates add verified credited
-production separately. Missing weeks/custom scoring never become invented zeroes.
-Public forecasts stay tentative with explicit source/role/accuracy limitations.
-
-At 16:51 UTC, all five live pages validate: 6,190 weekly rows across 428 players.
-A temporary PPR probe joins the shared catalog and previously retrieved fresh NFL
-history/schedule. Three sampled current rookies have weekly/remaining/full-season
-estimates; two without prior NFL appearances lack required weekly forecast coverage
-and remain unknown. This source probe does not prove preseason or future accuracy.
-Controlled preseason tests cover no-history rookie estimates without borrowing
-later-issued projections. Native GPT-6.1-Sol high reasoning validates both passes
-for the fictional 12-point rookie versus 15/25-point owned receivers: Hold, confidence
-50, no invented historical games, unknown perception. The immediate-upgrade
-expectation was corrected after the model exposed the original fixture's mismatch.
-The final targeted native case passes; the full twenty-one-case native sweep was
-not rerun. Future playing time, broad custom/platform scoring, deeper comparisons,
-media relevance and prospective fantasy/betting quality remain unverified.
-
-Final verification passes the root command with 740 workspace tests (312 API, 164
-core, 180 integrations, 84 dashboard), sixteen evaluator regressions across twenty-
-one controlled cases and two expected platform skips. All 200 final desktop/mobile
-Chromium journeys pass, including six public forecast workflows for rookie weekly
-numbers, exact remaining trade horizons, both passes, saved reloads/settings isolation
-and searchable Help navigation. Inspect 1440×1000 and 320×568 screenshots outside
-the repo; expected numbers and source cards are readable without overflow/runtime
-errors. Build, types, lint, formatting and whitespace checks pass. Manual boundary
-review covers scoring, identities, time/freshness, sparse expectations, caches,
-source closure, prompt limits and transaction isolation; no automated security scan
-runs. Browser plugin absent, repository Playwright used with temporary SQLite/dummy
-providers. All owned processes are terminal; no new credentials, real delivery,
-roster/wager action, owner-service restart, commit or release. Other browsers/real
-devices/human sessions remain open, as does the original advisor goal.
+ESPN public weekly forecasts were verified as a projection source on October 9 (6,190 live weekly
+rows across 428 players). The app stopped using them on October 23 and now makes its own
+projections (`sidekick-model-v1`); ESPN forecasts remain only an offline benchmark in
+`scripts/research/`. See [decisions](decisions.md), "Own projections; ESPN projections removed".
 
 ## Advisor integration completion — October 9, 2026
 
@@ -677,268 +645,17 @@ There is no completed real forward sample yet. Historical timestamp/book coverag
 prospective fantasy/AI accuracy and profit remain unverified. See the
 [dated review](reviews/2026-10-11-live-prices-and-performance.md).
 
-## Improved game-market model — October 12, 2026
+## Game-market model versions — October 12–13, 2026
 
-Paired-price games use the new opponent-adjusted, regularized book-input model.
-Frozen older-season parameters reduce aggregate Brier error 7.27% versus the
-previous model in the real 2022–2025 archived-price comparison, covering 3,221
-matched non-push outcomes. The book baseline remains slightly better overall;
-recent totals trail it and a consistent advantage/profitability is unestablished.
-The statistical current Rams–Bills check uses actual public DraftKings prices,
-produces all three new forecasts and withholds unsupported action. Dummy browser
-checks verify saved schemas, source disclosure and separate prospective methods.
-This does not verify actual future outcomes, all sportsbooks/props, other devices
-or packaged releases. [Evidence](reviews/2026-10-12-model-v2-comparison.md).
-
-## Further context/blend model — October 12, 2026
-
-V3 adds earlier-week rest, season phase, line and team-residual context, with
-adaptive moneyline shrinkage. The frozen older-development selection reproduces
-on production data. A reused 3,221-outcome 2022–2025 audit improves pooled Brier
-slightly versus v2 and the book, but beats the book in only five of twelve
-season/market cases; pooled uncertainty includes zero and no simultaneous
-comparison establishes superiority. No paper selection qualifies. Consistent
-accuracy advantage and future profitability remain unverified.
-
-All 766 workspace tests, 220 Chromium journeys and two actual-report visual
-checks pass. Saved v2 remains readable and new v3 ledger identities are separate.
-Actual public prices exercise all three current game markets; bounded/full
-numeric contexts agree exactly and action is withheld. No future outcomes,
-all-book/prop support, other browsers/devices or release certification is implied.
-[Evidence](reviews/2026-10-12-model-v3-comparison.md).
-
-## Dated health/weather totals — October 12, 2026
-
-Typed injury, captured quarterback-change and regional forecast context is
-implemented for supported v4 totals. Moneyline/spread retain v3 probabilities.
-2025/2026 NFLverse injury files lack update timestamps and are excluded; historical
-2025 injury coverage is zero. Older undated charts are excluded. The live ESPN
-alternative supplied dated labels for a real Rams–Bills event, with IR excluded;
-its equivalence to historical NFLverse labels remains unverified. Covered SoFi
-weather stays unknown. All live numeric picks were withheld.
-
-The frozen reused 3,221-outcome study improves totals versus v3 in three of four
-seasons and worsens 2024. The model beats the book in five of twelve cells, with
-pooled uncertainty spanning zero and no qualified paper bets. Injury-only
-diagnostic error worsens v3; reliable independent injury/QB/weather benefits,
-future outcomes, profitability and consistent market superiority are unestablished.
-See [v4 source/method/test evidence](reviews/2026-10-12-model-v4-comparison.md).
-
-All 781 workspace tests/root suites, 222 Chromium journeys and two actual-report
-visual checks pass, with final build/types/lint/format/whitespace validation.
-These checks do not certify a packaged release or future prediction accuracy.
-
-## Better personnel sources — October 12, 2026
-
-Official NFL article modification dates recover usable injury facts for 130 games
-in the 2025 study, with partial coverage and actual article links. Prior weekly
-passing performance and snap roles have typed adapters, strict identity/cutoff
-checks and unknown unmatched values. These inputs are descriptive; six tested
-corrections worsened older development error, and the official-count trial raised
-recent error. No production v5 is enabled. Retained v3/v4 errors reproduce exactly;
-only five of twelve market/season cells beat the book and uncertainty spans zero.
-
-790 workspace tests plus root suites, 222 Chromium journeys and final focused provider/
-model checks pass. A real pregame numerical record captures current source context
-and paired prices for later grading; outcomes are pending and all picks were
-withheld. Exact publication/fill timing, officially confirmed starters, sustained
-book advantage and profitability remain unverified.
-[Evidence](reviews/2026-10-12-personnel-data-comparison.md).
-
-## Richer QB/practice research — October 12, 2026
-
-Typed passing/rushing EPA, team-relative QB evidence and position/practice role
-features are implemented and tested. Advice exposes descriptive values without
-changing production probabilities. The frozen v6 candidate lowers aggregate Brier
-on 3,221 matched archive outcomes to 0.23653643 versus the book's 0.23666635, but
-beats it in only six of twelve season/market cells; all simultaneous intervals
-include zero. On 224 additional 2026 outcomes, only spreads beat the book.
-Numerical deployment, consistent advantage and profitability are unverified.
-
-2016–2025 snapshots have both-team EPA in 2,231 of 2,639 contexts and offensive
-limited-practice roles in 1,647. No usable dated 2025 practice or 2026 injury
-coverage was recovered by these sources. A live 2026 typed-source check returns
-180 QB rows (174 usable EPA) and 7,277 snaps. That proves parser/source compatibility,
-not complete injury coverage or historical publication timing. Regression tests
-verify target/week/future invariance and production probability preservation.
-[Evidence](reviews/2026-10-12-model-v6-comparison.md).
-
-## Alternate boosted-tree comparison — October 13, 2026
-
-Research-only time-decayed boosted trees and adaptive book blending are implemented
-and tested with deterministic future/target/week exclusion. Eighteen older-data
-procedures per market are compared and frozen. On 3,221 matched archive outcomes,
-trees score Brier 0.23691737 versus book 0.23666635, winning five of twelve cells.
-Trees win all four archived totals cells, but 2026 totals and pooled results lose.
-All uncertainty intervals remain compatible with no advantage. No v7 production
-method, sportsbook edge or profitability is verified.
-
-The original pre-kickoff v6 Bills–Rams forecast has a separate final-result receipt:
-Buffalo 37, Rams 34. Moneyline/spread error slightly improve versus the recorded
-book, while total error worsens. That is one independently observed game, excluded
-from v7 selection and the prior current-season replay. 799 workspace tests plus
-root suites and final checks pass.
-[Evidence](reviews/2026-10-13-model-v7-comparison.md).
-
-## Totals hybrid seasonal retest — October 13, 2026
-
-The research hybrid and optional weekly calibration/book blending are implemented
-and verified for target/week/future exclusion and exact v3 non-total preservation.
-Seventeen older procedures are compared. The selected plain hybrid has archive
-Brier 0.23638752 versus paired book 0.23666635, winning seven of twelve cells and
-all four totals seasons. Its intervals include zero and current-season totals
-regress. Enabled seasonal correction loses older selection and worsens later
-results. No live hybrid method, consistent edge or profitability is established.
-802 workspace tests plus root suites and final checks pass.
-[Evidence](reviews/2026-10-13-model-v8-hybrid-comparison.md).
-
-## Online totals-expert retest — October 13, 2026
-
-Totals-only expert tracking is implemented and verified for recovery, season
-reset/carry, prior-week label exclusion, convex/isolated weights and exact v3
-moneyline/spread output. Older selection rejects all sixteen mixtures. The best
-enabled mixture cuts reused 2026 totals excess error about 85%, but scores Brier
-0.25045825 versus book 0.25004633 and production 0.25015286. A fixed-weight
-control does slightly better than learning on both samples; adaptive value, a
-consistent edge and profitability remain unverified. No live method changes.
-805 workspace tests plus root suites and final checks pass.
-[Evidence](reviews/2026-10-13-model-v9-expert-comparison.md).
-
-## Game-level totals-signal retest — October 13, 2026
-
-Bounded weekly team-stat ingestion and prior-week opponent-adjusted efficiency/
-volume features are implemented and tested. Live public reads yield 5,948 rows;
-5,938 join the fixed completed rating-observation pool. All audited totals have
-supported prior histories. Raw reparse, historical aliases, malformed/missing/
-duplicate inputs and target/future label/stat exclusion are verified. Historical
-publication/revision availability and true neutral-script tempo are unverified.
-
-Older selection retains plain hybrid. A separately frozen new-feature mixture
-wins all four archive totals seasons, Brier 0.24949643 versus book 0.25011732,
-but fails current totals, 0.25076852 versus book 0.25004633 and fixed mixture
-0.25039020. Moneyline/spread remain exactly unchanged. No live model switch,
-consistent edge or profitability is established. 812 workspace tests plus root
-suites and final checks pass.
-[Evidence](reviews/2026-10-13-model-v10-matchup-comparison.md).
-
-## External-market totals research — October 13, 2026
-
-Real bounded public reads collected 113 matched Kalshi/Polymarket tapes and
-62,463 pre-cutoff trades for a fresh 79-game 2026 replay. Price coverage is 74,
-flow coverage 64; only one game has a supported nonzero wallet-weight feature.
-Settlement-payout leakage, pagination/time filtering, direction/identity gates,
-past-only wallet weighting and exact moneyline/spread output are tested. Combined
-totals Brier 0.25013828 and flow 0.25018439 beat book 0.25026877 in point estimates;
-whole-sample intervals include zero. This is a different fresh base from the old
-77-game enriched context, not a reproduced old audit or a validated profit claim.
-
-Fourteen upcoming forecasts have verified live paired book prices and sealed
-numeric records; all results remain pending. Separate current headline capture
-is implemented, but historical sentiment accuracy and representative social
-coverage are unverified. No live model switch or background collector. 819
-workspace tests plus root suites and final checks pass.
-[Evidence](reviews/2026-10-13-model-v11-external-markets.md).
-
-### Historical prediction-market expansion (research only)
-
-Live public checks recover sixteen 2024 Polymarket totals contracts and 380
-2025 provider/game tapes (156 Kalshi, 224 Polymarket), combined with the unchanged
-113 v11 2026 tapes. Seven-day windows, archived endpoints, historical dollar
-fields, legacy minute prices and verified title/rule orientation are implemented.
-Checked 2023 sources yield no usable contracts; 2024 wallet activity is sparse.
-
-The frozen expanded totals candidate beats the reused 2026 sportsbook point
-estimate (0.24989373 versus 0.25026877), but loses the combined late-2025/2026
-audit (0.25064412 versus 0.25032936). Intervals include no improvement. Moneyline
-and spreads are exact matches to production; production dispatch and earlier
-forecast seals are unchanged. No consistent edge, executable historical returns,
-general historical sentiment or proven whale skill is verified.
-[Evidence](reviews/2026-10-13-model-v12-historical-totals.md).
-
-### Seasonal external totals feedback (research only)
-
-Verified weighted weekly fits, seasonal reset/weak-prior alternatives and earlier
-prequential forecast feedback on the same frozen v12 sources. Selected adapter
-reduces late-2025 excess Brier loss by 44.6% (0.25073543 versus old 0.25103671),
-but still loses book 0.25036106 and the combined audit. The 2026 point estimate
-is 0.25025792 versus book 0.25026877, with modifications confined to one week.
-Intervals include no improvement. Moneyline/spreads remain numerically exact;
-live dispatch and earlier forecast seals are preserved. No consistent edge or
-independent prospective success is verified.
-[Evidence](reviews/2026-10-13-model-v13-seasonal-external-totals.md).
-
-### Fixed coverage/liquidity ablation (research only)
-
-Verified forced removal of coverage/unsigned-volume predictors in both fit and
-inference, plus a stricter fixed price-only control. Adaptation/source settings
-remain fixed. Primary ablation reduces late-2025 excess loss by 85.0%, scoring
-0.25041735 versus book 0.25036106; combined audit still loses (0.25036635 versus
-0.25032936). Price-only differences are practically negligible and it returns
-book exactly on 2026. No sportsbook edge or new prospective success is verified.
-Moneyline/spread outputs, production and earlier issued records remain unchanged.
-[Evidence](reviews/2026-10-13-model-v14-directional-totals.md).
-
-### Canonical signed-flow repair and robust pressure (research only)
-
-Verified official Kalshi direction semantics against all 117,536 captured raw
-executions: legacy parsing mapped every one to Under, and 70,673 Over directions
-are repaired in separately retained inputs. This invalidates earlier attribution
-to correctly oriented Kalshi flow; old forecasts remain exactly as issued. No
-production dispatch uses the research adapter.
-
-Verified centered minute/actor pressure, split-fill invariance, distinct-minute
-gates, large-bucket classification and a price-confirmed control. Direction-only
-repair still loses late 2025. Robust primary scores 0.25036107 versus book
-0.25036106 there, with tiny combined and 2026 point wins and intervals including
-zero. Most forecast corrections are practically negligible; no consistent edge
-or independent prospective success is verified. Moneyline/spreads remain exact.
-[Evidence](reviews/2026-10-13-model-v15-robust-trade-flow.md).
-
-### Football drive residual totals (research only)
-
-Verified bounded live nflverse PBP acquisition for 2019–2026, paired derivation of
-3,822 team-game rows, 39 unavailable historical games and exact offline replay from
-retained selected source fields. Verified opponent-adjusted prior-week football
-features, continuous totals residual fitting, prior-season carryover, earlier-origin
-feedback and separately fitted corrected-flow ablation. Historical publication
-vintages and sportsbook observation times remain unavailable.
-
-Frozen development-selected football-only primary scores 0.24869777 versus book
-0.25026877 on 79 reused 2026 games, and 0.25016943 versus 0.25032936 on combined
-audit. It still loses late 2025 and all 890 matched totals. Added flow worsens both
-later phases; nominal primary intervals include zero. No consistent edge or
-independent prospective success is verified, and no production model is promoted.
-All four candidates preserve 893 moneyline and 870 spread outputs exactly.
-[Evidence](reviews/2026-10-13-model-v16-drive-totals.md).
-
-### Independent recent totals feedback (research only)
-
-Verified exact v16 raw forecast reproduction and new feedback with bounded current-
-season history, distinct-week/effective-game guards, season reset or limited fading
-seed, and half/full correction caps. Frozen development selects a two-week half-
-life, cap 0.5 and reset. Source features, fitting and no-flow choice are unchanged.
-
-On reused samples, late-2025 Brier improves to 0.25024812 versus book 0.25036106;
-combined audit is 0.24985803 versus 0.25032936, and all 890 totals are 0.25007216
-versus 0.25010217. 2026 retains a smaller gain than v16; full 2023 and 2024 still
-lose. Conservative intervals include zero and no independent prospective or
-consistent edge is established. All eight variants preserve 893 moneyline and
-870 spread outputs exactly; production and issued forecasts are unchanged.
-[Evidence](reviews/2026-10-13-model-v17-recent-feedback.md).
-
-### Weekly stability totals feedback (rejected research candidate)
-
-Verified exact v17 reproduction, weekly cluster/leave-week-out reliability with
-pooled/directional heads, three-week evidence gates and immutable policy/cache.
-Selected on 537 earlier 2021–2022 totals; inherited source settings were previously
-selected later, so the complete pipeline remains retrospective.
-
-Primary reduces 2023 and 2024 excess loss by 14.7% and 91.3% but still loses both.
-All 890 Brier regresses to 0.25024754 versus book 0.25010217 and v17 0.25007216;
-late 2025 also loses. Stricter controls copy book exactly throughout 2024, and
-no candidate is promoted. All six preserve 890 raw totals, 893 moneyline and
-870 spread probabilities exactly. No independent prospective edge is verified.
-[Evidence](reviews/2026-10-13-model-v18-stable-feedback.md).
+Production uses `market-context-v3` for moneyline and spread and `health-weather-total-v4` for
+supported totals. On the reused 3,221-outcome 2022–2025 archive they improve slightly on the old
+scores-only model and roughly match the no-vig sportsbook; every book-improvement interval
+includes zero and no paper selection qualifies. Research versions v5–v18 (personnel, boosted
+trees, hybrids, prediction-market flow, drive features, feedback schemes) were local research only
+and none showed a consistent edge. The October 22 untouched 2026 holdout (272 outcomes) also
+includes zero. Future pre-kickoff outcomes, sportsbook identity, quote timing and fills remain
+unverified. See the [betting model history](reviews/2026-10-betting-model-history.md) and the
+[October 22 test](reviews/2026-10-22-betting-model-test.md).
 
 ## Report library preview — October 14, 2026
 
@@ -952,7 +669,7 @@ support. See [exact current preview receipts](reviews/2026-10-14-report-library.
 ## Real report QA — October 14, 2026
 
 Five default report types pass real-model review against a sanitized public 2018 league and
-separate 2026 Week 6 public-projection scenarios. One-time/recurring cron ticks produce dashboard
+separate 2026 Week 6 public-projection scenarios (ESPN projections, no longer used). One-time/recurring cron ticks produce dashboard
 drafts, with duplicate prevention, eligible-lineup gating and no outbound delivery. 104 source/
 content checks and eight actual reports render in the corrected macOS ARM preview without
 dialogs/errors, including source links, two-decimal scores/year labels, missing graphs and
@@ -963,7 +680,8 @@ Windows/Linux native verification is claimed. [Current exact receipts](reviews/2
 
 Authorized private ESPN browser-source import now has API and real-file
 desktop/mobile/restart coverage: 12 teams, 199 roster entries, 192 picks and 198
-validated current-week league-applied forecasts. It is a labeled manual snapshot;
+validated current-week league-applied forecasts (ESPN projections are no longer saved from
+imports as of October 23). It is a labeled manual snapshot;
 authenticated automatic refresh, historical numeric-rule scoring and seasonal
 forecast coverage are not established by this test.
 

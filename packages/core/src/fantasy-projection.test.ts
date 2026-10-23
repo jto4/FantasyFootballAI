@@ -6,7 +6,9 @@ import {
   projectPlayerStats,
   projectSpecialTeamsPoints,
   projectionContext,
+  ruledOutKeys,
   teamGame,
+  vacatedCarryShare,
 } from './fantasy-projection.js';
 import { propModelSettings } from './prop-model-settings.js';
 
@@ -94,4 +96,55 @@ it('projects kickers and defenses from scored history and the betting total', ()
   expect(
     projectSpecialTeamsPoints('K', 'SEA', target, history.slice(0, 2), context, flat),
   ).toBeUndefined();
+});
+
+it('gives a running back the carries of a teammate back ruled out this week', () => {
+  const back = (id: string, week: number, carries: number): PlayerGameStats => ({
+    playerId: id,
+    name: `Fictional Back ${id}`,
+    position: 'RB',
+    team: 'SEA',
+    opponent: 'LA',
+    gameId: game(week).id,
+    season: 2026,
+    week,
+    seasonType: 'REG',
+    stats: { carries, rushing_yards: carries * 4, rushing_tds: 0, receptions: 2 },
+  });
+  const starter = [1, 2, 3].map((w) => back('00-0000010', w, 15));
+  const backup = [1, 2, 3].map((w) => back('00-0000011', w, 5));
+  const ruledOut = ruledOutKeys([
+    { gsisId: '00-0000010', season: 2026, week: 4, seasonType: 'REG', reportStatus: 'Out' },
+    { gsisId: '00-0000012', season: 2026, week: 4, reportStatus: 'Questionable' },
+    { gsisId: '00-0000013', season: 2026, week: 4, seasonType: 'POST', reportStatus: 'Out' },
+  ]);
+  expect([...ruledOut]).toEqual(['2026:4:00-0000010']);
+  const data = { players: [...starter, ...backup], games };
+  const context = projectionContext(data, { snaps: new Map(), depth: new Map(), ruledOut });
+  // The starter had 45 of the backs' 60 recent carries; his own projection is not adjusted.
+  expect(vacatedCarryShare(context, '00-0000011', 'SEA', games[3]!)).toBeCloseTo(0.6);
+  expect(vacatedCarryShare(context, '00-0000010', 'SEA', games[3]!)).toBe(0);
+  const input = {
+    playerId: '00-0000011',
+    position: 'RB',
+    team: 'SEA',
+    game: games[3]!,
+    history: backup,
+  };
+  const plain = projectFantasyPoints(halfPpr, input, context, propModelSettings)!;
+  const adjusted = projectFantasyPoints(
+    halfPpr,
+    input,
+    context,
+    propModelSettings,
+    undefined,
+    0.75,
+  )!;
+  expect(adjusted.vacatedCarryShare).toBeCloseTo(0.6);
+  expect(adjusted.stats.carries! / plain.stats.carries!).toBeCloseTo(2.5 ** 0.75);
+  expect(adjusted.stats.receptions).toBe(plain.stats.receptions);
+  expect(adjusted.points).toBeGreaterThan(plain.points);
+  // Without an injury list nothing changes.
+  const healthy = projectionContext({ players: [...starter, ...backup], games });
+  expect(vacatedCarryShare(healthy, '00-0000011', 'SEA', games[3]!)).toBe(0);
 });
