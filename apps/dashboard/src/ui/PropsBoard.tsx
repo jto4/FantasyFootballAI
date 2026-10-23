@@ -323,8 +323,8 @@ export function PropsBoard({
                         </strong>
                         {r.lean ? (
                           <span className={`lean-chip ${r.lean.strength}`}>
-                            {r.lean.side === 'over' ? 'Over' : 'Under'} · {r.lean.strength} (+
-                            {num(r.lean.score * 100)} pts)
+                            {r.lean.side === 'over' ? 'Over' : 'Under'} · {r.lean.strength}{' '}
+                            <span className="lean-edge">+{num(r.lean.score * 100)} pts</span>
                           </span>
                         ) : (
                           <small>No lean{r.model.edge > 0 ? ' without a real price' : ''}</small>

@@ -338,6 +338,8 @@ export function summarizePropLeans(records: PropLeanRecord[]) {
       ...(wins + losses ? { winRate: Math.round((wins / (wins + losses)) * 1000) / 1000 } : {}),
     };
   };
+  // Only leans the prop model priced count; earlier gap-based leans used a different method.
+  records = records.filter((r) => r.overChance !== undefined);
   const graded = records.filter((r) => r.result);
   // Brier score of the model's over chance on decided props; 0.25 is a coin flip.
   const priced = graded.filter((r) => r.overChance !== undefined && r.result!.outcome !== 'push');

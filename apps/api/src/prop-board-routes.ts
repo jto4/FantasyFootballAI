@@ -47,6 +47,9 @@ export class PropLeanStore {
       }[]
     ).map((row) => JSON.parse(row.payload) as PropLeanRecord);
   }
+  delete(key: string) {
+    this.db.prepare('DELETE FROM leans WHERE key = ?').run(key);
+  }
   save(record: PropLeanRecord) {
     this.db
       .prepare(
@@ -228,10 +231,15 @@ export function createPropBoardRouter(deps: {
         : {}),
     });
     for (const row of rows) {
-      if (!row.lean || row.projection === undefined || !row.kickoffAt) continue;
-      if (Date.parse(row.kickoffAt) <= now()) continue;
+      if (!row.kickoffAt || Date.parse(row.kickoffAt) <= now()) continue;
+      const key = `${row.gameId}:${row.espnId ?? row.playerName}:${row.stat}`;
+      // Before kickoff a prop that no longer leans must not keep an earlier saved lean.
+      if (!row.lean || row.projection === undefined) {
+        deps.leans.delete(key);
+        continue;
+      }
       deps.leans.save({
-        key: `${row.gameId}:${row.espnId ?? row.playerName}:${row.stat}`,
+        key,
         gameId: row.gameId,
         kickoffAt: row.kickoffAt,
         playerName: row.playerName,

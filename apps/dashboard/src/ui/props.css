@@ -160,3 +160,13 @@
 .props-table td .lean-chip {
   margin-top: 4px;
 }
+.lean-edge {
+  text-transform: none;
+  font-weight: 500;
+}
+.props-table td:last-child {
+  white-space: nowrap;
+}
+.props-record span {
+  display: block;
+}

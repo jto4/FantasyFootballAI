@@ -134,6 +134,7 @@ it('grades a saved lean from the game’s stats and summarizes against break-eve
     side: 'over',
     strength: 'strong',
     projection: 80,
+    overChance: 0.6,
     observedAt: '2026-10-18T00:00:00Z',
   };
   const stats = [log(6, 75)];
@@ -155,5 +156,12 @@ it('grades a saved lean from the game’s stats and summarizes against break-eve
     breakEven: 0.524,
     overall: { wins: 1, losses: 1, pushes: 0, winRate: 0.5 },
     byStrength: { strong: { wins: 1, losses: 0 }, slight: { wins: 0, losses: 1 } },
+    // (0.6 − 1)² for the over that hit and (0.6 − 0)² for the over that missed.
+    brier: 0.26,
+    pricedGames: 2,
   });
+  // Leans the model didn't price (the earlier gap method) are left out of the record.
+  const unpriced: PropLeanRecord = { ...lean };
+  delete unpriced.overChance;
+  expect(summarizePropLeans([unpriced]).pending).toBe(0);
 });
