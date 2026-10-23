@@ -4,7 +4,6 @@ import { useLiveDashboard } from './hooks/useLiveDashboard';
 import { requestJson } from './api-client';
 import {
   isGenerationJob,
-  isGenerationRequest,
   isSavedReport,
   scheduleRecommendations,
   type GenerationRequest,
@@ -16,7 +15,9 @@ import { FriendlyError } from './FriendlyError';
 import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
-import { readTeamSelections, saveTeamSelections, selectedTeamId } from './team-selection';
+import { useChatPanel } from './hooks/useChatPanel';
+import { usePendingGeneration } from './hooks/usePendingGeneration';
+import { useTeamSelection } from './hooks/useTeamSelection';
 import { ChatBox } from './ChatBox';
 import type { SchedulePrefill } from './ScheduleEditor';
 import type { SearchTask } from './search-tasks';
@@ -121,25 +122,7 @@ export function App() {
   const setActiveLeagueId = (leagueId: string) => updateRoute({ leagueId, reportId: '' });
   const setInitialReviewId = (reportId: string) => updateRoute({ reportId }, false, false);
   const [generatingKind, setGeneratingKind] = useState('');
-  const [pendingGeneration, setPendingGeneration] = useState<GenerationRequest | null>(() => {
-    try {
-      const value: unknown = JSON.parse(
-        localStorage.getItem('sidekick.pendingGeneration') ?? 'null',
-      );
-      return isGenerationRequest(value) ? value : null;
-    } catch {
-      return null;
-    }
-  });
-  useEffect(() => {
-    try {
-      if (pendingGeneration)
-        localStorage.setItem('sidekick.pendingGeneration', JSON.stringify(pendingGeneration));
-      else localStorage.removeItem('sidekick.pendingGeneration');
-    } catch {
-      /* The server still retains this job if browser storage is unavailable. */
-    }
-  }, [pendingGeneration]);
+  const [pendingGeneration, setPendingGeneration] = usePendingGeneration();
   const pendingJob = state.generationJobs?.find(
     (job) => job.requestId === pendingGeneration?.requestId,
   );
@@ -183,23 +166,7 @@ export function App() {
   const [aiChecking, setAiChecking] = useState(false);
   const [aiCredentialRevision, setAiCredentialRevision] = useState(0);
   const [showTools, setShowTools] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-  useEffect(() => {
-    // ⌘/Ctrl+J toggles the chat panel from anywhere, including while typing in it.
-    const listener = (event: KeyboardEvent) => {
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        !event.altKey &&
-        !event.shiftKey &&
-        event.key === 'j'
-      ) {
-        event.preventDefault();
-        setChatOpen((open) => !open);
-      }
-    };
-    window.addEventListener('keydown', listener);
-    return () => window.removeEventListener('keydown', listener);
-  }, []);
+  const [chatOpen, setChatOpen] = useChatPanel();
   const [setupWizardOpen, setSetupWizardOpen] = useState(false);
   const [setupWizardStep, setSetupWizardStep] = useState(setupProgress?.step ?? 0);
   const setupWizardTriggerRef = useRef<HTMLButtonElement>(null);
@@ -280,23 +247,11 @@ export function App() {
     'checking' | 'running' | 'stopping' | 'stopped' | 'unavailable'
   >('checking');
   const league = resolveActiveLeague(state.leagues, activeLeagueId);
-  const [teamSelections, setTeamSelections] = useState(readTeamSelections);
-  const homeTeamId = selectedTeamId(league, teamSelections);
-  function chooseTeam(id: string) {
-    if (!league?.teams.some((team) => team.id === id)) return;
-    const next = Object.fromEntries([
-      ...Object.entries(teamSelections)
-        .filter(([key]) => key !== league.id)
-        .slice(-99),
-      [league.id, id],
-    ]);
-    void saveTeamSelections(next).catch(() =>
-      setNotice(
-        'Your team choice is active for this session, but could not be saved on this device.',
-      ),
-    );
-    setTeamSelections(next);
-  }
+  const { teamId: homeTeamId, chooseTeam } = useTeamSelection(league, () =>
+    setNotice(
+      'Your team choice is active for this session, but could not be saved on this device.',
+    ),
+  );
 
   useEffect(() => {
     if (!league) return;
