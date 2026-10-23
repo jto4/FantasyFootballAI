@@ -20,7 +20,7 @@ export type WeeklyBriefing = {
   }[];
   waivers: { id: string; name: string; position: string; gain: number }[];
   notes: string[];
-  matchup?: { week: number; you: MatchupSide; opponent: MatchupSide };
+  matchup?: { week: number; you: MatchupSide; opponent: MatchupSide; winProbability?: number };
 };
 
 export type MatchupSide = {
@@ -28,7 +28,15 @@ export type MatchupSide = {
   name: string;
   points?: number;
   /** `started`: the game has begun, so the player's points are already in the score. */
-  starters: { id: string; name: string; position: string; estimate?: number; started?: boolean }[];
+  starters: {
+    id: string;
+    name: string;
+    position: string;
+    estimate?: number;
+    /** 10th–90th percentile of past results around estimates like this one. */
+    range?: { low: number; high: number };
+    started?: boolean;
+  }[];
   projected?: number;
 };
 
@@ -52,7 +60,11 @@ function isMatchupSide(x: unknown): x is MatchupSide {
         person(p) &&
         text((p as { position?: unknown }).position, 10) &&
         ((p as { estimate?: unknown }).estimate === undefined ||
-          finite((p as { estimate?: unknown }).estimate)),
+          finite((p as { estimate?: unknown }).estimate)) &&
+        ((p as { range?: unknown }).range === undefined ||
+          (record((p as { range?: unknown }).range) &&
+            finite((p as { range: Record<string, unknown> }).range.low) &&
+            finite((p as { range: Record<string, unknown> }).range.high))),
     )
   );
 }
@@ -96,7 +108,11 @@ export function isWeeklyBriefing(value: unknown): value is WeeklyBriefing {
       (record(value.matchup) &&
         Number.isInteger(value.matchup.week) &&
         isMatchupSide(value.matchup.you) &&
-        isMatchupSide(value.matchup.opponent)))
+        isMatchupSide(value.matchup.opponent) &&
+        (value.matchup.winProbability === undefined ||
+          (finite(value.matchup.winProbability) &&
+            value.matchup.winProbability >= 0 &&
+            value.matchup.winProbability <= 1))))
   );
 }
 

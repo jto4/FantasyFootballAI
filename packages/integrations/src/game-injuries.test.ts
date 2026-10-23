@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { parseDatedGameInjuries } from './game-injuries.js';
+import { GameDayInjuries, parseDatedGameInjuries } from './game-injuries.js';
 import { buildPregameAvailability } from './game-availability.js';
 import type { FootballGame } from '@sidekick/core';
 const game: FootballGame = {
@@ -81,4 +81,24 @@ it('rejects changed event/team identities, started games, duplicate teams and fu
   const duplicate = payload();
   duplicate.injuries.push(duplicate.injuries[0]!);
   expect(() => parseDatedGameInjuries(duplicate, game, at)).toThrow();
+});
+
+it('caches each game-day list for ten minutes and retries failures', async () => {
+  let calls = 0;
+  let clock = Date.parse(at);
+  let fail = true;
+  const fetcher = (async () => {
+    calls++;
+    if (fail) return new Response('', { status: 503 });
+    return new Response(JSON.stringify(payload()), { status: 200 });
+  }) as typeof fetch;
+  const lists = new GameDayInjuries(fetcher, () => clock);
+  await expect(lists.get(game)).rejects.toThrow();
+  fail = false;
+  expect((await lists.get(game)).map((r) => r.fullName)).toEqual(['Recorded QB']);
+  await lists.get(game);
+  expect(calls).toBe(2);
+  clock += 11 * 60_000;
+  await lists.get(game);
+  expect(calls).toBe(3);
 });

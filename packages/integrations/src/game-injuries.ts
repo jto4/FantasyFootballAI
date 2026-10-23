@@ -92,3 +92,21 @@ export async function fetchDatedGameInjuries(
     new Date(now()).toISOString(),
   );
 }
+
+/** Game-day lists per game, cached for ten minutes; failures are not cached. */
+export class GameDayInjuries {
+  private cache = new Map<string, { until: number; value: Promise<NFLInjuryReportRow[]> }>();
+  constructor(
+    private readonly fetcher: typeof fetch = fetch,
+    private readonly now: () => number = Date.now,
+  ) {}
+  get(game: FootballGame): Promise<NFLInjuryReportRow[]> {
+    const hit = this.cache.get(game.id);
+    if (hit && hit.until > this.now()) return hit.value;
+    const value = fetchDatedGameInjuries(game, this.fetcher, this.now);
+    this.cache.set(game.id, { until: this.now() + 10 * 60_000, value });
+    value.catch(() => this.cache.delete(game.id));
+    while (this.cache.size > 40) this.cache.delete(this.cache.keys().next().value!);
+    return value;
+  }
+}

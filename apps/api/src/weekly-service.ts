@@ -15,8 +15,14 @@ import {
   type PlayerGameStats,
   rankWaivers,
   findTrades,
+  playerNameKey,
+  type FootballGame,
+  fantasyOutcomeSpread,
+  matchupVarianceScale,
+  matchupWinProbability,
+  projectionRange,
 } from '@sidekick/core';
-import type { LiveBoxScore } from '@sidekick/integrations';
+import type { LiveBoxScore, NFLInjuryReportRow } from '@sidekick/integrations';
 import { adviceInjuryEvidence } from '@sidekick/integrations';
 import { projectionSourceId } from './projections.js';
 
@@ -32,9 +38,12 @@ export interface LineupAlerts {
   alerts: {
     playerId: string;
     name: string;
-    reason: 'out' | 'doubtful' | 'bye';
+    /** `inactive`: listed Out on the game-day report after the team's earlier designation. */
+    reason: 'out' | 'inactive' | 'doubtful' | 'bye';
     status?: string;
     kickoffAt?: string;
+    /** The lineup optimizer's swap, or the best same-position bench player yet to play. */
+    replacement?: { id: string; name: string; estimate: number };
   }[];
   /** Earliest upcoming kickoff among this week's starters. */
   nextKickoffAt?: string;
@@ -70,6 +79,8 @@ export interface WeeklyBriefing {
     week: number;
     you: MatchupSide;
     opponent: MatchupSide;
+    /** Chance you outscore the opponent, before any starter's game begins (see Live after). */
+    winProbability?: number;
   };
 }
 
@@ -78,7 +89,15 @@ export interface MatchupSide {
   name: string;
   /** Platform-recorded score; may be live during games. */
   points?: number;
-  starters: { id: string; name: string; position: string; estimate?: number }[];
+  starters: {
+    id: string;
+    name: string;
+    position: string;
+    estimate?: number;
+    /** 10th–90th percentile of past results around estimates like this one. */
+    range?: { low: number; high: number };
+    started?: boolean;
+  }[];
   /** Sum of starter estimates, only when every starter has one for this week. */
   projected?: number;
 }
@@ -94,6 +113,10 @@ export function createWeeklyService(
   const { now, load } = shared;
   const usageFor = projectionUsage(deps);
   async function briefing(leagueId: string, teamId: string): Promise<WeeklyBriefing> {
+    return (await briefingWithEvidence(leagueId, teamId)).summary;
+  }
+  /** The briefing plus the player evidence and roster behind it, for alerts. */
+  async function briefingWithEvidence(leagueId: string, teamId: string) {
     const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
     if (!leagueRow?.teams.some((team) => team.id === teamId))
       throw new Error('That team is not in the connected league.');
@@ -122,7 +145,7 @@ export function createWeeklyService(
       }),
     );
     const evidence = buildPlayerEvidence({
-      usage: await usageFor(loaded.season),
+      usage: await usageFor(loaded.season, loaded.data.games),
       league,
       players: loaded.players,
       projections: deps.store
@@ -205,9 +228,12 @@ export function createWeeklyService(
       .map(({ player, evidence, status }) => ({
         id: player.id,
         name: player.name,
-        // A this-week report without a designation supersedes the older roster flag.
+        // A this-week report without a designation supersedes an older roster flag, but not an
+        // Out flag: that already keeps the player out of the lineup math.
         status:
-          evidence?.coverage === 'week-window' && !evidence.status
+          evidence?.coverage === 'week-window' &&
+          !evidence.status &&
+          !isInactiveFootballStatus(status)
             ? 'No game designation'
             : status!,
         basis:
@@ -261,11 +287,17 @@ export function createWeeklyService(
         // the team score.
         const started =
           week === leagueWeek && byId.get(id)?.warnings.includes(weeklyGameWithheldWarning);
+        const position = player?.position ?? '';
+        const range =
+          estimate !== undefined
+            ? projectionRange(position, estimate, fantasyOutcomeSpread)
+            : undefined;
         return {
           id,
           name: player?.name ?? 'Unknown player',
-          position: player?.position ?? '',
+          position,
           ...(estimate !== undefined ? { estimate } : {}),
+          ...(range ? { range: { low: range.low, high: range.high } } : {}),
           ...(started ? { started: true } : {}),
         };
       });
@@ -295,13 +327,31 @@ export function createWeeklyService(
     };
     const matchup =
       current && current.teams.length === 2
-        ? {
-            week: current.week,
-            you: side(current.teams.find((t) => t.teamId === teamId)!),
-            opponent: side(current.teams.find((t) => t.teamId !== teamId)!),
-          }
+        ? (() => {
+            const you = side(current.teams.find((t) => t.teamId === teamId)!);
+            const opponent = side(current.teams.find((t) => t.teamId !== teamId)!);
+            // Pre-kickoff only: once games start, Live tracks the score as it changes.
+            const pregame = [...you.starters, ...opponent.starters].every((p) => !p.started);
+            const chance =
+              pregame && you.starters.length && opponent.starters.length
+                ? matchupWinProbability(
+                    [
+                      { settled: 0, remaining: you.starters },
+                      { settled: 0, remaining: opponent.starters },
+                    ],
+                    fantasyOutcomeSpread,
+                    matchupVarianceScale,
+                  )
+                : undefined;
+            return {
+              week: current.week,
+              you,
+              opponent,
+              ...(chance !== undefined ? { winProbability: chance } : {}),
+            };
+          })()
         : undefined;
-    return {
+    const summary: WeeklyBriefing = {
       leagueId,
       teamId,
       week,
@@ -318,6 +368,7 @@ export function createWeeklyService(
       waivers,
       notes,
     };
+    return { summary, byId, roster };
   }
   /** Preloads public stats and the player catalog so Advice opens without a cold download. */
   /**
@@ -346,7 +397,7 @@ export function createWeeklyService(
       sets.push({
         tag: 'model',
         players: buildPlayerEvidence({
-          usage: await usageFor(loaded.season),
+          usage: await usageFor(loaded.season, loaded.data.games),
           league,
           players: loaded.players.filter((p) => imported.has(p.id)),
           projections: [],
@@ -385,7 +436,7 @@ export function createWeeklyService(
    * decide on notifications.
    */
   async function alerts(leagueId: string, teamId: string): Promise<LineupAlerts> {
-    const summary = await briefing(leagueId, teamId);
+    const { summary, byId, roster } = await briefingWithEvidence(leagueId, teamId);
     const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId)!;
     const loaded = await load({ mode: 'lineup', leagueId, week: summary.week });
     const starters = summary.matchup?.you.starters ?? [];
@@ -396,6 +447,20 @@ export function createWeeklyService(
     );
     const rows: LineupAlerts['alerts'] = [];
     const kickoffs: number[] = [];
+    const ruledOutToday = new Set<string>();
+    const gameLists = new Map<string, Promise<NFLInjuryReportRow[]>>();
+    const gameDayStatus = async (game: FootballGame, name: string, team: string) => {
+      if (!deps.gameDayInjuries) return undefined;
+      if (!gameLists.has(game.id))
+        gameLists.set(
+          game.id,
+          deps.gameDayInjuries.get(game).catch(() => []),
+        );
+      const key = playerNameKey(name);
+      return (await gameLists.get(game.id)!).find(
+        (row) => nflTeamKey(row.team) === team && playerNameKey(row.fullName) === key,
+      )?.reportStatus;
+    };
     for (const starter of starters) {
       const player = loaded.players.find((row) => row.id === starter.id);
       const team = player?.nflTeam ? nflTeamKey(player.nflTeam) : undefined;
@@ -404,25 +469,43 @@ export function createWeeklyService(
         : undefined;
       const kickoff = game?.kickoffAt ? Date.parse(game.kickoffAt) : undefined;
       if (kickoff !== undefined && kickoff > asOf) kickoffs.push(kickoff);
-      const status = statusById.get(starter.id);
+      // The roster flag counts when it is Out, even if the display shows the week's report.
+      const flagged = byId.get(starter.id)?.status;
+      const status = isInactiveFootballStatus(flagged) ? flagged : statusById.get(starter.id);
+      // Inactives are announced about 90 minutes before kickoff; ESPN's game page lists them as
+      // Out. Checked only inside the three hours before this player's game.
+      const gameDay =
+        game && kickoff !== undefined && kickoff > asOf && kickoff - asOf <= 3 * 3_600_000
+          ? await gameDayStatus(game, starter.name, team!)
+          : undefined;
       // A team with no game this week is on bye; an unknown team is not guessed.
       const reason =
         team && weekGames.length && !game
           ? ('bye' as const)
-          : isInactiveFootballStatus(status)
-            ? ('out' as const)
-            : /^doubtful$/i.test(status ?? '')
-              ? ('doubtful' as const)
-              : undefined;
+          : gameDay === 'Out' && !isInactiveFootballStatus(status)
+            ? ('inactive' as const)
+            : isInactiveFootballStatus(status)
+              ? ('out' as const)
+              : /^doubtful$/i.test(status ?? '') || gameDay === 'Doubtful'
+                ? ('doubtful' as const)
+                : undefined;
       if (!reason) continue;
       if (kickoff !== undefined && kickoff <= asOf) continue;
+      // Prefer the lineup optimizer's swap (it knows flex slots); otherwise the best bench player
+      // at the same position.
+      const planned = summary.lineup.changes.find((change) => change.bench?.id === starter.id);
+      const replacement = planned
+        ? { id: planned.start.id, name: planned.start.name, estimate: planned.start.points }
+        : benchReplacement(starter.id, starters, byId, roster, ruledOutToday);
       rows.push({
         playerId: starter.id,
         name: starter.name,
         reason,
         ...(status ? { status } : {}),
         ...(game?.kickoffAt ? { kickoffAt: game.kickoffAt } : {}),
+        ...(replacement ? { replacement } : {}),
       });
+      if (reason === 'inactive' || reason === 'out') ruledOutToday.add(starter.id);
     }
     const staleAfterMs = (deps.store.settingsSnapshot().leagueStaleAfterHours ?? 24) * 3_600_000;
     const importedAt = leagueRow.snapshotImportedAt;
@@ -466,7 +549,7 @@ export function createWeeklyService(
       if (evidence.status) player.status = evidence.status;
     }
     const evidence = buildPlayerEvidence({
-      usage: await usageFor(loaded.season),
+      usage: await usageFor(loaded.season, loaded.data.games),
       league,
       players: loaded.players,
       projections: deps.store
@@ -619,4 +702,38 @@ export function createWeeklyService(
     };
   }
   return { briefing, alerts, waiverDay, tradeIdeas, live };
+}
+
+/**
+ * The highest-projected bench player at the starter's position whose game has not begun and who
+ * is not listed as unavailable. Flex eligibility is not considered.
+ */
+export function benchReplacement(
+  starterId: string,
+  starters: { id: string }[],
+  byId: Map<string, PlayerAdviceEvidence>,
+  roster: { id: string; name: string }[],
+  unavailable: Set<string> = new Set(),
+) {
+  const position = footballPosition(byId.get(starterId)?.position ?? '');
+  if (!position) return undefined;
+  const starting = new Set(starters.map((s) => s.id));
+  let best: { id: string; name: string; estimate: number } | undefined;
+  for (const player of roster) {
+    const evidence = byId.get(player.id);
+    if (
+      starting.has(player.id) ||
+      unavailable.has(player.id) ||
+      !evidence ||
+      footballPosition(evidence.position ?? '') !== position ||
+      evidence.projectedPoints === undefined ||
+      isInactiveFootballStatus(evidence.status) ||
+      /^doubtful$/i.test(evidence.status ?? '') ||
+      evidence.warnings.includes(weeklyGameWithheldWarning)
+    )
+      continue;
+    if (!best || evidence.projectedPoints > best.estimate)
+      best = { id: player.id, name: player.name, estimate: evidence.projectedPoints };
+  }
+  return best;
 }

@@ -23,13 +23,16 @@ import {
   projectFantasyPoints,
   projectSpecialTeamsPoints,
   projectionContext,
+  projectionRange,
   teamGame,
   type UsageInput,
 } from './fantasy-projection.js';
 import {
   fantasyModelWeight,
+  fantasyOutcomeSpread,
   specialTeamsSettings,
   vacatedCarryExponent,
+  weatherSettings,
 } from './fantasy-projection-settings.js';
 import { propModelSettings, propUsageNorms } from './prop-model-settings.js';
 import { isInactiveFootballStatus } from './player-availability.js';
@@ -318,6 +321,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
                 rows.map((row, i) => ({ gameId: row.gameId, points: scoreResults[i]!.points! })),
                 projection,
                 specialTeamsSettings[evidence.position],
+                weatherSettings,
               )
             : undefined
           : projectFantasyPoints(
@@ -333,6 +337,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               propModelSettings,
               propUsageNorms,
               vacatedCarryExponent,
+              weatherSettings,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -453,6 +458,25 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             'The app’s own model: recent production weighted toward the latest games, adjusted for snap share, depth chart, the betting total and spread, the opponent and home field, then scored with your league’s rules. Backtested on 2026 games it was not fitted on; not a guarantee.',
         },
       );
+      const range = projectionRange(
+        evidence.position ?? '',
+        evidence.projectedPoints,
+        fantasyOutcomeSpread,
+      );
+      if (range)
+        for (const [id, label, value] of [
+          ['range-low', 'Likely low end (1 in 10 similar projections finished lower)', range.low],
+          [
+            'range-high',
+            'Likely high end (1 in 10 similar projections finished higher)',
+            range.high,
+          ],
+        ] as const)
+          metric(id, label, value, 'points/week', {
+            sourceIds: evidence.projectionSourceIds,
+            description:
+              'Spread of past results around projections like this one, fitted on 2025 and checked on 2026 (70–85% of results landed inside, by position).',
+          });
       const ownStats =
         'stats' in own ? (own.stats as Partial<Record<FootballStatKey, number>>) : {};
       for (const [stat, label, unit] of [
@@ -472,6 +496,19 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             sourceIds: evidence.projectionSourceIds,
           });
       }
+      const wind = own.windFactor;
+      if (wind < 1)
+        metric(
+          'wind-adjustment',
+          'Projection lost to forecast wind',
+          Math.round((1 - wind) * 100),
+          'percent',
+          {
+            sourceIds: evidence.projectionSourceIds,
+            description:
+              'Forecast wind at kickoff (issued about 48 hours ahead, outdoor stadiums only) lowers offensive and kicker projections, about 10% per 10 km/h above 10 km/h (fitted on 2025, checked on 2026).',
+          },
+        );
       const vacated = (own as { vacatedCarryShare?: number }).vacatedCarryShare ?? 0;
       if (vacated)
         metric(
@@ -486,7 +523,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
           },
         );
       evidence.warnings.push(
-        'Sidekick projections assume the player is active. Running backs get extra carries when a teammate back is listed Out or Doubtful; other injuries, late role changes and weather news after the last data refresh are not included.',
+        'Sidekick projections assume the player is active. Running backs get extra carries when a teammate back is listed Out or Doubtful, and forecast wind is applied inside 36 hours of kickoff; other injuries, late role changes and weather news after the last data refresh are not included.',
       );
     } else if (input.scope !== 'week') {
       const estimate = forecast?.(

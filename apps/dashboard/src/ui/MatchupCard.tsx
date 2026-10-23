@@ -14,6 +14,23 @@ function Side({ side, align }: { side: MatchupSide; align: 'start' | 'end' }) {
   );
 }
 
+function Estimate({ starter }: { starter: MatchupSide['starters'][number] }) {
+  return (
+    <>
+      {points(starter.estimate!)}
+      {starter.range && (
+        <span
+          className="matchup-range"
+          title="Likely range: 8 in 10 similar projections finished inside it"
+        >
+          {' '}
+          {starter.range.low.toFixed(0)}–{starter.range.high.toFixed(0)}
+        </span>
+      )}
+    </>
+  );
+}
+
 /** Head-to-head view of the league's current week; never mixes in another week's estimates. */
 export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
   const matchup = briefing.matchup;
@@ -35,6 +52,20 @@ export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
               ? `You’re projected to win by ${points(edge)}`
               : `You’re projected to lose by ${points(-edge)}`}
       </h3>
+      {matchup.winProbability !== undefined && (
+        <div className="matchup-chance">
+          <p>
+            <strong>{Math.round(matchup.winProbability * 100)}%</strong> chance you win
+          </p>
+          <span className="matchup-chance-bar" aria-hidden="true">
+            <span style={{ width: `${Math.round(matchup.winProbability * 100)}%` }} />
+          </span>
+          <small>
+            Before kickoff, from each starter’s estimate and how far past results strayed from
+            similar estimates. Teammates’ scores are treated as unrelated.
+          </small>
+        </div>
+      )}
       {stale && (
         <p className="matchup-note">
           From the league’s week {matchup.week} data; update the league for week {briefing.week}.
@@ -76,18 +107,22 @@ export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
                       ) : null}
                     </td>
                     <td className="matchup-estimate">
-                      {mine?.estimate !== undefined
-                        ? points(mine.estimate)
-                        : mine?.started
-                          ? 'Played'
-                          : '—'}
+                      {mine?.estimate !== undefined ? (
+                        <Estimate starter={mine} />
+                      ) : mine?.started ? (
+                        'Played'
+                      ) : (
+                        '—'
+                      )}
                     </td>
                     <td className="matchup-estimate">
-                      {theirs?.estimate !== undefined
-                        ? points(theirs.estimate)
-                        : theirs?.started
-                          ? 'Played'
-                          : '—'}
+                      {theirs?.estimate !== undefined ? (
+                        <Estimate starter={theirs} />
+                      ) : theirs?.started ? (
+                        'Played'
+                      ) : (
+                        '—'
+                      )}
                     </td>
                     <td>
                       {theirs ? (

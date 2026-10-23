@@ -100,3 +100,47 @@ export async function fetchGameWeather(
   }
   return readBoundedJson(r, 8_000_000);
 }
+
+/**
+ * Forecast wind for upcoming outdoor games, from the same 48-hour-lead forecast the projections
+ * were fitted on, so it is available only inside the 36 hours before kickoff. Cached per venue
+ * and day for three hours; failures leave the game without a forecast.
+ */
+export class PublicGameWeather {
+  private cache = new Map<string, { until: number; value: Promise<unknown> }>();
+  constructor(
+    private readonly fetcher: typeof fetch = fetch,
+    private readonly now: () => number = Date.now,
+  ) {}
+  async windFor(games: FootballGame[]): Promise<Map<string, number>> {
+    const now = this.now();
+    const asOf = new Date(now).toISOString();
+    const wind = new Map<string, number>();
+    const due = games.filter((game) => {
+      const kickoff = Date.parse(game.kickoffAt ?? '');
+      return (
+        Number.isFinite(kickoff) &&
+        kickoff > now &&
+        kickoff - now <= 36 * 3_600_000 &&
+        weatherVenue(game) !== undefined
+      );
+    });
+    await Promise.all(
+      due.slice(0, 20).map(async (game) => {
+        const day = game.kickoffAt!.slice(0, 10);
+        const key = `${weatherVenue(game)!.id}:${day}`;
+        let hit = this.cache.get(key);
+        if (!hit || hit.until <= now) {
+          const value = fetchGameWeather(game, day, day, this.fetcher);
+          hit = { until: now + 3 * 3_600_000, value };
+          this.cache.set(key, hit);
+          value.catch(() => this.cache.delete(key));
+        }
+        const parsed = parseGameWeather(await hit.value.catch(() => undefined), game, asOf);
+        if (parsed) wind.set(game.id, parsed.windKph);
+      }),
+    );
+    while (this.cache.size > 100) this.cache.delete(this.cache.keys().next().value!);
+    return wind;
+  }
+}

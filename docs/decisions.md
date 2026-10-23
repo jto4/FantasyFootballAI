@@ -537,3 +537,33 @@ points), a separate early-season blend with the recent average (fitted weight 1)
 changes (per stat the model already matches or beats the 8-game average; the total gap of 0.05
 points to it is noise). Current backtest: 5.49 mean absolute error against 5.70 for the 8-game
 average (`docs/research/fantasy-projection-backtest-2026-10-23.json`).
+
+### Ranges, win probability, wind and game-day inactives — October 23, 2026
+
+**Ranges and win probability.** Each position's error spread is modelled as SD = a + b ×
+projection, fitted on 2025 by least squares on |error|·√(π/2), with the 10th and 90th percentiles
+of the standardized error giving a skewed likely range. On 2026 the ranges held 70–85% of results
+by position (TE narrowest). Matchup win probability is a normal approximation over the remaining
+starters with their summed variance scaled by 1.4 (fitted on random 2025 lineup pairs to absorb
+correlation); on 1,800 random 2026 pairs its Brier score was 0.213 against 0.25 for a coin flip,
+and each 20% bin landed within about 6 points of its predicted rate. Home shows it only before any
+starter's game begins; Live keeps its in-game version, now using the same spreads for unplayed
+starters and a flat, untested allowance for players mid-game. Teammate correlation is ignored.
+
+**Wind.** Using the archived Open-Meteo forecast issued about 48 hours ahead (the betting model's
+source, so no game's own weather leaks in), offense and kickers lose 10% of their projection per
+10 km/h of wind above 10 km/h, capped at half. Threshold and size were fitted on 2025 and adopted
+because RMSE also fell on windy 2026 games (6.19 → 6.16); mean absolute error over all 2026 games
+fell from 5.49 to 5.44. Rain (seven wet games) and cold (none yet in 2026) did not generalize,
+and D/ST showed no wind effect. The app fetches the forecast only inside 36 hours of kickoff, so
+projections can move on Saturday.
+
+**Game-day inactives.** Starter alerts now read ESPN's game page inside the three hours before a
+starter's kickoff, where inactives appear as Out about 90 minutes before the game, and name the
+lineup optimizer's swap for that player, or else the best same-position bench player whose game
+has not started.
+Desktop notifications announce a new reason for the same player again. A roster flag of Out now
+raises an alert and shows on Home even when that week's nflverse report has no designation yet
+(previously the report's blank designation hid it). Re-emitting the backtest with wind also
+adopted a 50/50 quarterback blend with the recent average under the existing rule (weight chosen
+on weeks 1–3, kept only because it also won on weeks 4+).

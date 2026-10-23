@@ -104,11 +104,16 @@ export {
   parseGameWeather,
   fetchGameWeather,
   weatherVenue,
+  PublicGameWeather,
 } from './game-weather.js';
 export { PublicPregameEvidence, type PregameEvidenceProvider } from './game-pregame.js';
 export { fetchHistoricalQuarterbacks, fetchCurrentQuarterbacks } from './game-quarterbacks.js';
 
-export { fetchDatedGameInjuries, parseDatedGameInjuries } from './game-injuries.js';
+export {
+  GameDayInjuries,
+  fetchDatedGameInjuries,
+  parseDatedGameInjuries,
+} from './game-injuries.js';
 export {
   parsePersonnelPerformance,
   parsePersonnelSnaps,

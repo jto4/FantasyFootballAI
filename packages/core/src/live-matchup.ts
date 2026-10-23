@@ -1,4 +1,6 @@
 import { nflTeamKey } from './advice-math.js';
+import { projectionRange } from './fantasy-projection.js';
+import { fantasyOutcomeSpread, matchupVarianceScale } from './fantasy-projection-settings.js';
 
 export type LiveGameState = 'pre' | 'in' | 'post' | 'bye' | 'unknown';
 
@@ -31,7 +33,7 @@ export interface LiveSide {
 export interface LiveMatchup {
   you: LiveSide;
   opponent: LiveSide;
-  /** Rough chance you finish ahead; present only when both sides have scores and estimates. */
+  /** Chance you finish ahead; present only when both sides have scores and estimates. */
   winChance?: number;
 }
 
@@ -51,8 +53,9 @@ function normal(z: number) {
  *
  * Projected final adds estimates only for starters whose games have not kicked off; players in
  * progress are already partly counted in the platform score, so they add nothing further. The win
- * chance is a normal approximation with each unplayed starter's spread set to 45% of their
- * estimate, so it is a rough guide rather than a calibrated probability.
+ * chance is a normal approximation: unplayed starters use the position spreads fitted on past
+ * results (calibrated before kickoff), and each player mid-game adds a flat 3-point spread, which
+ * is untested.
  */
 export function liveMatchup(
   sides: {
@@ -80,7 +83,8 @@ export function liveMatchup(
         if (starter.estimate === undefined) unknownRemaining = true;
         else {
           remaining += starter.estimate;
-          variance += (0.45 * starter.estimate) ** 2;
+          const range = projectionRange(starter.position, starter.estimate, fantasyOutcomeSpread);
+          variance += matchupVarianceScale * (range?.sd ?? 0.45 * starter.estimate) ** 2;
         }
       }
       return { ...starter, state, ...(game?.detail ? { detail: game.detail } : {}) };

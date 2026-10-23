@@ -36,6 +36,25 @@ test('announces starter problems within a day of kickoff and stale imports withi
   );
 });
 
+test('announces a game-day inactive with the suggested bench replacement', () => {
+  const inactive = {
+    ...report,
+    snapshot: undefined,
+    alerts: [
+      {
+        playerId: 'p1',
+        name: 'Questionable Player',
+        reason: 'inactive',
+        kickoffAt: '2026-10-25T13:00:00Z',
+        replacement: { id: 'p9', name: 'Bench Player', estimate: 9.44 },
+      },
+    ],
+  };
+  const [due] = dueNotifications(inactive, now, new Set(['league 1:8:p1:doubtful']));
+  assert.equal(due.title, 'Questionable Player is inactive today');
+  assert.match(due.body, /Start Bench Player instead \(9\.4 projected\)\./);
+});
+
 test('polls each saved team, notifies once, and remembers sent notifications across restarts', async () => {
   const statePath = join(await mkdtemp(join(tmpdir(), 'alerts-')), 'sent.json');
   const shown = [];

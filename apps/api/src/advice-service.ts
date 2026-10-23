@@ -81,6 +81,10 @@ export interface AdviceDependencies {
   props?: Pick<PublicPropLines, 'props' | 'books'>;
   scoreboard?: Pick<PublicNflScoreboard, 'current'>;
   boxScores?: Pick<PublicNflBoxScores, 'get'>;
+  /** Forecast wind for outdoor games inside 36 hours of kickoff. */
+  weather?: Pick<import('@sidekick/integrations').PublicGameWeather, 'windFor'>;
+  /** ESPN's game-day injury list (inactives appear as Out about 90 minutes before kickoff). */
+  gameDayInjuries?: Pick<import('@sidekick/integrations').GameDayInjuries, 'get'>;
   /** Snap counts and depth charts for the prop model. */
   usage?: Pick<PublicUsageData, 'get'>;
   now?: () => number;
@@ -307,7 +311,7 @@ export function createAdviceService(deps: AdviceDependencies) {
           : ('week' as const);
     const evidence = loaded.league
       ? buildPlayerEvidence({
-          usage: await usageFor(loaded.season),
+          usage: await usageFor(loaded.season, loaded.data.games),
           league: loaded.league,
           players,
           projections: deps.store
@@ -573,7 +577,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     );
     const evidence = league
       ? buildPlayerEvidence({
-          usage: await usageFor(loaded.season),
+          usage: await usageFor(loaded.season, loaded.data.games),
           league,
           players: loaded.players,
           projections,

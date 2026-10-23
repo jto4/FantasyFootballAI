@@ -1,11 +1,17 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
 const hour = 3_600_000;
-const reasons = { out: 'is out', doubtful: 'is doubtful', bye: 'is on bye' };
+const reasons = {
+  out: 'is out',
+  inactive: 'is inactive today',
+  doubtful: 'is doubtful',
+  bye: 'is on bye',
+};
 
 /**
  * Notifications due for one league's alert report. Each problem is announced once per week:
- * starter problems inside the 24 hours before that player's kickoff, and an out-of-date imported
+ * starter problems inside the 24 hours before that player's kickoff (game-day inactives arrive
+ * about 90 minutes before, and a new reason for the same player is announced again), and an out-of-date imported
  * league inside the 48 hours before the team's next kickoff.
  */
 export function dueNotifications(report, now, sent) {
@@ -19,7 +25,11 @@ export function dueNotifications(report, now, sent) {
     due.push({
       key,
       title: `${alert.name} ${reasons[alert.reason] ?? 'needs a look'}`,
-      body: `${report.leagueName}: they're in your starting lineup. Open lineup advice to swap.`,
+      body:
+        `${report.leagueName}: they're in your starting lineup. ` +
+        (alert.replacement?.name && Number.isFinite(alert.replacement.estimate)
+          ? `Start ${alert.replacement.name} instead (${alert.replacement.estimate.toFixed(1)} projected).`
+          : 'Open lineup advice to swap.'),
       hash: `#/advice?mode=lineup&league=${league}`,
     });
   }

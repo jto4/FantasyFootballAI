@@ -297,9 +297,40 @@ p.weekly-answer {
   border-bottom: 1px solid var(--line);
   text-align: left;
 }
+.matchup-chance {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+.matchup-chance p {
+  margin: 0;
+}
+.matchup-chance strong {
+  font-size: 22px;
+  margin-right: 6px;
+}
+.matchup-chance small {
+  color: var(--muted);
+}
+.matchup-chance-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--chart-band);
+}
+.matchup-chance-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chart-highlight);
+}
+.matchup-range {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
 .matchup-lineups th:nth-child(n + 2):nth-child(-n + 3),
 .matchup-estimate {
-  width: 56px;
+  min-width: 56px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }

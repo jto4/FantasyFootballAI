@@ -4,7 +4,12 @@ import { formatDateTime } from './date-format';
 import type { WeeklyBriefing } from './weekly-briefing';
 
 type Alerts = {
-  alerts: { playerId: string; name: string; reason: 'out' | 'doubtful' | 'bye' }[];
+  alerts: {
+    playerId: string;
+    name: string;
+    reason: 'out' | 'inactive' | 'doubtful' | 'bye';
+    replacement?: { name: string; estimate: number };
+  }[];
   nextKickoffAt?: string;
   snapshot?: { stale: boolean };
 };
@@ -13,7 +18,16 @@ const isAlerts = (x: unknown): x is Alerts =>
   Array.isArray(x.alerts) &&
   x.alerts.every((a) => record(a) && typeof a.name === 'string') &&
   (x.nextKickoffAt === undefined || typeof x.nextKickoffAt === 'string');
-const reasons = { out: 'is out', doubtful: 'is doubtful', bye: 'is on bye' };
+const reasons = {
+  out: 'is out',
+  inactive: 'is inactive today',
+  doubtful: 'is doubtful',
+  bye: 'is on bye',
+};
+const swap = (r: { name: string; estimate: number } | undefined) =>
+  r && typeof r.name === 'string' && Number.isFinite(r.estimate)
+    ? ` Start ${r.name} instead (${r.estimate.toFixed(1)} projected).`
+    : '';
 const points = (n: number) =>
   `+${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n)}`;
 
@@ -51,11 +65,11 @@ export function NextUpCard({
   const item = problem
     ? {
         tone: 'urgent',
-        title: `${problem.name} ${reasons[problem.reason]}`,
+        title: `${problem.name} ${reasons[problem.reason] ?? 'needs a look'}`,
         body:
-          alerts!.alerts.length > 1
+          (alerts!.alerts.length > 1
             ? `${alerts!.alerts.length - 1} more starter${alerts!.alerts.length > 2 ? 's need' : ' needs'} a look too.`
-            : 'They’re in your starting lineup.',
+            : 'They’re in your starting lineup.') + swap(problem.replacement),
         action: 'Fix my lineup',
         run: () => onAdvice('lineup'),
       }

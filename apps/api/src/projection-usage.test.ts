@@ -33,3 +33,16 @@ it('adds the week’s Out/Doubtful list to usage data and reuses the merged obje
   });
   expect((await noUsage(2026))?.snaps.size).toBe(0);
 });
+
+it('adds forecast wind for the games passed in', async () => {
+  const usage = { snaps: new Map(), depth: new Map() };
+  const usageFor = projectionUsage({
+    usage: { get: async () => usage },
+    weather: { windFor: async (games) => new Map(games.map((g) => [g.id, 25])) },
+  });
+  const games = [{ id: 'g1' }] as never;
+  const withWind = await usageFor(2026, games);
+  expect([...(withWind?.windKph ?? [])]).toEqual([['g1', 25]]);
+  expect(await usageFor(2026, games)).toBe(withWind);
+  expect(await usageFor(2026)).toBe(usage);
+});

@@ -172,15 +172,15 @@ export function LivePage({
           {live.winChance !== undefined && (
             <section className="live-chance" aria-label="Win chance">
               <p>
-                <strong>{Math.round(live.winChance * 100)}%</strong> rough chance you win (bragging
-                rights not included)
+                <strong>{Math.round(live.winChance * 100)}%</strong> chance you win (bragging rights
+                not included)
               </p>
               <span className="live-chance-bar" aria-hidden="true">
                 <span style={{ width: `${Math.round(live.winChance * 100)}%` }} />
               </span>
               <small>
-                From the score so far plus estimates for players yet to play. Not a calibrated
-                probability.
+                From the score so far plus estimates for players yet to play, with spreads fitted on
+                past results. Players mid-game add a rough allowance, so treat it as a guide.
               </small>
             </section>
           )}

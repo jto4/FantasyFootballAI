@@ -19,6 +19,28 @@ export interface UsageInput {
   depth: Map<string, DepthEntry[]>;
   /** `season:week:playerId` for players listed Out or Doubtful on that week's injury report. */
   ruledOut?: Set<string>;
+  /** Forecast wind at kickoff by game ID (outdoor venues only; issued about 48 hours ahead). */
+  windKph?: Map<string, number>;
+}
+
+/** Offense loses `windCoefficient` of its projection per 10 km/h of wind above the threshold. */
+export interface WeatherParams {
+  windThresholdKph: number;
+  /** Negative: the share lost per 10 km/h; 0 turns the adjustment off. */
+  windCoefficient: number;
+}
+
+/** Multiplier for an offensive projection (QB, RB, WR, TE, K) from the game's forecast wind. */
+export function windFactor(
+  context: ProjectionContext,
+  game: FootballGame,
+  weather: WeatherParams | undefined,
+): number {
+  const wind = context.windKph.get(game.id);
+  if (!weather?.windCoefficient || wind === undefined) return 1;
+  const excess = Math.max(0, wind - weather.windThresholdKph) / 10;
+  // Bounded so an extreme forecast cannot erase a projection.
+  return Math.max(0.5, 1 + weather.windCoefficient * excess);
 }
 
 /** Keys for players listed Out or Doubtful, from nflverse injury report rows. */
@@ -63,6 +85,7 @@ export interface ProjectionContext {
   byTeamGame: Map<string, PlayerGameStats[]>;
   depth: Map<string, DepthEntry[]>;
   ruledOut: Set<string>;
+  windKph: Map<string, number>;
 }
 
 /** The model league and player histories for one data snapshot, built once and reused. */
@@ -89,6 +112,7 @@ export function projectionContext(
     byTeamGame,
     depth: usage?.depth ?? new Map(),
     ruledOut: usage?.ruledOut ?? new Set<string>(),
+    windKph: usage?.windKph ?? new Map<string, number>(),
   };
   contexts.set(data, { ...(usage ? { usage } : {}), value });
   return value;
@@ -196,6 +220,7 @@ export function projectFantasyPoints(
   norms?: PropUsageNorms,
   /** Running backs: exponent on 1 / (1 − vacated carry share); 0 turns the adjustment off. */
   vacatedCarryExponent = 0,
+  weather?: WeatherParams,
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
@@ -232,13 +257,16 @@ export function projectFantasyPoints(
     seasonType: 'REG',
     stats: projected.stats,
   });
+  // Wind scales the scored total rather than each stat, matching how it was fitted.
+  const wind = windFactor(context, input.game, weather);
   return scored.points === undefined
     ? undefined
     : {
-        points: Math.round(scored.points * 100) / 100,
+        points: Math.round(scored.points * wind * 100) / 100,
         stats: projected.stats,
         sampleGames: projected.sampleGames,
         vacatedCarryShare: vacated,
+        windFactor: wind,
       };
 }
 
@@ -253,7 +281,8 @@ export function projectSpecialTeamsPoints(
   history: { gameId: string; points: number }[],
   context: ProjectionContext,
   params: SpecialTeamsParams,
-): { points: number; sampleGames: number } | undefined {
+  weather?: WeatherParams,
+): { points: number; sampleGames: number; windFactor: number } | undefined {
   const pos = footballPosition(position);
   if (pos !== 'K' && pos !== 'DST') return undefined;
   const order = (g?: FootballGame) => (g ? g.season * 100 + g.week : 0);
@@ -279,5 +308,86 @@ export function projectSpecialTeamsPoints(
     if (pos === 'K' && own > 0) points *= (own / average) ** params.kickerEnvExponent;
     if (pos === 'DST') points += params.defenseOpponentCoefficient * (average - opponent);
   }
-  return { points: Math.round(points * 100) / 100, sampleGames: past.length };
+  // Defenses showed no wind effect in the backtest; kickers lose like the offense.
+  const wind = pos === 'K' ? windFactor(context, game, weather) : 1;
+  return {
+    points: Math.round(points * wind * 100) / 100,
+    sampleGames: past.length,
+    windFactor: wind,
+  };
+}
+
+/** How far a position's results land from its projection, fitted offline (see settings). */
+export interface OutcomeSpread {
+  /** Error standard deviation = sdIntercept + sdSlope × projected points (at least 1). */
+  sdIntercept: number;
+  sdSlope: number;
+  /** 10th and 90th percentiles of the error in standard deviations; results skew high. */
+  low: number;
+  high: number;
+}
+
+/**
+ * A likely range for one player's week: the 10th to 90th percentile of past results around
+ * projections like this one. Skill players are floored at zero; D/ST can score below it.
+ */
+export function projectionRange(
+  position: string,
+  points: number,
+  spreads: Partial<Record<string, OutcomeSpread>>,
+): { low: number; high: number; sd: number } | undefined {
+  const pos = footballPosition(position);
+  const spread = spreads[pos];
+  if (!spread || !Number.isFinite(points)) return undefined;
+  const sd = Math.max(1, spread.sdIntercept + spread.sdSlope * points);
+  const round = (x: number) => Math.round(x * 10) / 10;
+  const low = points + spread.low * sd;
+  return {
+    low: round(pos === 'DST' ? low : Math.max(0, low)),
+    high: round(points + spread.high * sd),
+    sd,
+  };
+}
+
+/**
+ * Chance one side outscores the other, treating each remaining starter's result as independent
+ * with the fitted spread (summed variance scaled up for correlation) and settled points as fixed.
+ * Undefined when a remaining starter has no estimate or no fitted spread.
+ */
+export function matchupWinProbability(
+  sides: [
+    { settled: number; remaining: { position: string; estimate?: number }[] },
+    { settled: number; remaining: { position: string; estimate?: number }[] },
+  ],
+  spreads: Partial<Record<string, OutcomeSpread>>,
+  varianceScale: number,
+): number | undefined {
+  let mean = 0,
+    variance = 0;
+  for (const [index, side] of sides.entries()) {
+    const sign = index === 0 ? 1 : -1;
+    mean += sign * side.settled;
+    for (const starter of side.remaining) {
+      if (starter.estimate === undefined) return undefined;
+      const range = projectionRange(starter.position, starter.estimate, spreads);
+      if (!range) return undefined;
+      mean += sign * starter.estimate;
+      variance += range.sd ** 2;
+    }
+  }
+  if (variance === 0) return mean > 0 ? 1 : mean < 0 ? 0 : 0.5;
+  const z = mean / Math.sqrt(varianceScale * variance);
+  return Math.round(normalCdf(z) * 1000) / 1000;
+}
+
+/** Standard normal CDF (Abramowitz–Stegun 7.1.26, error below 1e-7). */
+function normalCdf(z: number) {
+  const x = Math.abs(z) / Math.SQRT2;
+  const t = 1 / (1 + 0.3275911 * x);
+  const erf =
+    1 -
+    ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) *
+      t *
+      Math.exp(-x * x);
+  return z >= 0 ? 0.5 * (1 + erf) : 0.5 * (1 - erf);
 }
