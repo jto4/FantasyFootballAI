@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { record, type AdviceMode } from '@sidekick/core';
-import { requestJson } from './api-client';
+import { useApi } from './hooks/useApi';
 import { formatDateTime } from './date-format';
 import type { WeeklyBriefing } from './weekly-briefing';
 
@@ -39,21 +38,11 @@ export function NextUpCard({
   onRefresh: () => void;
   onLive: () => void;
 }) {
-  const [alerts, setAlerts] = useState<Alerts>();
-  useEffect(() => {
-    const controller = new AbortController();
-    requestJson(
-      `/api/alerts?${new URLSearchParams({ league: leagueId, team: teamId })}`,
-      isAlerts,
-      {
-        signal: controller.signal,
-      },
-      60_000,
-    )
-      .then((value) => !controller.signal.aborted && setAlerts(value))
-      .catch(() => undefined);
-    return () => controller.abort();
-  }, [leagueId, teamId]);
+  const { data: alerts } = useApi(
+    `/api/alerts?${new URLSearchParams({ league: leagueId, team: teamId })}`,
+    isAlerts,
+    { timeoutMs: 60_000 },
+  );
   const problem = alerts?.alerts[0];
   const change = briefing?.lineup.changes[0];
   // A claim costs a roster spot and waiver priority, so tiny gains don't make the top card.

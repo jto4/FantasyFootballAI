@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { record, type PropBoardRow } from '@sidekick/core';
-import { requestJson } from './api-client';
+import { useApi } from './hooks/useApi';
 import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
 
@@ -74,30 +74,20 @@ export function PropsBoard({
   myTeamName: string | undefined;
   onAnalyze: (pick: PropHandoff) => void;
 }) {
-  const [board, setBoard] = useState<Board>();
-  const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
   const [gameId, setGameId] = useState('');
   const [stat, setStat] = useState('');
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<'all' | 'leans' | 'fantasy' | 'mine'>('leans');
-  useEffect(() => {
-    const controller = new AbortController();
-    setError('');
-    requestJson(
-      `/api/props/board${leagueId ? `?${new URLSearchParams({ league: leagueId })}` : ''}`,
-      isBoard,
-      { signal: controller.signal },
-      120_000,
-    )
-      .then((value) => !controller.signal.aborted && setBoard(value))
-      .catch(
-        () =>
-          !controller.signal.aborted &&
-          setError('The props board couldn’t load. ESPN may be slow; try again in a minute.'),
-      );
-    return () => controller.abort();
-  }, [leagueId, revision]);
+  const { data: board, error } = useApi(
+    `/api/props/board${leagueId ? `?${new URLSearchParams({ league: leagueId })}` : ''}`,
+    isBoard,
+    {
+      timeoutMs: 120_000,
+      revision,
+      errorMessage: 'The props board couldn’t load. ESPN may be slow; try again in a minute.',
+    },
+  );
 
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();

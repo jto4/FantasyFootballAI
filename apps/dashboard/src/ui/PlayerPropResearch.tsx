@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { isPropGameLog, type PropGameLog, type FootballStatKey } from '@sidekick/core';
-import { requestJson } from './api-client';
+import { isPropGameLog, type FootballStatKey } from '@sidekick/core';
+import { useApi } from './hooks/useApi';
 import { ResearchChart } from './ResearchChart';
 import { LoadingStatus } from './LoadFeedback';
 import './market-signals.css';
@@ -15,34 +14,17 @@ export function PlayerPropResearch({
   stat: FootballStatKey;
   line: string;
 }) {
-  const [log, setLog] = useState<PropGameLog>(),
-    [error, setError] = useState(''),
-    [busy, setBusy] = useState(false);
-  useEffect(() => {
-    setLog(undefined);
-    setError('');
-    setBusy(false);
-    if (!gameId || !playerId) return;
-    const controller = new AbortController();
-    setBusy(true);
-    void requestJson(
-      `/api/player-props/log?${new URLSearchParams({ game: gameId, player: playerId, stat })}`,
-      isPropGameLog,
-      { signal: controller.signal },
-      45000,
-    )
-      .then((r) => {
-        if (!controller.signal.aborted) setLog(r);
-      })
-      .catch((e) => {
-        if (!controller.signal.aborted)
-          setError(e instanceof Error ? e.message : 'Player logs could not load.');
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setBusy(false);
-      });
-    return () => controller.abort();
-  }, [gameId, playerId, stat]);
+  const {
+    data: log,
+    error,
+    loading: busy,
+  } = useApi(
+    gameId && playerId
+      ? `/api/player-props/log?${new URLSearchParams({ game: gameId, player: playerId, stat })}`
+      : undefined,
+    isPropGameLog,
+    { timeoutMs: 45_000 },
+  );
   const threshold = line.trim() !== '' && Number.isFinite(Number(line)) ? Number(line) : undefined;
   const values = log?.rows.map((r) => r.value) ?? [];
   return (

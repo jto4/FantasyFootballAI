@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   isPropLine,
   playerNameKey,
@@ -6,7 +6,7 @@ import {
   type FootballStatKey,
   type PropLine,
 } from '@sidekick/core';
-import { requestJson } from './api-client';
+import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 
 export type PropPick = {
@@ -49,35 +49,22 @@ export function PublishedProps({
   disabled: boolean;
   onPick: (pick: PropPick) => void;
 }) {
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const {
+    data: snapshot,
+    error,
+    loading,
+  } = useApi(
+    game
+      ? `/api/advice/props?${new URLSearchParams({ game: game.id, season: String(season) })}`
+      : undefined,
+    isSnapshot,
+    {
+      timeoutMs: 60_000,
+      errorMessage: 'Prop lines could not be loaded. Try again later or enter the prop below.',
+    },
+  );
   const [query, setQuery] = useState('');
   const [statFilter, setStatFilter] = useState('');
-  useEffect(() => {
-    setSnapshot(null);
-    setError('');
-    if (!game) return;
-    const controller = new AbortController();
-    setLoading(true);
-    requestJson(
-      `/api/advice/props?${new URLSearchParams({ game: game.id, season: String(season) })}`,
-      isSnapshot,
-      { signal: controller.signal },
-      60_000,
-    )
-      .then((value) => {
-        if (!controller.signal.aborted) setSnapshot(value);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted)
-          setError('Prop lines could not be loaded. Try again later or enter the prop below.');
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [game?.id, season]);
   // Lines name players as the sportsbook spells them; only an exact, unique name match is used.
   const byName = new Map<string, string[]>();
   for (const player of players) {

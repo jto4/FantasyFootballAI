@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { record, type TradeIdea, type WaiverDay } from '@sidekick/core';
-import { requestJson } from './api-client';
+import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 
 const points = (n: number) =>
@@ -12,33 +11,14 @@ const isTradeIdeas = (x: unknown): x is { ideas: TradeIdea[]; warnings: string[]
   record(x) && Array.isArray(x.ideas) && strings(x.warnings);
 
 function useReport<T>(path: string, league: string, team: string, guard: (x: unknown) => x is T) {
-  const [state, setState] = useState<{ data?: T; error?: string; loading: boolean }>({
-    loading: true,
-  });
-  useEffect(() => {
-    if (!league || !team) return;
-    const controller = new AbortController();
-    setState({ loading: true });
-    requestJson(
-      `${path}?${new URLSearchParams({ league, team })}`,
-      guard,
-      {
-        signal: controller.signal,
-      },
-      60_000,
-    )
-      .then((data) => !controller.signal.aborted && setState({ data, loading: false }))
-      .catch(
-        () =>
-          !controller.signal.aborted &&
-          setState({
-            loading: false,
-            error: 'This list could not be prepared. Try again shortly.',
-          }),
-      );
-    return () => controller.abort();
-  }, [path, league, team]);
-  return state;
+  return useApi(
+    league && team ? `${path}?${new URLSearchParams({ league, team })}` : undefined,
+    guard,
+    {
+      timeoutMs: 60_000,
+      errorMessage: 'This list could not be prepared. Try again shortly.',
+    },
+  );
 }
 
 /** This week's free agents ranked by best-lineup gain; choosing one fills the waiver form. */
