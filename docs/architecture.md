@@ -85,6 +85,8 @@ The dashboard requests `/api/state?view=summary`, with at most 50 report summari
 
 `packages/core` separates domain types, league state, schedules, analysis, and workflow contracts behind its existing barrel. Shared guards validate nested Settings, league, report, schedule/job, edit/send, and error payloads. `api-errors.ts` adds stable error codes to legacy messages. Persistence separates defaults, types, SQL/migrations, validation/restore, and retention. Settings uses focused form/revision, Yahoo, and image-library hooks. Dashboard CSS uses canonical `tokens.css`, an ordered `app.css`, and focused `workflow.css`; consolidation preserves cascade order and selector specificity.
 
+API advice code is split by responsibility: `advice-service.ts` runs the two-pass AI analysis and owns the data loader (`AdviceLoaded`/`AdviceLoader`); `weekly-service.ts` holds the deterministic team features (briefing, alerts, Waiver day, trade ideas, live) and receives that loader; `prop-evidence.ts`, `advice-context.ts` and `prediction-ledger.ts` are focused helpers. League-and-team routes share one handler table. `calendar-events.ts` runs league calendar events; `index.ts` keeps hoisted wrappers because schedulers are created before the report service. Provider parsers read untrusted JSON with core's `asObject`/`asList`/`asText`, and every season-from-date calculation uses `nflSeasonFor`. Dashboard single-resource loads use `hooks/useApi` (stale responses ignored, data kept on same-URL refresh); App-level state lives in focused hooks such as `useChatPanel`, `useTeamSelection` and `usePendingGeneration`.
+
 ## Durable operations
 
 For operational contracts, see [local operations](operations.md). MCP draft creation uses
