@@ -1,6 +1,6 @@
 import type { LineupEstimate, PlayerAdviceEvidence } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
-import { optimizeLineup, playerNameKey } from './advice-math.js';
+import { optimizeLineup, playerNameKey, startedStarterIds } from './advice-math.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 
 export interface WaiverDay {
@@ -54,8 +54,12 @@ type Scored = { points: number; missing: string; assignments: LineupEstimate['as
  * Best lineup over the players with estimates. Missing estimates never count as zero: a lineup
  * with unfilled slots is only comparable to another with exactly the same unfilled slots.
  */
-const points = (league: LeagueConnection, roster: PlayerAdviceEvidence[]): Scored | undefined => {
-  const lineup = optimizeLineup(active(roster), league.settings.roster_positions);
+const points = (
+  league: LeagueConnection,
+  roster: PlayerAdviceEvidence[],
+  locked?: ReadonlySet<string>,
+): Scored | undefined => {
+  const lineup = optimizeLineup(active(roster), league.settings.roster_positions, locked);
   if (!lineup.assignments.length) return;
   return {
     points: lineup.assignments.reduce((sum, row) => sum + row.points, 0),
@@ -79,7 +83,9 @@ export function rankWaivers(
   const { of, rosteredIds, rosteredNames } = rosters(league, evidence);
   const mine = of(teamId);
   const warnings: string[] = [];
-  const current = points(league, mine);
+  // Starters already playing this week are locked in place on the platform.
+  const locked = startedStarterIds(league, teamId, league.matchups?.[0]?.week, mine);
+  const current = points(league, mine, locked);
   if (current?.missing)
     warnings.push(
       `No estimate yet for your ${current.missing.split('|').join(', ')} spot. Gains compare the rest of the lineup only.`,
@@ -90,6 +96,7 @@ export function rankWaivers(
     );
   const name = (id: string) => mine.find((p) => p.id === id)?.name ?? id;
   const weakSpots = (current?.assignments ?? [])
+    .filter((row) => !row.locked)
     .map((row) => ({ ...row, name: name(row.playerId) }))
     .sort((a, b) => a.points - b.points)
     .slice(0, 3);
@@ -107,7 +114,7 @@ export function rankWaivers(
     rows.sort((a, b) => b.projectedPoints! - a.projectedPoints!).slice(0, 20),
   );
   const candidates = pool.map((player) => {
-    const added = gain(current, points(league, [...mine, player]));
+    const added = gain(current, points(league, [...mine, player], locked));
     let drop: WaiverDay['candidates'][number]['drop'];
     let dropPoints: number | undefined;
     for (const owned of mine) {
@@ -115,7 +122,7 @@ export function rankWaivers(
       if (owned.projectedPoints === undefined) continue;
       const netGain = gain(
         current,
-        points(league, [...mine.filter((p) => p.id !== owned.id), player]),
+        points(league, [...mine.filter((p) => p.id !== owned.id), player], locked),
       );
       // On equal gains, drop the owned player with the lower estimate.
       if (

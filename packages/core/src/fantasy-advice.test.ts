@@ -7,6 +7,7 @@ import {
   validateStartSitAssessment,
 } from './fantasy-advice.js';
 import { adviceDecisionPolicy } from './advice-policy.js';
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 
 const asOf = '2026-10-07T12:00:00Z';
 const player = (
@@ -572,4 +573,49 @@ it('retains every explicitly selected draft/waiver player with missing estimates
       'insufficient',
     );
   }
+});
+
+it('keeps a starter whose game has begun locked without blocking advice on the other spots', () => {
+  const started = {
+    ...player('wr', 'WR', 0),
+    warnings: [weeklyGameWithheldWarning],
+  };
+  delete (started as Partial<PlayerAdviceEvidence>).projectedPoints;
+  const bench = player('bench-wr', 'WR', 30);
+  const connected: LeagueConnection = {
+    ...league,
+    teams: [
+      {
+        ...league.teams[0]!,
+        rosterSize: 3,
+        roster: [...league.teams[0]!.roster!, { id: 'bench-wr', name: 'bench-wr', position: 'WR' }],
+      },
+      league.teams[1]!,
+    ],
+    matchups: [
+      {
+        week: 5,
+        teams: [
+          { teamId: 'mine', starters: ['qb', 'wr'] },
+          { teamId: 'other', starters: [] },
+        ],
+      },
+    ],
+  } as LeagueConnection;
+  const plan = buildFantasyAdvicePlan(
+    connected,
+    { mode: 'lineup', teamId: 'mine', week: 5 },
+    [player('qb', 'QB', 20), started, bench],
+    asOf,
+  );
+  // The better-projected bench receiver cannot replace a receiver who already played.
+  expect(plan.lineup?.assignments.find((a) => a.playerId === 'wr')).toMatchObject({ locked: true });
+  expect(plan.lineup?.assignments.some((a) => a.playerId === 'bench-wr')).toBe(false);
+  expect(plan.warnings.some((w) => w.includes('locked in the starting lineup'))).toBe(true);
+  const coverage = plan.confidence.factors.find((f) => f.label === 'Relevant player/data coverage');
+  expect(coverage?.score).toBe(coverage?.maximum);
+  expect(
+    adviceDecisionPolicy({ mode: 'lineup', leagueId: 'test', teamId: 'mine' }, plan, undefined, [])
+      .maximumVerdict,
+  ).not.toBe('insufficient');
 });

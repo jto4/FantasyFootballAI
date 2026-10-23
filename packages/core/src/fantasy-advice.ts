@@ -7,9 +7,16 @@ import type {
   LineupEstimate,
   PlayerAdviceEvidence,
 } from './advice-types.js';
-import { adviceConfidence, optimizeLineup, playerNameKey, starterSlots } from './advice-math.js';
+import {
+  adviceConfidence,
+  optimizeLineup,
+  playerNameKey,
+  startedStarterIds,
+  starterSlots,
+} from './advice-math.js';
 import { replacementBaselines } from './draft-replacement.js';
 import { isInactiveFootballStatus } from './player-availability.js';
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 
 export class StartSitSelectionError extends Error {
   constructor(reason: 'players' | 'slot') {
@@ -200,7 +207,17 @@ export function buildFantasyAdvicePlan(
     warnings.push(...slots.warnings);
   } else if (request.mode === 'lineup') {
     const activeRoster = roster.filter((player) => !isInactiveFootballStatus(player.status));
-    plan.lineup = optimizeLineup(activeRoster, league.settings.roster_positions);
+    const locked = startedStarterIds(
+      league,
+      team.id,
+      request.week ?? (league.settings.currentWeek as number | undefined),
+      activeRoster,
+    );
+    plan.lineup = optimizeLineup(activeRoster, league.settings.roster_positions, locked);
+    for (const id of locked)
+      warnings.push(
+        `${byId.get(id)?.name ?? id}'s game has already started, so they are locked in the starting lineup. Only recommend changes for players whose games have not kicked off.`,
+      );
     if (!completeRoster)
       warnings.push(
         'The team roster snapshot is incomplete; a full-team recommendation cannot be verified.',
@@ -227,7 +244,7 @@ export function buildFantasyAdvicePlan(
         'A legal assignment using supplied estimates. Not a win forecast.',
       );
       // Current lineup comparison requires a legal full assignment, not a bench/roster sum.
-      const currentLineup = optimizeLineup(current, league.settings.roster_positions);
+      const currentLineup = optimizeLineup(current, league.settings.roster_positions, locked);
       if (
         currentLineup.complete &&
         currentLineup.points !== undefined &&
@@ -329,7 +346,13 @@ export function buildFantasyAdvicePlan(
       );
     if (request.candidateIds?.some((id) => !selected.some((player) => player.id === id)))
       throw new Error('At least one selected waiver player is already rostered in this snapshot.');
-    plan.lineup = optimizeLineup(active(roster), league.settings.roster_positions);
+    const waiverLocked = startedStarterIds(
+      league,
+      team.id,
+      request.week ?? (league.settings.currentWeek as number | undefined),
+      roster,
+    );
+    plan.lineup = optimizeLineup(active(roster), league.settings.roster_positions, waiverLocked);
     const baseline = plan.lineup.complete && completeRoster ? plan.lineup.points : undefined;
     if (baseline !== undefined)
       metric('waiver-before', 'Current best starting-lineup estimate', baseline, sourceIds(roster));
@@ -345,7 +368,7 @@ export function buildFantasyAdvicePlan(
       .filter((player) => player.projectedPoints !== undefined && active([player]).length === 1)
       .map((player) => {
         const afterRoster = active([...roster.filter((p) => p.id !== drop?.id), player]);
-        const after = optimizeLineup(afterRoster, league.settings.roster_positions);
+        const after = optimizeLineup(afterRoster, league.settings.roster_positions, waiverLocked);
         const value =
           baseline !== undefined && after.complete ? after.points! - baseline : undefined;
         if (value !== undefined) {
@@ -531,7 +554,11 @@ export function buildFantasyAdvicePlan(
           (['lineup', 'waivers'].includes(request.mode) &&
             (plan.lineup?.complete || plan.startSit) &&
             (isInactiveFootballStatus(player.status) || player.weeklyGameStatus === 'bye') &&
-            !plan.lineup?.assignments.some((assignment) => assignment.playerId === player.id)),
+            !plan.lineup?.assignments.some((assignment) => assignment.playerId === player.id)) ||
+          // A player whose game has begun is settled for the week: locked if starting, unusable
+          // if benched. No estimate is needed for either.
+          (['lineup', 'waivers'].includes(request.mode) &&
+            player.warnings.includes(weeklyGameWithheldWarning)),
       ).length / relevant.length
     : 0;
   const fresh = Boolean(

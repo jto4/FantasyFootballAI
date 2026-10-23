@@ -174,9 +174,13 @@ export function WeeklyHome({
                   ) : briefing?.lineup.complete ? (
                     <p className="weekly-answer">
                       <strong>Your lineup looks set.</strong>
-                      {briefing.lineup.points !== undefined
-                        ? ` ${points(briefing.lineup.points)} projected points.`
-                        : ''}
+                      {/* Once some starters have played, project the final, not just who is left. */}
+                      {briefing.matchup?.you.starters.some((p) => p.started) &&
+                      briefing.matchup.you.projected !== undefined
+                        ? ` ${points(briefing.matchup.you.projected)} projected, with ${points(briefing.matchup.you.points ?? 0)} already in.`
+                        : briefing.lineup.points !== undefined
+                          ? ` ${points(briefing.lineup.points)} projected points.`
+                          : ''}
                     </p>
                   ) : (
                     <p>

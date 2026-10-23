@@ -1,4 +1,5 @@
 import {
+  clipboard,
   app,
   BrowserWindow,
   dialog,
@@ -20,6 +21,7 @@ import { pathToFileURL } from 'node:url';
 import { resolveVerificationProfile } from '@sidekick/integrations';
 import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
 import { startGameDayAlerts } from './game-day-alerts.mjs';
+import { contextMenuTemplate } from './context-menu.mjs';
 import {
   getTeamSelectionPreference,
   setTeamSelectionPreference,
@@ -718,6 +720,15 @@ function createWindow({ initiallyHidden = false } = {}) {
   });
   window.webContents.on('will-navigate', (event, url) => {
     if (url !== dashboardUrl && !url.startsWith(`${dashboardUrl}/`)) event.preventDefault();
+  });
+  window.webContents.on('context-menu', (_event, params) => {
+    const template = contextMenuTemplate(params, {
+      webContents: window.webContents,
+      shell,
+      clipboard,
+      isPackaged: app.isPackaged,
+    });
+    if (template.length) Menu.buildFromTemplate(template).popup({ window });
   });
   window.webContents.on('will-prevent-unload', (event) => {
     // Only disposable test teardown may discard unsaved input without a close prompt.

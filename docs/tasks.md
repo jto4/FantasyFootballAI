@@ -10,6 +10,11 @@ Completed work and its evidence live in the archived task records and dated revi
 
 ## Open work
 
+### Game-lock and app review — October 23, 2026
+
+- [x] Desktop right-click menu (edit, copy, links, spelling; Inspect in development builds).
+- [x] Starters whose games have begun are locked in lineup, waiver and Waiver day math, the AI lineup analysis, and chat; the matchup projection adds points so far to remaining estimates. Home's top card only pushes waiver claims worth 2+ points.
+
 ### Ask Sidekick chat and UI tidy — October 22, 2026
 
 - [x] Home shows the newest draft per report type once; Reports hides failures a later run replaced; Advice has one tab row with AI options tucked away; Live asks for your team.

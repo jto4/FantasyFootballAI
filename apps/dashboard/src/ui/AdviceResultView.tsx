@@ -676,8 +676,10 @@ function Lineup({
             <li key={`${assignment.slot}:${index}`}>
               {name}
               {totals.get(name)! > 1 ? ` slot ${occurrence}` : ''}:{' '}
-              {names.get(assignment.playerId) ?? 'Unknown player'} · {number(assignment.points)}{' '}
-              estimated points
+              {names.get(assignment.playerId) ?? 'Unknown player'} ·{' '}
+              {assignment.locked
+                ? 'game started, locked in'
+                : `${number(assignment.points)} estimated points`}
             </li>
           );
         })}

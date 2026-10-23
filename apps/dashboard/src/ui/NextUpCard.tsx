@@ -56,7 +56,8 @@ export function NextUpCard({
   }, [leagueId, teamId]);
   const problem = alerts?.alerts[0];
   const change = briefing?.lineup.changes[0];
-  const pickup = briefing?.waivers[0];
+  // A claim costs a roster spot and waiver priority, so tiny gains don't make the top card.
+  const pickup = briefing?.waivers.find((w) => w.gain >= 2);
   const next = alerts?.nextKickoffAt;
   const item = problem
     ? {

@@ -294,7 +294,8 @@ export interface PlayerAdviceEvidence {
 export interface LineupEstimate {
   complete: boolean;
   points?: number;
-  assignments: { slot: string; playerId: string; points: number }[];
+  /** `locked` marks a starter whose game has begun; their points are not estimated (0 here). */
+  assignments: { slot: string; playerId: string; points: number; locked?: true }[];
   missingSlots: string[];
   warnings: string[];
 }

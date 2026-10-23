@@ -1,3 +1,4 @@
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 import { describe, expect, it } from 'vitest';
 import {
   adviceConfidence,
@@ -5,6 +6,7 @@ import {
   analyzeBetHistory,
   historicalPlayerGames,
   optimizeLineup,
+  startedStarterIds,
   scoreHistoricalGame,
   wilsonInterval,
   isUpcomingFootballGame,
@@ -271,6 +273,35 @@ describe('legal starting lineups', () => {
     expect(
       optimizeLineup([player('same', 'QB', 20), player('same', 'QB', 30)], ['QB']).complete,
     ).toBe(false);
+  });
+  it('keeps a starter whose game has begun in the lineup instead of replacing him', () => {
+    // A.J. Brown played Thursday, so his estimate is withheld; Mitchell is on the bench.
+    const roster = [player('brown', 'WR'), player('mitchell', 'WR', 12), player('nacua', 'WR', 20)];
+    const unlocked = optimizeLineup(roster, ['WR', 'WR']);
+    expect(unlocked.assignments.map((a) => a.playerId).sort()).toEqual(['mitchell', 'nacua']);
+    const locked = optimizeLineup(roster, ['WR', 'WR'], new Set(['brown']));
+    expect(locked.complete).toBe(true);
+    expect(locked.assignments).toEqual([
+      { slot: 'WR 1', playerId: 'brown', points: 0, locked: true },
+      { slot: 'WR 2', playerId: 'nacua', points: 20 },
+    ]);
+    // More locked players than spots never leaves no lineup at all.
+    expect(
+      optimizeLineup([player('a', 'WR'), player('b', 'WR')], ['WR'], new Set(['a', 'b'])).complete,
+    ).toBe(true);
+  });
+  it('finds started starters from this week’s matchup and the withheld-estimate warning', () => {
+    const league = {
+      matchups: [
+        { week: 7, teams: [{ teamId: 'me', starters: ['brown', 'nacua'] }, { teamId: 'them' }] },
+      ],
+    } as unknown as Parameters<typeof startedStarterIds>[0];
+    const ids = startedStarterIds(league, 'me', 7, [
+      { id: 'brown', warnings: [weeklyGameWithheldWarning] },
+      { id: 'nacua', warnings: [] },
+      { id: 'mitchell', warnings: [weeklyGameWithheldWarning] },
+    ]);
+    expect([...ids]).toEqual(['brown']);
   });
 });
 

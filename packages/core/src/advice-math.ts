@@ -1,5 +1,6 @@
 import { defenseScoreValue } from './defense-scoring.js';
 import type { LeagueConnection } from './domain-types.js';
+import { weeklyGameWithheldWarning } from './advice-warnings.js';
 import {
   espnKickingRules,
   kickingScoreValue,
@@ -390,8 +391,16 @@ export function starterSlots(input: unknown): {
   return { slots, warnings };
 }
 
-/** Assign each player once; global matching avoids putting a needed TE in FLEX greedily. */
-export function optimizeLineup(roster: PlayerAdviceEvidence[], rawSlots: unknown): LineupEstimate {
+/**
+ * Assign each player once; global matching avoids putting a needed TE in FLEX greedily. `locked`
+ * players (starters whose games have begun) must keep a starting spot; their remaining value is
+ * unknown, so they count as 0 and only the other slots are optimized around them.
+ */
+export function optimizeLineup(
+  roster: PlayerAdviceEvidence[],
+  rawSlots: unknown,
+  locked: ReadonlySet<string> = new Set(),
+): LineupEstimate {
   const { slots, warnings } = starterSlots(rawSlots);
   if (warnings.length) return { complete: false, assignments: [], missingSlots: [], warnings };
   if (roster.length > 100 || new Set(roster.map((player) => player.id)).size !== roster.length)
@@ -403,9 +412,19 @@ export function optimizeLineup(roster: PlayerAdviceEvidence[], rawSlots: unknown
     };
   type State = { points: number; assignments: LineupEstimate['assignments'] };
   const choices = new Map<number, State>([[0, { points: 0, assignments: [] }]]);
-  for (const player of roster) {
-    if (player.projectedPoints === undefined || !Number.isFinite(player.projectedPoints)) continue;
-    for (const [mask, value] of [...choices.entries()]) {
+  // Locked players go first so every later choice already accounts for their spots.
+  const ordered = [
+    ...roster.filter((player) => locked.has(player.id)),
+    ...roster.filter((player) => !locked.has(player.id)),
+  ];
+  for (const player of ordered) {
+    const isLocked = locked.has(player.id);
+    const projected = isLocked ? 0 : player.projectedPoints;
+    if (projected === undefined || !Number.isFinite(projected)) continue;
+    const before = [...choices.entries()];
+    // A locked player cannot be left out, so only states that seat them survive.
+    if (isLocked) choices.clear();
+    for (const [mask, value] of before) {
       slots.forEach((slot, index) => {
         const bit = 1 << index;
         if (
@@ -414,7 +433,7 @@ export function optimizeLineup(roster: PlayerAdviceEvidence[], rawSlots: unknown
         )
           return;
         const next = mask | bit,
-          points = value.points + player.projectedPoints!;
+          points = value.points + projected;
         if (!choices.has(next) || points > choices.get(next)!.points)
           choices.set(next, {
             points,
@@ -423,12 +442,15 @@ export function optimizeLineup(roster: PlayerAdviceEvidence[], rawSlots: unknown
               {
                 slot: `${slot.label} ${index + 1}`,
                 playerId: player.id,
-                points: player.projectedPoints!,
+                points: projected,
+                ...(isLocked ? { locked: true as const } : {}),
               },
             ],
           });
       });
     }
+    // More locked players than fitting spots: keep the earlier states rather than none.
+    if (isLocked && !choices.size) for (const [mask, value] of before) choices.set(mask, value);
   }
   const complete = choices.get((1 << slots.length) - 1);
   if (complete)
@@ -686,4 +708,26 @@ export function wilsonInterval(wins: number, total: number): [number, number] {
 }
 function completedBefore(game: FootballGame, day: string) {
   return game.date < day && game.homeScore !== undefined && game.awayScore !== undefined;
+}
+
+/**
+ * This week's starters whose games have already begun: their estimates are withheld, and the
+ * platform locks them in place, so lineup math must keep them seated rather than replace them.
+ */
+export function startedStarterIds(
+  league: Pick<LeagueConnection, 'matchups'>,
+  teamId: string,
+  week: number | undefined,
+  evidence: Pick<PlayerAdviceEvidence, 'id' | 'warnings'>[],
+): Set<string> {
+  const starters = new Set(
+    (league.matchups ?? [])
+      .filter((m) => week === undefined || m.week === week)
+      .flatMap((m) => m.teams.filter((t) => t.teamId === teamId).flatMap((t) => t.starters ?? [])),
+  );
+  return new Set(
+    evidence
+      .filter((p) => starters.has(p.id) && p.warnings.includes(weeklyGameWithheldWarning))
+      .map((p) => p.id),
+  );
 }

@@ -1422,11 +1422,16 @@ export function createAdviceService(deps: AdviceDependencies) {
       const players = lineup.map((id) => {
         const player = byId.get(id) ?? allRostered.get(id);
         const estimate = week === leagueWeek ? byId.get(id)?.projectedPoints : undefined;
+        // An estimate withheld because the game has begun means the player's points are already in
+        // the team score.
+        const started =
+          week === leagueWeek && byId.get(id)?.warnings.includes(weeklyGameWithheldWarning);
         return {
           id,
           name: player?.name ?? 'Unknown player',
           position: player?.position ?? '',
           ...(estimate !== undefined ? { estimate } : {}),
+          ...(started ? { started: true } : {}),
         };
       });
       // Platforms list starters in their own order; sort by position so both sides line up.
@@ -1436,15 +1441,21 @@ export function createAdviceService(deps: AdviceDependencies) {
         return index < 0 ? order.length : index;
       };
       players.sort((a, b) => rank(a.position) - rank(b.position));
-      const estimated = players.filter((p) => p.estimate !== undefined);
+      const remaining = players.filter((p) => !p.started);
+      const anyStarted = remaining.length < players.length;
+      // Points so far plus estimates for starters yet to play; unknown if either part is missing.
+      const projected =
+        players.length &&
+        remaining.every((p) => p.estimate !== undefined) &&
+        (!anyStarted || entry.points !== undefined)
+          ? (anyStarted ? entry.points! : 0) + remaining.reduce((sum, p) => sum + p.estimate!, 0)
+          : undefined;
       return {
         teamId: entry.teamId,
         name: league.teams.find((t) => t.id === entry.teamId)?.name ?? entry.teamId,
         ...(entry.points !== undefined ? { points: entry.points } : {}),
         starters: players,
-        ...(players.length && estimated.length === players.length
-          ? { projected: estimated.reduce((sum, p) => sum + p.estimate!, 0) }
-          : {}),
+        ...(projected !== undefined ? { projected } : {}),
       };
     };
     const matchup =

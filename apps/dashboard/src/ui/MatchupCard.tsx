@@ -76,10 +76,18 @@ export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
                       ) : null}
                     </td>
                     <td className="matchup-estimate">
-                      {mine?.estimate !== undefined ? points(mine.estimate) : '—'}
+                      {mine?.estimate !== undefined
+                        ? points(mine.estimate)
+                        : mine?.started
+                          ? 'Played'
+                          : '—'}
                     </td>
                     <td className="matchup-estimate">
-                      {theirs?.estimate !== undefined ? points(theirs.estimate) : '—'}
+                      {theirs?.estimate !== undefined
+                        ? points(theirs.estimate)
+                        : theirs?.started
+                          ? 'Played'
+                          : '—'}
                     </td>
                     <td>
                       {theirs ? (

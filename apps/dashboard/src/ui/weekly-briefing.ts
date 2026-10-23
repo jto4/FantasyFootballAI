@@ -27,7 +27,8 @@ export type MatchupSide = {
   teamId: string;
   name: string;
   points?: number;
-  starters: { id: string; name: string; position: string; estimate?: number }[];
+  /** `started`: the game has begun, so the player's points are already in the score. */
+  starters: { id: string; name: string; position: string; estimate?: number; started?: boolean }[];
   projected?: number;
 };
 
