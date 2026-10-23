@@ -49,6 +49,11 @@ export interface LeagueConnection {
   season?: number | undefined;
   teamCount: number;
   scoring: Record<string, number>;
+  /**
+   * Rules that replace `scoring` for one lineup position, keyed the same way. ESPN stores most
+   * D/ST and some kicker values this way (per-slot "points overrides").
+   */
+  positionScoring?: Partial<Record<'DST' | 'K', Record<string, number>>>;
   settings: Record<string, unknown>;
   teams: Team[];
   draft?: LeagueDraft | undefined;

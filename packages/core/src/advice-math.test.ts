@@ -472,3 +472,61 @@ it('scores ESPN leagues from numeric stat IDs and leaves return/defensive TDs ou
     ).unsupported,
   ).toContain('999');
 });
+
+it('scores ESPN D/ST and kickers from slot overrides, with base offense rules ignored for D/ST', () => {
+  const espn = {
+    platform: 'espn' as const,
+    scoring: { '3': 0.04, '42': 0.1, '53': 0.5, '63': 6, '86': 1, '99': 0, '123': 0 },
+    positionScoring: {
+      DST: { '99': 1, '95': 2, '89': 5, '123': -1, '133': -3, '103': 6 },
+      K: { '74': 5, '77': 4, '80': 3, '85': -1 },
+    },
+  };
+  const base = {
+    name: '',
+    team: 'CHI',
+    opponent: 'NE',
+    gameId: 'g',
+    season: 2026,
+    week: 7,
+    seasonType: 'REG' as const,
+  };
+  const defense = scoreHistoricalGame(espn, {
+    ...base,
+    playerId: 'CHI',
+    position: 'DST',
+    stats: {
+      dst_points_allowed: 30,
+      dst_yards_allowed: 410,
+      dst_sacks: 3,
+      dst_interceptions: 1,
+      dst_interception_return_tds: 1,
+    },
+  });
+  // 3 sacks + 1 INT (2) + pick-six (6) − 28–34 allowed (1) − 400–449 yards (3).
+  expect(defense).toEqual({ points: 7, unsupported: [], missing: [] });
+  const kicker = scoreHistoricalGame(espn, {
+    ...base,
+    playerId: 'k',
+    position: 'K',
+    stats: {
+      passing_yards: 0,
+      receiving_yards: 0,
+      receptions: 0,
+      fg_made: 3,
+      fg_missed: 1,
+      fg_blocked: 0,
+      fg_made_30_39: 1,
+      fg_made_40_49: 1,
+      fg_made_50_59: 1,
+      fg_made_60_: 0,
+      fg_made_0_19: 0,
+      fg_made_20_29: 0,
+      pat_made: 3,
+      pat_missed: 0,
+      pat_blocked: 0,
+    },
+  });
+  // 3 + 4 + 5 for the kicks, −1 for the miss, 3 PATs at the base value.
+  expect(kicker).toEqual({ points: 14, unsupported: [], missing: [] });
+});

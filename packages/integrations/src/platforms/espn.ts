@@ -162,6 +162,22 @@ export function normalizeEspnLeague(
           typeof entry[0] === 'string' && entry[1] !== undefined,
       ),
   ) as Record<string, number>;
+  // ESPN keeps D/ST (lineup slot 16) and kicker (slot 17) values in per-slot overrides; the base
+  // points are often 0 for those stats.
+  const positionScoring: NonNullable<LeagueConnection['positionScoring']> = {};
+  for (const item of scoringItems) {
+    const row = asRecord(item) ?? {};
+    const statId = boundedId(row.statId, 40);
+    const overrides = asRecord(row.pointsOverrides);
+    if (!statId || !overrides) continue;
+    for (const [slot, position] of [
+      ['16', 'DST'],
+      ['17', 'K'],
+    ] as const) {
+      const points = numberOrUndefined(overrides[slot]);
+      if (points !== undefined) (positionScoring[position] ??= {})[statId] = points;
+    }
+  }
   const teams: LeagueConnection['teams'] = data.teams.map((entry, index) => {
     const team = asRecord(entry) ?? {};
     const teamId = boundedId(team.id, 40) ?? String(index);
@@ -212,6 +228,7 @@ export function normalizeEspnLeague(
     season: responseSeason ?? season,
     teamCount: teams.length,
     scoring,
+    ...(Object.keys(positionScoring).length ? { positionScoring } : {}),
     settings: {
       ...(scoringType ? { scoringType } : {}),
       ...(currentWeek !== undefined ? { currentWeek } : {}),

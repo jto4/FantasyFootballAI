@@ -35,6 +35,9 @@ import {
   type RosterPlayer,
   capturePredictionRecords,
   liveMatchup,
+  footballPosition,
+  scoreHistoricalGame,
+  type PlayerGameStats,
   rankWaivers,
   findTrades,
   captureDecisionSnapshot,
@@ -50,6 +53,8 @@ import type {
   PublicSportsbookLines,
   PublicPropLines,
   PublicNflScoreboard,
+  PublicNflBoxScores,
+  LiveBoxScore,
 } from '@sidekick/integrations';
 import {
   adviceModelChoices,
@@ -79,6 +84,7 @@ export interface AdviceDependencies {
   odds?: Pick<PublicSportsbookLines, 'get' | 'verify' | 'result'>;
   props?: Pick<PublicPropLines, 'props' | 'books'>;
   scoreboard?: Pick<PublicNflScoreboard, 'current'>;
+  boxScores?: Pick<PublicNflBoxScores, 'get'>;
   now?: () => number;
 }
 
@@ -1573,14 +1579,74 @@ export function createAdviceService(deps: AdviceDependencies) {
     const sameWeek = board?.week === summary.week;
     // A score from an earlier week (old league data) must not read as this week's score.
     const currentScores = summary.matchup.week === summary.week;
+    const boxes = new Map<string, LiveBoxScore | undefined>();
+    if (sameWeek && deps.boxScores) {
+      const started = board!.games.filter((g) => g.state !== 'pre');
+      await Promise.all(
+        started.map(async (g) =>
+          boxes.set(g.espnId, await deps.boxScores!.get(g.espnId).catch(() => undefined)),
+        ),
+      );
+    }
+    const boxFor = (nflTeam?: string) => {
+      const key = nflTeam ? nflTeamKey(nflTeam) : undefined;
+      const game = key ? board?.games.find((g) => g.home === key || g.away === key) : undefined;
+      return game && game.state !== 'pre' ? boxes.get(game.espnId) : undefined;
+    };
+    /** Box-score points under this league's rules, or undefined when they can't be computed. */
+    const livePoints = (player: { id: string; position?: string; nflTeam?: string }) => {
+      const box = boxFor(player.nflTeam);
+      if (!box || !player.nflTeam) return undefined;
+      const position = footballPosition(player.position);
+      let line: Pick<
+        PlayerGameStats,
+        'stats' | 'madeFieldGoalDistances' | 'blockedFieldGoalDistances'
+      >;
+      if (position === 'DST') {
+        const stats = box.defenses[nflTeamKey(player.nflTeam)];
+        if (!stats) return undefined;
+        line = { stats };
+      } else {
+        const espnId =
+          leagueRow.platform === 'espn'
+            ? player.id
+            : loaded.players.find((p) => p.id === player.id)?.espnId;
+        if (!espnId) return undefined;
+        const found = box.players[espnId];
+        // No box-score line once the game is under way means no stats recorded yet.
+        if (!found) return 0;
+        line = found;
+      }
+      const scored = scoreHistoricalGame(leagueRow, {
+        playerId: player.id,
+        name: '',
+        position,
+        team: nflTeamKey(player.nflTeam),
+        opponent: '',
+        gameId: box.espnId,
+        season: loaded.season,
+        week: summary.week,
+        seasonType: 'REG',
+        ...line,
+      });
+      return scored.points === undefined ? undefined : Math.round(scored.points * 100) / 100;
+    };
+    // Imported snapshots froze the platform score before kickoff, so box scores replace it.
     const sideInput = (side: MatchupSide) => ({
       teamId: side.teamId,
       name: side.name,
-      ...(currentScores && side.points !== undefined ? { points: side.points } : {}),
-      starters: side.starters.map((s) => ({
-        ...s,
-        ...(team(s.id) ? { nflTeam: team(s.id)! } : {}),
-      })),
+      ...(currentScores && side.points !== undefined && !base.imported
+        ? { points: side.points }
+        : {}),
+      starters: side.starters.map((s) => {
+        const nflTeam = team(s.id);
+        const points = livePoints({ ...s, ...(nflTeam ? { nflTeam } : {}) });
+        return {
+          ...s,
+          ...(nflTeam ? { nflTeam } : {}),
+          ...(points !== undefined ? { livePoints: points } : {}),
+        };
+      }),
     });
     return {
       ...base,

@@ -52,6 +52,14 @@ function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
               {s.detail ?? stateLabel[s.state]}
               {s.state === 'pre' && s.estimate !== undefined ? ` · est. ${points(s.estimate)}` : ''}
             </span>
+            {(s.state === 'in' || s.state === 'post') && (
+              <span
+                className="live-points"
+                title={s.livePoints === undefined ? 'These stats can’t be scored yet' : undefined}
+              >
+                {points(s.livePoints)}
+              </span>
+            )}
           </li>
         ))}
       </ul>
@@ -147,8 +155,8 @@ export function LivePage({
       {error && <p role="alert">{error}</p>}
       {report?.imported && (
         <p className="notice live-notice">
-          {report.leagueName} is an imported league, so its score can’t update during games. Game
-          states and estimates still update.{' '}
+          {report.leagueName} is an imported league, so scores come from NFL box scores instead of
+          the league site. Lineup changes made after your last import won’t show.{' '}
           <button type="button" className="text-button" onClick={onLeagues}>
             Set up automatic refresh
           </button>
@@ -189,6 +197,13 @@ export function LivePage({
             <Side side={live.you} mine />
             <Side side={live.opponent} mine={false} />
           </div>
+          {(live.you.scoreSource === 'box-score' || live.opponent.scoreSource === 'box-score') && (
+            <p className="live-sub">
+              Scores and player points are worked out from ESPN’s NFL box scores with your league’s
+              rules and refresh every minute. The official {report.leagueName} score can differ
+              slightly after stat corrections.
+            </p>
+          )}
           {report.updatedAt && !report.imported && (
             <p className="live-sub">League score updated {formatDateTime(report.updatedAt)}.</p>
           )}

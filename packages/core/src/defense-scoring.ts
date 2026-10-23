@@ -35,11 +35,51 @@ const bands: Record<string, [FootballStatKey, number, number]> = {
 
 export const sleeperDefenseRules = new Set([...Object.keys(events), ...Object.keys(bands)]);
 
-/** Only Sleeper-published defense semantics are verified. Do not substitute a final score. */
+// ESPN D/ST stat IDs, as used in league scoring settings and their slot-16 overrides.
+const espnEvents: Record<string, FootballStatKey> = {
+  '93': 'dst_blocked_kick_return_tds',
+  '95': 'dst_interceptions',
+  '96': 'dst_fumble_recoveries',
+  '97': 'dst_blocked_kicks',
+  '98': 'dst_safeties',
+  '99': 'dst_sacks',
+  '101': 'dst_kickoff_return_tds',
+  '102': 'dst_punt_return_tds',
+  '103': 'dst_interception_return_tds',
+  '104': 'dst_fumble_return_tds',
+  '120': 'dst_points_allowed',
+  '127': 'dst_yards_allowed',
+  '206': 'dst_two_point_returns',
+  '209': 'dst_one_point_safeties',
+};
+const espnBands: Record<string, [FootballStatKey, number, number]> = {
+  '89': ['dst_points_allowed', 0, 0],
+  '90': ['dst_points_allowed', 1, 6],
+  '91': ['dst_points_allowed', 7, 13],
+  '92': ['dst_points_allowed', 14, 17],
+  '121': ['dst_points_allowed', 18, 21],
+  '122': ['dst_points_allowed', 22, 27],
+  '123': ['dst_points_allowed', 28, 34],
+  '124': ['dst_points_allowed', 35, 45],
+  '125': ['dst_points_allowed', 46, 150],
+  '128': ['dst_yards_allowed', 0, 99],
+  '129': ['dst_yards_allowed', 100, 199],
+  '130': ['dst_yards_allowed', 200, 299],
+  '131': ['dst_yards_allowed', 300, 349],
+  '132': ['dst_yards_allowed', 350, 399],
+  '133': ['dst_yards_allowed', 400, 449],
+  '134': ['dst_yards_allowed', 450, 499],
+  '135': ['dst_yards_allowed', 500, 549],
+  '136': ['dst_yards_allowed', 550, 2000],
+};
+
+/** Sleeper and ESPN defense rules; other platforms stay unsupported. Never infer from a final. */
 export function defenseScoreValue(platform: string, key: string, row: PlayerGameStats) {
-  if (platform !== 'sleeper') return;
-  const field = Object.hasOwn(events, key) ? events[key] : undefined;
-  const band = Object.hasOwn(bands, key) ? bands[key] : undefined;
+  if (platform !== 'sleeper' && platform !== 'espn') return;
+  const eventRules = platform === 'espn' ? espnEvents : events;
+  const bandRules = platform === 'espn' ? espnBands : bands;
+  const field = Object.hasOwn(eventRules, key) ? eventRules[key] : undefined;
+  const band = Object.hasOwn(bandRules, key) ? bandRules[key] : undefined;
   if (!field && !band) return;
   const stat = (field ?? band![0])!;
   const value = row.stats[stat];

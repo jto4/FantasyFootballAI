@@ -457,6 +457,15 @@ export function isLeagueConnection(value: unknown): value is LeagueConnection {
     Object.values(value.scoring).every(
       (item) => typeof item === 'number' && Number.isFinite(item),
     ) &&
+    (value.positionScoring === undefined ||
+      (record(value.positionScoring) &&
+        Object.entries(value.positionScoring).every(
+          ([position, rules]) =>
+            ['DST', 'K'].includes(position) &&
+            record(rules) &&
+            Object.keys(rules).length <= 200 &&
+            Object.values(rules).every((item) => typeof item === 'number' && Number.isFinite(item)),
+        ))) &&
     record(value.settings) &&
     date(value.connectedAt) &&
     (value.lastSyncedAt === undefined || date(value.lastSyncedAt)) &&

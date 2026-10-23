@@ -384,6 +384,8 @@ describe('ESPN league connector', () => {
                 scoringItems: [
                   { statId: 1, points: 6 },
                   { statId: 3, points: 0.5 },
+                  { statId: 99, points: 0, pointsOverrides: { '16': 1 } },
+                  { statId: 86, points: 0, pointsOverrides: { '17': 1, '16': 'bad' } },
                 ],
               },
               customLeagueMessage: 'Do not share credentials with anyone.',
@@ -446,7 +448,8 @@ describe('ESPN league connector', () => {
       id: '77',
       season: 2026,
       teamCount: 2,
-      scoring: { '1': 6, '3': 0.5 },
+      scoring: { '1': 6, '3': 0.5, '99': 0, '86': 0 },
+      positionScoring: { DST: { '99': 1 }, K: { '86': 1 } },
       settings: expect.objectContaining({
         currentWeek: 3,
         seasonComplete: false,

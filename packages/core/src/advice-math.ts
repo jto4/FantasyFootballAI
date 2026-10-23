@@ -1,6 +1,11 @@
 import { defenseScoreValue } from './defense-scoring.js';
 import type { LeagueConnection } from './domain-types.js';
-import { kickingScoreValue, sleeperKickingRules, yahooKickingRules } from './kicking-scoring.js';
+import {
+  espnKickingRules,
+  kickingScoreValue,
+  sleeperKickingRules,
+  yahooKickingRules,
+} from './kicking-scoring.js';
 import type {
   AdviceConfidence,
   BetEvidence,
@@ -138,7 +143,7 @@ const yahooNonOffense = new Set([
 
 /** Refuse incomplete or unfamiliar scoring instead of substituting standard/PPR points. */
 export function scoreHistoricalGame(
-  league: Pick<LeagueConnection, 'platform' | 'scoring'>,
+  league: Pick<LeagueConnection, 'platform' | 'scoring' | 'positionScoring'>,
   row: PlayerGameStats,
 ): { points?: number; unsupported: string[]; missing: string[] } {
   const unsupported: string[] = [],
@@ -155,7 +160,13 @@ export function scoreHistoricalGame(
         : league.platform === 'espn'
           ? espnScoring
           : {};
-  for (const [key, weight] of Object.entries(league.scoring)) {
+  const position = footballPosition(row.position);
+  // Position overrides replace the base value for that stat only; other base rules still apply.
+  const scoring = {
+    ...league.scoring,
+    ...(position === 'DST' || position === 'K' ? league.positionScoring?.[position] : undefined),
+  };
+  for (const [key, weight] of Object.entries(scoring)) {
     if (!Number.isFinite(weight)) {
       unsupported.push(key);
       continue;
@@ -168,10 +179,12 @@ export function scoreHistoricalGame(
         missing.push(...defense.missing);
         points += defense.value * weight;
       } else if (!(
-        league.platform === 'sleeper' &&
-        (Object.hasOwn(offensiveScoring, key) ||
-          sleeperKickingRules.has(key) ||
-          ['st_td', 'st_fum_rec', 'st_ff', 'st_tkl_solo'].includes(key))
+        (league.platform === 'sleeper' &&
+          (Object.hasOwn(offensiveScoring, key) ||
+            sleeperKickingRules.has(key) ||
+            ['st_td', 'st_fum_rec', 'st_ff', 'st_tkl_solo'].includes(key))) ||
+        (league.platform === 'espn' &&
+          (Object.hasOwn(espnScoring, key) || espnKickingRules.has(key) || espnNonOffense.has(key)))
       )) {
         unsupported.push(key);
       }

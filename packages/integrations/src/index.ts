@@ -133,3 +133,4 @@ export { normalizeEspnLeague } from './platforms/espn.js';
 export { espnSnapshotWeeklyProjections } from './espn-snapshot-projections.js';
 export { AnthropicProvider, defaultClaudeModel } from './anthropic-ai.js';
 export { PublicNflScoreboard, parseNflScoreboard, type LiveNflGame } from './nfl-scoreboard.js';
+export { parseNflBoxScore, PublicNflBoxScores, type LiveBoxScore } from './nfl-boxscore.js';

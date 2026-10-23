@@ -1,7 +1,11 @@
 import { dirname as researchDirname, join as researchJoin } from 'node:path';
 import { MarketResearchStore } from './market-research-store.js';
 import { createMarketResearchRouter } from './market-research-routes.js';
-import { PublicPredictionMarketData, readBoundedJson } from '@sidekick/integrations';
+import {
+  PublicNflBoxScores,
+  PublicPredictionMarketData,
+  readBoundedJson,
+} from '@sidekick/integrations';
 import { createChatRouter } from './chat-routes.js';
 import { ChatStore } from './chat-store.js';
 import { resolveConfiguredAI } from './ai-runtime.js';
@@ -477,6 +481,7 @@ app.use(
     odds: publicSportsbookLines,
     props: publicPropLines,
     scoreboard: new PublicNflScoreboard(),
+    boxScores: new PublicNflBoxScores(),
     pregame: publicPregameEvidence,
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,

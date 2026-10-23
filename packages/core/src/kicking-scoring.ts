@@ -31,12 +31,40 @@ const yahooRules: Record<string, Rule> = {
   'Field Goals 50+ Yards': sleeperRules.fgm_50p!,
   'Point After Attempt Made': sleeperRules.xpm!,
 };
+// ESPN kicker stat IDs. Attempt-only IDs are left out, so leagues weighting them stay unscored.
+const espnRules: Record<string, Rule> = {
+  '74': sleeperRules.fgm_50p!,
+  '76': sleeperRules.fgmiss_50p!,
+  '77': sleeperRules.fgm_40_49!,
+  '79': sleeperRules.fgmiss_40_49!,
+  '80': { fields: ['fg_made_0_19', 'fg_made_20_29', 'fg_made_30_39'] },
+  '82': {
+    fields: ['fg_missed_0_19', 'fg_missed_20_29', 'fg_missed_30_39'],
+    blockedRange: [0, 39],
+  },
+  '83': sleeperRules.fgm!,
+  '85': sleeperRules.fgmiss!,
+  '86': sleeperRules.xpm!,
+  '88': sleeperRules.xpmiss!,
+  '198': sleeperRules.fgm_50_59!,
+  '200': sleeperRules.fgmiss_50_59!,
+  '201': sleeperRules.fgm_60p!,
+  '203': sleeperRules.fgmiss_60p!,
+};
+export const espnKickingRules = new Set(Object.keys(espnRules));
 export const sleeperKickingRules = new Set(Object.keys(sleeperRules));
 export const yahooKickingRules = new Set(Object.keys(yahooRules));
 
 /** nflverse missed counts/buckets exclude blocks; Sleeper penalizes both as misses. */
 export function kickingScoreValue(platform: string, key: string, row: PlayerGameStats) {
-  const mapping = platform === 'sleeper' ? sleeperRules : platform === 'yahoo' ? yahooRules : {};
+  const mapping =
+    platform === 'sleeper'
+      ? sleeperRules
+      : platform === 'yahoo'
+        ? yahooRules
+        : platform === 'espn'
+          ? espnRules
+          : {};
   const rule = Object.hasOwn(mapping, key) ? mapping[key] : undefined;
   if (!rule) return;
   const missing: string[] = [];

@@ -41,6 +41,14 @@ export const defenseStatKeys = [
   'dst_blocked_kicks',
   'dst_points_allowed',
   'dst_yards_allowed',
+  // Split touchdown and rare-score counts, for platforms that weight them separately (ESPN).
+  'dst_interception_return_tds',
+  'dst_fumble_return_tds',
+  'dst_kickoff_return_tds',
+  'dst_punt_return_tds',
+  'dst_blocked_kick_return_tds',
+  'dst_two_point_returns',
+  'dst_one_point_safeties',
 ] as const;
 export const footballStatKeys = [
   'attempts',

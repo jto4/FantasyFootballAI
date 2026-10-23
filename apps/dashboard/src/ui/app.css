@@ -3465,3 +3465,15 @@ kbd {
   gap: 6px;
   font-weight: 600;
 }
+
+/* Live points beside each started player; the game state sits just before them. */
+.live-starter .live-state {
+  margin-left: auto;
+  text-align: right;
+}
+.live-points {
+  min-width: 44px;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

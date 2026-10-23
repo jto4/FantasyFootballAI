@@ -8,13 +8,19 @@ export interface LiveStarterInput {
   position: string;
   nflTeam?: string;
   estimate?: number;
+  /** Points so far from the NFL box score under this league's rules; set once a game starts. */
+  livePoints?: number;
 }
 
 export interface LiveSide {
   teamId: string;
   name: string;
-  /** Platform score so far; undefined when the league data has no live points. */
+  /**
+   * Score so far: the platform's when it has one, otherwise the sum of starters' box-score points
+   * (undefined if any started starter could not be scored).
+   */
   points?: number;
+  scoreSource?: 'platform' | 'box-score';
   /** Score so far plus estimates for starters whose games have not started. */
   projectedFinal?: number;
   starters: (LiveStarterInput & { state: LiveGameState; detail?: string })[];
@@ -79,13 +85,18 @@ export function liveMatchup(
       }
       return { ...starter, state, ...(game?.detail ? { detail: game.detail } : {}) };
     });
+    const started = starters.filter((s) => s.state === 'in' || s.state === 'post');
+    const boxScore = started.every((s) => s.livePoints !== undefined)
+      ? Math.round(started.reduce((sum, s) => sum + s.livePoints!, 0) * 100) / 100
+      : undefined;
+    const points = input.points ?? boxScore;
     return {
       teamId: input.teamId,
       name: input.name,
-      ...(input.points !== undefined ? { points: input.points } : {}),
-      ...(input.points !== undefined && !unknownRemaining
-        ? { projectedFinal: input.points + remaining }
+      ...(points !== undefined
+        ? { points, scoreSource: input.points !== undefined ? 'platform' : 'box-score' }
         : {}),
+      ...(points !== undefined && !unknownRemaining ? { projectedFinal: points + remaining } : {}),
       starters,
       yetToPlay: starters.filter((s) => s.state === 'pre' || s.state === 'unknown').length,
       playing: starters.filter((s) => s.state === 'in').length,

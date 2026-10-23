@@ -54,3 +54,28 @@ it('marks byes and withholds the projection when a remaining starter has no esti
   expect(live.you.projectedFinal).toBeUndefined();
   expect(live.winChance).toBeUndefined();
 });
+
+it('totals box-score points when the platform has no score, and only when every started starter scored', () => {
+  const live = liveMatchup(
+    {
+      you: {
+        teamId: 'a',
+        name: 'A',
+        starters: [
+          { id: 'y0', name: 'y0', position: 'WR', nflTeam: 'CHI', estimate: 10, livePoints: 6.3 },
+          { id: 'y1', name: 'y1', position: 'WR', nflTeam: 'ATL', estimate: 10, livePoints: 4.2 },
+          { id: 'y2', name: 'y2', position: 'WR', nflTeam: 'TEN', estimate: 10 },
+        ],
+      },
+      opponent: {
+        teamId: 'b',
+        name: 'B',
+        starters: [{ id: 'o0', name: 'o0', position: 'WR', nflTeam: 'NE', estimate: 10 }],
+      },
+    },
+    games,
+  );
+  expect(live.you).toMatchObject({ points: 10.5, scoreSource: 'box-score', projectedFinal: 20.5 });
+  expect(live.opponent.points).toBeUndefined();
+  expect(live.winChance).toBeUndefined();
+});
