@@ -217,6 +217,36 @@ export function AppearanceSettings() {
   );
 }
 
+/**
+ * A percent field that lets the owner type freely ("-", "-2", "-20") and saves on blur or Enter:
+ * whole numbers from -50 to 50 other than 0; anything else returns to the last saved value.
+ */
+function NudgeInput({ value, onCommit }: { value: number; onCommit: (percent: number) => void }) {
+  const [draft, setDraft] = useState(String(value));
+  const commit = () => {
+    const percent = Number(draft);
+    if (Number.isInteger(percent) && percent !== 0 && Math.abs(percent) <= 50) {
+      if (percent !== value) onCommit(percent);
+      setDraft(String(percent));
+    } else setDraft(String(value));
+  };
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      value={draft}
+      onChange={(event) => setDraft(event.target.value.slice(0, 4))}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          commit();
+        }
+      }}
+    />
+  );
+}
+
 /** League-scoped player list with add (via the league's player pool) and remove. */
 function PlayerList({
   leagues,
@@ -551,26 +581,14 @@ export function PersonalizeSection({
                 </span>
                 <label>
                   <span className="visually-hidden">Nudge for {item.name} in percent</span>
-                  <input
-                    type="number"
-                    min={-50}
-                    max={50}
-                    step={5}
+                  <NudgeInput
                     value={nudge.percent}
-                    onChange={(event) => {
-                      const percent = Math.max(
-                        -50,
-                        Math.min(50, Math.round(Number(event.target.value) || 0)),
-                      );
+                    onCommit={(percent) =>
                       set(
                         'playerNudges',
-                        preferences.playerNudges!.map((n) =>
-                          n === nudge
-                            ? { ...n, percent: percent || (nudge.percent > 0 ? -5 : 5) }
-                            : n,
-                        ),
-                      );
-                    }}
+                        preferences.playerNudges!.map((n) => (n === nudge ? { ...n, percent } : n)),
+                      )
+                    }
                   />
                   %
                 </label>

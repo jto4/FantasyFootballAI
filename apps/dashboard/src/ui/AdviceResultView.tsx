@@ -8,6 +8,7 @@ import {
 import { formatDateTime } from './date-format';
 import { adviceTitle } from './advice-navigation';
 import { DataReadiness } from './DataReadiness';
+import { formatOdds } from './display-preferences';
 
 const verdictNames = {
   recommend: 'Recommended',
@@ -169,8 +170,7 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
             {result.marketQuote.sportsbook} via ESPN · {result.marketQuote.kind} ·{' '}
             {result.marketQuote.side}
             {result.marketQuote.line === undefined ? '' : ` · line ${result.marketQuote.line}`} ·
-            American odds {result.marketQuote.americanOdds > 0 ? '+' : ''}
-            {result.marketQuote.americanOdds}.
+            odds {formatOdds(result.marketQuote.americanOdds)}.
           </p>
           <p>
             Fetched {formatDateTime(result.marketQuote.observedAt)}. This saved analysis uses that

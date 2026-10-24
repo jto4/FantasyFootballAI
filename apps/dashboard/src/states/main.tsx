@@ -196,6 +196,21 @@ function Gallery() {
           >
             Plain confirmation
           </button>
+          <button
+            type="button"
+            className="small-button"
+            onClick={() => {
+              const status = document.getElementById('confirm-results')!;
+              status.textContent = '';
+              for (const name of ['first', 'second'])
+                void confirmAction(`The ${name} queued question.`, discardOptions).then(
+                  (ok) => (status.textContent += `${name}:${ok} `),
+                );
+            }}
+          >
+            Queue two confirmations
+          </button>
+          <output id="confirm-results" />
         </div>
       </State>
       <ConfirmHost />

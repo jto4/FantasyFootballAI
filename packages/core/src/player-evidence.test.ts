@@ -258,6 +258,25 @@ it('projects the week with the app’s own model, with supporting sample/workloa
   expect(evidence.warnings.join(' ')).toContain('assume the player is active');
 });
 
+it('applies an owner nudge to the decision value while the model metric keeps its own number', () => {
+  const plain = buildPlayerEvidence(input)[0]!;
+  const nudged = buildPlayerEvidence({
+    ...input,
+    preferences: {
+      playerNudges: [
+        { leagueId: input.league.id, playerId: plain.id, name: plain.name, percent: 20 },
+      ],
+    },
+  })[0]!;
+  expect(nudged.projectedPoints).toBeCloseTo(plain.projectedPoints! * 1.2, 1);
+  const metric = (e: typeof plain, suffix: string) =>
+    e.metrics.find((m) => m.id.endsWith(`:${suffix}`))?.value;
+  expect(metric(nudged, 'projected')).toBe(metric(plain, 'projected'));
+  expect(metric(nudged, 'adjusted-projection')).toBe(nudged.projectedPoints);
+  expect(metric(nudged, 'owner-nudge')).toBe(20);
+  expect(metric(plain, 'adjusted-projection')).toBeUndefined();
+});
+
 it('uses a median of scoring-matched, uniquely matched sources and respects week/league/scope', () => {
   const projections = [
     projection(),

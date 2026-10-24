@@ -327,3 +327,19 @@ export function prunePreferences(
   if (record.playerNudges !== undefined) next.playerNudges = kept(record.playerNudges);
   return next as UserPreferences;
 }
+
+/**
+ * Whether the owner changed any projection for this league (a nudge, or a model adjustment
+ * switched off). Recorded predictions must then be rebuilt without those changes so accuracy
+ * tracking measures the model, not the owner's takes.
+ */
+export function hasProjectionChanges(
+  preferences: UserPreferences | undefined,
+  leagueId: string,
+): boolean {
+  return Boolean(
+    preferences?.playerNudges?.some((nudge) => nudge.leagueId === leagueId) ||
+    preferences?.projectionAdjustments?.wind === false ||
+    preferences?.projectionAdjustments?.vacatedCarries === false,
+  );
+}

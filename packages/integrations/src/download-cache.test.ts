@@ -1,5 +1,5 @@
 import { afterEach, expect, it } from 'vitest';
-import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, rm, stat, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { cachedDownload, configureDownloadCache } from './download-cache.js';
@@ -151,4 +151,25 @@ it('can refuse a stale copy so the caller reports the outage', async () => {
     cachedDownload('https://example.test/injuries.csv', { ...options, staleFallback: false }),
   ).rejects.toThrow();
   expect((await cachedDownload('https://example.test/injuries.csv', options)).stale).toBe(true);
+});
+
+it('clears temp files left by interrupted writes', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'sidekick-cache-'));
+  configureDownloadCache(directory);
+  const old = join(directory, 'abc.data.123.tmp');
+  const fresh = join(directory, 'def.data.456.tmp');
+  await writeFile(old, 'x'.repeat(100));
+  await writeFile(fresh, 'y');
+  const hoursAgo = new Date(Date.now() - 2 * 3_600_000);
+  await utimes(old, hoursAgo, hoursAgo);
+  const remote = server('a');
+  await cachedDownload('https://example.test/new.csv', {
+    fetcher: remote.fetcher,
+    maxBytes: 10,
+    parse: (t) => t,
+  });
+  const names = await readdir(directory);
+  expect(names).not.toContain('abc.data.123.tmp');
+  // A write that may still be in progress is left alone.
+  expect(names).toContain('def.data.456.tmp');
 });

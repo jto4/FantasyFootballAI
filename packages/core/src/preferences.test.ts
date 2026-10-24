@@ -129,3 +129,22 @@ it('drops only the entries of removed leagues', async () => {
   expect(pruned.playerNudges).toEqual([]);
   expect(isValidPreferences(pruned, new Set(['kept']))).toBe(true);
 });
+
+it('knows when recorded predictions must leave out the owner’s changes', async () => {
+  const { hasProjectionChanges } = await import('./preferences.js');
+  expect(hasProjectionChanges(undefined, 'league')).toBe(false);
+  expect(hasProjectionChanges({ lineupStrategy: 'safe' }, 'league')).toBe(false);
+  expect(
+    hasProjectionChanges(
+      { playerNudges: [{ leagueId: 'other', playerId: '1', name: 'X', percent: 10 }] },
+      'league',
+    ),
+  ).toBe(false);
+  expect(
+    hasProjectionChanges(
+      { playerNudges: [{ leagueId: 'league', playerId: '1', name: 'X', percent: 10 }] },
+      'league',
+    ),
+  ).toBe(true);
+  expect(hasProjectionChanges({ projectionAdjustments: { wind: false } }, 'league')).toBe(true);
+});

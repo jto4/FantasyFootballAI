@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { Dialog } from './Dialog';
 
 export interface ConfirmOptions {
@@ -9,9 +9,11 @@ export interface ConfirmOptions {
   tone?: 'default' | 'danger';
 }
 interface Request extends ConfirmOptions {
+  id: number;
   message: string;
   resolve: (confirmed: boolean) => void;
 }
+let nextId = 0;
 
 let enqueue: ((request: Request) => void) | undefined;
 
@@ -22,7 +24,7 @@ let enqueue: ((request: Request) => void) | undefined;
  */
 export function confirmAction(message: string, options: ConfirmOptions = {}): Promise<boolean> {
   if (!enqueue) return Promise.resolve(window.confirm(message));
-  return new Promise((resolve) => enqueue!({ ...options, message, resolve }));
+  return new Promise((resolve) => enqueue!({ ...options, id: ++nextId, message, resolve }));
 }
 
 /** Discard-unsaved-changes wording shared by every guard. */
@@ -44,23 +46,45 @@ export function ConfirmHost() {
   }, []);
   const current = queue[0];
   if (!current) return null;
+  // Removes this request by identity, so a double-click cannot also dismiss the next one.
   const finish = (confirmed: boolean) => {
     current.resolve(confirmed);
-    setQueue((rest) => rest.slice(1));
+    setQueue((rest) => rest.filter((request) => request.id !== current.id));
+  };
+  // When one question follows another, the second click of a double-click lands on the new
+  // dialog's buttons; only single clicks (and keyboard presses) answer a question.
+  const click = (confirmed: boolean) => (event: MouseEvent) => {
+    if (event.detail <= 1) finish(confirmed);
+  };
+  // ...and it must not move focus off Cancel either.
+  const keepFocus = (event: MouseEvent) => {
+    if (event.detail > 1) event.preventDefault();
   };
   return (
-    <Dialog titleId="confirm-dialog-title" onClose={() => finish(false)} className="confirm-dialog">
+    // A new key per request remounts the dialog, so each one starts focused on Cancel.
+    <Dialog
+      key={current.id}
+      titleId="confirm-dialog-title"
+      onClose={() => finish(false)}
+      className="confirm-dialog"
+    >
       <h2 id="confirm-dialog-title">{current.title ?? 'Are you sure?'}</h2>
       <p>{current.message}</p>
       <div className="confirm-dialog-actions">
         {/* Cancel comes first so it takes the initial focus: Enter never confirms by accident. */}
-        <button type="button" className="small-button" onClick={() => finish(false)}>
+        <button
+          type="button"
+          className="small-button"
+          onClick={click(false)}
+          onMouseDown={keepFocus}
+        >
           {current.cancelLabel ?? 'Cancel'}
         </button>
         <button
           type="button"
           className={current.tone === 'danger' ? 'primary-button danger-confirm' : 'primary-button'}
-          onClick={() => finish(true)}
+          onClick={click(true)}
+          onMouseDown={keepFocus}
         >
           {current.confirmLabel ?? 'Continue'}
         </button>

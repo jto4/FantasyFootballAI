@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { weeklyGameWithheldWarning, type PlayerAdviceEvidence } from '@sidekick/core';
-import { benchReplacement } from './weekly-service.js';
+import { benchReplacement, plannedReplacement } from './weekly-service.js';
 
 const player = (
   id: string,
@@ -39,4 +39,30 @@ it('suggests the best available bench player at the same position', () => {
   });
   expect(benchReplacement('wr1', starters, byId, roster, new Set(['wr3']))).toBeUndefined();
   expect(benchReplacement('rb1', starters, byId, roster)).toBeUndefined();
+});
+
+it('trusts the optimizer’s swap only when it is unambiguous', () => {
+  const byId = new Map(
+    [
+      player('wr1', 'WR', 3),
+      player('te1', 'TE', 9),
+      player('rb9', 'RB', 8),
+      player('wr9', 'WR', 7),
+    ].map((p) => [p.id, p]),
+  );
+  const change = (startId: string, benchId: string, points: number) => ({
+    slot: 'FLEX 7',
+    start: { id: startId, name: `Player ${startId}`, points },
+    bench: { id: benchId, name: `Player ${benchId}` },
+  });
+  // A single change is a direct swap, even across positions (flex).
+  expect(plannedReplacement([change('rb9', 'wr1', 8)], 'wr1', byId)?.id).toBe('rb9');
+  // With several changes, an index-paired cross-position swap is not trusted...
+  expect(
+    plannedReplacement([change('rb9', 'wr1', 8), change('wr9', 'te1', 7)], 'wr1', byId),
+  ).toBeUndefined();
+  // ...but a same-position one is.
+  expect(
+    plannedReplacement([change('wr9', 'wr1', 7), change('rb9', 'te1', 8)], 'wr1', byId)?.id,
+  ).toBe('wr9');
 });

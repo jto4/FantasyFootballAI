@@ -27,7 +27,10 @@ export function describeError(
   }
   // Raw browser network errors mean nothing to a reader; keep them for support only.
   const network = /(failed to fetch|networkerror|load failed|network request failed)/i;
-  const timeout = /(timed? ?out|signal timed out|timeouterror)/i;
+  // Only the browser's own bare timeout text is replaced; a server message that happens to say
+  // "timed out" usually carries the next step (e.g. "check saved advice before retrying").
+  const timeout =
+    /^(signal timed out\.?|the operation (was aborted due to timeout|timed out)\.?|timeouterror.*)$/i;
   if (network.test(message)) {
     details.push(message);
     const prefix = message
@@ -37,7 +40,7 @@ export function describeError(
     const reach =
       'Could not reach the local service. Check that Sunday Sidekick is still running, then try again.';
     message = prefix ? `${prefix}. ${reach}` : reach;
-  } else if (timeout.test(message) && !/local request timed out/i.test(message)) {
+  } else if (timeout.test(message)) {
     details.push(message);
     message = 'This is taking longer than expected. Try again in a moment.';
   }

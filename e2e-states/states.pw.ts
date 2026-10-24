@@ -54,3 +54,17 @@ for (const [button, name] of [
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
   });
+
+test('queued confirmations each start on Cancel and a double-click answers only one', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Queue two confirmations', exact: true }).click();
+  const dialog = page.locator('section.confirm-dialog');
+  await expect(dialog).toContainText('The first queued question.');
+  await dialog.getByRole('button', { name: 'Discard changes' }).dblclick();
+  await expect(dialog).toContainText('The second queued question.');
+  await expect(dialog.getByRole('button', { name: 'Keep editing' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(dialog).toBeHidden();
+  await expect(page.locator('#confirm-results')).toHaveText('first:true second:false ');
+});

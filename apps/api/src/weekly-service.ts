@@ -17,6 +17,7 @@ import {
   findTrades,
   playerNameKey,
   defaultNotificationPreferences,
+  hasProjectionChanges,
   type FootballGame,
   type UserPreferences,
   fantasyOutcomeSpread,
@@ -440,8 +441,26 @@ export function createWeeklyService(
     asOf: string,
   ) {
     const mine = new Set(roster.map((p) => p.id));
+    // Records measure the app's projections, so the owner's nudges and switched-off model
+    // adjustments are left out of them (the briefing itself still uses them).
+    const recorded = hasProjectionChanges(deps.store.settingsSnapshot().preferences, league.id)
+      ? buildPlayerEvidence({
+          usage: await usageFor(loaded.season, loaded.data.games),
+          league,
+          players: loaded.players.filter((p) => mine.has(p.id)),
+          projections: deps.store
+            .snapshot()
+            .playerProjections.filter((row) => row.leagueId === league.id)
+            .map((row) => ({ ...row, sourceId: projectionSourceId(row) })),
+          data: loaded.data,
+          season: loaded.season,
+          week,
+          scope: 'week',
+          asOf,
+        })
+      : evidence.filter((p) => mine.has(p.id));
     const sets: { tag: string; players: PlayerAdviceEvidence[] }[] = [
-      { tag: 'league', players: evidence.filter((p) => mine.has(p.id)) },
+      { tag: 'league', players: recorded },
     ];
     // Only players whose league projection came from an import need a separate model record.
     const imported = new Set(
@@ -452,7 +471,6 @@ export function createWeeklyService(
         tag: 'model',
         players: buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
-          preferences: deps.store.settingsSnapshot().preferences,
           league,
           players: loaded.players.filter((p) => imported.has(p.id)),
           projections: [],
@@ -548,12 +566,9 @@ export function createWeeklyService(
                 : undefined;
       if (!reason) continue;
       if (kickoff !== undefined && kickoff <= asOf) continue;
-      // Prefer the lineup optimizer's swap (it knows flex slots); otherwise the best bench player
-      // at the same position.
-      const planned = summary.lineup.changes.find((change) => change.bench?.id === starter.id);
-      const replacement = planned
-        ? { id: planned.start.id, name: planned.start.name, estimate: planned.start.points }
-        : benchReplacement(starter.id, starters, byId, roster, ruledOutToday);
+      const replacement =
+        plannedReplacement(summary.lineup.changes, starter.id, byId) ??
+        benchReplacement(starter.id, starters, byId, roster, ruledOutToday);
       rows.push({
         playerId: starter.id,
         name: starter.name,
@@ -883,4 +898,21 @@ export function benchReplacement(
       best = { id: player.id, name: player.name, estimate: evidence.projectedPoints };
   }
   return best;
+}
+
+/**
+ * The lineup optimizer's swap for a starter. The briefing pairs incoming and outgoing players by
+ * list order, not by slot, so a pairing is trusted only when it is the single change or the
+ * incoming player plays the same position; otherwise the caller falls back to the bench.
+ */
+export function plannedReplacement(
+  changes: WeeklyBriefing['lineup']['changes'],
+  starterId: string,
+  byId: Map<string, PlayerAdviceEvidence>,
+) {
+  const position = (id: string) => footballPosition(byId.get(id)?.position ?? '');
+  const planned = changes.find((change) => change.bench?.id === starterId);
+  if (!planned) return undefined;
+  if (changes.length > 1 && position(planned.start.id) !== position(starterId)) return undefined;
+  return { id: planned.start.id, name: planned.start.name, estimate: planned.start.points };
 }

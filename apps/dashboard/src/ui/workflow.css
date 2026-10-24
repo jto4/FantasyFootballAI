@@ -1392,7 +1392,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
 }
-.personalize-players input[type='number'] {
+.personalize-players input[inputmode='numeric'] {
   width: 64px;
   margin-right: 4px;
 }

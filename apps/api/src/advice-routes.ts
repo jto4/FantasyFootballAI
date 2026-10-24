@@ -1,4 +1,4 @@
-import { nflSeasonFor } from '@sidekick/core';
+import { preferredBookLines, nflSeasonFor } from '@sidekick/core';
 import { freezeForecastProtocol } from './forecast-protocol.js';
 import { Router } from 'express';
 import { adviceJournal, isAdviceRequest, type AdviceRequest } from '@sidekick/core';
@@ -97,7 +97,24 @@ export function createAdviceRouter(
             ...(read === 'props' ? { priced: false } : {}),
             warnings: ['Published lines are unavailable right now.'],
           });
-        res.json(await deps.props[read](games[0]!));
+        const snapshot = await deps.props[read](games[0]!);
+        // The owner's sportsbook choice (Personalize) applies here as on the props board.
+        const books = deps.store.settingsSnapshot().preferences?.props?.sportsbooks;
+        const lines = preferredBookLines<(typeof snapshot.lines)[number]>(snapshot.lines, books);
+        res.json(
+          lines.length === snapshot.lines.length
+            ? snapshot
+            : {
+                ...snapshot,
+                lines,
+                warnings: [
+                  ...snapshot.warnings,
+                  lines.length
+                    ? 'Showing only your chosen sportsbooks (Settings → Personalize).'
+                    : 'None of these lines come from your chosen sportsbooks. Change them in Settings → Personalize.',
+                ],
+              },
+        );
       } catch {
         res.status(502).json({ error: 'Published lines could not be loaded. Try again shortly.' });
       }

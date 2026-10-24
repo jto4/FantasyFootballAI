@@ -23,11 +23,21 @@ test('personalize saves preferences, hides Home cards and applies display choice
       .check();
     await page.getByLabel(/Minimum edge before a prop lean/).fill('3');
     await page.getByRole('checkbox', { name: 'DraftKings', exact: true }).check();
+    // Add a nudge and type a negative value freely.
+    const nudges = page.getByRole('group', { name: 'Add a player to player nudges choices' });
+    // The picker adds the player and clears itself, so the box never stays checked.
+    await nudges.getByRole('checkbox').first().click();
+    const nudge = page.getByRole('textbox', { name: /^Nudge for .* in percent/ });
+    await nudge.fill('-');
+    await nudge.fill('-20');
+    await nudge.press('Enter');
+    await expect(nudge).toHaveValue('-20');
     await page.getByRole('button', { name: 'Save Personalize', exact: true }).click();
     await expect(page.locator('.settings-save-bar')).toContainText('Saved');
 
     const preferences = workspace.store.settingsSnapshot().preferences!;
     expect(preferences.lineupStrategy).toBe('win-chance');
+    expect(preferences.playerNudges?.[0]?.percent).toBe(-20);
     expect(preferences.ai?.tone).toBe('straight');
     expect(preferences.notifications?.gameDaySummary).toBe(true);
     expect(preferences.props).toMatchObject({ minEdgePoints: 3, sportsbooks: ['DraftKings'] });

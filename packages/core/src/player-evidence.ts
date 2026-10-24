@@ -782,6 +782,18 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
         description:
           'Set in Settings → Personalize → Player nudges; not part of the model or its backtest.',
       });
+      // The model's own number stays in its metric; this is the number decisions use.
+      metric(
+        'adjusted-projection',
+        'Projection used for decisions (with your adjustment)',
+        evidence.projectedPoints,
+        'points/week',
+        {
+          sourceIds: evidence.projectionSourceIds,
+          description:
+            "The app's projection times your adjustment. Lineup, waiver and trade math use this value.",
+        },
+      );
       evidence.warnings.push(
         `Includes your ${nudge > 0 ? '+' : ''}${nudge}% adjustment to this player's projection.`,
       );

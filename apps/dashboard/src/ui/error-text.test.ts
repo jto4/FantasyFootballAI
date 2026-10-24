@@ -31,5 +31,14 @@ it('translates raw browser network and timeout errors', () => {
   });
   expect(describeError(new TypeError('Failed to fetch')).message).toMatch(/^Could not reach/);
   expect(describeError(new Error('signal timed out')).message).toMatch(/longer than expected/);
+  expect(describeError(new Error('The operation was aborted due to timeout')).message).toMatch(
+    /longer than expected/,
+  );
+  // Server messages that mention a timeout keep their guidance.
+  const advice = 'Advice was canceled or timed out. Check saved advice before retrying.';
+  expect(describeError(advice).message).toBe(advice);
+  expect(describeError(new Error('AI CLI request timed out.')).message).toBe(
+    'AI CLI request timed out.',
+  );
   expect(describeError(undefined).message).toBe('Something went wrong. Try again.');
 });

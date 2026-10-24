@@ -157,9 +157,17 @@ async function atomicWrite(path: string, text: string) {
 }
 const writeMeta = (path: string, meta: Meta) => atomicWrite(path, JSON.stringify(meta));
 
-/** Removes least-recently-used entries until the folder fits the limit. */
+/**
+ * Removes temp files an interrupted write left behind (older than an hour), then
+ * least-recently-used entries until the folder fits the limit.
+ */
 async function enforceLimit(directory: string, limit: number) {
   const names = await readdir(directory);
+  const now = Date.now();
+  for (const name of names.filter((n) => n.endsWith('.tmp'))) {
+    const info = await stat(join(directory, name)).catch(() => undefined);
+    if (info && now - info.mtimeMs > 3_600_000) await rm(join(directory, name), { force: true });
+  }
   const entries = await Promise.all(
     names
       .filter((name) => name.endsWith('.data'))
