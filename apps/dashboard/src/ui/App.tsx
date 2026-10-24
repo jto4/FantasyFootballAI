@@ -14,6 +14,7 @@ import { ReportComposer } from './ReportComposer';
 import { FriendlyError } from './FriendlyError';
 import { describeError } from './error-text';
 import { ConfirmHost, confirmAction, discardOptions } from './ConfirmDialog';
+import { getDisplayPreferences } from './display-preferences';
 import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
@@ -62,6 +63,9 @@ import {
   DeliveryTask,
   LivePage,
 } from './lazy-pages';
+
+// The address at launch, before routing normalizes it.
+const launchHash = typeof location === 'undefined' ? '' : location.hash;
 export function App() {
   const [verificationMode] = useState(
     () => typeof window !== 'undefined' && window.sidekickDesktop?.isVerificationMode?.() === true,
@@ -122,6 +126,13 @@ export function App() {
     );
   });
   const { section, leagueId: activeLeagueId, reportId: initialReviewId } = route;
+  useEffect(() => {
+    // A fresh launch (no page in the address) opens the owner's chosen start page.
+    const start = getDisplayPreferences().startPage;
+    if (start !== 'League desk' && !/^#\/[a-z]/.test(launchHash))
+      updateRoute({ section: start }, true, false);
+    // Only on first load.
+  }, []);
   useEffect(() => {
     // On phones More is a pop-up menu over the page, so it must not reopen by itself.
     if (isToolSection(section) && !isPhoneLayout()) setShowTools(true);
@@ -1193,6 +1204,9 @@ export function App() {
                       searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
                     }
                     onLive={() => navigate('Live')}
+                    onPersonalize={(settingId) =>
+                      void searchNavigate({ section: 'Settings', settingId })
+                    }
                     onResults={() =>
                       searchNavigate({ section: 'Advice', adviceId: '', adviceView: 'results' })
                     }

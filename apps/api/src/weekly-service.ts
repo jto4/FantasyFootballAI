@@ -16,7 +16,9 @@ import {
   rankWaivers,
   findTrades,
   playerNameKey,
+  defaultNotificationPreferences,
   type FootballGame,
+  type UserPreferences,
   fantasyOutcomeSpread,
   matchupVarianceScale,
   matchupWinProbability,
@@ -28,7 +30,9 @@ import { projectionSourceId } from './projections.js';
 
 import type { AdviceDependencies, AdviceLoader } from './advice-service.js';
 import { appendPredictionRecords } from './prediction-ledger.js';
-import { projectionUsage } from './projection-usage.js';
+import { lineupStrategy, projectionUsage } from './projection-usage.js';
+
+type NotificationPreferences = NonNullable<UserPreferences['notifications']>;
 
 export interface LineupAlerts {
   leagueId: string;
@@ -47,6 +51,18 @@ export interface LineupAlerts {
   }[];
   /** Earliest upcoming kickoff among this week's starters. */
   nextKickoffAt?: string;
+  /** The owner's notification choices, applied by the desktop notifier. */
+  notifications: NotificationPreferences;
+  /** Watched players ruled out before their game. */
+  watchlist?: { playerId: string; name: string; status: string; kickoffAt: string }[];
+  /** Pre-kickoff look at the matchup, for the optional game-day summary notification. */
+  gameDaySummary?: {
+    kickoffAt: string;
+    projected: number;
+    opponentProjected?: number;
+    opponentName?: string;
+    winProbability?: number;
+  };
   /** Present for imported leagues, which cannot refresh on their own. */
   snapshot?: { importedAt?: string; stale: boolean };
 }
@@ -146,6 +162,7 @@ export function createWeeklyService(
     );
     const evidence = buildPlayerEvidence({
       usage: await usageFor(loaded.season, loaded.data.games),
+      preferences: deps.store.settingsSnapshot().preferences,
       league,
       players: loaded.players,
       projections: deps.store
@@ -166,6 +183,7 @@ export function createWeeklyService(
           { mode, teamId, week, season: loaded.season },
           evidence,
           asOf,
+          lineupStrategy(deps.store.settingsSnapshot().preferences),
         );
       } catch {
         return undefined;
@@ -398,6 +416,7 @@ export function createWeeklyService(
         tag: 'model',
         players: buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          preferences: deps.store.settingsSnapshot().preferences,
           league,
           players: loaded.players.filter((p) => imported.has(p.id)),
           projections: [],
@@ -507,14 +526,61 @@ export function createWeeklyService(
       });
       if (reason === 'inactive' || reason === 'out') ruledOutToday.add(starter.id);
     }
-    const staleAfterMs = (deps.store.settingsSnapshot().leagueStaleAfterHours ?? 24) * 3_600_000;
+    const settings = deps.store.settingsSnapshot();
+    const staleAfterMs = (settings.leagueStaleAfterHours ?? 24) * 3_600_000;
     const importedAt = leagueRow.snapshotImportedAt;
+    // Watched players (rostered or not) who are ruled out before their game.
+    const watched: NonNullable<LineupAlerts['watchlist']> = [];
+    for (const item of (settings.preferences?.watchlist ?? []).filter(
+      (w) => w.leagueId === leagueId,
+    )) {
+      const player = loaded.players.find((row) => row.id === item.playerId);
+      const team = player?.nflTeam ? nflTeamKey(player.nflTeam) : undefined;
+      const game = team
+        ? weekGames.find((g) => nflTeamKey(g.home) === team || nflTeamKey(g.away) === team)
+        : undefined;
+      const kickoff = game?.kickoffAt ? Date.parse(game.kickoffAt) : undefined;
+      if (!player || kickoff === undefined || kickoff <= asOf) continue;
+      const gameDay =
+        kickoff - asOf <= 3 * 3_600_000
+          ? await gameDayStatus(game!, player.name, team!)
+          : undefined;
+      const status = gameDay === 'Out' ? 'Inactive' : player.status;
+      if (isInactiveFootballStatus(status) || gameDay === 'Out')
+        watched.push({
+          playerId: player.id,
+          name: player.name,
+          status: status ?? 'Out',
+          kickoffAt: game!.kickoffAt!,
+        });
+    }
+    // One look ahead before the first starter kicks off, while nothing is settled yet.
+    const matchup = summary.matchup;
+    const gameDaySummary =
+      matchup && kickoffs.length && matchup.you.projected !== undefined
+        ? {
+            kickoffAt: new Date(Math.min(...kickoffs)).toISOString(),
+            projected: matchup.you.projected,
+            ...(matchup.opponent.projected !== undefined
+              ? {
+                  opponentProjected: matchup.opponent.projected,
+                  opponentName: matchup.opponent.name,
+                }
+              : {}),
+            ...(matchup.winProbability !== undefined
+              ? { winProbability: matchup.winProbability }
+              : {}),
+          }
+        : undefined;
     return {
       leagueId,
       teamId,
       leagueName: leagueRow.displayName,
       week: summary.week,
       alerts: rows,
+      notifications: { ...defaultNotificationPreferences, ...settings.preferences?.notifications },
+      ...(watched.length ? { watchlist: watched } : {}),
+      ...(gameDaySummary ? { gameDaySummary } : {}),
       ...(kickoffs.length ? { nextKickoffAt: new Date(Math.min(...kickoffs)).toISOString() } : {}),
       ...(leagueRow.connectionMode === 'snapshot'
         ? {
@@ -550,6 +616,7 @@ export function createWeeklyService(
     }
     const evidence = buildPlayerEvidence({
       usage: await usageFor(loaded.season, loaded.data.games),
+      preferences: deps.store.settingsSnapshot().preferences,
       league,
       players: loaded.players,
       projections: deps.store
@@ -701,7 +768,42 @@ export function createWeeklyService(
       ),
     };
   }
-  return { briefing, alerts, waiverDay, tradeIdeas, live };
+  /** Watched players in this league: projection, likely range, status and who rosters them. */
+  async function watchlist(leagueId: string, teamId: string) {
+    requireTeam(leagueId, teamId);
+    const watched = (deps.store.settingsSnapshot().preferences?.watchlist ?? []).filter(
+      (item) => item.leagueId === leagueId,
+    );
+    if (!watched.length) return { leagueId, items: [] };
+    const { league, week, evidence } = await poolEvidence(leagueId, 'week');
+    const byId = new Map(evidence.map((player) => [player.id, player]));
+    const owner = new Map(
+      league.teams.flatMap((team) => (team.roster ?? []).map((p) => [p.id, team.name] as const)),
+    );
+    return {
+      leagueId,
+      week,
+      items: watched.map((item) => {
+        const player = byId.get(item.playerId);
+        const projected = player?.projectedPoints;
+        const range =
+          projected !== undefined && player
+            ? projectionRange(player.position, projected, fantasyOutcomeSpread)
+            : undefined;
+        return {
+          id: item.playerId,
+          name: player?.name ?? item.name,
+          position: player?.position ?? '',
+          ...(player?.team ? { nflTeam: player.team } : {}),
+          ...(player?.status ? { status: player.status } : {}),
+          rosteredBy: owner.get(item.playerId) ?? 'Free agent',
+          ...(projected !== undefined ? { projected } : {}),
+          ...(range ? { range: { low: range.low, high: range.high } } : {}),
+        };
+      }),
+    };
+  }
+  return { briefing, alerts, waiverDay, tradeIdeas, live, watchlist };
 }
 
 /**

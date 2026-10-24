@@ -229,7 +229,7 @@ test('larger leagues stay compact and charts remain readable in black mode at na
     await chart.getByRole('button', { name: 'Show fewer matchups', exact: true }).click();
     if (info.project.name === 'mobile') {
       await page.getByRole('button', { name: 'Settings', exact: true }).click();
-      await page.getByRole('button', { name: 'Storage & desktop', exact: true }).click();
+      await page.getByRole('button', { name: 'Personalize', exact: true }).click();
       await page.getByRole('radio', { name: 'Dark', exact: true }).check();
       await page.getByRole('button', { name: 'Reports', exact: true }).click();
       await page.getByRole('button', { name: 'League charts', exact: true }).click();

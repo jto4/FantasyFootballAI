@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { dueNotifications, startGameDayAlerts } from './game-day-alerts.mjs';
+import { dueNotifications, inQuietHours, startGameDayAlerts } from './game-day-alerts.mjs';
 
 const now = Date.parse('2026-10-25T12:00:00Z');
 const report = {
@@ -76,4 +76,52 @@ test('polls each saved team, notifies once, and remembers sent notifications acr
   restarted.stop();
   assert.equal(shown.length, 2);
   assert.equal(JSON.parse(await readFile(statePath, 'utf8')).length, 2);
+});
+
+test('follows notification choices: kinds, lead time, quiet hours, watchlist and summary', () => {
+  const base = {
+    ...report,
+    snapshot: undefined,
+    watchlist: [
+      { playerId: 'w1', name: 'Watched Player', status: 'Out', kickoffAt: '2026-10-25T17:00:00Z' },
+    ],
+    gameDaySummary: {
+      kickoffAt: '2026-10-25T13:00:00Z',
+      projected: 112.4,
+      opponentProjected: 104.9,
+      opponentName: 'Fictional Twos',
+      winProbability: 0.63,
+    },
+  };
+  // Defaults: starter and watchlist alerts, no summary.
+  assert.deepEqual(
+    dueNotifications(base, now, new Set()).map((n) => n.title),
+    ['Out Player is out', 'Watched Player is out'],
+  );
+  const chosen = {
+    ...base,
+    notifications: { out: false, watchlist: false, gameDaySummary: true, leadHours: 24 },
+  };
+  const summaryTime = Date.parse('2026-10-25T12:00:00Z');
+  const [summary] = dueNotifications(chosen, summaryTime, new Set());
+  assert.equal(summary.title, 'Fictional League: kickoff soon');
+  assert.match(summary.body, /112\.4 vs 104\.9 \(Fictional Twos\), a 63% chance to win/);
+  // Two-hour lead time: a 17:00 kickoff is not yet due at 12:00.
+  assert.deepEqual(
+    dueNotifications({ ...base, notifications: { leadHours: 2 } }, now, new Set()),
+    [],
+  );
+  // Quiet hours wrap past midnight and hold everything.
+  assert.equal(inQuietHours(new Date(2026, 9, 25, 23, 30).getTime(), '23:00', '08:00'), true);
+  assert.equal(inQuietHours(new Date(2026, 9, 25, 7, 59).getTime(), '23:00', '08:00'), true);
+  assert.equal(inQuietHours(new Date(2026, 9, 25, 8, 0).getTime(), '23:00', '08:00'), false);
+  const quietNow = new Date(2026, 9, 25, 2, 0).getTime();
+  assert.deepEqual(
+    dueNotifications(
+      { ...base, notifications: { quietStart: '00:00', quietEnd: '06:00' } },
+      quietNow,
+      new Set(),
+    ),
+    [],
+  );
 });

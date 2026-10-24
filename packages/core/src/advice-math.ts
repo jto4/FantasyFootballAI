@@ -408,6 +408,8 @@ export function optimizeLineup(
   roster: PlayerAdviceEvidence[],
   rawSlots: unknown,
   locked: ReadonlySet<string> = new Set(),
+  /** What to maximize per player (a lineup strategy); totals still report projected points. */
+  value?: (player: PlayerAdviceEvidence) => number,
 ): LineupEstimate {
   const { slots, warnings } = starterSlots(rawSlots);
   if (warnings.length) return { complete: false, assignments: [], missingSlots: [], warnings };
@@ -418,13 +420,14 @@ export function optimizeLineup(
       missingSlots: slots.map((slot) => slot.label),
       warnings: ['Roster is too large or contains duplicate player IDs.'],
     };
-  type State = { points: number; assignments: LineupEstimate['assignments'] };
-  const choices = new Map<number, State>([[0, { points: 0, assignments: [] }]]);
+  type State = { score: number; points: number; assignments: LineupEstimate['assignments'] };
+  const choices = new Map<number, State>([[0, { score: 0, points: 0, assignments: [] }]]);
   // Locked players go first so every later choice already accounts for their spots.
   const ordered = [
     ...roster.filter((player) => locked.has(player.id)),
     ...roster.filter((player) => !locked.has(player.id)),
   ];
+  const scoreOf = value;
   for (const player of ordered) {
     const isLocked = locked.has(player.id);
     const projected = isLocked ? 0 : player.projectedPoints;
@@ -441,9 +444,11 @@ export function optimizeLineup(
         )
           return;
         const next = mask | bit,
-          points = value.points + projected;
-        if (!choices.has(next) || points > choices.get(next)!.points)
+          points = value.points + projected,
+          score = value.score + (isLocked || !scoreOf ? projected : scoreOf(player));
+        if (!choices.has(next) || score > choices.get(next)!.score)
           choices.set(next, {
+            score,
             points,
             assignments: [
               ...value.assignments,
@@ -470,7 +475,7 @@ export function optimizeLineup(
       warnings,
     };
   const [bestMask, best] = [...choices.entries()].sort(
-    (a, b) => bitCount(b[0]) - bitCount(a[0]) || b[1].points - a[1].points,
+    (a, b) => bitCount(b[0]) - bitCount(a[0]) || b[1].score - a[1].score,
   )[0]!;
   return {
     complete: false,

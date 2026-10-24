@@ -13,6 +13,7 @@ import { EmptyStatus, LoadError, LoadingStatus } from '../ui/LoadFeedback';
 import { MatchupCard } from '../ui/MatchupCard';
 import { NextUpCard } from '../ui/NextUpCard';
 import { WaitStatus } from '../ui/WaitStatus';
+import { WatchlistCard } from '../ui/WatchlistCard';
 import { initializeTheme } from '../ui/theme';
 import type { WeeklyBriefing } from '../ui/weekly-briefing';
 import { alertsFixture, briefingFixture, stubApi } from './fixtures';
@@ -143,6 +144,13 @@ function Gallery() {
           lineup: { ...briefingFixture.lineup, changes: [] },
           waivers: [],
         })}
+      </State>
+      <h2>Watchlist</h2>
+      <State name="watchlist" title="Watched players with projections and status">
+        <WatchlistCard leagueId="league" teamId="team" count={3} onManage={noop} />
+      </State>
+      <State name="watchlist-empty" title="Empty watchlist">
+        <WatchlistCard leagueId="league" teamId="team" count={0} onManage={noop} />
       </State>
       <h2>Matchup</h2>
       <State name="matchup" title="Win chance and likely ranges">

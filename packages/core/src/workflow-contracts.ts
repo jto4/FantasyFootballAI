@@ -3,6 +3,7 @@ import { isValidLeagueCalendarEvent, isValidTimezone } from './schedules.js';
 import { isValidWritingStylePresets } from './index.js';
 import type { AppSettings, LeagueConnection, ReportKind, SavedReport } from './index.js';
 import type { ReportVisuals } from './domain-types.js';
+import { isSettingsSection } from './settings-sections.js';
 
 /** Durable outbound data contains public routing identity, never provider credentials. */
 export interface DeliveryEnvelope {
@@ -437,9 +438,7 @@ export function isAppSettings(value: unknown): value is AppSettings {
     value.sectionRevisions === undefined ||
     (record(value.sectionRevisions) &&
       Object.entries(value.sectionRevisions).every(
-        ([key, val]) =>
-          ['ai', 'voice', 'delivery', 'schedules', 'privacy', 'storage'].includes(key) &&
-          revision(val),
+        ([key, val]) => isSettingsSection(key) && revision(val),
       ))
   );
 }

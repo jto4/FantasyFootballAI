@@ -5,6 +5,7 @@ import { dirname } from 'node:path';
 import { Router } from 'express';
 import {
   buildPropBoard,
+  preferredBookLines,
   defaultMarketWeight,
   fitMarketWeight,
   propModelSettings,
@@ -84,7 +85,7 @@ function marketWeightFromResults(records: PropLeanRecord[]) {
 export function createPropBoardRouter(deps: {
   data: Pick<PublicFootballData, 'get'>;
   props: Pick<PublicPropLines, 'props'>;
-  store: Pick<LocalStore, 'snapshot'>;
+  store: Pick<LocalStore, 'snapshot'> & Partial<Pick<LocalStore, 'settingsSnapshot'>>;
   leans: PropLeanStore;
   /** Snap counts and depth charts for the prop model; without them those features stay off. */
   usage?: Pick<PublicUsageData, 'get'>;
@@ -138,13 +139,21 @@ export function createPropBoardRouter(deps: {
           }
         }),
       );
-    deps.ledger?.record(lines, games, at);
+    const prefs = deps.store.settingsSnapshot?.().preferences?.props;
+    // Every line is saved (when allowed) before the owner's sportsbook filter narrows the view.
+    if (prefs?.lineCapture !== false) deps.ledger?.record(lines, games, at);
+    const shown = preferredBookLines(lines, prefs?.sportsbooks);
+    if (lines.length && !shown.length)
+      warnings.push(
+        'None of this week’s lines come from your chosen sportsbooks. Change them in Settings → Personalize.',
+      );
     const league = deps.store.snapshot().leagues.find((l) => l.id === req.query.league);
     const model = propModelFor(data, await deps.usage?.get(data.season).catch(() => undefined));
     const fitted = marketWeightFromResults(deps.leans.list());
     const rows = buildPropBoard({
-      lines,
+      lines: shown,
       games,
+      minEdge: (prefs?.minEdgePoints ?? 0) / 100,
       stats: data.players,
       week,
       predict: (line, game, team) =>

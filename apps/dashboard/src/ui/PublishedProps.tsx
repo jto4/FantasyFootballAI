@@ -8,6 +8,7 @@ import {
 } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
+import { formatOdds } from './display-preferences';
 import { ErrorNotice } from './ErrorNotice';
 
 export type PropPick = {
@@ -32,7 +33,6 @@ const isSnapshot = (value: unknown): value is Snapshot => {
     v.warnings.every((w) => typeof w === 'string')
   );
 };
-const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
 
 /** Published prop lines for the chosen game; picking one fills player, stat, line and price. */
 export function PublishedProps({
@@ -177,7 +177,7 @@ export function PublishedProps({
                                 }
                               >
                                 {side === 'over' ? 'Over' : 'Under'}
-                                {odds !== undefined ? ` ${signed(odds)}` : ''}
+                                {odds !== undefined ? ` ${formatOdds(odds)}` : ''}
                               </button>
                             );
                           })}

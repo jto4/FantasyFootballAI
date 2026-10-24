@@ -7,6 +7,7 @@ import {
   isValidLeagueCalendarEvent,
   isValidNewsSources,
   isValidWritingStylePresets,
+  isValidPreferences,
   type LeagueCalendarEvent,
 } from '@sidekick/core';
 import { isValidReportSchedule } from './scheduler.js';
@@ -209,6 +210,7 @@ export function isValidSettingsUpdate(value: unknown, leagueIds: ReadonlySet<str
     Number.isInteger(newsRefreshMinutes) &&
     newsRefreshMinutes >= 5 &&
     newsRefreshMinutes <= 1440 &&
-    (leagueStaleAfterHours === undefined || isLeagueStaleAfterHours(leagueStaleAfterHours))
+    (leagueStaleAfterHours === undefined || isLeagueStaleAfterHours(leagueStaleAfterHours)) &&
+    isValidPreferences(settings.preferences, leagueIds)
   );
 }

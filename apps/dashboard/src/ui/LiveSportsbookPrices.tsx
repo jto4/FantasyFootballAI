@@ -12,7 +12,8 @@ import {
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
 import { ErrorNotice } from './ErrorNotice';
-const odds = (n: number) => (n > 0 ? `+${n}` : String(n));
+import { formatOdds } from './display-preferences';
+const odds = (n: number) => formatOdds(n);
 export function LiveSportsbookPrices({
   game,
   season,

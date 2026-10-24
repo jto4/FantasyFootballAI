@@ -35,6 +35,7 @@ import {
   weatherSettings,
 } from './fantasy-projection-settings.js';
 import { propModelSettings, propUsageNorms } from './prop-model-settings.js';
+import { playerNudge, type UserPreferences } from './preferences.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 import { weeklyGameWithheldWarning } from './advice-warnings.js';
 
@@ -50,6 +51,8 @@ export interface PlayerEvidenceInput {
   asOf: string;
   /** Snap counts and depth charts for the projection model; features stay off without them. */
   usage?: UsageInput | undefined;
+  /** Owner preferences: model adjustments that are switched off and per-player nudges. */
+  preferences?: UserPreferences | undefined;
 }
 
 /** Saved ESPN projections (from older league imports) are never used; the app projects its own. */
@@ -60,6 +63,8 @@ const isEspnProjection = (row: PlayerProjection) =>
 
 /** Assemble source-linked facts before the model sees them; never ask AI to calculate points. */
 export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvidence[] {
+  const windOn = input.preferences?.projectionAdjustments?.wind !== false;
+  const carriesOn = input.preferences?.projectionAdjustments?.vacatedCarries !== false;
   const forecast =
     input.scope === 'week' ? undefined : prepareFantasyForecast(input.league, input.data, input);
   const history = historicalPlayerGames(input.data, input);
@@ -321,7 +326,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
                 rows.map((row, i) => ({ gameId: row.gameId, points: scoreResults[i]!.points! })),
                 projection,
                 specialTeamsSettings[evidence.position],
-                weatherSettings,
+                windOn ? weatherSettings : undefined,
               )
             : undefined
           : projectFantasyPoints(
@@ -336,8 +341,8 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               projection,
               propModelSettings,
               propUsageNorms,
-              vacatedCarryExponent,
-              weatherSettings,
+              carriesOn ? vacatedCarryExponent : 0,
+              windOn ? weatherSettings : undefined,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -767,6 +772,19 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
         if (evidence.position === 'DST' && evidence.projectionMethod !== 'imported')
           delete evidence.projectedPoints;
       }
+    }
+    // The owner's own take on this player, applied last so every projection source gets it.
+    const nudge = playerNudge(input.preferences, input.league.id, player.id);
+    if (nudge && evidence.projectedPoints !== undefined) {
+      evidence.projectedPoints =
+        Math.round(evidence.projectedPoints * (1 + nudge / 100) * 100) / 100;
+      metric('owner-nudge', 'Your adjustment to this projection', nudge, 'percent', {
+        description:
+          'Set in Settings → Personalize → Player nudges; not part of the model or its backtest.',
+      });
+      evidence.warnings.push(
+        `Includes your ${nudge > 0 ? '+' : ''}${nudge}% adjustment to this player's projection.`,
+      );
     }
     return evidence;
   });

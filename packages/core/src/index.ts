@@ -167,3 +167,4 @@ export * from './untrusted.js';
 export * from './prop-usage.js';
 export * from './fantasy-projection.js';
 export * from './fantasy-projection-settings.js';
+export * from './preferences.js';

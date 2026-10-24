@@ -2,7 +2,14 @@ import { ReadyDrafts } from './ReadyDrafts';
 import { LeagueTrends } from './LeagueTrends';
 import type { RefObject, ReactNode } from 'react';
 import { Activity, CalendarDays, FileText, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
-import { leagueSeasonPhase, rankTeams, reportVisuals, type LeagueConnection } from '@sidekick/core';
+import {
+  leagueSeasonPhase,
+  orderedHomeCards,
+  rankTeams,
+  reportVisuals,
+  type HomeCardId,
+  type LeagueConnection,
+} from '@sidekick/core';
 import { LeagueVisuals } from './LeagueVisuals';
 import type { AppState, NewsSnapshot } from './app-state';
 import { seasonKicker } from './season-copy';
@@ -77,6 +84,12 @@ export function LeagueDesk({
       ).length)
     : 0;
   const matchup = league?.matchups?.[0];
+  const hidden = new Set(
+    orderedHomeCards(state.settings.preferences)
+      .filter((card) => !card.visible)
+      .map((card) => card.id),
+  );
+  const shown = (id: HomeCardId) => !hidden.has(id);
   return (
     <>
       <section className="welcome-row">
@@ -101,7 +114,7 @@ export function LeagueDesk({
         </div>
       </section>
       {weekly}
-      {league && (
+      {league && shown('drafts') && (
         <ReadyDrafts
           drafts={state.reports.filter(
             (report) =>
@@ -204,7 +217,7 @@ export function LeagueDesk({
           {status}
         </details>
       )}
-      {league && aiReady && (
+      {league && aiReady && shown('activity') && (
         <details
           className="home-disclosure"
           open={
@@ -228,7 +241,7 @@ export function LeagueDesk({
           />
         </details>
       )}
-      {league && (
+      {league && shown('league-news') && (
         <details
           className="home-disclosure league-extra"
           open={disclosures.news ?? false}

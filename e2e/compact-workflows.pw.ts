@@ -155,9 +155,14 @@ test('Home keeps pending work visible while settings and league details expand o
       page.getByRole('heading', { name: 'Power rankings', exact: true }).first(),
     ).toBeVisible();
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
-    await expect(page.getByRole('group', { name: 'Appearance', exact: true })).toBeHidden();
+    await expect(
+      page.getByRole('group', { name: 'Appearance and display', exact: true }),
+    ).toBeHidden();
+    await page.getByRole('button', { name: 'Personalize', exact: true }).click();
+    await expect(
+      page.getByRole('group', { name: 'Appearance and display', exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Storage & desktop', exact: true }).click();
-    await expect(page.getByRole('group', { name: 'Appearance', exact: true })).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Refresh diagnostics', exact: true }),
     ).toBeHidden();

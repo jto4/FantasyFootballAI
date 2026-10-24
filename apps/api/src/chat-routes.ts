@@ -3,6 +3,7 @@ import { Router } from 'express';
 import type { AIProvider } from '@sidekick/core';
 import { SignedInAIError, SignedInCodexError } from '@sidekick/integrations';
 import { answerChat, type ChatMessage } from './chat-service.js';
+import { settingsForTask, styleInstructions } from './ai-preferences.js';
 import type { ChatStore } from './chat-store.js';
 import type { LocalStore } from './store.js';
 
@@ -72,7 +73,7 @@ export function createChatRouter(deps: {
       return res.status(404).json({ error: 'Conversation not found.' });
     let provider: AIProvider | null;
     try {
-      provider = await deps.configuredAI(state.settings);
+      provider = await deps.configuredAI(settingsForTask(state.settings, 'chat'));
     } catch {
       provider = null;
     }
@@ -92,6 +93,7 @@ export function createChatRouter(deps: {
     const question: ChatMessage = { role: 'user', text: message, at };
     try {
       const result = await answerChat({
+        style: styleInstructions(state.settings.preferences),
         provider,
         question: message,
         history: existing?.messages ?? [],

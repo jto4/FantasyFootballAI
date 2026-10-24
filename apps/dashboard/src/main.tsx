@@ -7,8 +7,10 @@ import './ui/workflow.css';
 import './ui/appearance.css';
 import './ui/reports.css';
 import { initializeTheme } from './ui/theme';
+import { initializeDisplay } from './ui/display-preferences';
 
 initializeTheme();
+initializeDisplay();
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

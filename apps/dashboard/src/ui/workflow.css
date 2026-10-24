@@ -1319,3 +1319,80 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+/* Personalize settings. */
+.personalize {
+  display: grid;
+  gap: 18px;
+}
+.personalize-block {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.personalize-block h3 {
+  margin: 0;
+}
+.personalize-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.personalize-grid label {
+  display: grid;
+  gap: 4px;
+}
+.personalize-checks {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.personalize-choice {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.personalize-choice legend {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.personalize-choice label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.personalize-choice small {
+  display: block;
+  color: var(--muted);
+}
+.personalize-cards,
+.personalize-players {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.personalize-cards li,
+.personalize-players li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.personalize-players input[type='number'] {
+  width: 64px;
+  margin-right: 4px;
+}

@@ -92,6 +92,8 @@ export function buildPropBoard(input: {
   stats: PlayerGameStats[];
   week: number;
   rosters?: { teamName: string; players: { name: string; nflTeam?: string; espnId?: string }[] }[];
+  /** Owner's minimum edge over break-even (a fraction, e.g. 0.03) before a lean is shown. */
+  minEdge?: number;
   /** Prop model for one line; undefined when the player lacks history. */
   predict?: (
     line: PropLine,
@@ -180,7 +182,7 @@ export function buildPropBoard(input: {
           ['passing_tds', 'passing_interceptions'].includes(line.stat) &&
           (model.side === 'over' ? line.overOdds : line.underOdds) === undefined
         )
-          ? model.edge > 0
+          ? model.edge > Math.max(0, input.minEdge ?? 0)
             ? {
                 lean: {
                   side: model.side,
@@ -279,4 +281,17 @@ export function summarizePropLeans(records: PropLeanRecord[]) {
       ]),
     ) as Record<PropLeanStrength, ReturnType<typeof tally>>,
   };
+}
+
+/** Lines from the owner's chosen sportsbooks (case-insensitive); all lines when none are chosen. */
+export function preferredBookLines<T extends { sportsbook: string }>(
+  lines: T[],
+  books: string[] | undefined,
+): T[] {
+  if (!books?.length) return lines;
+  const wanted = books.map((book) => book.toLowerCase().replace(/[^a-z0-9]/g, ''));
+  return lines.filter((line) => {
+    const name = line.sportsbook.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return wanted.some((book) => name.includes(book) || book.includes(name));
+  });
 }

@@ -44,6 +44,7 @@ export const settingsSectionFields = {
     'includeMemberContextInChatReplies',
     'conversationRetentionDays',
   ],
+  personalize: ['preferences'],
   storage: [],
 } as const satisfies Record<string, readonly (keyof AppSettings)[]>;
 export type SettingsSection = keyof typeof settingsSectionFields;

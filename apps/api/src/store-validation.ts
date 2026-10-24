@@ -16,6 +16,7 @@ import {
 import {
   defaultLeagueStaleAfterHours,
   isValidNewsSources,
+  isValidPreferences,
   isLeagueStaleAfterHours,
   isValidWritingStylePresets,
   normalizeActionSettings,
@@ -291,6 +292,10 @@ export function validateState(input: unknown): AppState {
       calendarEvents: normalizeLeagueCalendarEvents(rawSettings.calendarEvents, leagueIds),
       channelBoundaries: normalizeChannelBoundaries(rawSettings.channelBoundaries),
       newsSources: normalizeNewsSources(rawSettings.newsSources),
+      // Saved preferences that no longer validate (a league was removed) are dropped, not fatal.
+      preferences: isValidPreferences(rawSettings.preferences, leagueIds)
+        ? (rawSettings.preferences ?? {})
+        : {},
       nflInjuryReportsEnabled: rawSettings.nflInjuryReportsEnabled === true,
       includeMemberContextInChatReplies: rawSettings.includeMemberContextInChatReplies === true,
       scheduledSyncRetries:

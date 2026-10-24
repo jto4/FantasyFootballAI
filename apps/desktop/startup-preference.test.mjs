@@ -22,6 +22,8 @@ test('appearance survives restart independently of the dashboard port and reject
       assert.equal((await stat(preferencePath)).mode & 0o777, 0o600);
     await assert.rejects(setAppearancePreference(preferencePath, '../dark'), /Unknown appearance/);
     assert.equal(await getAppearancePreference(preferencePath), 'dark');
+    await setAppearancePreference(preferencePath, 'system');
+    assert.equal(await getAppearancePreference(preferencePath), 'system');
     await setAppearancePreference(preferencePath, 'light');
     assert.equal(await getAppearancePreference(preferencePath), 'light');
     await writeFile(preferencePath, '{"theme":"invalid"}');

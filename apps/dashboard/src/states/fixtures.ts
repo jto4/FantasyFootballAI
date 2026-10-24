@@ -130,6 +130,40 @@ export function stubApi() {
   window.fetch = async (input: RequestInfo | URL) => {
     const url = new URL(String(input instanceof Request ? input.url : input), location.origin);
     const league = url.searchParams.get('league');
+    if (url.pathname === '/api/advice/watchlist')
+      return new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: 'w1',
+              name: 'Fictional Sleeper',
+              position: 'WR',
+              nflTeam: 'SEA',
+              rosteredBy: 'Free agent',
+              projected: 9.4,
+              range: { low: 2.9, high: 17.8 },
+            },
+            {
+              id: 'w2',
+              name: 'Fictional Starter',
+              position: 'RB',
+              nflTeam: 'LA',
+              rosteredBy: 'Fictional Twos',
+              projected: 14.2,
+              range: { low: 5.1, high: 25.3 },
+            },
+            {
+              id: 'w3',
+              name: 'Fictional Injured',
+              position: 'TE',
+              nflTeam: 'KC',
+              rosteredBy: 'Free agent',
+              status: 'Out',
+            },
+          ],
+        }),
+        { headers: { 'content-type': 'application/json' } },
+      );
     if (url.pathname === '/api/alerts') {
       if (league === 'pending') return new Promise<Response>(() => undefined);
       if (league === 'failed')

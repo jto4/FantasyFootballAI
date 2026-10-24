@@ -17,6 +17,8 @@ const states: [name: string, ready?: string][] = [
   ['home-failed', 'Couldn’t finish checking your lineup'],
   ['home-alert', 'is inactive today'],
   ['home-clear', 'You’re set'],
+  ['watchlist', 'Fictional Injured'],
+  ['watchlist-empty', 'Add players'],
   ['matchup', 'chance you win'],
 ];
 

@@ -587,3 +587,31 @@ chat) show elapsed time, the usual duration and Cancel where the work can be can
 Hard-to-reach states are kept visible by a development-only gallery (`states.html`) with
 screenshot tests, and by development-only API fault injection (`SIDEKICK_FAULTS`); see
 `docs/setup.md`.
+
+### Personalization — October 24, 2026
+
+A **Personalize** settings section holds the owner's choices. Device display choices stay in
+local storage, applied before paint, because they describe the screen, not the league: theme
+(light, dark or match system, also honored by the desktop window), text size, density, reduced
+motion, start page, odds format and 12/24-hour clock. Everything else is one validated
+`preferences` object saved with the settings:
+
+- **Home layout**: show, hide and reorder Home's cards; a new Watchlist card lists watched players
+  with this week's projection, likely range, status and who rosters them.
+- **Notifications**: which desktop alerts fire, how early (2, 6 or 24 hours), quiet hours (alerts
+  wait until they end), watched players ruled out, and an optional game-day summary with the
+  projection and win chance before the first starter kicks off.
+- **Lineups and projections**: lineup strategy (balanced, safe floor, chase upside, maximize win
+  chance), switches for the wind and vacated-carries adjustments, and per-player nudges of up to
+  ±50% applied last to any projection source and labeled as the owner's. On simulated 2025–2026
+  rosters (QB, 2 RB, 2 WR, TE, flex, D/ST from each week's players, 9,229 matchups) every
+  strategy won within 0.2 points of balanced, so strategies are presented as a preference, not an
+  edge; balanced stays the default.
+- **Props**: a minimum edge over break-even before a lean is shown, which sportsbooks to show
+  (every line is still saved to the ledger), and a switch for background line saving.
+- **AI**: tone and answer length for Ask and Advice (added as one instruction line only when
+  changed from the defaults) and a model per task (Ask, Advice, Reports) for API connections;
+  CLI and signed-in connections keep their own model, and owner-entered prices are dropped when a
+  task uses a different model.
+
+Preferences that name a removed league are dropped on load rather than failing it.

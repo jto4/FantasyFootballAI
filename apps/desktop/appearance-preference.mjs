@@ -5,14 +5,14 @@ import { dirname } from 'node:path';
 export async function getAppearancePreference(path) {
   try {
     const preference = JSON.parse(await readFile(path, 'utf8'));
-    return preference?.theme === 'dark' ? 'dark' : 'light';
+    return ['dark', 'system'].includes(preference?.theme) ? preference.theme : 'light';
   } catch {
     return 'light';
   }
 }
 
 export async function setAppearancePreference(path, theme) {
-  if (theme !== 'light' && theme !== 'dark') throw new TypeError('Unknown appearance.');
+  if (!['light', 'dark', 'system'].includes(theme)) throw new TypeError('Unknown appearance.');
   await mkdir(dirname(path), { recursive: true, mode: 0o700 });
   const temporaryPath = `${path}.${randomUUID()}.tmp`;
   try {

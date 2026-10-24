@@ -62,7 +62,8 @@ import { createWeeklyService } from './weekly-service.js';
 import { appendPredictionRecords } from './prediction-ledger.js';
 import { addPropEvidence } from './prop-evidence.js';
 import { draftContext, rosterContext } from './advice-context.js';
-import { projectionUsage } from './projection-usage.js';
+import { lineupStrategy, projectionUsage } from './projection-usage.js';
+import { settingsForTask, styleInstructions } from './ai-preferences.js';
 export type { LineupAlerts, WeeklyBriefing, MatchupSide } from './weekly-service.js';
 
 export interface AdviceDependencies {
@@ -194,7 +195,7 @@ export function createAdviceService(deps: AdviceDependencies) {
             },
             warnings: [] as string[],
           })
-        : models(deps.store.settingsSnapshot()),
+        : models(settingsForTask(deps.store.settingsSnapshot(), 'advice')),
       deps.signedInAI?.status().catch(() => 'unavailable' as const),
       deps.signedInCodex?.status().catch(() => 'unavailable' as const),
     ]);
@@ -215,7 +216,7 @@ export function createAdviceService(deps: AdviceDependencies) {
       model:
         request.connection && request.connection !== 'saved'
           ? signedModel(request.connection)
-          : modelName(deps.store.settingsSnapshot()),
+          : modelName(settingsForTask(deps.store.settingsSnapshot(), 'advice')),
       ...(deps.signedInAI || deps.signedInCodex
         ? {
             connection: request.connection ?? 'saved',
@@ -312,6 +313,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     const evidence = loaded.league
       ? buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          preferences: deps.store.settingsSnapshot().preferences,
           league: loaded.league,
           players,
           projections: deps.store
@@ -363,7 +365,9 @@ export function createAdviceService(deps: AdviceDependencies) {
    * model override checked against the provider's current list, or the saved runtime.
    */
   async function analysisProvider(request: AdviceRequest, signal?: AbortSignal) {
-    const savedSettings = deps.store.settingsSnapshot();
+    // The owner's advice model (Personalize) stands in for the saved model; a one-off choice in
+    // the Advice form still overrides it.
+    const savedSettings = settingsForTask(deps.store.settingsSnapshot(), 'advice');
     let settings = savedSettings;
     const usesCodex =
       request.connection === 'codex-cli' ||
@@ -578,6 +582,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     const evidence = league
       ? buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          preferences: deps.store.settingsSnapshot().preferences,
           league,
           players: loaded.players,
           projections,
@@ -614,6 +619,7 @@ export function createAdviceService(deps: AdviceDependencies) {
             },
             evidence,
             asOf,
+            lineupStrategy(deps.store.settingsSnapshot().preferences),
           )
         : undefined;
     const betHistory =
@@ -825,10 +831,13 @@ export function createAdviceService(deps: AdviceDependencies) {
       decisionPolicy,
     });
     let usage: { inputTokens: number; outputTokens: number } | undefined;
+    const adviceStyle = styleInstructions(deps.store.settingsSnapshot().preferences);
     async function generate(prompt: string): Promise<string> {
       signal?.throwIfAborted();
       const input = {
-        system: adviceReasoningInstructions,
+        system: adviceStyle
+          ? `${adviceReasoningInstructions}\n${adviceStyle}`
+          : adviceReasoningInstructions,
         prompt,
         reasoningEffort: 'high' as const,
         temperature: 0.2,
@@ -1074,7 +1083,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     ]);
   }
   const weekly = createWeeklyService(deps, { now, load });
-  const { briefing, alerts, waiverDay, tradeIdeas, live } = weekly;
+  const { briefing, alerts, waiverDay, tradeIdeas, live, watchlist } = weekly;
   return {
     live,
     readiness,
@@ -1086,6 +1095,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     alerts,
     waiverDay,
     tradeIdeas,
+    watchlist,
   };
 
   async function models(settings: AppSettings) {

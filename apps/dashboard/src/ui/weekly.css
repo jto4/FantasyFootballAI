@@ -429,3 +429,34 @@ p.weekly-answer {
   font-size: 12px;
   color: var(--muted);
 }
+.watchlist-card {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.watchlist-card .section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.watchlist-card h3 {
+  margin: 0 0 8px;
+}
+.watchlist-card ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.watchlist-card li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.watchlist-card small {
+  color: var(--muted);
+}

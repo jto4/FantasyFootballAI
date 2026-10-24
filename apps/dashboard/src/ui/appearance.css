@@ -74,3 +74,40 @@
     display: none;
   }
 }
+
+/* Text size: the app is sized in px, so scale the whole page (like browser zoom). */
+:root[data-text-size='small'] body {
+  zoom: 0.92;
+}
+:root[data-text-size='large'] body {
+  zoom: 1.1;
+}
+:root[data-text-size='larger'] body {
+  zoom: 1.22;
+}
+/* Compact density: tighter cards and lists for more on screen. */
+:root[data-density='compact']
+  :is(.next-up, .wait-status, .error-notice, .matchup-card, .report-card, .settings-card) {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+:root[data-density='compact'] :is(.weekly-home-grid, .content-grid, .lower-grid) {
+  gap: 10px;
+}
+:root[data-density='compact']
+  :is(.matchup-lineups td, .matchup-lineups th, .prop-table td, .prop-table th) {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+:root[data-density='compact'] .weekly-home article {
+  padding: 12px;
+}
+/* Reduced motion on request, independent of the operating system setting. */
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

@@ -169,6 +169,10 @@ export function normalizeSettingsUpdate(
     chatAgentName: typeof chatAgentName === 'string' ? chatAgentName.trim() : 'Sunday Sidekick',
     ...(typeof chatReplyLeagueId === 'string' && chatReplyLeagueId ? { chatReplyLeagueId } : {}),
     mcpDeliveryEnabled: mcpDeliveryEnabled === true,
+    // Validated with the whole update; an empty object clears every preference.
+    ...((input as { preferences?: unknown }).preferences
+      ? { preferences: (input as { preferences: AppSettings['preferences'] }).preferences }
+      : {}),
     ...(current.settings.imessageSyncCursor?.chatGuid ===
     (imessageProvider === 'imsg' ? `imsg:${imessageChatGuid}` : imessageChatGuid)
       ? { imessageSyncCursor: current.settings.imessageSyncCursor }

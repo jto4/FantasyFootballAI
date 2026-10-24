@@ -125,6 +125,8 @@ export function startPropLineCapture(
     props: Pick<PublicPropLines, 'props'>;
     ledger: PropLineLedger;
     now?: () => number;
+    /** The owner can switch background saving off in Personalize; checked on every tick. */
+    enabled?: () => boolean;
   },
   onError: (error: unknown) => void = () => undefined,
   intervalMs = 20 * 60_000,
@@ -133,7 +135,7 @@ export function startPropLineCapture(
   let running = false;
   let lastDailyCapture = '';
   const tick = async () => {
-    if (running) return;
+    if (running || deps.enabled?.() === false) return;
     running = true;
     try {
       const at = new Date(now()).toISOString();

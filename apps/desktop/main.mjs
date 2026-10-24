@@ -6,6 +6,7 @@ import {
   ipcMain,
   Menu,
   nativeImage,
+  nativeTheme,
   Notification,
   shell,
   Tray,
@@ -134,11 +135,16 @@ ipcMain.on('sidekick:get-theme', (event) => {
     event.returnValue = 'light';
   }
 });
+// "system" follows the operating system's appearance (nativeTheme drives prefers-color-scheme).
+const windowBackground = (theme) =>
+  theme === 'dark' || (theme === 'system' && nativeTheme.shouldUseDarkColors)
+    ? '#000000'
+    : '#ffffff';
 ipcMain.handle('sidekick:set-theme', (event, theme) => {
   assertTrustedDashboard(event);
-  if (theme !== 'light' && theme !== 'dark') throw new TypeError('Unknown appearance.');
+  if (!['light', 'dark', 'system'].includes(theme)) throw new TypeError('Unknown appearance.');
   appearanceTheme = theme;
-  mainWindow.setBackgroundColor(theme === 'dark' ? '#000000' : '#ffffff');
+  mainWindow.setBackgroundColor(windowBackground(theme));
   // Serialize rapid toggles so an older write cannot replace the latest choice.
   appearanceWrites = appearanceWrites
     .catch(() => undefined)
@@ -689,7 +695,7 @@ function createWindow({ initiallyHidden = false } = {}) {
     minWidth: 900,
     minHeight: 640,
     show: false,
-    backgroundColor: appearanceTheme === 'dark' ? '#000000' : '#ffffff',
+    backgroundColor: windowBackground(appearanceTheme),
     title: 'Sunday Sidekick',
     webPreferences: {
       ...(verificationProfile ? { partition: 'sidekick-verification' } : {}),

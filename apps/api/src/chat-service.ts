@@ -349,6 +349,8 @@ export async function answerChat(
     now: Date;
     signal?: AbortSignal;
     onStep?: (label: string) => void;
+    /** Owner tone/length instructions appended to the system prompt. */
+    style?: string;
   },
   maxRounds = 3,
 ): Promise<{ answer: string; lookups: ChatLookup[] }> {
@@ -391,7 +393,7 @@ export async function answerChat(
       .filter(Boolean)
       .join('\n\n');
     const text = await input.provider.generate({
-      system,
+      system: input.style ? `${system}\n${input.style}` : system,
       prompt,
       maxOutputTokens: 2_000,
       reasoningEffort: 'medium',

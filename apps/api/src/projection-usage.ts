@@ -1,4 +1,10 @@
-import { ruledOutKeys, type FootballGame, type UsageInput } from '@sidekick/core';
+import {
+  ruledOutKeys,
+  type FootballGame,
+  type LineupStrategy,
+  type UsageInput,
+  type UserPreferences,
+} from '@sidekick/core';
 import type {
   NFLInjuryReportCache,
   PublicGameWeather,
@@ -37,4 +43,11 @@ export function projectionUsage(deps: {
     merged.set(base, { key, value });
     return value;
   };
+}
+
+/** The owner's lineup strategy as a plan option (balanced when unset). */
+export function lineupStrategy(preferences: UserPreferences | undefined): {
+  strategy?: LineupStrategy;
+} {
+  return preferences?.lineupStrategy ? { strategy: preferences.lineupStrategy } : {};
 }

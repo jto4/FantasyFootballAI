@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 24: Personalize settings (display, Home layout and watchlist, notifications, lineup
+  strategy, projection switches and player nudges, prop threshold and sportsbooks, AI tone,
+  length and per-task model).
 - October 23 (UI states): no false all-clear on Home, one error style with retry and support
   details, in-app confirmations, elapsed time on long waits, a UI state gallery with screenshot
   tests, and development-only API fault injection.

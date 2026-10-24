@@ -126,6 +126,11 @@ export function createAdviceRouter(
     ['/api/live', 'live', 'This list could not be prepared. Try again shortly.'],
     ['/api/alerts', 'alerts', 'Alerts are unavailable.'],
     [
+      '/api/advice/watchlist',
+      'watchlist',
+      'Your watchlist could not be prepared. Try again shortly.',
+    ],
+    [
       '/api/advice/briefing',
       'briefing',
       'Your weekly summary could not be prepared. Try again shortly.',

@@ -1,5 +1,5 @@
 import { RoutineBackupSection } from './RoutineBackupSection';
-import { AppearanceSettings } from './Appearance';
+import { PersonalizeSection } from './PersonalizeSection';
 import { settingTarget } from './search-catalog';
 import { DiagnosticsSection } from './DiagnosticsSection';
 import { useImageLibrary } from './hooks/useImageLibrary';
@@ -61,6 +61,7 @@ const sectionLabels: Record<SettingsSection, string> = {
   delivery: 'Delivery & access',
   schedules: 'Schedules & sources',
   privacy: 'Privacy',
+  personalize: 'Personalize',
   storage: 'Storage & desktop',
 };
 const actionNames: Record<string, string> = {
@@ -613,7 +614,13 @@ export function SettingsPage({
           </details>
         </>
       )}
-      {section === 'storage' && <AppearanceSettings />}
+      {section === 'personalize' && (
+        <PersonalizeSection
+          preferences={form.preferences ?? {}}
+          leagues={leagues}
+          onChange={(preferences) => setForm((current) => ({ ...current, preferences }))}
+        />
+      )}
       {section === 'storage' && (
         <>
           <DesktopSettingsSections

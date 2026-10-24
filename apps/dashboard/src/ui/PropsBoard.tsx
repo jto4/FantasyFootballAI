@@ -3,6 +3,7 @@ import { record, type PropBoardRow } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
+import { formatOdds } from './display-preferences';
 import { ErrorNotice } from './ErrorNotice';
 
 export type PropHandoff = {
@@ -283,8 +284,8 @@ export function PropsBoard({
                     </strong>
                     <small>
                       {r.sportsbook}
-                      {r.overOdds !== undefined ? ` · O ${signed(r.overOdds)}` : ''}
-                      {r.underOdds !== undefined ? ` · U ${signed(r.underOdds)}` : ''}
+                      {r.overOdds !== undefined ? ` · O ${formatOdds(r.overOdds)}` : ''}
+                      {r.underOdds !== undefined ? ` · U ${formatOdds(r.underOdds)}` : ''}
                     </small>
                   </td>
                   <td>

@@ -514,7 +514,12 @@ const propLineLedger = new PropLineLedger(
   researchJoin(researchDirname(store.path), 'prop-lines.sqlite'),
 );
 const propLineCapture = startPropLineCapture(
-  { data: publicFootballData, props: publicPropLines, ledger: propLineLedger },
+  {
+    data: publicFootballData,
+    props: publicPropLines,
+    ledger: propLineLedger,
+    enabled: () => store.settingsSnapshot().preferences?.props?.lineCapture !== false,
+  },
   (error) =>
     logEvent('warn', 'props.capture.failed', { component: 'advice', errorName: errorName(error) }),
 );

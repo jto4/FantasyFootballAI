@@ -303,6 +303,8 @@ export interface AppSettings {
   nflInjuryReportsEnabled?: boolean;
   /** Additional retries for transient scheduled league refresh failures; defaults to off. */
   scheduledSyncRetries?: 0 | 1 | 2 | 3;
+  /** Personalization: lineup strategy, nudges, watchlist, props, notifications, AI, Home. */
+  preferences?: import('./preferences.js').UserPreferences;
   aiRuntime?: {
     mode: 'api' | 'anthropic-api' | 'cli' | 'apple-cli' | 'codex-cli';
     model: string;
