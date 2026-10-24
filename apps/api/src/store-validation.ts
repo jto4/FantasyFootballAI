@@ -17,6 +17,8 @@ import {
   defaultLeagueStaleAfterHours,
   isValidNewsSources,
   isValidPreferences,
+  prunePreferences,
+  type UserPreferences,
   isLeagueStaleAfterHours,
   isValidWritingStylePresets,
   normalizeActionSettings,
@@ -293,9 +295,14 @@ export function validateState(input: unknown): AppState {
       channelBoundaries: normalizeChannelBoundaries(rawSettings.channelBoundaries),
       newsSources: normalizeNewsSources(rawSettings.newsSources),
       // Saved preferences that no longer validate (a league was removed) are dropped, not fatal.
-      preferences: isValidPreferences(rawSettings.preferences, leagueIds)
-        ? (rawSettings.preferences ?? {})
-        : {},
+      // Entries for removed leagues are dropped; anything else invalid resets preferences.
+      preferences: (() => {
+        const pruned = prunePreferences(
+          rawSettings.preferences as UserPreferences | undefined,
+          leagueIds,
+        );
+        return isValidPreferences(pruned, leagueIds) ? (pruned ?? {}) : {};
+      })(),
       nflInjuryReportsEnabled: rawSettings.nflInjuryReportsEnabled === true,
       includeMemberContextInChatReplies: rawSettings.includeMemberContextInChatReplies === true,
       scheduledSyncRetries:

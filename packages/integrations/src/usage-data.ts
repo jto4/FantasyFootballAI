@@ -9,6 +9,8 @@ export interface UsageSnapshot {
   snaps: Map<string, number>;
   /** Skill-position depth listings by nflverse player ID, current season only. */
   depth: Map<string, DepthEntry[]>;
+  /** True when a download failed and a saved copy was used; refreshed again soon. */
+  stale?: boolean;
 }
 
 /**
@@ -93,6 +95,13 @@ export class PublicUsageData {
     if (hit && hit.until > this.now()) return hit.value;
     const value = this.load(season);
     this.cache.set(season, { until: this.now() + 12 * 3_600_000, value });
+    // A snapshot built from saved copies after a network failure is retried in ten minutes.
+    void value
+      .then((snapshot) => {
+        const entry = this.cache.get(season);
+        if (snapshot.stale && entry?.value === value) entry.until = this.now() + 10 * 60_000;
+      })
+      .catch(() => undefined);
     // A failed load is retried on the next request rather than cached.
     value.catch(() => this.cache.delete(season));
     return value;
@@ -101,6 +110,7 @@ export class PublicUsageData {
     if (!Number.isInteger(season) || season < 2012 || season > 2099)
       throw new Error('Invalid usage season.');
     const seasons = [season - 2, season - 1, season];
+    let stale = false;
     const [snapFiles, depthFile] = await Promise.all([
       Promise.allSettled(
         seasons.map((s) =>
@@ -115,7 +125,10 @@ export class PublicUsageData {
               encode: (rows) => rows,
               decode: (rows) => rows as ReturnType<typeof parsePersonnelSnaps>,
             },
-          }).then((download) => download.value),
+          }).then((download) => {
+            if (download.stale) stale = true;
+            return download.value;
+          }),
         ),
       ),
       // The daily depth file is large; only its compact form is kept on disk.
@@ -131,7 +144,10 @@ export class PublicUsageData {
           decode: (stored) => new Map(stored as [string, DepthEntry[]][]),
         },
       })
-        .then((download) => download.value)
+        .then((download) => {
+          if (download.stale) stale = true;
+          return download.value;
+        })
         .catch(() => new Map<string, DepthEntry[]>()),
     ]);
     const snaps = new Map<string, number>();
@@ -139,6 +155,6 @@ export class PublicUsageData {
       if (file.status === 'fulfilled')
         for (const row of file.value)
           snaps.set(snapKey(row.name, row.team, row.gameId), row.offense);
-    return { snaps, depth: depthFile };
+    return { snaps, depth: depthFile, ...(stale ? { stale: true } : {}) };
   }
 }

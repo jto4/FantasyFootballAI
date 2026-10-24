@@ -58,6 +58,8 @@ export async function fetchNFLInjuryReports(
     maxBytes: maxResponseBytes,
     accept: 'text/csv, text/plain;q=0.9',
     timeoutMs: requestTimeoutMs,
+    // An old report must not be presented as just retrieved; the cache's outage handling applies.
+    staleFallback: false,
     parse: (csv) => parseNFLInjuryReports(csv, season),
     derive: {
       version: 'injuries-v1',

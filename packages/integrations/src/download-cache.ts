@@ -46,6 +46,12 @@ export async function cachedDownload<T>(
     now?: () => number;
     /** Parses the downloaded text; runs only on a fresh download. */
     parse: (text: string) => T;
+    /**
+     * On a network failure, return the cached copy (marked stale, with its older date) instead of
+     * failing. Off for data whose age matters more than its presence (injury statuses), so the
+     * caller's own outage handling and warnings apply.
+     */
+    staleFallback?: boolean;
     /** Store a compact form instead of the raw text; bump `version` when the form changes. */
     derive?: { version: string; encode: (value: T) => unknown; decode: (stored: unknown) => T };
   },
@@ -83,19 +89,34 @@ export async function cachedDownload<T>(
       },
     });
   } catch (error) {
-    if (meta) return { value: await readCached(), validatedAt: meta.validatedAt, stale: true };
+    if (meta && options.staleFallback !== false) {
+      const value = await readCached().catch(() => undefined);
+      if (value !== undefined) return { value, validatedAt: meta.validatedAt, stale: true };
+    }
     throw error;
   }
   const validatedAt = new Date(now()).toISOString();
   if (response.status === 304 && meta) {
     await response.body?.cancel();
-    const value = await readCached();
+    let value: T;
+    try {
+      value = await readCached();
+    } catch {
+      // The saved copy is missing or unreadable (evicted, hand-deleted, or written by an older
+      // version): forget it and download the file again rather than failing on every refresh.
+      await rm(metaPath!, { force: true });
+      await rm(dataPath!, { force: true });
+      return cachedDownload(url, options);
+    }
     await writeMeta(metaPath!, { ...meta, validatedAt });
     return { value, validatedAt, stale: false };
   }
   if (!response.ok) {
     await response.body?.cancel();
-    if (meta) return { value: await readCached(), validatedAt: meta.validatedAt, stale: true };
+    if (meta && options.staleFallback !== false) {
+      const value = await readCached().catch(() => undefined);
+      if (value !== undefined) return { value, validatedAt: meta.validatedAt, stale: true };
+    }
     throw new Error(`Download failed (${response.status}).`);
   }
   const text = await readBoundedText(response, options.maxBytes);

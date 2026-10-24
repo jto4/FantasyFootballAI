@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   defaultNotificationPreferences,
   homeCardLabels,
-  isAdviceOptions,
   orderedHomeCards,
   type AITask,
   type LeagueConnection,
@@ -19,6 +18,17 @@ import {
   type DisplayPreferences,
 } from './display-preferences';
 import { setTheme, useThemePreference, type ThemePreference } from './theme';
+
+type PlayerList = { players: { id: string; name: string; position: string; nflTeam?: string }[] };
+const isPlayerList = (value: unknown): value is PlayerList =>
+  typeof value === 'object' &&
+  value !== null &&
+  Array.isArray((value as PlayerList).players) &&
+  (value as PlayerList).players.length <= 5_000 &&
+  (value as PlayerList).players.every(
+    (p) =>
+      typeof p?.id === 'string' && typeof p.name === 'string' && typeof p.position === 'string',
+  );
 
 /** Sportsbooks the props board and price checks commonly list; names match case-insensitively. */
 export const knownSportsbooks = [
@@ -231,10 +241,8 @@ function PlayerList({
     error,
     reload,
   } = useApi(
-    leagueId
-      ? `/api/advice/options?${new URLSearchParams({ mode: 'waivers', league: leagueId })}`
-      : undefined,
-    isAdviceOptions,
+    leagueId ? `/api/advice/players?${new URLSearchParams({ league: leagueId })}` : undefined,
+    isPlayerList,
     { timeoutMs: 60_000 },
   );
   return (

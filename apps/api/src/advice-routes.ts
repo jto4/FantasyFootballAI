@@ -317,6 +317,16 @@ export function createAdviceRouter(
       });
     }
   });
+  router.get('/api/advice/players', async (req, res) => {
+    const league = req.query.league;
+    if (typeof league !== 'string' || !deps.store.snapshot().leagues.some((l) => l.id === league))
+      return res.status(400).json({ error: 'Choose a connected league.' });
+    try {
+      res.json(await service.playerList(league));
+    } catch {
+      res.status(502).json({ error: 'Players could not be loaded. Try again shortly.' });
+    }
+  });
   router.get('/api/advice/options', async (req, res) => {
     if (
       Object.keys(req.query).some(

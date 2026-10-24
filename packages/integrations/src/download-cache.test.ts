@@ -1,5 +1,5 @@
 import { afterEach, expect, it } from 'vitest';
-import { mkdtemp, readdir, stat } from 'node:fs/promises';
+import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { cachedDownload, configureDownloadCache } from './download-cache.js';
@@ -111,4 +111,44 @@ it('keeps only depth-chart rank changes', () => {
     'WR1@03',
     'TE3@04',
   ]);
+});
+
+it('downloads again when the saved copy is missing or unreadable', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'sidekick-cache-'));
+  configureDownloadCache(directory);
+  const remote = server('a,b\n1,2\n');
+  const get = () =>
+    cachedDownload('https://example.test/file.csv', {
+      fetcher: remote.fetcher,
+      maxBytes: 1_000,
+      parse: (text) => text.split('\n')[1],
+    });
+  await get();
+  const data = (await readdir(directory)).find((name) => name.endsWith('.data'))!;
+  await rm(join(directory, data));
+  expect((await get()).value).toBe('1,2');
+  // Conditional request, 304, unreadable copy, then a plain download.
+  expect(remote.calls).toEqual([null, '"8"', null]);
+  const again = (await readdir(directory)).find((name) => name.endsWith('.data'))!;
+  await writeFile(join(directory, again), '{not json', { mode: 0o600 });
+  const derived = await cachedDownload('https://example.test/file.csv', {
+    fetcher: remote.fetcher,
+    maxBytes: 1_000,
+    parse: (text) => text.length,
+    derive: { version: 'v2', encode: (n) => n, decode: (n) => Number(n) },
+  });
+  expect(derived.value).toBe(8);
+});
+
+it('can refuse a stale copy so the caller reports the outage', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'sidekick-cache-'));
+  configureDownloadCache(directory);
+  const remote = server('x');
+  const options = { fetcher: remote.fetcher, maxBytes: 100, parse: (t: string) => t };
+  await cachedDownload('https://example.test/injuries.csv', options);
+  remote.fail();
+  await expect(
+    cachedDownload('https://example.test/injuries.csv', { ...options, staleFallback: false }),
+  ).rejects.toThrow();
+  expect((await cachedDownload('https://example.test/injuries.csv', options)).stale).toBe(true);
 });

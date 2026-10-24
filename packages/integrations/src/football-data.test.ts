@@ -1,3 +1,7 @@
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { configureDownloadCache } from './download-cache.js';
 import { describe, expect, it } from 'vitest';
 import { footballStatKeys, kickingStatKeys } from '@sidekick/core';
 import {
@@ -357,6 +361,48 @@ it('retains original dates during outages and backs off without disguising stale
   const count = calls;
   await data.get(2026);
   expect(calls).toBe(count);
+});
+
+it('after a restart with no network, uses saved copies with their own date, warns and retries', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'sidekick-football-cache-'));
+  configureDownloadCache(directory);
+  try {
+    let now = Date.parse('2026-10-07T12:00:00Z'),
+      fail = false;
+    const fetcher: typeof fetch = async (url) => {
+      if (fail) throw new TypeError('Failed to fetch');
+      const csv = (body: string) => new Response(body, { headers: { etag: '"v1"' } });
+      if (String(url).includes('trending')) return Response.json([]);
+      if (String(url).endsWith('draft_picks.csv')) return csv(draftCsv);
+      if (String(url).endsWith('games.csv')) return csv(gamesCsv);
+      if (String(url).includes('position[]=DEF')) return Response.json([]);
+      if (String(url).includes('stats_team')) return new Response('', { status: 404 });
+      return csv(
+        statsCsv(
+          record.map((value, index) =>
+            index === 3 ? String(url).match(/week_(\d{4})\.csv$/)![1]! : value,
+          ),
+        ),
+      );
+    };
+    const first = await new PublicFootballData(fetcher, () => now).get(2026);
+    now += 60 * 60 * 1_000;
+    fail = true;
+    const restarted = new PublicFootballData(fetcher, () => now);
+    const offline = await restarted.get(2026);
+    expect(offline.players.length).toBe(first.players.length);
+    const stats = offline.sources.find((source) => source.id === 'stats-2026')!;
+    expect(stats.status).toBe('available');
+    expect(stats.retrievedAt).toBe(new Date(Date.parse('2026-10-07T12:00:00Z')).toISOString());
+    expect(offline.warnings.join(' ')).toContain('could not refresh; using the copy saved');
+    // Not treated as fresh for hours: the next request tries the network again soon.
+    fail = false;
+    now += 6 * 60 * 1_000;
+    const recovered = await restarted.get(2026);
+    expect(recovered.warnings.join(' ')).not.toContain('could not refresh; using the copy saved');
+  } finally {
+    configureDownloadCache(undefined);
+  }
 });
 
 it('rejects oversized streamed/declared responses and reports unavailable sources without raw errors', async () => {

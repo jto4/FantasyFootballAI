@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { normalizeEspnLeague } from '@sidekick/integrations';
-import { isLeagueConnection } from '@sidekick/core';
+import { prunePreferences, isLeagueConnection } from '@sidekick/core';
 import {
   isValidEspnSeason,
   parseLeagueInput,
@@ -228,6 +228,13 @@ export function createLeagueRouter(dependencies: LeagueRouteDependencies): Route
       state.playerProjections = state.playerProjections.filter(
         (projection) => projection.leagueId !== req.params.id,
       );
+      // Watchlist entries and nudges for the removed league would otherwise fail every later
+      // settings save.
+      const pruned = prunePreferences(
+        state.settings.preferences,
+        new Set(state.leagues.map((league) => league.id)),
+      );
+      if (pruned) state.settings.preferences = pruned;
     });
     dependencies.reconcileCalendar(store.snapshot().settings.calendarEvents ?? []);
     res.status(204).end();

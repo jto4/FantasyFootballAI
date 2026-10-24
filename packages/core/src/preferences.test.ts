@@ -84,6 +84,13 @@ it('handles quiet hours across midnight and sportsbook choices', () => {
     'FanDuel Sportsbook',
   ]);
   expect(preferredBookLines(lines, [])).toHaveLength(3);
+  // Empty or generic book names never slip through a chosen-books filter.
+  expect(
+    preferredBookLines(
+      [{ sportsbook: '' }, { sportsbook: 'Bet' }, { sportsbook: 'DraftKings' }],
+      ['DraftKings', 'BetMGM'],
+    ).map((l) => l.sportsbook),
+  ).toEqual(['DraftKings']);
 });
 
 it('lets a strategy decide close calls while totals stay projected points', async () => {
@@ -102,4 +109,23 @@ it('lets a strategy decide close calls while totals stay projected points', asyn
   );
   expect(upside.assignments[0]!.playerId).toBe('boom');
   expect(upside.points).toBe(9.8);
+});
+
+it('drops only the entries of removed leagues', async () => {
+  const { prunePreferences } = await import('./preferences.js');
+  const pruned = prunePreferences(
+    {
+      lineupStrategy: 'safe',
+      watchlist: [
+        { leagueId: 'kept', playerId: '1', name: 'A' },
+        { leagueId: 'gone', playerId: '2', name: 'B' },
+      ],
+      playerNudges: [{ leagueId: 'gone', playerId: '3', name: 'C', percent: 10 }],
+    },
+    new Set(['kept']),
+  )!;
+  expect(pruned.lineupStrategy).toBe('safe');
+  expect(pruned.watchlist).toEqual([{ leagueId: 'kept', playerId: '1', name: 'A' }]);
+  expect(pruned.playerNudges).toEqual([]);
+  expect(isValidPreferences(pruned, new Set(['kept']))).toBe(true);
 });

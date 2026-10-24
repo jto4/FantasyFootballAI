@@ -306,3 +306,24 @@ export function inQuietHours(minutesOfDay: number, start?: string, end?: string)
     ? minutesOfDay >= from && minutesOfDay < to
     : minutesOfDay >= from || minutesOfDay < to;
 }
+
+/**
+ * Preferences without watchlist entries and nudges for leagues that are no longer connected, so
+ * removing a league never leaves settings that fail validation (and never discards the rest).
+ */
+export function prunePreferences(
+  preferences: UserPreferences | undefined,
+  leagueIds: ReadonlySet<string>,
+): UserPreferences | undefined {
+  if (!isObject(preferences)) return preferences;
+  const record = preferences as Record<string, unknown>;
+  // Saved data is untrusted here; anything malformed is left for validation to reject.
+  const kept = (items: unknown) =>
+    Array.isArray(items)
+      ? items.filter((item) => !isObject(item) || leagueIds.has(String(item.leagueId)))
+      : items;
+  const next: Record<string, unknown> = { ...record };
+  if (record.watchlist !== undefined) next.watchlist = kept(record.watchlist);
+  if (record.playerNudges !== undefined) next.playerNudges = kept(record.playerNudges);
+  return next as UserPreferences;
+}

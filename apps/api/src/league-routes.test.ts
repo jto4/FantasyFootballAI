@@ -166,6 +166,11 @@ describe('league API routes', () => {
       { id: 'event-a', leagueId: 'league-a' },
       { id: 'event-b', leagueId: 'league-b' },
     ] as NonNullable<AppState['settings']['calendarEvents']>;
+    state.settings.preferences = {
+      lineupStrategy: 'upside',
+      watchlist: [{ leagueId: 'league-a', playerId: '1', name: 'Fictional Watch' }],
+      playerNudges: [{ leagueId: 'league-a', playerId: '2', name: 'Fictional Nudge', percent: 10 }],
+    };
     const reconcileCalendar = vi.fn();
     const baseUrl = await startServer(state, undefined, reconcileCalendar);
 
@@ -177,5 +182,11 @@ describe('league API routes', () => {
     expect(state.settings.chatRepliesEnabled).toBe(false);
     expect(state.settings.chatRepliesAutoSend).toBe(false);
     expect(reconcileCalendar).toHaveBeenCalledWith(state.settings.calendarEvents);
+    // League-scoped preferences go with the league; the rest stay.
+    expect(state.settings.preferences).toEqual({
+      lineupStrategy: 'upside',
+      watchlist: [],
+      playerNudges: [],
+    });
   });
 });

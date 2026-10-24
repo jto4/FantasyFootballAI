@@ -54,6 +54,9 @@ export class SleeperPlayerCatalog {
       accept: 'application/json',
       timeoutMs: 15_000,
       now: this.now,
+      // Injury statuses in an old list must not count as fresh; get() keeps the in-memory list
+      // through outages and retries after a minute.
+      staleFallback: false,
       parse: (text) => parseSleeperCatalog(JSON.parse(text)),
       derive: {
         version: 'sleeper-catalog-v1',

@@ -1085,7 +1085,20 @@ export function createAdviceService(deps: AdviceDependencies) {
   }
   const weekly = createWeeklyService(deps, { now, load });
   const { briefing, alerts, waiverDay, tradeIdeas, live, watchlist } = weekly;
+  /** Names for player pickers (Personalize): the league's pool, no AI provider involved. */
+  async function playerList(leagueId: string) {
+    const loaded = await load({ mode: 'waivers', leagueId });
+    return {
+      players: loaded.players.slice(0, 5_000).map((player) => ({
+        id: player.id,
+        name: player.name,
+        position: player.position ?? '',
+        ...(player.nflTeam ? { nflTeam: player.nflTeam } : {}),
+      })),
+    };
+  }
   return {
+    playerList,
     live,
     readiness,
     options,

@@ -141,8 +141,45 @@ test('checks often near kickoff and rarely when games are days away', () => {
   // Wake up in time for the 50-hour window.
   assert.equal(nextCheckDelay([{ nextKickoffAt: at(51) }], now, interval), hour);
   assert.equal(nextCheckDelay([{}], now, interval), 3 * hour);
+  // Watched players' games count too.
+  assert.equal(
+    nextCheckDelay([{ nextKickoffAt: at(120), nextWatchKickoffAt: at(10) }], now, interval),
+    interval,
+  );
   assert.equal(
     nextCheckDelay([{ nextKickoffAt: at(120) }, { nextKickoffAt: at(3) }], now, interval),
     interval,
   );
+});
+
+test('checks a newly chosen team right away during an idle wait', async () => {
+  const statePath = join(await mkdtemp(join(tmpdir(), 'alerts-')), 'sent.json');
+  let current = { 'league 1': 't1' };
+  const fetched = [];
+  let fire;
+  const realSetInterval = globalThis.setInterval;
+  globalThis.setInterval = (fn) => ((fire = fn), { unref() {} });
+  try {
+    const alerts = startGameDayAlerts({
+      statePath,
+      teams: () => current,
+      fetchReport: async (league, team) => (
+        fetched.push(team),
+        { ...report, alerts: [], nextKickoffAt: undefined, snapshot: undefined }
+      ),
+      notify: () => undefined,
+      now: () => now,
+    });
+    await alerts.tick();
+    fire();
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(fetched, ['t1']);
+    current = { 'league 1': 't2' };
+    fire();
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(fetched, ['t1', 't2']);
+    alerts.stop();
+  } finally {
+    globalThis.setInterval = realSetInterval;
+  }
 });

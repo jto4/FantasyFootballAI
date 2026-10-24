@@ -292,6 +292,8 @@ export function preferredBookLines<T extends { sportsbook: string }>(
   const wanted = books.map((book) => book.toLowerCase().replace(/[^a-z0-9]/g, ''));
   return lines.filter((line) => {
     const name = line.sportsbook.toLowerCase().replace(/[^a-z0-9]/g, '');
-    return wanted.some((book) => name.includes(book) || book.includes(name));
+    // A line's book name must contain a chosen book ("FanDuel Sportsbook" for "FanDuel"); an
+    // empty or generic name never matches.
+    return name.length > 0 && wanted.some((book) => book.length > 0 && name.includes(book));
   });
 }

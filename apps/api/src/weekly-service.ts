@@ -54,6 +54,8 @@ export interface LineupAlerts {
   nextKickoffAt?: string;
   /** The owner's notification choices, applied by the desktop notifier. */
   notifications: NotificationPreferences;
+  /** Earliest upcoming kickoff among watched players, so the notifier knows when to check. */
+  nextWatchKickoffAt?: string;
   /** Watched players ruled out before their game. */
   watchlist?: { playerId: string; name: string; status: string; kickoffAt: string }[];
   /** Pre-kickoff look at the matchup, for the optional game-day summary notification. */
@@ -567,6 +569,7 @@ export function createWeeklyService(
     const importedAt = leagueRow.snapshotImportedAt;
     // Watched players (rostered or not) who are ruled out before their game.
     const watched: NonNullable<LineupAlerts['watchlist']> = [];
+    const watchKickoffs: number[] = [];
     for (const item of (settings.preferences?.watchlist ?? []).filter(
       (w) => w.leagueId === leagueId,
     )) {
@@ -577,6 +580,7 @@ export function createWeeklyService(
         : undefined;
       const kickoff = game?.kickoffAt ? Date.parse(game.kickoffAt) : undefined;
       if (!player || kickoff === undefined || kickoff <= asOf) continue;
+      watchKickoffs.push(kickoff);
       const gameDay =
         kickoff - asOf <= 3 * 3_600_000
           ? await gameDayStatus(game!, player.name, team!)
@@ -616,6 +620,9 @@ export function createWeeklyService(
       alerts: rows,
       notifications: { ...defaultNotificationPreferences, ...settings.preferences?.notifications },
       ...(watched.length ? { watchlist: watched } : {}),
+      ...(watchKickoffs.length
+        ? { nextWatchKickoffAt: new Date(Math.min(...watchKickoffs)).toISOString() }
+        : {}),
       ...(gameDaySummary ? { gameDaySummary } : {}),
       ...(kickoffs.length ? { nextKickoffAt: new Date(Math.min(...kickoffs)).toISOString() } : {}),
       ...(leagueRow.connectionMode === 'snapshot'
@@ -811,8 +818,10 @@ export function createWeeklyService(
       (item) => item.leagueId === leagueId,
     );
     if (!watched.length) return { leagueId, items: [] };
-    const { league, week, evidence } = await poolEvidence(leagueId, 'week');
-    const byId = new Map(evidence.map((player) => [player.id, player]));
+    // The shared weekly computation already holds evidence for the whole player pool.
+    const { summary, byId } = await briefingWithEvidence(leagueId, teamId);
+    const week = summary.week;
+    const league = deps.store.snapshot().leagues.find((row) => row.id === leagueId)!;
     const owner = new Map(
       league.teams.flatMap((team) => (team.roster ?? []).map((p) => [p.id, team.name] as const)),
     );

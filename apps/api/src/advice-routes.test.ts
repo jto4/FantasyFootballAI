@@ -1928,6 +1928,36 @@ it('saved Codex advice advertises its fixed model, omits unsupported budgets and
   ).toBe(true);
 });
 
+it('lists watched players from the shared weekly evidence', async () => {
+  const w = await workspace();
+  await w.store.update((state) => {
+    state.settings.preferences = {
+      watchlist: [{ leagueId: 'league', playerId: 'wr', name: 'Fictional Receiver' }],
+    };
+  });
+  const response = await fetch(`${w.url}/api/advice/watchlist?league=league&team=mine`);
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body.items).toEqual([
+    expect.objectContaining({ id: 'wr', name: 'Fictional Receiver', rosteredBy: 'Mine' }),
+  ]);
+  expect(w.calls).toEqual([]);
+});
+
+it('lists the league player pool for pickers without touching the AI provider', async () => {
+  const w = await workspace();
+  const response = await fetch(`${w.url}/api/advice/players?league=league`);
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body.players.length).toBeGreaterThan(0);
+  expect(Object.keys(body.players[0]).sort()).toEqual(
+    expect.arrayContaining(['id', 'name', 'position']),
+  );
+  expect(w.calls).toEqual([]);
+  expect(w.configurations).toEqual([]);
+  expect((await fetch(`${w.url}/api/advice/players?league=missing`)).status).toBe(400);
+});
+
 it('builds the weekly briefing deterministically without any AI configuration or call', async () => {
   const w = await workspace();
   const response = await fetch(`${w.url}/api/advice/briefing?league=league&team=mine`);

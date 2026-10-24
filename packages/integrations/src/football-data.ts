@@ -178,9 +178,12 @@ export class PublicFootballData {
       sources: [],
       warnings: [],
     };
+    let refreshFailed = false;
     const loaded = await Promise.allSettled(
       resources.map(
-        async (resource): Promise<Partial<FootballDataSnapshot> & { validatedAt?: string }> => {
+        async (
+          resource,
+        ): Promise<Partial<FootballDataSnapshot> & { validatedAt?: string; stale?: boolean }> => {
           if (resource.kind === 'add' || resource.kind === 'drop') {
             const response = await this.fetcher(resource.url, {
               signal: AbortSignal.timeout(20_000),
@@ -207,6 +210,7 @@ export class PublicFootballData {
           const csv = download.value;
           return {
             validatedAt: download.validatedAt,
+            ...(download.stale ? { stale: true } : {}),
             ...(resource.kind === 'draft-picks'
               ? { draftPicks: parseNFLDraftPicks(csv, season) }
               : resource.kind === 'games'
@@ -233,6 +237,14 @@ export class PublicFootballData {
         result.warnings.push(`${resource.name} is unavailable; no values were invented.`);
         return;
       }
+      // The network failed but a saved copy exists: use it with its own date, say so, and try
+      // again soon instead of treating the snapshot as fresh for hours.
+      if (item.value.stale) {
+        result.warnings.push(
+          `${resource.name} could not refresh; using the copy saved ${item.value.validatedAt}.`,
+        );
+        refreshFailed = true;
+      }
       if (item.value.players) result.players.push(...item.value.players);
       if (item.value.games) result.games = item.value.games;
       if (item.value.draftPicks) result.draftPicks = item.value.draftPicks;
@@ -250,7 +262,7 @@ export class PublicFootballData {
     result.sources.push(...defense.sources);
     result.warnings.push(...defense.warnings);
     // The app makes its own projections; ESPN forecasts are only a research benchmark now.
-    return { ...result, refreshFailed: defense.refreshFailed };
+    return { ...result, refreshFailed: defense.refreshFailed || refreshFailed };
   }
 }
 

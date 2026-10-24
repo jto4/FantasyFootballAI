@@ -104,6 +104,22 @@ export function WeeklyHome({
       ) ?? [];
   const incomplete =
     !team?.roster || team.rosterSize === undefined || team.rosterSize !== team.roster.length;
+  const rosterFreshness = league ? (
+    <p className={freshness === 'fresh' ? 'connection-success' : 'field-warning'}>
+      {league.connectionMode === 'snapshot'
+        ? `Imported from ${platformName(league.platform)}${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}.`
+        : freshness === 'fresh'
+          ? 'Roster snapshot is recent.'
+          : freshness === 'stale'
+            ? 'Roster snapshot needs a refresh.'
+            : 'Last roster update unknown.'}
+      {league.lastSyncedAt ? ` Last synced ${formatDateTime(league.lastSyncedAt)}.` : ''}{' '}
+      <button className="text-button" onClick={onRefresh}>
+        {league.connectionMode === 'snapshot' ? 'Import updated roster' : 'Refresh roster'}
+      </button>
+    </p>
+  ) : null;
+  const nextUpShown = cards.some((card) => card.id === 'next-up' && card.visible);
   return (
     <section className="weekly-home" aria-labelledby="weekly-home-title">
       <div className="weekly-home-heading">
@@ -134,6 +150,8 @@ export function WeeklyHome({
         </p>
       ) : (
         <>
+          {/* The roster's date and refresh sit under the top card, or first when it is hidden. */}
+          {!nextUpShown && rosterFreshness}
           {cards.map((card) => {
             if (!card.visible) return null;
             switch (card.id) {
@@ -153,6 +171,7 @@ export function WeeklyHome({
                         onLive={onLive}
                       />
                     )}
+                    {rosterFreshness}
                   </Fragment>
                 );
               case 'matchup':
@@ -317,19 +336,6 @@ export function WeeklyHome({
                 return null;
             }
           })}
-          <p className={freshness === 'fresh' ? 'connection-success' : 'field-warning'}>
-            {league.connectionMode === 'snapshot'
-              ? `Imported from ${platformName(league.platform)}${league.snapshotImportedAt ? ` · ${formatDateTime(league.snapshotImportedAt)}` : ''}.`
-              : freshness === 'fresh'
-                ? 'Roster snapshot is recent.'
-                : freshness === 'stale'
-                  ? 'Roster snapshot needs a refresh.'
-                  : 'Last roster update unknown.'}
-            {league.lastSyncedAt ? ` Last synced ${formatDateTime(league.lastSyncedAt)}.` : ''}{' '}
-            <button className="text-button" onClick={onRefresh}>
-              {league.connectionMode === 'snapshot' ? 'Import updated roster' : 'Refresh roster'}
-            </button>
-          </p>
           {!team && <p>Choose your team to get started.</p>}
         </>
       )}

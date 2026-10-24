@@ -125,7 +125,11 @@ export function dueNotifications(report, now, sent) {
  */
 export function nextCheckDelay(reports, now, intervalMs) {
   const kickoffs = reports
-    .flatMap((report) => [report.nextKickoffAt, report.gameDaySummary?.kickoffAt])
+    .flatMap((report) => [
+      report.nextKickoffAt,
+      report.nextWatchKickoffAt,
+      report.gameDaySummary?.kickoffAt,
+    ])
     .map((value) => Date.parse(value ?? ''))
     .filter((time) => Number.isFinite(time) && time > now);
   const idle = 3 * hour;
@@ -150,6 +154,7 @@ export function startGameDayAlerts({
   let sent;
   let running = false;
   let nextCheckAt = 0;
+  let checkedTeams = '';
   async function loadSent() {
     if (sent) return sent;
     try {
@@ -161,8 +166,11 @@ export function startGameDayAlerts({
     return sent;
   }
   async function tick(force = false) {
-    if (running || (!force && now() < nextCheckAt)) return;
+    // A newly chosen team or league is checked right away, not after the idle wait.
+    const teamsNow = JSON.stringify(teams());
+    if (running || (!force && now() < nextCheckAt && teamsNow === checkedTeams)) return;
     running = true;
+    checkedTeams = teamsNow;
     try {
       const keys = await loadSent();
       const before = keys.size;
