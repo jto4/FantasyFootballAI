@@ -1,6 +1,6 @@
 import type { LeagueConnection, LeagueConnector, RosterPlayer } from '@sidekick/core';
 import { normalizeScoring } from '@sidekick/core';
-import { readBoundedJson } from '../http.js';
+import { cachedDownload } from '../download-cache.js';
 import {
   asRecord,
   boundedInteger,
@@ -48,48 +48,63 @@ export class SleeperPlayerCatalog {
   }
 
   private async fetchPlayers(): Promise<Map<string, RosterPlayer>> {
-    const response = await fetch('https://api.sleeper.app/v1/players/nfl', {
-      signal: AbortSignal.timeout(15_000),
-      headers: { accept: 'application/json' },
+    // The full list is ~15 MB of JSON; only the fields used here are kept on disk.
+    const download = await cachedDownload('https://api.sleeper.app/v1/players/nfl', {
+      maxBytes: sleeperPlayerCatalogMaxBytes,
+      accept: 'application/json',
+      timeoutMs: 15_000,
+      now: this.now,
+      parse: (text) => parseSleeperCatalog(JSON.parse(text)),
+      derive: {
+        version: 'sleeper-catalog-v1',
+        encode: (players) => [...players.values()],
+        decode: (stored) =>
+          new Map((stored as RosterPlayer[]).map((player) => [player.id, player] as const)),
+      },
     });
-    if (!response.ok) throw new Error(`Sleeper player catalog request failed (${response.status})`);
-    const raw = asRecord(await readBoundedJson(response, sleeperPlayerCatalogMaxBytes));
-    if (!raw) throw new Error('Sleeper player catalog response was invalid.');
-    const players = new Map<string, RosterPlayer>();
-    for (const [id, item] of Object.entries(raw).slice(0, 25_000)) {
-      const player = asRecord(item);
-      if (!player) continue;
-      const firstName = boundedString(player.first_name, 80);
-      const lastName = boundedString(player.last_name, 80);
-      const name =
-        boundedString(player.full_name, 120) || [firstName, lastName].filter(Boolean).join(' ');
-      if (!name) continue;
-      const position = boundedString(player.position, 12);
-      const nflTeam = boundedString(player.team, 8);
-      const status = boundedString(player.status, 32);
-      const gsisId = boundedId(player.gsis_id, 40);
-      const espnId = boundedId(player.espn_id, 40);
-      const yahooId = boundedId(player.yahoo_id, 40);
-      const injuryStatus = boundedString(player.injury_status, 80);
-      players.set(id, {
-        id,
-        sleeperId: id,
-        name,
-        ...(position ? { position } : {}),
-        ...(nflTeam ? { nflTeam } : {}),
-        ...(status ? { status } : {}),
-        ...(gsisId ? { gsisId } : {}),
-        ...(espnId ? { espnId } : {}),
-        ...(yahooId ? { yahooId } : {}),
-        ...(injuryStatus ? { injuryStatus } : {}),
-      });
-    }
+    const players = download.value;
     if (players.size === 0) throw new Error('Sleeper player catalog contained no usable players.');
     this.players = players;
     this.loadedAt = this.now();
     this.retryAfter = 0;
     return players;
   }
+}
+
+/** Validates and narrows the Sleeper player list to the fields the app uses. */
+function parseSleeperCatalog(value: unknown): Map<string, RosterPlayer> {
+  const raw = asRecord(value);
+  if (!raw) throw new Error('Sleeper player catalog response was invalid.');
+  const players = new Map<string, RosterPlayer>();
+  for (const [id, item] of Object.entries(raw).slice(0, 25_000)) {
+    const player = asRecord(item);
+    if (!player) continue;
+    const firstName = boundedString(player.first_name, 80);
+    const lastName = boundedString(player.last_name, 80);
+    const name =
+      boundedString(player.full_name, 120) || [firstName, lastName].filter(Boolean).join(' ');
+    if (!name) continue;
+    const position = boundedString(player.position, 12);
+    const nflTeam = boundedString(player.team, 8);
+    const status = boundedString(player.status, 32);
+    const gsisId = boundedId(player.gsis_id, 40);
+    const espnId = boundedId(player.espn_id, 40);
+    const yahooId = boundedId(player.yahoo_id, 40);
+    const injuryStatus = boundedString(player.injury_status, 80);
+    players.set(id, {
+      id,
+      sleeperId: id,
+      name,
+      ...(position ? { position } : {}),
+      ...(nflTeam ? { nflTeam } : {}),
+      ...(status ? { status } : {}),
+      ...(gsisId ? { gsisId } : {}),
+      ...(espnId ? { espnId } : {}),
+      ...(yahooId ? { yahooId } : {}),
+      ...(injuryStatus ? { injuryStatus } : {}),
+    });
+  }
+  return players;
 }
 
 const sharedSleeperPlayerCatalog = new SleeperPlayerCatalog();

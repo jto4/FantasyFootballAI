@@ -1,6 +1,6 @@
 import { depthPosition, snapKey, type DepthEntry } from '@sidekick/core';
 import { parsePersonnelSnaps } from './game-personnel.js';
-import { readBoundedText } from './http.js';
+import { cachedDownload } from './download-cache.js';
 
 const releaseRoot = 'https://github.com/nflverse/nflverse-data/releases/download';
 
@@ -50,7 +50,35 @@ export function parseDepthCharts(csv: string, season: number): Map<string, Depth
   }
   const depth = new Map<string, DepthEntry[]>();
   for (const { id, ...entry } of byKey.values()) depth.set(id, [...(depth.get(id) ?? []), entry]);
-  return depth;
+  return compactDepthCharts(depth);
+}
+
+/**
+ * Keeps only the dated snapshots where a player's rank at a position changed. The model asks for
+ * "the latest snapshot before kickoff", and an unchanged day repeats the rank before it, so the
+ * answers are identical while the daily files shrink from tens of megabytes to a few hundred KB.
+ */
+export function compactDepthCharts(depth: Map<string, DepthEntry[]>): Map<string, DepthEntry[]> {
+  const compact = new Map<string, DepthEntry[]>();
+  for (const [id, entries] of depth) {
+    const weekly = entries.filter((e) => !e.at);
+    const dated = entries.filter((e) => e.at).sort((a, b) => a.at!.localeCompare(b.at!));
+    const kept: DepthEntry[] = [];
+    const last = new Map<string, DepthEntry>();
+    for (const entry of dated) {
+      const previous = last.get(entry.pos);
+      // A new calendar year starts a new season's chart, so its first listing is always kept.
+      if (
+        !previous ||
+        previous.rank !== entry.rank ||
+        previous.at!.slice(0, 4) !== entry.at!.slice(0, 4)
+      )
+        kept.push(entry);
+      last.set(entry.pos, entry);
+    }
+    compact.set(id, [...weekly, ...kept]);
+  }
+  return compact;
 }
 
 /** Snap counts (three seasons) and the current depth chart, cached for twelve hours. */
@@ -69,17 +97,6 @@ export class PublicUsageData {
     value.catch(() => this.cache.delete(season));
     return value;
   }
-  private async text(url: string, maxBytes: number) {
-    const response = await this.fetcher(url, {
-      redirect: 'follow',
-      signal: AbortSignal.timeout(60_000),
-    });
-    if (!response.ok) {
-      await response.body?.cancel();
-      throw new Error('Usage data is unavailable.');
-    }
-    return readBoundedText(response, maxBytes);
-  }
   private async load(season: number): Promise<UsageSnapshot> {
     if (!Number.isInteger(season) || season < 2012 || season > 2099)
       throw new Error('Invalid usage season.');
@@ -87,13 +104,34 @@ export class PublicUsageData {
     const [snapFiles, depthFile] = await Promise.all([
       Promise.allSettled(
         seasons.map((s) =>
-          this.text(`${releaseRoot}/snap_counts/snap_counts_${s}.csv`, 12_000_000).then((csv) =>
-            parsePersonnelSnaps(csv, s),
-          ),
+          cachedDownload(`${releaseRoot}/snap_counts/snap_counts_${s}.csv`, {
+            fetcher: this.fetcher,
+            now: this.now,
+            maxBytes: 12_000_000,
+            timeoutMs: 60_000,
+            parse: (csv) => parsePersonnelSnaps(csv, s),
+            derive: {
+              version: 'snaps-v1',
+              encode: (rows) => rows,
+              decode: (rows) => rows as ReturnType<typeof parsePersonnelSnaps>,
+            },
+          }).then((download) => download.value),
         ),
       ),
-      this.text(`${releaseRoot}/depth_charts/depth_charts_${season}.csv`, 150_000_000)
-        .then((csv) => parseDepthCharts(csv, season))
+      // The daily depth file is large; only its compact form is kept on disk.
+      cachedDownload(`${releaseRoot}/depth_charts/depth_charts_${season}.csv`, {
+        fetcher: this.fetcher,
+        now: this.now,
+        maxBytes: 150_000_000,
+        timeoutMs: 60_000,
+        parse: (csv) => parseDepthCharts(csv, season),
+        derive: {
+          version: 'depth-v1',
+          encode: (depth) => [...depth],
+          decode: (stored) => new Map(stored as [string, DepthEntry[]][]),
+        },
+      })
+        .then((download) => download.value)
         .catch(() => new Map<string, DepthEntry[]>()),
     ]);
     const snaps = new Map<string, number>();

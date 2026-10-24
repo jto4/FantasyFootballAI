@@ -46,6 +46,19 @@ it('keeps the first line, the last line each day and the last line before kickof
   ledger.close();
 });
 
+it('does not rewrite an unchanged price on the same day', () => {
+  const ledger = new PropLineLedger(':memory:');
+  const sunday = game('2026_07_KC_SEA', '2026-10-26T00:20:00.000Z');
+  expect(ledger.record([line(sunday.id, 220.5)], [sunday], '2026-10-23T12:00:00.000Z')).toBe(1);
+  expect(ledger.record([line(sunday.id, 220.5)], [sunday], '2026-10-23T12:20:00.000Z')).toBe(0);
+  // A new day or a new price is recorded.
+  expect(ledger.record([line(sunday.id, 220.5)], [sunday], '2026-10-24T09:00:00.000Z')).toBe(1);
+  expect(ledger.record([line(sunday.id, 221.5)], [sunday], '2026-10-24T09:20:00.000Z')).toBe(1);
+  const [history] = ledger.list(sunday.id);
+  expect(history!.observations).toBe(3);
+  expect(Object.keys(history!.daily)).toEqual(['2026-10-23', '2026-10-24']);
+});
+
 it('captures every game of the week once a day and near-kickoff games on each tick', async () => {
   let now = Date.parse('2026-10-23T12:00:00.000Z');
   const soon = game('2026_07_PIT_NO', '2026-10-23T13:30:00.000Z');

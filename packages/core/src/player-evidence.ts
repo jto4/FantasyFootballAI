@@ -2,6 +2,7 @@ import type { LeagueConnection, PlayerProjection, RosterPlayer } from './domain-
 import type {
   AdviceMetric,
   FootballDataSnapshot,
+  FootballGame,
   FootballStatKey,
   PlayerAdviceEvidence,
   PlayerGameStats,
@@ -95,6 +96,12 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             (row.period === undefined ||
               (row.period.fromWeek === 1 && row.period.throughWeek === 18))),
   );
+  // This week's regular-season games by team, built once instead of scanned per player.
+  const weekGames = new Map<string, FootballGame[]>();
+  for (const game of input.data.games)
+    if (game.season === input.season && game.week === input.week && game.seasonType === 'REG')
+      for (const side of new Set([nflTeamKey(game.home), nflTeamKey(game.away)]))
+        weekGames.set(side, [...(weekGames.get(side) ?? []), game]);
   const nameCounts = new Map<string, number>();
   for (const player of input.players) {
     const key = playerNameKey(player.name);
@@ -692,14 +699,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
       );
     }
     if (input.scope === 'week') {
-      const upcoming = input.data.games.filter(
-        (game) =>
-          game.season === input.season &&
-          game.week === input.week &&
-          game.seasonType === 'REG' &&
-          (nflTeamKey(game.home) === nflTeamKey(player.nflTeam ?? '') ||
-            nflTeamKey(game.away) === nflTeamKey(player.nflTeam ?? '')),
-      );
+      const upcoming = weekGames.get(nflTeamKey(player.nflTeam ?? '')) ?? [];
       if (
         player.nflTeam &&
         input.data.sources.some(

@@ -3,7 +3,12 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { dueNotifications, inQuietHours, startGameDayAlerts } from './game-day-alerts.mjs';
+import {
+  dueNotifications,
+  inQuietHours,
+  nextCheckDelay,
+  startGameDayAlerts,
+} from './game-day-alerts.mjs';
 
 const now = Date.parse('2026-10-25T12:00:00Z');
 const report = {
@@ -123,5 +128,21 @@ test('follows notification choices: kinds, lead time, quiet hours, watchlist and
       new Set(),
     ),
     [],
+  );
+});
+
+test('checks often near kickoff and rarely when games are days away', () => {
+  const hour = 3_600_000;
+  const at = (hours) => new Date(now + hours * hour).toISOString();
+  const interval = 15 * 60_000;
+  assert.equal(nextCheckDelay([{ nextKickoffAt: at(5) }], now, interval), interval);
+  assert.equal(nextCheckDelay([{ nextKickoffAt: at(49) }], now, interval), interval);
+  assert.equal(nextCheckDelay([{ nextKickoffAt: at(120) }], now, interval), 3 * hour);
+  // Wake up in time for the 50-hour window.
+  assert.equal(nextCheckDelay([{ nextKickoffAt: at(51) }], now, interval), hour);
+  assert.equal(nextCheckDelay([{}], now, interval), 3 * hour);
+  assert.equal(
+    nextCheckDelay([{ nextKickoffAt: at(120) }, { nextKickoffAt: at(3) }], now, interval),
+    interval,
   );
 });

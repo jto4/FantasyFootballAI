@@ -29,6 +29,7 @@ import { adviceInjuryEvidence } from '@sidekick/integrations';
 import { projectionSourceId } from './projections.js';
 
 import type { AdviceDependencies, AdviceLoader } from './advice-service.js';
+import type { AppState } from './store-types.js';
 import { appendPredictionRecords } from './prediction-ledger.js';
 import { lineupStrategy, projectionUsage } from './projection-usage.js';
 
@@ -131,8 +132,41 @@ export function createWeeklyService(
   async function briefing(leagueId: string, teamId: string): Promise<WeeklyBriefing> {
     return (await briefingWithEvidence(leagueId, teamId)).summary;
   }
-  /** The briefing plus the player evidence and roster behind it, for alerts. */
-  async function briefingWithEvidence(leagueId: string, teamId: string) {
+  /**
+   * Home, starter alerts and Live all start from the same weekly computation (~0.7 s of
+   * projections). It is shared for two minutes, and rebuilt sooner when the league, imported
+   * projections or settings change. Public data refreshes land within that window at most.
+   */
+  const recent = new Map<
+    string,
+    { key: string; until: number; value: ReturnType<typeof computeBriefing> }
+  >();
+  function briefingWithEvidence(leagueId: string, teamId: string) {
+    const read = <T>(fn: (state: Readonly<AppState>) => T) =>
+      deps.store.peek ? deps.store.peek(fn) : fn(deps.store.snapshot());
+    const key = read((state) => {
+      const league = state.leagues.find((row) => row.id === leagueId);
+      return JSON.stringify([
+        league?.lastSyncedAt,
+        league?.snapshotImportedAt,
+        league?.matchups?.length,
+        state.playerProjections.filter((row) => row.leagueId === leagueId).length,
+        state.settings.sectionRevisions,
+      ]);
+    });
+    const slot = `${leagueId}\u0000${teamId}`;
+    const hit = recent.get(slot);
+    if (hit && hit.key === key && hit.until > now()) return hit.value;
+    const value = computeBriefing(leagueId, teamId);
+    recent.set(slot, { key, until: now() + 120_000, value });
+    // Failures are not shared; the next request tries again.
+    value.catch(() => {
+      if (recent.get(slot)?.value === value) recent.delete(slot);
+    });
+    while (recent.size > 20) recent.delete(recent.keys().next().value!);
+    return value;
+  }
+  async function computeBriefing(leagueId: string, teamId: string) {
     const leagueRow = deps.store.snapshot().leagues.find((row) => row.id === leagueId);
     if (!leagueRow?.teams.some((team) => team.id === teamId))
       throw new Error('That team is not in the connected league.');
@@ -442,7 +476,9 @@ export function createWeeklyService(
         asOf,
       ),
     );
-    const existing = new Set((deps.store.snapshot().predictionRecords ?? []).map((r) => r.id));
+    const existing = deps.store.peek
+      ? deps.store.peek((state) => new Set((state.predictionRecords ?? []).map((r) => r.id)))
+      : new Set((deps.store.snapshot().predictionRecords ?? []).map((r) => r.id));
     const fresh = records.filter((r) => !existing.has(r.id));
     if (!fresh.length) return;
     await deps.store.update((state) => {

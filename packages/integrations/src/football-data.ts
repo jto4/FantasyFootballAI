@@ -8,6 +8,7 @@ import {
   type PlayerMarketActivity,
 } from '@sidekick/core';
 import { readBoundedJson, readBoundedText } from './http.js';
+import { cachedDownload } from './download-cache.js';
 import { csvRecords } from './football-csv.js';
 import { PublicTeamDefenseData } from './team-defense-data.js';
 import { nflDraftPicksUrl, parseNFLDraftPicks } from './nfl-draft-data.js';
@@ -178,32 +179,42 @@ export class PublicFootballData {
       warnings: [],
     };
     const loaded = await Promise.allSettled(
-      resources.map(async (resource) => {
-        const response = await this.fetcher(resource.url, {
-          signal: AbortSignal.timeout(20_000),
-          headers: {
-            accept:
-              resource.kind === 'add' || resource.kind === 'drop' ? 'application/json' : 'text/csv',
-          },
-        });
-        if (!response.ok) {
-          await response.body?.cancel();
-          throw new Error('Public football data is unavailable.');
-        }
-        if (resource.kind === 'add' || resource.kind === 'drop')
+      resources.map(
+        async (resource): Promise<Partial<FootballDataSnapshot> & { validatedAt?: string }> => {
+          if (resource.kind === 'add' || resource.kind === 'drop') {
+            const response = await this.fetcher(resource.url, {
+              signal: AbortSignal.timeout(20_000),
+              headers: { accept: 'application/json' },
+            });
+            if (!response.ok) {
+              await response.body?.cancel();
+              throw new Error('Public football data is unavailable.');
+            }
+            return {
+              market: parsePlayerMarket(await readBoundedJson(response, 100_000), resource.kind),
+            };
+          }
+          // CSV files go through the disk cache: an unchanged file is a 304, not a re-download.
+          const download = await cachedDownload(resource.url, {
+            fetcher: this.fetcher,
+            now: this.now,
+            accept: 'text/csv',
+            timeoutMs: 20_000,
+            maxBytes:
+              resource.kind === 'games' || resource.kind === 'draft-picks' ? 6_000_000 : 12_000_000,
+            parse: (csv) => csv,
+          });
+          const csv = download.value;
           return {
-            market: parsePlayerMarket(await readBoundedJson(response, 100_000), resource.kind),
+            validatedAt: download.validatedAt,
+            ...(resource.kind === 'draft-picks'
+              ? { draftPicks: parseNFLDraftPicks(csv, season) }
+              : resource.kind === 'games'
+                ? { games: parseFootballGames(csv) }
+                : { players: parsePlayerGameStats(csv, resource.year) }),
           };
-        const csv = await readBoundedText(
-          response,
-          resource.kind === 'games' || resource.kind === 'draft-picks' ? 6_000_000 : 12_000_000,
-        );
-        return resource.kind === 'draft-picks'
-          ? { draftPicks: parseNFLDraftPicks(csv, season) }
-          : resource.kind === 'games'
-            ? { games: parseFootballGames(csv) }
-            : { players: parsePlayerGameStats(csv, resource.year) };
-      }),
+        },
+      ),
     );
     loaded.forEach((item, index) => {
       const resource = resources[index]!;
@@ -212,7 +223,11 @@ export class PublicFootballData {
         name: resource.name,
         url: resource.url,
         status: item.status === 'fulfilled' ? 'available' : 'unavailable',
-        ...(item.status === 'fulfilled' ? { retrievedAt: new Date(this.now()).toISOString() } : {}),
+        ...(item.status === 'fulfilled'
+          ? {
+              retrievedAt: item.value.validatedAt ?? new Date(this.now()).toISOString(),
+            }
+          : {}),
       });
       if (item.status === 'rejected') {
         result.warnings.push(`${resource.name} is unavailable; no values were invented.`);

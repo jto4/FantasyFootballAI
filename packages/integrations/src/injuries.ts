@@ -5,7 +5,7 @@ import {
   type LeagueConnection,
   type RosterPlayer,
 } from '@sidekick/core';
-import { readBoundedText } from './http.js';
+import { cachedDownload } from './download-cache.js';
 
 const nflverseDataUrl = 'https://github.com/nflverse/nflverse-data/releases/download/injuries';
 const maxResponseBytes = 2_000_000;
@@ -53,14 +53,19 @@ export async function fetchNFLInjuryReports(
   if (!Number.isInteger(season) || season < 2009 || season > 2099)
     throw new Error('Choose an NFL injury-report season between 2009 and 2099.');
   const url = nflInjuryReportUrl(season);
-  const response = await fetcher(url, {
-    signal: AbortSignal.timeout(requestTimeoutMs),
-    headers: { accept: 'text/csv, text/plain;q=0.9' },
-    redirect: 'follow',
+  const download = await cachedDownload(url, {
+    fetcher,
+    maxBytes: maxResponseBytes,
+    accept: 'text/csv, text/plain;q=0.9',
+    timeoutMs: requestTimeoutMs,
+    parse: (csv) => parseNFLInjuryReports(csv, season),
+    derive: {
+      version: 'injuries-v1',
+      encode: (rows) => rows,
+      decode: (rows) => rows as NFLInjuryReportRow[],
+    },
   });
-  if (!response.ok) throw new Error(`NFL injury report request failed (${response.status}).`);
-  const csv = await readBoundedText(response, maxResponseBytes);
-  return parseNFLInjuryReports(csv, season);
+  return download.value;
 }
 
 export function nflInjuryReportUrl(season: number): string {

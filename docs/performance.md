@@ -11,6 +11,47 @@ minimum supported Node.js 22.13 runtime on macOS. Each run writes the same JSON 
 to a downloadable, run-scoped artifact so maintainers can compare OS and runtime samples
 without treating noisy hosted-runner timings as fixed performance thresholds.
 
+## Data and computation efficiency — 2026-10-24
+
+Measured on an Apple Silicon Mac with the owner's ESPN league (14 roster spots, week 7) using
+`npm run perf:data` (public data only) and the same flow through the weekly service. Times are
+wall clock in one Node process; downloads count response bodies.
+
+|                                           | Before                  | After                                       |
+| ----------------------------------------- | ----------------------- | ------------------------------------------- |
+| Downloaded per start or 6–12 h refresh    | 115.3 MB in 69 requests | 4.8 MB (11 files answered 304 Not Modified) |
+| Public data load (`perf:data`)            | 4.7 s                   | 2.4 s                                       |
+| First Home answer after start             | 8.3 s                   | 6.0 s                                       |
+| Weekly briefing, recomputed               | 0.66 s                  | 0.24 s                                      |
+| Briefing / alerts / Live within 2 minutes | 0.70–0.85 s each        | < 1 ms / 17 ms / 17 ms (shared)             |
+| Projecting every player again             | 0.38 s                  | 2–4 ms (memoized per data snapshot)         |
+| Process memory after load                 | 1,057 MB RSS            | 486 MB RSS                                  |
+| Disk used by the download cache           | —                       | 34 MB                                       |
+
+What changed:
+
+- **Download cache** (`packages/integrations/src/download-cache.ts`): nflverse files, the
+  Sleeper player list and injury reports are revalidated with ETag/Last-Modified and read from
+  disk when unchanged, so "retrieved at" stays the time the server confirmed them. The
+  65 MB daily depth-chart file is kept only as rank changes (148,775 → 3,102 entries, 166 KB;
+  identical answers on 980,288 lookups), the Sleeper list only with the fields used. The
+  folder is capped at 300 MB, least-recently-used first.
+- **Shared weekly results**: Home, starter alerts and Live reuse one computation for two
+  minutes, rebuilt sooner when the league, imported projections or settings change.
+- **Hot paths**: projected stats are memoized per player and game for each data snapshot;
+  player-name keys are cached; games are indexed by team and week instead of scanned per player.
+- **Fewer writes**: the props board writes only leans that changed; the line ledger skips an
+  unchanged price already recorded that day; SQLite write-ahead logs are trimmed to 1 MB after
+  checkpoints (they stayed at ~4 MB each).
+- **Quieter background work**: Live polls every minute only while a starter's game is in
+  progress (every ten minutes otherwise, and on return to the window); desktop starter alerts
+  check every 15 minutes inside the 50 hours before a kickoff and every three hours otherwise,
+  and the sent-alert file is written only when it changes.
+
+Not changed: a cold start still parses about 20 MB of stats CSV (most of the remaining 6 s);
+ESPN team-defense and Sleeper trending calls (about 4 MB) are not cached because their answers
+change daily.
+
 ## Baseline recorded on 2026-09-27
 
 Local macOS ARM, Node.js 25.9.0; synthetic fixture of 8 leagues, 96 teams, 80 member

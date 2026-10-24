@@ -36,6 +36,7 @@
     "build": "node scripts/build.mjs",
     "test:ui-states": "playwright test -c playwright.states.config.mjs",
     "perf:smoke": "npm run build && node scripts/performance-smoke.mjs",
+    "perf:data": "npm run build --workspace @sidekick/core && npm run build --workspace @sidekick/integrations && node scripts/perf-data.mjs",
     "desktop:make": "npm run build && npm run make --workspace @sidekick/desktop",
     "desktop:update-lock": "npm run build && node scripts/desktop-package.mjs --update-lock",
     "typecheck": "npm run typecheck --workspaces --if-present",

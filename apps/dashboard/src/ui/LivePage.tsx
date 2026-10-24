@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { record, type LeagueConnection, type LiveMatchup, type LiveSide } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
@@ -83,6 +83,7 @@ export function LivePage({
   const [report, setReport] = useState<LiveReport>();
   const [error, setError] = useState('');
   const [checkedAt, setCheckedAt] = useState<string>();
+  const playingRef = useRef<(playing: boolean) => void>(() => undefined);
   useEffect(() => {
     if (!league || !teamId) return;
     let controller = new AbortController();
@@ -99,6 +100,9 @@ export function LivePage({
         .then((value) => {
           if (signal.aborted) return;
           setReport(value);
+          playingRef.current(
+            (value.matchup?.you.playing ?? 0) + (value.matchup?.opponent.playing ?? 0) > 0,
+          );
           setError('');
           setCheckedAt(new Date().toISOString());
         })
@@ -106,12 +110,29 @@ export function LivePage({
           () => !signal.aborted && setError('Live scores could not be loaded. Retrying shortly.'),
         );
     };
-    load();
+    // Every minute while a starter's game is in progress; every ten minutes otherwise (and right
+    // away when the window comes back), so an idle Live tab is not recomputing the matchup.
+    let lastLoad = 0;
+    let playing = false;
+    const loadNow = () => {
+      lastLoad = Date.now();
+      load();
+    };
+    loadNow();
     const timer = setInterval(() => {
-      if (document.visibilityState === 'visible') load();
+      if (document.visibilityState !== 'visible') return;
+      if (playing || Date.now() - lastLoad >= 10 * 60_000) loadNow();
     }, 60_000);
+    const visible = () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastLoad >= 60_000) loadNow();
+    };
+    document.addEventListener('visibilitychange', visible);
+    playingRef.current = (value) => {
+      playing = value;
+    };
     return () => {
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', visible);
       controller.abort();
     };
   }, [league?.id, teamId]);

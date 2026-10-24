@@ -67,7 +67,8 @@ import { settingsForTask, styleInstructions } from './ai-preferences.js';
 export type { LineupAlerts, WeeklyBriefing, MatchupSide } from './weekly-service.js';
 
 export interface AdviceDependencies {
-  store: Pick<LocalStore, 'snapshot' | 'settingsSnapshot' | 'update'>;
+  store: Pick<LocalStore, 'snapshot' | 'settingsSnapshot' | 'update'> &
+    Partial<Pick<LocalStore, 'peek'>>;
   data: Pick<PublicFootballData, 'get'> & Partial<Pick<PublicFootballData, 'outcomes'>>;
   catalog: () => Promise<Map<string, RosterPlayer>>;
   news: Pick<FootballNewsCache, 'get'> & Partial<Pick<FootballNewsCache, 'getForAdvice'>>;

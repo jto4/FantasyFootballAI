@@ -33,4 +33,5 @@
 - `npm run test:ui-states`: screenshot-test the development UI state gallery (errors, loading, long waits, confirmations, Home checks) in light and dark; see `docs/setup.md`.
 - `npm run perf:smoke`: build and measure local API startup, representative state latency, dashboard assets, and API memory; see `docs/performance.md` for scope and release limitations.
 - `npm run credentials:smoke`: build the API and round-trip a random temporary credential through the current OS credential store, then delete it; it does not touch saved Sidekick credentials.
+- `npm run perf:data`: opt-in live check of public data downloads and load time with an empty and a filled download cache, plus projection reuse; see `docs/performance.md`.
 - `npm run news:smoke`: check the configured ESPN, PFF, FOX Sports, CBS Sports, and Pro Football Talk RSS feeds directly; this is an opt-in live check, not part of CI.

@@ -241,13 +241,20 @@ export function scoreHistoricalGame(
  * position and uniqueness before joining.
  */
 export function playerNameKey(name: string): string {
-  return name
+  // Called for every stat row and player on every request; the same few thousand names repeat.
+  const hit = nameKeys.get(name);
+  if (hit !== undefined) return hit;
+  const key = name
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[,.]?\s+(jr|sr|ii|iii|iv|v)\.?\s*$/, '')
     .replace(/[^a-z0-9]/g, '');
+  if (nameKeys.size >= 50_000) nameKeys.clear();
+  nameKeys.set(name, key);
+  return key;
 }
+const nameKeys = new Map<string, string>();
 
 export function footballPosition(position: string | undefined): string {
   const key = position?.toUpperCase() ?? '';
@@ -277,12 +284,10 @@ export function defensePlayerIdentity(player: {
   return `dst:${team}`;
 }
 
+const teamAliases: Record<string, string> = { LAR: 'LA', JAC: 'JAX', WSH: 'WAS', LVR: 'LV' };
 export function nflTeamKey(team: string): string {
   const normalized = team.trim().toUpperCase();
-  return (
-    ({ LAR: 'LA', JAC: 'JAX', WSH: 'WAS', LVR: 'LV' } as Record<string, string>)[normalized] ??
-    normalized
-  );
+  return teamAliases[normalized] ?? normalized;
 }
 
 /** A scoreless feed row is not proof that a same-day game is still upcoming. */

@@ -86,6 +86,11 @@ export interface ProjectionContext {
   depth: Map<string, DepthEntry[]>;
   ruledOut: Set<string>;
   windKph: Map<string, number>;
+  /** Projected stats per player and game, reused while this data snapshot lasts. */
+  memo: Map<
+    string,
+    { stats: Partial<Record<FootballStatKey, number>>; sampleGames: number } | null
+  >;
 }
 
 /** The model league and player histories for one data snapshot, built once and reused. */
@@ -113,6 +118,7 @@ export function projectionContext(
     depth: usage?.depth ?? new Map(),
     ruledOut: usage?.ruledOut ?? new Set<string>(),
     windKph: usage?.windKph ?? new Map<string, number>(),
+    memo: new Map(),
   };
   contexts.set(data, { ...(usage ? { usage } : {}), value });
   return value;
@@ -120,15 +126,21 @@ export function projectionContext(
 
 /** The game a team plays in a given week, or undefined on a bye. */
 export function teamGame(games: FootballGame[], season: number, week: number, team: string) {
-  const key = nflTeamKey(team);
-  return games.find(
-    (g) =>
-      g.season === season &&
-      g.week === week &&
-      g.seasonType === 'REG' &&
-      (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
-  );
+  let index = gameIndexes.get(games);
+  if (!index) {
+    index = new Map();
+    for (const g of games)
+      if (g.seasonType === 'REG')
+        for (const side of [g.home, g.away]) {
+          const key = `${g.season}:${g.week}:${nflTeamKey(side)}`;
+          if (!index.has(key)) index.set(key, g);
+        }
+    gameIndexes.set(games, index);
+  }
+  return index.get(`${season}:${week}:${nflTeamKey(team)}`);
 }
+// Built once per games list (per data snapshot) instead of scanning every game per player.
+const gameIndexes = new WeakMap<FootballGame[], Map<string, FootballGame>>();
 
 /**
  * Share of the team's running-back carries over its last three games (same season) that belonged
@@ -224,15 +236,27 @@ export function projectFantasyPoints(
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
-  const depth = propDepth(
-    context.depth.get(input.playerId),
-    position,
-    input.game,
-    input.history,
-    context.league.games,
-  );
-  const projected = projectPlayerStats({ ...input, depth }, context, settings, norms);
-  if (!projected) return undefined;
+  const depth = (): ReturnType<typeof propDepth> =>
+    propDepth(
+      context.depth.get(input.playerId),
+      position,
+      input.game,
+      input.history,
+      context.league.games,
+    );
+  // The model's stats depend only on the player, the game and this data snapshot, so repeated
+  // requests (Home, alerts, Live, waivers) reuse them. Only the context's own histories are cached.
+  const memoKey =
+    input.history === context.byPlayer.get(input.playerId)
+      ? `${input.playerId}:${position}:${nflTeamKey(input.team)}:${input.game.id}`
+      : undefined;
+  let base = memoKey !== undefined ? context.memo.get(memoKey) : undefined;
+  if (base === undefined) {
+    base = projectPlayerStats({ ...input, depth: depth() }, context, settings, norms) ?? null;
+    if (memoKey !== undefined) context.memo.set(memoKey, base);
+  }
+  if (!base) return undefined;
+  const projected = { stats: { ...base.stats }, sampleGames: base.sampleGames };
   const vacated =
     position === 'RB' && vacatedCarryExponent
       ? vacatedCarryShare(context, input.playerId, input.team, input.game)

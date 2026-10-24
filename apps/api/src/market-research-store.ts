@@ -11,6 +11,10 @@ export class MarketResearchStore {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     this.db = new Database(path);
     this.db.pragma('journal_mode = WAL');
+    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
+    this.db.pragma('journal_size_limit = 1048576');
+    // Start each run with a trimmed log rather than the last run's high-water mark.
+    this.db.pragma('wal_checkpoint(TRUNCATE)');
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS research (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT',
     );

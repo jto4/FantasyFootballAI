@@ -645,6 +645,9 @@ state: `prop-lines.sqlite` (first, daily and last-before-kickoff prop lines and 
 `prop-leans.sqlite` (pre-kickoff prop leans and their grades) and `chat.sqlite` (Ask Sidekick
 conversations, newest 50, deletable from the panel and kept out of exports and report prompts).
 Chat lookups go through the API's own loopback GET routes; see [decisions](decisions.md).
+`download-cache/` holds public downloads only (nflverse files, the Sleeper player list, injury
+reports), revalidated with conditional requests, private to the user and capped at 300 MB; it
+can be deleted at any time and is rebuilt on the next refresh. See [performance](performance.md).
 
 ## Authorized ESPN browser snapshots
 

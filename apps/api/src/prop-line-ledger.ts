@@ -29,8 +29,12 @@ export interface PropLineHistory {
   first: PropLineObservation;
   /** The last observation of each local-UTC day it was seen. */
   daily: Record<string, PropLineObservation>;
-  /** The last observation before kickoff; never updated once the game has started. */
+  /**
+   * The last price before kickoff (with the time it was first seen at that price); never updated
+   * once the game has started.
+   */
   closing: PropLineObservation;
+  /** Recorded changes and daily observations (an unchanged price is not counted again). */
   observations: number;
 }
 
@@ -52,6 +56,10 @@ export class PropLineLedger {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     this.db = new Database(path);
     this.db.pragma('journal_mode = WAL');
+    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
+    this.db.pragma('journal_size_limit = 1048576');
+    // Start each run with a trimmed log rather than the last run's high-water mark.
+    this.db.pragma('wal_checkpoint(TRUNCATE)');
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS lines (key TEXT PRIMARY KEY, game_id TEXT NOT NULL, payload TEXT NOT NULL) STRICT',
     );
@@ -74,6 +82,14 @@ export class PropLineLedger {
         const row = read.get(key) as { payload: string } | undefined;
         const previous = row ? (JSON.parse(row.payload) as PropLineHistory) : undefined;
         const seen = observation(line, at);
+        // An unchanged price already recorded today adds nothing; skipping it saves a write per
+        // line on every capture. The closing entry keeps the time that price was first seen.
+        const same = (o?: PropLineObservation) =>
+          o !== undefined &&
+          o.line === seen.line &&
+          o.overOdds === seen.overOdds &&
+          o.underOdds === seen.underOdds;
+        if (previous && same(previous.closing) && same(previous.daily[at.slice(0, 10)])) continue;
         const next: PropLineHistory = {
           key,
           gameId: line.gameId,

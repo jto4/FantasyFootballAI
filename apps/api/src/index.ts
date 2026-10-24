@@ -62,6 +62,7 @@ import {
   PublicNflScoreboard,
   PublicPregameEvidence,
   GameDayInjuries,
+  configureDownloadCache,
   PublicGameWeather,
   SignedInClaudeConnection,
   SignedInCodexConnection,
@@ -117,6 +118,8 @@ const port = Number(process.env.SIDEKICK_PORT ?? 4173);
 const isDevelopment =
   process.env.SIDEKICK_DEV_MODE === '1' || process.env.npm_lifecycle_event === 'dev';
 const store = new LocalStore();
+// Public downloads (nflverse files, the Sleeper player list) are revalidated, not re-downloaded.
+configureDownloadCache(researchJoin(researchDirname(store.path), 'download-cache'));
 async function currentDatabaseBackup() {
   const directory = await mkdtemp(join(tmpdir(), 'sunday-sidekick-backup-'));
   try {

@@ -119,8 +119,25 @@ export function dueNotifications(report, now, sent) {
 }
 
 /**
- * Polls the local service for each saved team every 15 minutes while the app runs. Sent keys
- * persist so a restart does not repeat a notification. Failures wait for the next poll.
+ * When the next check is worth making: every poll inside the 50 hours before the soonest
+ * kickoff (alerts look up to 48 hours ahead), otherwise every three hours, so the service is not
+ * recomputing lineups all week for nothing.
+ */
+export function nextCheckDelay(reports, now, intervalMs) {
+  const kickoffs = reports
+    .flatMap((report) => [report.nextKickoffAt, report.gameDaySummary?.kickoffAt])
+    .map((value) => Date.parse(value ?? ''))
+    .filter((time) => Number.isFinite(time) && time > now);
+  const idle = 3 * hour;
+  if (!kickoffs.length) return idle;
+  const until = Math.min(...kickoffs) - now;
+  return until > 50 * hour ? Math.max(intervalMs, Math.min(idle, until - 50 * hour)) : intervalMs;
+}
+
+/**
+ * Polls the local service for each saved team while the app runs: every 15 minutes near game
+ * time and every few hours otherwise. Sent keys persist so a restart does not repeat a
+ * notification. Failures wait for the next poll.
  */
 export function startGameDayAlerts({
   statePath,
@@ -132,6 +149,7 @@ export function startGameDayAlerts({
 }) {
   let sent;
   let running = false;
+  let nextCheckAt = 0;
   async function loadSent() {
     if (sent) return sent;
     try {
@@ -142,19 +160,25 @@ export function startGameDayAlerts({
     }
     return sent;
   }
-  async function tick() {
-    if (running) return;
+  async function tick(force = false) {
+    if (running || (!force && now() < nextCheckAt)) return;
     running = true;
     try {
       const keys = await loadSent();
+      const before = keys.size;
+      const reports = [];
       for (const [leagueId, teamId] of Object.entries(teams()).slice(0, 10)) {
         const report = await fetchReport(leagueId, teamId).catch(() => undefined);
         if (!report) continue;
+        reports.push(report);
         for (const notification of dueNotifications(report, now(), keys)) {
           notify(notification);
           keys.add(notification.key);
         }
       }
+      // A failed poll keeps the regular pace so a recovering service is checked again soon.
+      nextCheckAt = now() + (reports.length ? nextCheckDelay(reports, now(), intervalMs) : 0);
+      if (keys.size === before) return;
       // Keep the newest keys; older weeks can never be due again.
       const kept = [...keys].slice(-300);
       sent = new Set(kept);
@@ -168,7 +192,8 @@ export function startGameDayAlerts({
   const first = setTimeout(() => void tick(), 60_000);
   first.unref?.();
   return {
-    tick,
+    /** Runs a check now, ignoring the idle pacing (used by tests and on resume). */
+    tick: () => tick(true),
     stop() {
       clearInterval(timer);
       clearTimeout(first);

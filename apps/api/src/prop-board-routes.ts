@@ -33,6 +33,10 @@ export class PropLeanStore {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     this.db = new Database(path);
     this.db.pragma('journal_mode = WAL');
+    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
+    this.db.pragma('journal_size_limit = 1048576');
+    // Start each run with a trimmed log rather than the last run's high-water mark.
+    this.db.pragma('wal_checkpoint(TRUNCATE)');
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS leans (key TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT',
     );
@@ -182,15 +186,19 @@ export function createPropBoardRouter(deps: {
           }
         : {}),
     });
+    // Only changed leans are written: reloading the board used to rewrite every saved lean.
+    const savedLeans = new Map(deps.leans.list().map((record) => [record.key, record]));
+    const sameLean = (a: PropLeanRecord, b: PropLeanRecord) =>
+      JSON.stringify({ ...a, observedAt: '' }) === JSON.stringify({ ...b, observedAt: '' });
     for (const row of rows) {
       if (!row.kickoffAt || Date.parse(row.kickoffAt) <= now()) continue;
       const key = `${row.gameId}:${row.espnId ?? row.playerName}:${row.stat}`;
       // Before kickoff a prop that no longer leans must not keep an earlier saved lean.
       if (!row.lean || !row.model) {
-        deps.leans.delete(key);
+        if (savedLeans.has(key)) deps.leans.delete(key);
         continue;
       }
-      deps.leans.save({
+      const record: PropLeanRecord = {
         key,
         gameId: row.gameId,
         kickoffAt: row.kickoffAt,
@@ -203,7 +211,9 @@ export function createPropBoardRouter(deps: {
         projection: row.projection ?? row.model.mean,
         ...(row.model ? { overChance: row.model.overChance, modelMean: row.model.mean } : {}),
         observedAt: at,
-      });
+      };
+      const previous = savedLeans.get(key);
+      if (!previous || !sameLean(previous, record)) deps.leans.save(record);
     }
     grade(data.players);
     if (!games.length) warnings.push('No upcoming regular-season games were found.');

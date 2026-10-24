@@ -336,6 +336,14 @@ export class LocalStore {
     return cloneAppState(this.state);
   }
 
+  /**
+   * Reads from the live state without copying it. The reader must only compute plain values
+   * (counts, ids, dates) and must not keep or change what it is given; use snapshot() for that.
+   */
+  peek<T>(read: (state: Readonly<AppState>) => T): T {
+    return read(this.state);
+  }
+
   settingsSnapshot(): AppState['settings'] {
     return structuredClone(this.state.settings);
   }
@@ -612,6 +620,9 @@ export class LocalStore {
     const database = new Database(path, { timeout: 5_000 });
     try {
       database.pragma('journal_mode = WAL');
+      // Keep the write-ahead log from staying at its high-water mark after checkpoints.
+      database.pragma('journal_size_limit = 1048576');
+      database.pragma('wal_checkpoint(TRUNCATE)');
       database.pragma('synchronous = FULL');
       database.pragma('foreign_keys = ON');
       database.pragma('secure_delete = ON');

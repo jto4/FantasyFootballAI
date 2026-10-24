@@ -615,3 +615,14 @@ motion, start page, odds format and 12/24-hour clock. Everything else is one val
   task uses a different model.
 
 Preferences that name a removed league are dropped on load rather than failing it.
+
+### Efficiency: cache public downloads, share weekly results — October 24, 2026
+
+Public downloads are cached on disk and revalidated with conditional requests rather than
+re-downloaded; data that changes daily (Sleeper trending, ESPN feeds) is not cached. Cached
+values carry the time the server last confirmed them, and a failed revalidation falls back to
+the cached copy with its older date, so freshness warnings stay honest. Depth charts are stored
+as rank changes only, after checking that every lookup the model makes gives the same answer.
+Weekly results are shared for two minutes across Home, alerts and Live; that is also the
+longest a public-data refresh can take to show there. Background polling slows down when no
+game is near. Measurements are in `docs/performance.md`.
