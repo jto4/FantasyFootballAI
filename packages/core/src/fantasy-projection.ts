@@ -268,6 +268,14 @@ export function projectFantasyPoints(
       if (value !== undefined) projected.stats[stat] = value * factor;
     }
   }
+  // Wind was fitted on the scored total; league scoring is linear in the stats, so scaling every
+  // stat gives the same total and keeps the stat lines consistent with it.
+  const wind = windFactor(context, input.game, weather);
+  if (wind !== 1)
+    for (const key of Object.keys(projected.stats) as FootballStatKey[]) {
+      const value = projected.stats[key];
+      if (value !== undefined) projected.stats[key] = value * wind;
+    }
   // Stats the model does not project (first downs, bonuses) leave scoring unsupported, not zero.
   const scored = scoreHistoricalGame(scoring, {
     playerId: input.playerId,
@@ -281,12 +289,10 @@ export function projectFantasyPoints(
     seasonType: 'REG',
     stats: projected.stats,
   });
-  // Wind scales the scored total rather than each stat, matching how it was fitted.
-  const wind = windFactor(context, input.game, weather);
   return scored.points === undefined
     ? undefined
     : {
-        points: Math.round(scored.points * wind * 100) / 100,
+        points: Math.round(scored.points * 100) / 100,
         stats: projected.stats,
         sampleGames: projected.sampleGames,
         vacatedCarryShare: vacated,

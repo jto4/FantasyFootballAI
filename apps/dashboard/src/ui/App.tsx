@@ -220,9 +220,10 @@ export function App() {
     setNoticeInfo((current) => {
       if (typeof value === 'function') return { ...current, message: value(current.message) };
       if (!value) return { message: '', detail: '', action: '' };
-      // Raw network text and request references move into the support details.
+      // Raw network text and request references move into the support details. A plain notice
+      // has no retry: the failed action is not known here (showFailure names one when it is).
       const { message, detail } = describeError(value);
-      return { message, detail: detail ?? '', action: '' };
+      return { message, detail: detail ?? '', action: 'none' };
     });
   }
   function showFailure(message: string, error: unknown, action = 'retry') {
@@ -370,7 +371,7 @@ export function App() {
           ? error.message
           : 'Sunday Sidekick could not load. Reopen the app, then try again.';
       setStateLoadError(message);
-      if (stateLoaded) setNotice(`Could not refresh local league data. ${message}`);
+      if (stateLoaded) showFailure('Could not refresh local league data.', error);
     } finally {
       setStateLoading(false);
     }
@@ -884,21 +885,24 @@ export function App() {
               <FriendlyError
                 message={notice}
                 detail={noticeInfo.detail}
-                action={
-                  noticeInfo.action === 'reports'
-                    ? 'Open Reports'
-                    : noticeInfo.action === 'leagues'
-                      ? 'Check league connection'
-                      : noticeInfo.action === 'news'
-                        ? 'Refresh news'
-                        : 'Try again'
-                }
-                onAction={() => {
-                  if (noticeInfo.action === 'reports') navigate('Reports');
-                  else if (noticeInfo.action === 'leagues') navigate('Leagues');
-                  else if (noticeInfo.action === 'news') void refreshNews();
-                  else void refresh();
-                }}
+                {...(noticeInfo.action === 'none'
+                  ? {}
+                  : {
+                      action:
+                        noticeInfo.action === 'reports'
+                          ? 'Open Reports'
+                          : noticeInfo.action === 'leagues'
+                            ? 'Check league connection'
+                            : noticeInfo.action === 'news'
+                              ? 'Refresh news'
+                              : 'Try again',
+                      onAction: () => {
+                        if (noticeInfo.action === 'reports') navigate('Reports');
+                        else if (noticeInfo.action === 'leagues') navigate('Leagues');
+                        else if (noticeInfo.action === 'news') void refreshNews();
+                        else void refresh();
+                      },
+                    })}
               />
               <button type="button" className="text-button" onClick={() => setNotice('')}>
                 Dismiss message

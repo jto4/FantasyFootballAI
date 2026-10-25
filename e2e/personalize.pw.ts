@@ -7,6 +7,10 @@ test('personalize saves preferences, hides Home cards and applies display choice
   test.skip(info.project.name === 'mobile', 'Desktop-first settings flow.');
   const workspace = await apiWorkspace();
   try {
+    const poolRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('/api/advice/players')) poolRequests.push(request.url());
+    });
     await page.goto(`${workspace.url}/#/settings`);
     await page.getByRole('button', { name: 'Personalize', exact: true }).click();
     const display = page.getByRole('group', { name: 'Appearance and display', exact: true });
@@ -32,6 +36,8 @@ test('personalize saves preferences, hides Home cards and applies display choice
     await nudge.fill('-20');
     await nudge.press('Enter');
     await expect(nudge).toHaveValue('-20');
+    // The nudge and watchlist pickers share one request for the league's players.
+    expect(poolRequests).toHaveLength(1);
     await page.getByRole('button', { name: 'Save Personalize', exact: true }).click();
     await expect(page.locator('.settings-save-bar')).toContainText('Saved');
 

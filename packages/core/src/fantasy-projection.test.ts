@@ -208,6 +208,8 @@ it('lowers offensive and kicker projections in forecast wind, not defenses', () 
     weather,
   )!;
   expect(blown.points / still.points).toBeCloseTo(0.8, 2);
+  // The stat lines carry the same reduction as the total.
+  expect(blown.stats.receiving_yards! / still.stats.receiving_yards!).toBeCloseTo(0.8, 5);
   expect(blown.windFactor).toBeCloseTo(0.8);
   const scored = [1, 2, 3].map((w) => ({ gameId: games[w - 1]!.id, points: 8 }));
   const dst = projectSpecialTeamsPoints(

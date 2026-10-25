@@ -161,7 +161,15 @@ export function createWeeklyService(
     const hit = recent.get(slot);
     if (hit && hit.key === key && hit.until > now()) return hit.value;
     const value = computeBriefing(leagueId, teamId);
-    recent.set(slot, { key, until: now() + 120_000, value });
+    const entry = { key, until: now() + 120_000, value };
+    recent.set(slot, entry);
+    // Expire at the next kickoff when that comes sooner than two minutes.
+    void value
+      .then((result) => {
+        if (result.nextKickoff !== undefined)
+          entry.until = Math.min(entry.until, result.nextKickoff);
+      })
+      .catch(() => undefined);
     // Failures are not shared; the next request tries again.
     value.catch(() => {
       if (recent.get(slot)?.value === value) recent.delete(slot);
@@ -423,7 +431,13 @@ export function createWeeklyService(
       waivers,
       notes,
     };
-    return { summary, byId, roster };
+    // A kickoff changes who is locked in, so a shared result must not outlive the next one.
+    const kickoffs = loaded.data.games
+      .filter((game) => game.season === loaded.season && game.week === week && game.kickoffAt)
+      .map((game) => Date.parse(game.kickoffAt!))
+      .filter((time) => Number.isFinite(time) && time > Date.parse(asOf));
+    const nextKickoff = kickoffs.length ? Math.min(...kickoffs) : undefined;
+    return { summary, byId, roster, nextKickoff };
   }
   /** Preloads public stats and the player catalog so Advice opens without a cold download. */
   /**

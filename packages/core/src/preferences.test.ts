@@ -1,11 +1,5 @@
 import { expect, it } from 'vitest';
-import {
-  inQuietHours,
-  isValidPreferences,
-  orderedHomeCards,
-  playerNudge,
-  homeCardIds,
-} from './preferences.js';
+import { isValidPreferences, orderedHomeCards, playerNudge, homeCardIds } from './preferences.js';
 import { preferredBookLines } from './prop-board.js';
 
 const leagues = new Set(['league']);
@@ -70,10 +64,7 @@ it('keeps saved Home order and appends cards added later', () => {
   expect(playerNudge(undefined, 'league', '1')).toBe(0);
 });
 
-it('handles quiet hours across midnight and sportsbook choices', () => {
-  expect(inQuietHours(23 * 60 + 30, '23:00', '08:00')).toBe(true);
-  expect(inQuietHours(12 * 60, '23:00', '08:00')).toBe(false);
-  expect(inQuietHours(13 * 60, '12:00', '14:00')).toBe(true);
+it('applies sportsbook choices', () => {
   const lines = [
     { sportsbook: 'DraftKings' },
     { sportsbook: 'ESPN BET' },

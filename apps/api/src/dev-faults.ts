@@ -51,6 +51,8 @@ export function devFaults(initial: string | undefined, random: () => number = Ma
       });
     if (rule.kind === 'fail') return void fail(rule.value ?? 502);
     if (rule.kind === 'flaky') return random() < rule.value! ? void fail(502) : next();
+    // Browsers send one request at a time per HTTP/1.1 connection, so closing this socket fails
+    // only this request; the browser opens a new connection for the next one.
     if (rule.kind === 'drop') return void req.socket.destroy();
     const timer = setTimeout(next, rule.value);
     res.once('close', () => clearTimeout(timer));

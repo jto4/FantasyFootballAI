@@ -93,7 +93,7 @@ export function NextUpCard({
         ? {
             tone: 'action',
             title: `Start ${change.start.name}${change.bench ? ` over ${change.bench.name}` : ''}`,
-            body: `${change.slot} · estimated ${points(change.start.points - (change.bench?.points ?? 0))} points this week.`,
+            body: swapReason(change),
             action: 'Review lineup',
             run: () => onAdvice('lineup'),
           }
@@ -166,4 +166,19 @@ export function NextUpCard({
       )}
     </section>
   );
+}
+
+/**
+ * Why a swap is suggested. Under a safe, upside or win-chance lineup strategy the incoming player
+ * can project slightly lower, so the gain is only stated when it is positive.
+ */
+export function swapReason(change: {
+  slot: string;
+  start: { points: number };
+  bench?: { points?: number };
+}) {
+  const gain = change.start.points - (change.bench?.points ?? 0);
+  return gain > 0.05
+    ? `${change.slot} · estimated ${points(gain)} points this week.`
+    : `${change.slot} · your lineup strategy prefers this close call (${change.start.points.toFixed(1)} vs ${(change.bench?.points ?? 0).toFixed(1)} projected).`;
 }

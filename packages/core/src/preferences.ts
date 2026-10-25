@@ -295,18 +295,6 @@ export function isValidPreferences(
   return true;
 }
 
-/** Whether a local "HH:MM" time falls inside quiet hours that may wrap past midnight. */
-export function inQuietHours(minutesOfDay: number, start?: string, end?: string): boolean {
-  if (!start || !end) return false;
-  const toMinutes = (value: string) => Number(value.slice(0, 2)) * 60 + Number(value.slice(3, 5));
-  const from = toMinutes(start),
-    to = toMinutes(end);
-  if (from === to) return false;
-  return from < to
-    ? minutesOfDay >= from && minutesOfDay < to
-    : minutesOfDay >= from || minutesOfDay < to;
-}
-
 /**
  * Preferences without watchlist entries and nudges for leagues that are no longer connected, so
  * removing a league never leaves settings that fail validation (and never discards the rest).

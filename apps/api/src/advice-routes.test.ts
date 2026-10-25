@@ -1928,6 +1928,22 @@ it('saved Codex advice advertises its fixed model, omits unsupported budgets and
   ).toBe(true);
 });
 
+it('shares the weekly briefing for two minutes but never past a kickoff', async () => {
+  const w = await workspace();
+  const start = Date.parse('2026-10-07T12:00:00Z');
+  w.setNow(start);
+  const game = w.data.games.find((g) => g.season === 2026 && g.week === 5)!;
+  game.kickoffAt = new Date(start + 60_000).toISOString();
+  const asOf = async () =>
+    (await (await fetch(`${w.url}/api/advice/briefing?league=league&team=mine`)).json()).asOf;
+  const first = await asOf();
+  w.setNow(start + 30_000);
+  expect(await asOf()).toBe(first);
+  // Past the kickoff, well inside two minutes: recomputed.
+  w.setNow(start + 90_000);
+  expect(await asOf()).not.toBe(first);
+});
+
 it('lists watched players from the shared weekly evidence', async () => {
   const w = await workspace();
   await w.store.update((state) => {

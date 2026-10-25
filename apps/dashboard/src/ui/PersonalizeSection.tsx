@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   defaultNotificationPreferences,
   homeCardLabels,
@@ -9,7 +9,7 @@ import {
   type UserPreferences,
 } from '@sidekick/core';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useApi } from './hooks/useApi';
+import { requestJson } from './api-client';
 import { PlayerPicker } from './PlayerPicker';
 import { ErrorNotice } from './ErrorNotice';
 import {
@@ -29,6 +29,41 @@ const isPlayerList = (value: unknown): value is PlayerList =>
     (p) =>
       typeof p?.id === 'string' && typeof p.name === 'string' && typeof p.position === 'string',
   );
+
+// Both player lists on this page ask for the same league's pool; one request serves them.
+const playerPools = new Map<string, Promise<PlayerList>>();
+function usePlayerPool(leagueId: string) {
+  const [state, setState] = useState<{ data?: PlayerList; error?: unknown }>({});
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!leagueId) return;
+    let active = true;
+    setState({});
+    let request = playerPools.get(leagueId);
+    if (!request) {
+      request = requestJson(
+        `/api/advice/players?${new URLSearchParams({ league: leagueId })}`,
+        isPlayerList,
+        undefined,
+        60_000,
+      );
+      playerPools.set(leagueId, request);
+      // A failure is not shared with later attempts; a success is reused only briefly.
+      request.then(
+        () => setTimeout(() => playerPools.delete(leagueId), 60_000),
+        () => playerPools.delete(leagueId),
+      );
+    }
+    request.then(
+      (data) => active && setState({ data }),
+      (error: unknown) => active && setState({ error }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [leagueId, attempt]);
+  return { ...state, reload: () => setAttempt((n) => n + 1) };
+}
 
 /** Sportsbooks the props board and price checks commonly list; names match case-insensitively. */
 export const knownSportsbooks = [
@@ -266,15 +301,7 @@ function PlayerList({
   searchTarget: string;
 }) {
   const [leagueId, setLeagueId] = useState(leagues[0]?.id ?? '');
-  const {
-    data: options,
-    error,
-    reload,
-  } = useApi(
-    leagueId ? `/api/advice/players?${new URLSearchParams({ league: leagueId })}` : undefined,
-    isPlayerList,
-    { timeoutMs: 60_000 },
-  );
+  const { data: options, error, reload } = usePlayerPool(leagueId);
   return (
     <section className="personalize-block" data-search-target={searchTarget} tabIndex={-1}>
       <h3>{title}</h3>
