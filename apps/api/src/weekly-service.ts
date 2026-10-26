@@ -24,6 +24,8 @@ import {
   matchupVarianceScale,
   matchupWinProbability,
   projectionRange,
+  expectedPoints,
+  type NewsItem,
 } from '@sidekick/core';
 import type { LiveBoxScore, NFLInjuryReportRow } from '@sidekick/integrations';
 import { adviceInjuryEvidence } from '@sidekick/integrations';
@@ -855,16 +857,54 @@ export function createWeeklyService(
         };
       }),
     });
+    const matchup = liveMatchup(
+      { you: sideInput(summary.matchup.you), opponent: sideInput(summary.matchup.opponent) },
+      sameWeek ? board!.games : [],
+      sameWeek ? board!.byeTeams : [],
+    );
+    const history = recordWinChance(
+      `${leagueId}:${teamId}:${summary.matchup.week}`,
+      matchup.winChance,
+      matchup.you.points,
+      matchup.opponent.points,
+    );
     return {
       ...base,
       gamesAvailable: Boolean(sameWeek && board?.games.length),
       matchupWeek: summary.matchup.week,
-      matchup: liveMatchup(
-        { you: sideInput(summary.matchup.you), opponent: sideInput(summary.matchup.opponent) },
-        sameWeek ? board!.games : [],
-        sameWeek ? board!.byeTeams : [],
-      ),
+      matchup,
+      history,
     };
+  }
+  /**
+   * Win chance through the week, one point per change (at most one every two minutes), kept in
+   * memory while the app runs: a restart mid-game starts the line again.
+   */
+  const winChanceHistory = new Map<
+    string,
+    { at: string; chance: number; you?: number; opponent?: number }[]
+  >();
+  function recordWinChance(key: string, chance?: number, you?: number, opponent?: number) {
+    const series = winChanceHistory.get(key) ?? [];
+    const last = series.at(-1);
+    if (
+      chance !== undefined &&
+      (!last ||
+        (last.chance !== chance && now() - Date.parse(last.at) >= 120_000) ||
+        now() - Date.parse(last.at) >= 15 * 60_000)
+    ) {
+      series.push({
+        at: new Date(now()).toISOString(),
+        chance,
+        ...(you !== undefined ? { you } : {}),
+        ...(opponent !== undefined ? { opponent } : {}),
+      });
+      if (series.length > 400) series.shift();
+      winChanceHistory.set(key, series);
+      while (winChanceHistory.size > 40)
+        winChanceHistory.delete(winChanceHistory.keys().next().value!);
+    }
+    return series;
   }
   /** Watched players in this league: projection, likely range, status and who rosters them. */
   async function watchlist(leagueId: string, teamId: string) {
@@ -903,7 +943,162 @@ export function createWeeklyService(
       }),
     };
   }
-  return { briefing, alerts, waiverDay, tradeIdeas, live, watchlist };
+  /**
+   * Everything about one player for the player card: this week's projection, range and chance to
+   * play, the model's stat line and other numbers, recent games, matchup, who rosters him and
+   * recent headlines that name him. From the shared weekly computation; no AI call.
+   */
+  async function playerCard(leagueId: string, teamId: string, playerId: string) {
+    requireTeam(leagueId, teamId);
+    const { summary, byId } = await briefingWithEvidence(leagueId, teamId);
+    const player = byId.get(playerId);
+    if (!player) throw new Error('That player is not in this league’s player pool.');
+    const league = deps.store.snapshot().leagues.find((row) => row.id === leagueId)!;
+    const owner = league.teams.find((team) => team.roster?.some((p) => p.id === playerId));
+    const range =
+      player.projectedPoints !== undefined
+        ? projectionRange(player.position, player.projectedPoints, fantasyOutcomeSpread)
+        : undefined;
+    const news = await deps.news
+      .get()
+      .then((snapshot) => newsMentions(snapshot.items ?? [], player.name))
+      .catch(() => []);
+    const starting = summary.matchup?.you.starters.some((s) => s.id === playerId) ?? false;
+    return {
+      leagueId,
+      week: summary.week,
+      id: player.id,
+      name: player.name,
+      position: player.position,
+      ...(player.team ? { nflTeam: player.team } : {}),
+      ...(player.status ? { status: player.status } : {}),
+      ...(player.projectedPoints !== undefined ? { projected: player.projectedPoints } : {}),
+      ...(shownPlayChance(player) !== undefined ? { playChance: shownPlayChance(player) } : {}),
+      ...(range ? { range: { low: range.low, high: range.high } } : {}),
+      ...(player.projectionMethod ? { method: player.projectionMethod } : {}),
+      ...(player.matchup ? { matchup: player.matchup } : {}),
+      recent: player.historicalPoints.slice(0, 8).map((p) => Math.round(p * 10) / 10),
+      // The card lists the numbers behind the projection; market and sample counts stay in Advice.
+      started: player.warnings.includes(weeklyGameWithheldWarning),
+      numbers: player.metrics
+        .filter(
+          (m) =>
+            !/:(market-|sample|projected|range-|draft)/.test(m.id) &&
+            !['year', 'years', 'round', 'pick'].includes(m.unit) &&
+            !/test error/i.test(m.label),
+        )
+        .slice(0, 16)
+        .map((m) => ({ label: m.label, value: Math.round(m.value * 10) / 10, unit: m.unit })),
+      rosteredBy: owner ? (owner.id === teamId ? 'You' : owner.name) : 'Free agent',
+      starting,
+      news,
+    };
+  }
+  /**
+   * Start/sit for two to four players: each one's projection, range, chance to play and game,
+   * and this week's win chance if he takes the spot. "The spot" is every compared player who is
+   * in the lineup now (at least one), filled by this player plus the best of the others.
+   */
+  async function compare(leagueId: string, teamId: string, playerIds: string[]) {
+    requireTeam(leagueId, teamId);
+    const { summary, byId } = await briefingWithEvidence(leagueId, teamId);
+    const players = playerIds.map((id) => byId.get(id));
+    if (players.some((p) => !p))
+      throw new Error('That player is not in this league’s player pool.');
+    const chosen = players as PlayerAdviceEvidence[];
+    const matchup = summary.matchup;
+    const pregame = matchup
+      ? [...matchup.you.starters, ...matchup.opponent.starters].every((s) => !s.started)
+      : false;
+    const compared = new Set(playerIds);
+    const slots = Math.max(1, matchup?.you.starters.filter((s) => compared.has(s.id)).length ?? 1);
+    const starter = (p: PlayerAdviceEvidence) => ({
+      position: p.position,
+      ...(p.projectedPoints !== undefined ? { estimate: p.projectedPoints } : {}),
+      ...(p.playChance !== undefined ? { playChance: p.playChance } : {}),
+    });
+    const byExpected = [...chosen].sort(
+      (a, b) => (expectedPoints(b) ?? -Infinity) - (expectedPoints(a) ?? -Infinity),
+    );
+    const winChanceWith = (player: PlayerAdviceEvidence) => {
+      if (!matchup || !pregame) return undefined;
+      const others = matchup.you.starters.filter((s) => !compared.has(s.id));
+      const fill = [player, ...byExpected.filter((p) => p !== player).slice(0, slots - 1)];
+      return matchupWinProbability(
+        [
+          { settled: 0, remaining: [...others, ...fill.map(starter)] },
+          { settled: 0, remaining: matchup.opponent.starters },
+        ],
+        fantasyOutcomeSpread,
+        matchupVarianceScale,
+      );
+    };
+    const rows = chosen.map((p) => {
+      const range =
+        p.projectedPoints !== undefined
+          ? projectionRange(p.position, p.projectedPoints, fantasyOutcomeSpread)
+          : undefined;
+      const chance = winChanceWith(p);
+      const wind = p.metrics.find((m) => m.id.endsWith(':wind-adjustment'))?.value;
+      return {
+        id: p.id,
+        name: p.name,
+        position: p.position,
+        ...(p.team ? { nflTeam: p.team } : {}),
+        ...(p.status ? { status: p.status } : {}),
+        ...(p.projectedPoints !== undefined ? { projected: p.projectedPoints } : {}),
+        ...(expectedPoints(p) !== undefined ? { expected: expectedPoints(p) } : {}),
+        ...(shownPlayChance(p) !== undefined ? { playChance: shownPlayChance(p) } : {}),
+        ...(range ? { range: { low: range.low, high: range.high } } : {}),
+        ...(p.matchup ? { matchup: p.matchup } : {}),
+        ...(wind ? { windLossPercent: wind } : {}),
+        ...(chance !== undefined ? { winChance: chance } : {}),
+        started: p.warnings.includes(weeklyGameWithheldWarning),
+        inLineup: matchup?.you.starters.some((s) => s.id === p.id) ?? false,
+      };
+    });
+    const pick = [...rows]
+      .filter((r) => !r.started && r.expected !== undefined)
+      .sort(
+        (a, b) => (b.winChance ?? 0) - (a.winChance ?? 0) || (b.expected ?? 0) - (a.expected ?? 0),
+      )[0];
+    return {
+      week: summary.week,
+      slots,
+      players: rows,
+      ...(pick ? { recommended: pick.id } : {}),
+      ...(matchup && !pregame
+        ? { note: 'Games have started, so win chance is not compared.' }
+        : {}),
+    };
+  }
+  return { briefing, alerts, waiverDay, tradeIdeas, live, watchlist, playerCard, compare };
+}
+
+/** A Questionable chance to play, unless his status already says he is out (IR, Out). */
+function shownPlayChance(player: PlayerAdviceEvidence) {
+  return player.playChance !== undefined && !isInactiveFootballStatus(player.status)
+    ? player.playChance
+    : undefined;
+}
+
+/** Recent headlines that name the player in full (title or summary), newest first. */
+export function newsMentions(items: NewsItem[], name: string) {
+  const full = name
+    .replace(/\s+(jr\.?|sr\.?|ii|iii|iv)$/i, '')
+    .trim()
+    .toLowerCase();
+  if (full.split(' ').length < 2) return [];
+  return items
+    .filter((item) => `${item.title} ${item.summary ?? ''}`.toLowerCase().includes(full))
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .slice(0, 5)
+    .map((item) => ({
+      title: item.title,
+      source: item.source,
+      url: item.url,
+      publishedAt: item.publishedAt,
+    }));
 }
 
 /**

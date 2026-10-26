@@ -160,6 +160,12 @@ export class SleeperConnector implements LeagueConnector {
         validIds(roster.reserve).filter((p) => rosterPlayerIds.includes(p)),
       );
       const pointsWhole = numberOrUndefined(record.fpts);
+      // Sleeper waiver type 2 is FAAB; other types have a budget field that means nothing.
+      const budget =
+        boundedInteger(rawSettings.waiver_type, 0, 5) === 2
+          ? boundedInteger(rawSettings.waiver_budget, 1, 100_000)
+          : undefined;
+      const spent = boundedInteger(record.waiver_budget_used, 0, 100_000);
       const pointsFraction = boundedInteger(record.fpts_decimal, 0, 99) ?? 0;
       return {
         id: rosterId,
@@ -170,6 +176,7 @@ export class SleeperConnector implements LeagueConnector {
         ...(pointsWhole !== undefined ? { pointsFor: pointsWhole + pointsFraction / 100 } : {}),
         rosterSize: rosterPlayerIds.length || undefined,
         ...(rosterPlayerIds.length ? { rosterPlayerIds } : {}),
+        ...(budget && spent !== undefined ? { faabRemaining: Math.max(0, budget - spent) } : {}),
         taxiIds,
         reserveIds,
       };
@@ -229,6 +236,10 @@ export class SleeperConnector implements LeagueConnector {
         ...(seasonStatus ? { seasonStatus } : {}),
         ...(weeklyMatchups ? { currentWeek: weeklyMatchups.week } : {}),
         ...sleeperFormat(rawSettings),
+        ...(boundedInteger(rawSettings.waiver_budget, 1, 100_000) !== undefined &&
+        boundedInteger(rawSettings.waiver_type, 0, 5) === 2
+          ? { waiverBudget: boundedInteger(rawSettings.waiver_budget, 1, 100_000) }
+          : {}),
       },
       teams,
       ...(draft ? { draft } : {}),

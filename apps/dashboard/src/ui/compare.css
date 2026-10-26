@@ -1,0 +1,133 @@
+/* Start/sit compare and the all-leagues Sunday page. */
+.compare-page,
+.sunday-page {
+  display: grid;
+  gap: 16px;
+}
+.compare-pick {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+}
+.compare-pick .primary-button {
+  justify-self: start;
+}
+.compare-team {
+  display: grid;
+  gap: 4px;
+  max-width: 320px;
+}
+.compare-verdict {
+  margin: 0;
+  font-size: 17px;
+}
+.compare-note {
+  margin: 0;
+  color: var(--muted);
+}
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.compare-card,
+.sunday-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.compare-card.best {
+  border-color: var(--orange);
+  box-shadow: inset 0 0 0 1px var(--orange);
+}
+.compare-card h2 {
+  margin: 0;
+  font-size: 17px;
+}
+.compare-sub {
+  margin: 2px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.compare-points {
+  display: block;
+  font-size: 28px;
+}
+.compare-card dl {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.compare-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.compare-card dt {
+  color: var(--muted);
+}
+.compare-card dd {
+  margin: 0;
+  text-align: right;
+}
+.sunday-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+.sunday-card h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.sunday-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.sunday-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 8px 0;
+}
+.sunday-score strong {
+  font-size: 24px;
+}
+.sunday-flags {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sunday-flags li {
+  padding: 8px 12px;
+  border-left: 3px solid var(--warning);
+  border-radius: 4px;
+  background: var(--warning-bg);
+}
+.sunday-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sunday-table th {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+}
+.sunday-table td {
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+}
+
+.sunday-card .sunday-links {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}

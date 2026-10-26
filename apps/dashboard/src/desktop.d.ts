@@ -28,6 +28,9 @@ interface Window {
     getTheme?(): 'light' | 'dark' | 'system';
     getTeamSelections?(): Record<string, string>;
     setTeamSelections?(teams: Record<string, string>): Promise<Record<string, string>>;
+    getNotificationHistory?(): Promise<
+      { at: string; title: string; body: string; hash?: string }[]
+    >;
     setTheme?(theme: 'light' | 'dark' | 'system'): Promise<'light' | 'dark' | 'system'>;
     getLaunchAtLogin(): Promise<DesktopStartupSetting>;
     setLaunchAtLogin(enabled: boolean): Promise<DesktopStartupSetting>;

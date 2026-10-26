@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { weeklyGameWithheldWarning, type PlayerAdviceEvidence } from '@sidekick/core';
-import { benchReplacement, plannedReplacement, satOut } from './weekly-service.js';
+import { benchReplacement, newsMentions, plannedReplacement, satOut } from './weekly-service.js';
 
 const player = (
   id: string,
@@ -77,4 +77,28 @@ it('calls a starter Out only when he is missing from the box score and listed as
   // Listed Out but he played after all.
   expect(satOut({ position: 'WR', status: 'Out', inBoxScore: true })).toBe(false);
   expect(satOut({ position: 'DST', status: 'Out', inBoxScore: false })).toBe(false);
+});
+
+it('finds headlines that name the player in full, newest first', () => {
+  const item = (title: string, publishedAt: string, summary?: string) => ({
+    title,
+    source: 'ESPN',
+    url: `https://example.com/${encodeURIComponent(title)}`,
+    publishedAt,
+    ...(summary ? { summary } : {}),
+  });
+  const found = newsMentions(
+    [
+      item('Jordan Mason limited in practice', '2026-10-23T10:00:00Z'),
+      item('Mason who?', '2026-10-24T10:00:00Z'),
+      item('Vikings notes', '2026-10-25T10:00:00Z', 'Jordan Mason expected to play.'),
+    ],
+    'Jordan Mason',
+  );
+  expect(found.map((f) => f.title)).toEqual(['Vikings notes', 'Jordan Mason limited in practice']);
+  // Suffixes are ignored; one-word names match nothing.
+  expect(
+    newsMentions([item('Travis Etienne returns', '2026-10-25T10:00:00Z')], 'Travis Etienne Jr.'),
+  ).toHaveLength(1);
+  expect(newsMentions([item('Kicker news', '2026-10-25T10:00:00Z')], 'Kicker')).toEqual([]);
 });

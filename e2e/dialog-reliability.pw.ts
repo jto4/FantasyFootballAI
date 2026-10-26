@@ -194,6 +194,8 @@ test('scrolling inside a review does not move the page behind it and scrolling r
     expect(await page.evaluate(() => scrollY)).toBe(before);
     await page.keyboard.press('Escape');
     await expect(review).toBeHidden();
+    // Older drafts of the same report start hidden; show them so the page is long enough to scroll.
+    await page.getByRole('button', { name: 'Show them', exact: true }).click();
     await page.mouse.move(250, 400);
     await page.mouse.wheel(0, 600);
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before);

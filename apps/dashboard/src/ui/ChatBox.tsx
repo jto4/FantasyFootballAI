@@ -141,10 +141,22 @@ export function ChatBox({
   return (
     <section className={`chat chat-${variant}`} aria-label="Ask Sidekick">
       <header className="chat-head">
-        <div>
-          <strong>Ask Sidekick</strong>
-          <small>Your league, NFL news and betting prices</small>
-        </div>
+        {/* The Ask page already has the title; its header names the open chat instead. */}
+        {variant === 'page' ? (
+          <div>
+            <strong>{conversation?.title ?? 'New chat'}</strong>
+            <small>
+              {conversation
+                ? `${messages.length} ${messages.length === 1 ? 'message' : 'messages'}`
+                : 'Your league, NFL news and betting prices'}
+            </small>
+          </div>
+        ) : (
+          <div>
+            <strong>Ask Sidekick</strong>
+            <small>Your league, NFL news and betting prices</small>
+          </div>
+        )}
         <div className="chat-head-actions">
           <button
             type="button"

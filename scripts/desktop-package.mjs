@@ -33,6 +33,10 @@ async function copyProjectFiles() {
   await cp(join(root, 'apps/desktop/background-tray.mjs'), join(staging, 'background-tray.mjs'));
   await cp(join(root, 'apps/desktop/background-mode.mjs'), join(staging, 'background-mode.mjs'));
   await cp(join(root, 'apps/desktop/game-day-alerts.mjs'), join(staging, 'game-day-alerts.mjs'));
+  await cp(
+    join(root, 'apps/desktop/notification-history.mjs'),
+    join(staging, 'notification-history.mjs'),
+  );
   await cp(join(root, 'apps/desktop/context-menu.mjs'), join(staging, 'context-menu.mjs'));
   await cp(join(root, 'apps/desktop/tray-icon.png'), join(staging, 'tray-icon.png'));
   await cp(join(root, 'apps/desktop/mcp-endpoint.mjs'), join(staging, 'mcp-endpoint.mjs'));

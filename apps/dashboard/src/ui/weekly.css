@@ -464,3 +464,22 @@ p.weekly-answer {
 .watchlist-card small {
   color: var(--muted);
 }
+
+.visit-changes {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+.visit-changes h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.visit-changes ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}

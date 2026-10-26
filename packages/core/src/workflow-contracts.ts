@@ -476,7 +476,7 @@ export function isLeagueConnection(value: unknown): value is LeagueConnection {
         text(team.name, 500) &&
         optionalText(team.owner, 500) &&
         (team.rosterPlayerIds === undefined || stringList(team.rosterPlayerIds, 200, 256)) &&
-        ['wins', 'losses', 'pointsFor', 'rosterSize'].every(
+        ['wins', 'losses', 'pointsFor', 'rosterSize', 'faabRemaining'].every(
           (key) =>
             team[key] === undefined ||
             (typeof team[key] === 'number' && Number.isFinite(team[key])),

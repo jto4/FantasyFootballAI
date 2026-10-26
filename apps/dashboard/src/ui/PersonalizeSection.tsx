@@ -14,6 +14,7 @@ import {
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { requestJson } from './api-client';
 import { PlayerPicker } from './PlayerPicker';
+import { NotificationHistory } from './NotificationHistory';
 import { ErrorNotice } from './ErrorNotice';
 import {
   setDisplayPreference,
@@ -539,6 +540,7 @@ export function PersonalizeSection({
           </small>
         )}
       </section>
+      <NotificationHistory />
 
       <section className="personalize-block" data-search-target="lineup-strategy" tabIndex={-1}>
         <Choice

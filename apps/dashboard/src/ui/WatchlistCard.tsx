@@ -1,4 +1,5 @@
 import { record } from '@sidekick/core';
+import { PlayerName } from './PlayerCard';
 import { useApi } from './hooks/useApi';
 import { ErrorNotice } from './ErrorNotice';
 import { LoadingStatus } from './LoadFeedback';
@@ -66,7 +67,9 @@ export function WatchlistCard({
           {data?.items.map((item) => (
             <li key={item.id}>
               <span>
-                <strong>{item.name}</strong>{' '}
+                <strong>
+                  <PlayerName id={item.id} name={item.name} />
+                </strong>{' '}
                 <small>
                   {item.position}
                   {item.nflTeam ? ` · ${item.nflTeam}` : ''} · {item.rosteredBy}

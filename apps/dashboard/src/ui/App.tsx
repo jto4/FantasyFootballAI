@@ -15,6 +15,7 @@ import { FriendlyError } from './FriendlyError';
 import { describeError } from './error-text';
 import { ConfirmHost, confirmAction, discardOptions } from './ConfirmDialog';
 import { getDisplayPreferences } from './display-preferences';
+import { PlayerCardProvider } from './PlayerCard';
 import { AppSidebar, AppTopbar, isPhoneLayout, isToolSection } from './AppChrome';
 import { HomeStatus } from './HomeStatus';
 import { WeeklyHome } from './WeeklyHome';
@@ -31,7 +32,14 @@ import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import type { SendPreview } from './ReportsPage';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { parseLeagueInput, detectLeagueLink, leagueFormat, type Platform } from '@sidekick/core';
+import {
+  parseLeagueInput,
+  detectLeagueLink,
+  isAppSettings,
+  leagueFormat,
+  type Platform,
+  type UserPreferences,
+} from '@sidekick/core';
 import { SetupWizard } from './SetupWizard';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
@@ -63,6 +71,10 @@ import {
   DeliveryTask,
   LivePage,
   DynastyPage,
+  PropsPage,
+  SundayPage,
+  ComparePage,
+  TradePage,
 } from './lazy-pages';
 
 // The address at launch, before routing normalizes it.
@@ -183,6 +195,8 @@ export function App() {
   const [composerKind, setComposerKind] = useState<ReportKind | null>(null);
   const [setupBusy, setSetupBusy] = useState(false);
   const [aiCheckError, setAiCheckError] = useState('');
+  // A player name handed to the props board when it opens from a player card.
+  const propsPlayer = useRef('');
   const [aiChecking, setAiChecking] = useState(false);
   const [aiCredentialRevision, setAiCredentialRevision] = useState(0);
   const [showTools, setShowTools] = useState(false);
@@ -799,6 +813,22 @@ export function App() {
     setSetupInProgress(true);
     setSetupWizardOpen(true);
   }
+  /** Saves owner preferences from outside Settings (the player card's Watch button). */
+  async function savePreferences(next: UserPreferences) {
+    const settings = await requestJson('/api/settings/personalize', isAppSettings, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'If-Match': String(state.settings.sectionRevisions?.personalize ?? 0),
+      },
+      body: JSON.stringify({ preferences: next }),
+    });
+    setState((current) => ({ ...current, settings }));
+  }
+  function navigateToProps(player: string) {
+    propsPlayer.current = player;
+    navigate('Props');
+  }
   async function searchNavigate(destination: SearchDestination, check = true) {
     // Ask here (not in the route guard) so the task below opens only after an answer.
     const reviewedDiscard = Boolean(
@@ -866,429 +896,473 @@ export function App() {
         }
       />
 
-      <main className="main-area">
-        <AppTopbar
-          league={league}
-          leagues={state.leagues}
-          reports={state.reports}
-          dateLabel={dateLabel}
-          serviceStatus={serviceStatus}
-          verificationMode={verificationMode}
-          onLeagueChange={setActiveLeagueId}
-          onSearchNavigate={searchNavigate}
-          staleAfterHours={state.settings.leagueStaleAfterHours ?? 24}
-          refreshing={Boolean(league && refreshingLeagueId === league.id)}
-          {...(league ? { onFreshen: () => void refreshLeague(league.id) } : {})}
-          chatOpen={chatOpen}
-          {...(section !== 'Ask' ? { onChat: () => setChatOpen((open) => !open) } : {})}
-        />
+      <PlayerCardProvider
+        leagueId={league?.id}
+        teamId={homeTeamId}
+        preferences={state.settings.preferences}
+        savePreferences={savePreferences}
+        onNudge={() =>
+          void searchNavigate({ section: 'Settings', settingId: 'projection-preferences' })
+        }
+        onProps={(name) => navigateToProps(name)}
+      >
+        <main className="main-area">
+          <AppTopbar
+            league={league}
+            leagues={state.leagues}
+            reports={state.reports}
+            dateLabel={dateLabel}
+            serviceStatus={serviceStatus}
+            verificationMode={verificationMode}
+            onLeagueChange={setActiveLeagueId}
+            onSearchNavigate={searchNavigate}
+            staleAfterHours={state.settings.leagueStaleAfterHours ?? 24}
+            refreshing={Boolean(league && refreshingLeagueId === league.id)}
+            {...(league ? { onFreshen: () => void refreshLeague(league.id) } : {})}
+            chatOpen={chatOpen}
+            {...(section !== 'Ask' ? { onChat: () => setChatOpen((open) => !open) } : {})}
+          />
 
-        <div className="page-content">
-          {notice && noticeInfo.detail ? (
-            <>
-              <FriendlyError
-                message={notice}
-                detail={noticeInfo.detail}
-                {...(noticeInfo.action === 'none'
-                  ? {}
-                  : {
-                      action:
-                        noticeInfo.action === 'reports'
-                          ? 'Open Reports'
-                          : noticeInfo.action === 'leagues'
-                            ? 'Check league connection'
-                            : noticeInfo.action === 'news'
-                              ? 'Refresh news'
-                              : 'Try again',
-                      onAction: () => {
-                        if (noticeInfo.action === 'reports') navigate('Reports');
-                        else if (noticeInfo.action === 'leagues') navigate('Leagues');
-                        else if (noticeInfo.action === 'news') void refreshNews();
-                        else void refresh();
-                      },
-                    })}
-              />
-              <button type="button" className="text-button" onClick={() => setNotice('')}>
-                Dismiss message
-              </button>
-            </>
-          ) : (
-            notice && (
-              <div className="notice" role="status">
-                {notice}
-                <button onClick={() => setNotice('')} aria-label="Dismiss">
-                  ×
+          <div className="page-content">
+            {notice && noticeInfo.detail ? (
+              <>
+                <FriendlyError
+                  message={notice}
+                  detail={noticeInfo.detail}
+                  {...(noticeInfo.action === 'none'
+                    ? {}
+                    : {
+                        action:
+                          noticeInfo.action === 'reports'
+                            ? 'Open Reports'
+                            : noticeInfo.action === 'leagues'
+                              ? 'Check league connection'
+                              : noticeInfo.action === 'news'
+                                ? 'Refresh news'
+                                : 'Try again',
+                        onAction: () => {
+                          if (noticeInfo.action === 'reports') navigate('Reports');
+                          else if (noticeInfo.action === 'leagues') navigate('Leagues');
+                          else if (noticeInfo.action === 'news') void refreshNews();
+                          else void refresh();
+                        },
+                      })}
+                />
+                <button type="button" className="text-button" onClick={() => setNotice('')}>
+                  Dismiss message
+                </button>
+              </>
+            ) : (
+              notice && (
+                <div className="notice" role="status">
+                  {notice}
+                  <button onClick={() => setNotice('')} aria-label="Dismiss">
+                    ×
+                  </button>
+                </div>
+              )
+            )}
+            {setupInProgress && stateLoaded && !setupWizardOpen && (
+              <div className="onboarding-progress" role="status">
+                <strong>Continue setting up your league</strong>
+                <span>
+                  {!league
+                    ? 'Connect a league'
+                    : !aiReady
+                      ? 'Connect your AI writer'
+                      : 'Generate and review your first draft'}
+                </span>
+                <button
+                  type="button"
+                  className="small-button"
+                  onClick={() => {
+                    if (league && aiReady) {
+                      void createReport('power-rankings');
+                    } else if (!league && leagueId.trim()) setModal(true);
+                    else openSetupWizard();
+                  }}
+                  disabled={Boolean(generatingKind)}
+                >
+                  {league && aiReady
+                    ? 'Create first report'
+                    : !league && leagueId.trim()
+                      ? 'Resume league connection'
+                      : 'Continue setup'}
+                </button>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => setSetupInProgress(false)}
+                >
+                  Finish later
                 </button>
               </div>
-            )
-          )}
-          {setupInProgress && stateLoaded && !setupWizardOpen && (
-            <div className="onboarding-progress" role="status">
-              <strong>Continue setting up your league</strong>
-              <span>
-                {!league
-                  ? 'Connect a league'
-                  : !aiReady
-                    ? 'Connect your AI writer'
-                    : 'Generate and review your first draft'}
-              </span>
-              <button
-                type="button"
-                className="small-button"
-                onClick={() => {
-                  if (league && aiReady) {
-                    void createReport('power-rankings');
-                  } else if (!league && leagueId.trim()) setModal(true);
-                  else openSetupWizard();
-                }}
-                disabled={Boolean(generatingKind)}
-              >
-                {league && aiReady
-                  ? 'Create first report'
-                  : !league && leagueId.trim()
-                    ? 'Resume league connection'
-                    : 'Continue setup'}
-              </button>
-              <button
-                type="button"
-                className="text-button"
-                onClick={() => setSetupInProgress(false)}
-              >
-                Finish later
-              </button>
-            </div>
-          )}
-          {aiCheckError && section === 'League desk' && (
-            <FriendlyError
-              message="Your AI connection needs attention before you can create a report."
-              detail={aiCheckError}
-              action="Fix AI connection"
-              onAction={openSetupWizard}
-              compact
-            />
-          )}
-          {!stateLoaded && section !== 'Help' ? (
-            stateLoading ? (
-              <LoadingStatus message="Loading your leagues, reports, and schedule…" shape="cards" />
-            ) : (
-              <LoadError
-                message={stateLoadError || 'Could not load local league data.'}
-                onRetry={() => void refresh()}
+            )}
+            {aiCheckError && section === 'League desk' && (
+              <FriendlyError
+                message="Your AI connection needs attention before you can create a report."
+                detail={aiCheckError}
+                action="Fix AI connection"
+                onAction={openSetupWizard}
+                compact
               />
-            )
-          ) : section === 'Live' ? (
-            <Suspense fallback={<LoadingStatus message="Opening live view…" />}>
-              <LivePage
-                league={league}
-                teamId={homeTeamId}
-                onLeagues={() => navigate('Leagues')}
-                onChooseTeam={chooseTeam}
-              />
-            </Suspense>
-          ) : section === 'Dynasty' ? (
-            <Suspense fallback={<LoadingStatus message="Opening dynasty view…" />}>
-              <DynastyPage
-                league={league}
-                teamId={homeTeamId}
-                onChooseTeam={chooseTeam}
-                onPersonalize={() =>
-                  void searchNavigate({
-                    section: 'Settings',
-                    settingId: 'personalize-league-format',
-                  })
-                }
-              />
-            </Suspense>
-          ) : section === 'Help' ? (
-            <Suspense fallback={<LoadingStatus message="Opening help…" />}>
-              <HelpPage
-                key={searchFocusRevision}
-                articleId={route.helpId ?? ''}
-                onNavigate={searchNavigate}
-                onSample={() => setSampleOpen(true)}
-              />
-            </Suspense>
-          ) : section === 'Ask' ? (
-            <div className="ask-page">
-              <div className="page-title-block">
-                <div>
-                  <p className="section-overline">CHAT WITH YOUR DATA</p>
-                  <h1>Ask Sidekick</h1>
-                  <p>
-                    Lineups, standings, waivers, news and betting prices, answered from your league
-                    data with the receipts attached.
-                  </p>
-                </div>
-              </div>
-              <ChatBox variant="page" leagueId={league?.id} teamId={homeTeamId} page="Ask" />
-            </div>
-          ) : section === 'Advice' ? (
-            <Suspense fallback={<LoadingStatus message="Opening advice…" />}>
-              <AdvicePage
-                key={`${activeLeagueId}:${route.adviceMode ?? 'lineup'}:${route.adviceId ?? ''}:${route.adviceView ?? ''}`}
-                initialView={route.adviceView === 'results' ? 'research' : 'decision'}
-                leagues={state.leagues}
-                leagueId={activeLeagueId}
-                preferredTeamId={homeTeamId}
-                onTeamSelect={chooseTeam}
-                mode={route.adviceMode ?? 'lineup'}
-                resultId={route.adviceId ?? ''}
-                onNavigate={searchNavigate}
-                onDirtyChange={setAdviceDirty}
-              />
-            </Suspense>
-          ) : section === 'Settings' ? (
-            <Suspense fallback={<LoadingStatus message="Opening settings…" />}>
-              <SettingsPage
-                key={settingsNavigationKey}
-                settings={state.settings}
-                leagues={state.leagues}
-                onGuidedSetup={async () => {
-                  if (
-                    !settingsDirty ||
-                    (await confirmAction(
-                      'Guided setup will discard your unsaved settings.',
-                      discardOptions,
-                    ))
-                  ) {
-                    if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
-                    setSettingsDirty(false);
-                    setSetupWizardStep(1);
-                    setSetupInProgress(true);
-                    setSetupWizardOpen(true);
-                  }
-                }}
-                onSaved={(settings) => {
-                  setState((current) => ({ ...current, settings }));
-                }}
-                onCredentialsChanged={(provider) => {
-                  if (provider === 'openai') {
-                    setTestedRuntimeSignature('');
-                    setAiCredentialRevision((current) => current + 1);
-                    lastCheckedRuntime.current = '';
-                  }
-                  void refreshCredentials();
-                }}
-                onRuntimeTested={(testedRuntime) => {
-                  setTestedRuntimeSignature(JSON.stringify(testedRuntime));
-                  setAiCheckError('');
-                }}
-                aiConnectionFailed={Boolean(aiCheckError)}
-                focusTarget={settingsFocusTarget}
-                searchSettingId={route.settingId}
-                searchFocusRevision={searchFocusRevision}
-                onSearchSettingClear={() => updateRoute({ settingId: '' }, true, false)}
-                onFocusTargetHandled={() => setSettingsFocusTarget(null)}
-                onRestored={refresh}
-                onDirtyChange={setSettingsDirty}
-              />
-            </Suspense>
-          ) : section === 'Leagues' ? (
-            <Suspense fallback={<LoadingStatus message="Opening leagues…" />}>
-              <LeaguesPage
-                leagues={state.leagues}
-                {...(league ? { activeLeagueId: league.id } : {})}
-                {...(state.settings.leagueStaleAfterHours === undefined
-                  ? {}
-                  : { staleAfterHours: state.settings.leagueStaleAfterHours })}
-                refreshingLeagueId={refreshingLeagueId}
-                disconnectingLeagueId={disconnectingLeagueId}
-                onConnect={() => setModal(true)}
-                onSetActive={setActiveLeagueId}
-                onRefresh={(id) => void refreshLeague(id)}
-                onDisconnect={(id) => void removeLeague(id)}
-                onAddEspnLogin={() =>
-                  searchNavigate({ section: 'Settings', settingId: 'credential-espn' })
-                }
-              />
-            </Suspense>
-          ) : section === 'Reports' ? (
-            <Suspense fallback={<LoadingStatus message="Opening reports…" />}>
-              <ReportsPage
-                reports={state.reports}
-                jobs={state.generationJobs ?? []}
-                leagues={state.leagues}
-                settings={state.settings}
-                sendingReportId={sendingReportId}
-                initialReportId={initialReviewId}
-                onReviewChange={setInitialReviewId}
-                onCreate={() => void createReport('power-rankings')}
-                onDeliverySetup={() => {
-                  setSettingsFocusTarget('credentials');
-                  navigate('Settings');
-                }}
-                onSend={sendReport}
-                onSaved={refresh}
-                onDirtyChange={setReportDirty}
-                league={league}
-                generating={Boolean(generatingKind)}
-                onCreateKind={(kind) => void createReport(kind)}
-                onSchedule={(kind) => {
-                  const action = state.settings.actions.find((item) => item.kind === kind);
-                  if (
-                    action?.enabled &&
-                    action.schedule.enabled &&
-                    (action.leagueIds === undefined ||
-                      (league && action.leagueIds.includes(league.id)))
-                  ) {
-                    setScheduleEditor({ kind });
-                  } else {
-                    const recommendation = scheduleRecommendations[kind];
-                    setScheduleEditor({
-                      kind,
-                      prefill: {
-                        kind,
-                        source: 'report-library',
-                        frequency: recommendation?.frequency ?? 'once',
-                        weekday: recommendation?.weekday,
-                        dayOfMonth: recommendation?.dayOfMonth,
-                        time: recommendation?.time ?? '09:00',
-                        channel: 'dashboard',
-                        leagueIds: league ? [league.id] : [],
-                      },
-                    });
-                  }
-                }}
-              />
-            </Suspense>
-          ) : section === 'Schedule' ? (
-            <Suspense fallback={<LoadingStatus message="Opening schedule…" />}>
-              <SchedulePage
-                actions={state.settings.actions}
-                scheduledRuns={state.scheduledRuns}
-                reports={state.reports}
-                retryingRunId={retryingRunId}
-                generatingKind={generatingKind}
-                onGenerate={(kind) => void createReport(kind)}
-                onEditSchedule={() =>
-                  updateRoute({ section: 'Settings', settingId: 'automatic-actions' })
-                }
-                leagueName={league?.displayName}
-                manualSnapshot={league?.connectionMode === 'snapshot'}
-                league={league}
-                settings={state.settings}
-                onEditAction={(kind) => setScheduleEditor({ kind })}
-                onRetry={(run) => void retryScheduledRun(run)}
-              />
-            </Suspense>
-          ) : section === 'Members & memory' || section === 'Imports' ? (
-            <>
-              <Suspense fallback={<LoadingStatus message="Opening members…" />}>
-                <MemoryPage
-                  mode={section === 'Imports' ? 'imports' : 'members'}
-                  leagues={state.leagues.map(({ id, displayName }) => ({ id, displayName }))}
-                  memoryEnabled={state.settings.memoryEnabled}
-                  analyzeImportsWithAI={state.settings.analyzeImportsWithAI}
-                  imessageConfigured={
-                    state.settings.imessageProvider === 'imsg'
-                      ? navigator.platform.toLowerCase().startsWith('mac') &&
-                        Boolean(state.settings.imsgChatId)
-                      : credentialProviders.some(
-                          (item) => item.provider === 'bluebubbles' && item.configured,
-                        )
-                  }
-                  twilioConfigured={credentialProviders.some(
-                    (item) => item.provider === 'twilio' && item.configured,
-                  )}
-                  resendConfigured={credentialProviders.some(
-                    (item) => item.provider === 'resend' && item.configured,
-                  )}
-                  imessageProvider={state.settings.imessageProvider ?? 'bluebubbles'}
-                  {...(state.settings.imessageChatGuid
-                    ? { imessageChatGuid: state.settings.imessageChatGuid }
-                    : {})}
-                  {...(state.settings.smsRecipient
-                    ? { smsRecipient: state.settings.smsRecipient }
-                    : {})}
-                  {...(state.settings.conversationRetentionDays === undefined
-                    ? {}
-                    : { conversationRetentionDays: state.settings.conversationRetentionDays })}
+            )}
+            {!stateLoaded && section !== 'Help' ? (
+              stateLoading ? (
+                <LoadingStatus
+                  message="Loading your leagues, reports, and schedule…"
+                  shape="cards"
+                />
+              ) : (
+                <LoadError
+                  message={stateLoadError || 'Could not load local league data.'}
+                  onRetry={() => void refresh()}
+                />
+              )
+            ) : section === 'Live' ? (
+              <Suspense fallback={<LoadingStatus message="Opening live view…" />}>
+                <LivePage
+                  league={league}
+                  teamId={homeTeamId}
+                  onLeagues={() => navigate('Leagues')}
+                  onChooseTeam={chooseTeam}
                 />
               </Suspense>
-            </>
-          ) : (
-            <>
-              <LeagueDesk
-                disclosures={homeDisclosures}
-                onDisclosureChange={(key, open) =>
-                  setHomeDisclosures((current) =>
-                    current[key] === open ? current : { ...current, [key]: open },
-                  )
-                }
-                weekly={
-                  <WeeklyHome
-                    league={league}
-                    settings={state.settings}
-                    teamId={homeTeamId}
-                    onTeamChange={chooseTeam}
-                    onSavedAdvice={(id, mode) =>
-                      searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: id })
-                    }
-                    onAdvice={(mode) =>
-                      searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
-                    }
-                    onLive={() => navigate('Live')}
-                    onPersonalize={(settingId) =>
-                      void searchNavigate({ section: 'Settings', settingId })
-                    }
-                    onResults={() =>
-                      searchNavigate({ section: 'Advice', adviceId: '', adviceView: 'results' })
-                    }
-                    onRefresh={() => {
-                      if (league) void refreshLeague(league.id);
-                    }}
-                    onSetup={() => {
+            ) : section === 'Props' ? (
+              <Suspense fallback={<LoadingStatus message="Opening props…" />}>
+                <PropsPage
+                  league={league}
+                  teamId={homeTeamId}
+                  initialPlayer={propsPlayer.current}
+                  onNavigate={(destination) => void searchNavigate(destination)}
+                />
+              </Suspense>
+            ) : section === 'Sunday' ? (
+              <Suspense fallback={<LoadingStatus message="Opening every league…" />}>
+                <SundayPage
+                  leagues={state.leagues}
+                  onOpenLeague={(leagueId, target) =>
+                    updateRoute({ leagueId, reportId: '', section: target })
+                  }
+                />
+              </Suspense>
+            ) : section === 'Start/sit' ? (
+              <Suspense fallback={<LoadingStatus message="Opening start/sit…" />}>
+                <ComparePage league={league} teamId={homeTeamId} onChooseTeam={chooseTeam} />
+              </Suspense>
+            ) : section === 'Trade calculator' ? (
+              <Suspense fallback={<LoadingStatus message="Opening the trade calculator…" />}>
+                <TradePage
+                  league={league}
+                  teamId={homeTeamId}
+                  preferences={state.settings.preferences}
+                />
+              </Suspense>
+            ) : section === 'Dynasty' ? (
+              <Suspense fallback={<LoadingStatus message="Opening dynasty view…" />}>
+                <DynastyPage
+                  league={league}
+                  teamId={homeTeamId}
+                  onChooseTeam={chooseTeam}
+                  onPersonalize={() =>
+                    void searchNavigate({
+                      section: 'Settings',
+                      settingId: 'personalize-league-format',
+                    })
+                  }
+                />
+              </Suspense>
+            ) : section === 'Help' ? (
+              <Suspense fallback={<LoadingStatus message="Opening help…" />}>
+                <HelpPage
+                  key={searchFocusRevision}
+                  articleId={route.helpId ?? ''}
+                  onNavigate={searchNavigate}
+                  onSample={() => setSampleOpen(true)}
+                />
+              </Suspense>
+            ) : section === 'Ask' ? (
+              <div className="ask-page">
+                <div className="page-title-block compact">
+                  <div>
+                    <h1>Ask Sidekick</h1>
+                    <p>
+                      Lineups, standings, waivers, news and betting prices, answered from your
+                      league data with the receipts attached.
+                    </p>
+                  </div>
+                </div>
+                <ChatBox variant="page" leagueId={league?.id} teamId={homeTeamId} page="Ask" />
+              </div>
+            ) : section === 'Advice' ? (
+              <Suspense fallback={<LoadingStatus message="Opening advice…" />}>
+                <AdvicePage
+                  key={`${activeLeagueId}:${route.adviceMode ?? 'lineup'}:${route.adviceId ?? ''}:${route.adviceView ?? ''}`}
+                  initialView={route.adviceView === 'results' ? 'research' : 'decision'}
+                  leagues={state.leagues}
+                  leagueId={activeLeagueId}
+                  preferredTeamId={homeTeamId}
+                  onTeamSelect={chooseTeam}
+                  mode={route.adviceMode ?? 'lineup'}
+                  resultId={route.adviceId ?? ''}
+                  onNavigate={searchNavigate}
+                  onDirtyChange={setAdviceDirty}
+                />
+              </Suspense>
+            ) : section === 'Settings' ? (
+              <Suspense fallback={<LoadingStatus message="Opening settings…" />}>
+                <SettingsPage
+                  key={settingsNavigationKey}
+                  settings={state.settings}
+                  leagues={state.leagues}
+                  onGuidedSetup={async () => {
+                    if (
+                      !settingsDirty ||
+                      (await confirmAction(
+                        'Guided setup will discard your unsaved settings.',
+                        discardOptions,
+                      ))
+                    ) {
+                      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
+                      setSettingsDirty(false);
+                      setSetupWizardStep(1);
                       setSetupInProgress(true);
-                      setSetupWizardStep(0);
-                      setSetupWizardOpen(false);
-                      setModal(true);
-                    }}
-                  />
-                }
-                state={state}
-                league={league}
-                aiReady={aiReady}
-                aiChecking={aiChecking}
-                aiFailed={Boolean(aiCheckError)}
-                requiredSetupComplete={requiredSetupComplete}
-                generatingKind={generatingKind}
-                refreshingNews={refreshingNews}
-                news={news}
-                setupWizardTriggerRef={setupWizardTriggerRef}
-                openSetupWizard={openSetupWizard}
-                setModal={setModal}
-                setSettingsFocusTarget={setSettingsFocusTarget}
-                navigate={navigate}
-                createReport={createReport}
-                refreshLeague={refreshLeague}
-                refreshNews={refreshNews}
-                setInitialReviewId={setInitialReviewId}
-                onSample={() => setSampleOpen(true)}
-                status={
-                  <HomeStatus
-                    settings={state.settings}
-                    league={league}
-                    aiReady={aiReady}
-                    aiChecking={aiChecking}
-                    onAI={openSetupWizard}
-                    onLeagues={() => navigate('Leagues')}
-                    onSchedules={() => navigate('Schedule')}
-                    onDelivery={() =>
-                      searchNavigate({ section: 'Settings', settingId: 'automatic-actions' })
+                      setSetupWizardOpen(true);
                     }
+                  }}
+                  onSaved={(settings) => {
+                    setState((current) => ({ ...current, settings }));
+                  }}
+                  onCredentialsChanged={(provider) => {
+                    if (provider === 'openai') {
+                      setTestedRuntimeSignature('');
+                      setAiCredentialRevision((current) => current + 1);
+                      lastCheckedRuntime.current = '';
+                    }
+                    void refreshCredentials();
+                  }}
+                  onRuntimeTested={(testedRuntime) => {
+                    setTestedRuntimeSignature(JSON.stringify(testedRuntime));
+                    setAiCheckError('');
+                  }}
+                  aiConnectionFailed={Boolean(aiCheckError)}
+                  focusTarget={settingsFocusTarget}
+                  searchSettingId={route.settingId}
+                  searchFocusRevision={searchFocusRevision}
+                  onSearchSettingClear={() => updateRoute({ settingId: '' }, true, false)}
+                  onFocusTargetHandled={() => setSettingsFocusTarget(null)}
+                  onRestored={refresh}
+                  onDirtyChange={setSettingsDirty}
+                />
+              </Suspense>
+            ) : section === 'Leagues' ? (
+              <Suspense fallback={<LoadingStatus message="Opening leagues…" />}>
+                <LeaguesPage
+                  leagues={state.leagues}
+                  {...(league ? { activeLeagueId: league.id } : {})}
+                  {...(state.settings.leagueStaleAfterHours === undefined
+                    ? {}
+                    : { staleAfterHours: state.settings.leagueStaleAfterHours })}
+                  refreshingLeagueId={refreshingLeagueId}
+                  disconnectingLeagueId={disconnectingLeagueId}
+                  onConnect={() => setModal(true)}
+                  onSetActive={setActiveLeagueId}
+                  onRefresh={(id) => void refreshLeague(id)}
+                  onDisconnect={(id) => void removeLeague(id)}
+                  onAddEspnLogin={() =>
+                    searchNavigate({ section: 'Settings', settingId: 'credential-espn' })
+                  }
+                />
+              </Suspense>
+            ) : section === 'Reports' ? (
+              <Suspense fallback={<LoadingStatus message="Opening reports…" />}>
+                <ReportsPage
+                  reports={state.reports}
+                  jobs={state.generationJobs ?? []}
+                  leagues={state.leagues}
+                  settings={state.settings}
+                  sendingReportId={sendingReportId}
+                  initialReportId={initialReviewId}
+                  onReviewChange={setInitialReviewId}
+                  onCreate={() => void createReport('power-rankings')}
+                  onDeliverySetup={() => {
+                    setSettingsFocusTarget('credentials');
+                    navigate('Settings');
+                  }}
+                  onSend={sendReport}
+                  onSaved={refresh}
+                  onDirtyChange={setReportDirty}
+                  league={league}
+                  generating={Boolean(generatingKind)}
+                  onCreateKind={(kind) => void createReport(kind)}
+                  onSchedule={(kind) => {
+                    const action = state.settings.actions.find((item) => item.kind === kind);
+                    if (
+                      action?.enabled &&
+                      action.schedule.enabled &&
+                      (action.leagueIds === undefined ||
+                        (league && action.leagueIds.includes(league.id)))
+                    ) {
+                      setScheduleEditor({ kind });
+                    } else {
+                      const recommendation = scheduleRecommendations[kind];
+                      setScheduleEditor({
+                        kind,
+                        prefill: {
+                          kind,
+                          source: 'report-library',
+                          frequency: recommendation?.frequency ?? 'once',
+                          weekday: recommendation?.weekday,
+                          dayOfMonth: recommendation?.dayOfMonth,
+                          time: recommendation?.time ?? '09:00',
+                          channel: 'dashboard',
+                          leagueIds: league ? [league.id] : [],
+                        },
+                      });
+                    }
+                  }}
+                />
+              </Suspense>
+            ) : section === 'Schedule' ? (
+              <Suspense fallback={<LoadingStatus message="Opening schedule…" />}>
+                <SchedulePage
+                  actions={state.settings.actions}
+                  scheduledRuns={state.scheduledRuns}
+                  reports={state.reports}
+                  retryingRunId={retryingRunId}
+                  generatingKind={generatingKind}
+                  onGenerate={(kind) => void createReport(kind)}
+                  onEditSchedule={() =>
+                    updateRoute({ section: 'Settings', settingId: 'automatic-actions' })
+                  }
+                  leagueName={league?.displayName}
+                  manualSnapshot={league?.connectionMode === 'snapshot'}
+                  league={league}
+                  settings={state.settings}
+                  onEditAction={(kind) => setScheduleEditor({ kind })}
+                  onRetry={(run) => void retryScheduledRun(run)}
+                />
+              </Suspense>
+            ) : section === 'Members & memory' || section === 'Imports' ? (
+              <>
+                <Suspense fallback={<LoadingStatus message="Opening members…" />}>
+                  <MemoryPage
+                    mode={section === 'Imports' ? 'imports' : 'members'}
+                    leagues={state.leagues.map(({ id, displayName }) => ({ id, displayName }))}
+                    memoryEnabled={state.settings.memoryEnabled}
+                    analyzeImportsWithAI={state.settings.analyzeImportsWithAI}
+                    imessageConfigured={
+                      state.settings.imessageProvider === 'imsg'
+                        ? navigator.platform.toLowerCase().startsWith('mac') &&
+                          Boolean(state.settings.imsgChatId)
+                        : credentialProviders.some(
+                            (item) => item.provider === 'bluebubbles' && item.configured,
+                          )
+                    }
+                    twilioConfigured={credentialProviders.some(
+                      (item) => item.provider === 'twilio' && item.configured,
+                    )}
+                    resendConfigured={credentialProviders.some(
+                      (item) => item.provider === 'resend' && item.configured,
+                    )}
+                    imessageProvider={state.settings.imessageProvider ?? 'bluebubbles'}
+                    {...(state.settings.imessageChatGuid
+                      ? { imessageChatGuid: state.settings.imessageChatGuid }
+                      : {})}
+                    {...(state.settings.smsRecipient
+                      ? { smsRecipient: state.settings.smsRecipient }
+                      : {})}
+                    {...(state.settings.conversationRetentionDays === undefined
+                      ? {}
+                      : { conversationRetentionDays: state.settings.conversationRetentionDays })}
                   />
-                }
-              />
-            </>
-          )}
-          <footer className="page-footer">
-            <span>Built for the love of the game (and the group chat).</span>
-            <span>
-              <i /> LOCAL-FIRST BY DESIGN
-            </span>
-          </footer>
-        </div>
-      </main>
+                </Suspense>
+              </>
+            ) : (
+              <>
+                <LeagueDesk
+                  disclosures={homeDisclosures}
+                  onDisclosureChange={(key, open) =>
+                    setHomeDisclosures((current) =>
+                      current[key] === open ? current : { ...current, [key]: open },
+                    )
+                  }
+                  weekly={
+                    <WeeklyHome
+                      league={league}
+                      settings={state.settings}
+                      teamId={homeTeamId}
+                      onTeamChange={chooseTeam}
+                      onSavedAdvice={(id, mode) =>
+                        searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: id })
+                      }
+                      onAdvice={(mode) =>
+                        searchNavigate({ section: 'Advice', adviceMode: mode, adviceId: '' })
+                      }
+                      onLive={() => navigate('Live')}
+                      onNavigate={navigate}
+                      onPersonalize={(settingId) =>
+                        void searchNavigate({ section: 'Settings', settingId })
+                      }
+                      onResults={() =>
+                        searchNavigate({ section: 'Advice', adviceId: '', adviceView: 'results' })
+                      }
+                      onRefresh={() => {
+                        if (league) void refreshLeague(league.id);
+                      }}
+                      onSetup={() => {
+                        setSetupInProgress(true);
+                        setSetupWizardStep(0);
+                        setSetupWizardOpen(false);
+                        setModal(true);
+                      }}
+                    />
+                  }
+                  state={state}
+                  league={league}
+                  aiReady={aiReady}
+                  aiChecking={aiChecking}
+                  aiFailed={Boolean(aiCheckError)}
+                  requiredSetupComplete={requiredSetupComplete}
+                  generatingKind={generatingKind}
+                  refreshingNews={refreshingNews}
+                  news={news}
+                  setupWizardTriggerRef={setupWizardTriggerRef}
+                  openSetupWizard={openSetupWizard}
+                  setModal={setModal}
+                  setSettingsFocusTarget={setSettingsFocusTarget}
+                  navigate={navigate}
+                  createReport={createReport}
+                  refreshLeague={refreshLeague}
+                  refreshNews={refreshNews}
+                  setInitialReviewId={setInitialReviewId}
+                  onSample={() => setSampleOpen(true)}
+                  status={
+                    <HomeStatus
+                      settings={state.settings}
+                      league={league}
+                      aiReady={aiReady}
+                      aiChecking={aiChecking}
+                      onAI={openSetupWizard}
+                      onLeagues={() => navigate('Leagues')}
+                      onSchedules={() => navigate('Schedule')}
+                      onDelivery={() =>
+                        searchNavigate({ section: 'Settings', settingId: 'automatic-actions' })
+                      }
+                    />
+                  }
+                />
+              </>
+            )}
+            <footer className="page-footer">
+              <span>Built for the love of the game (and the group chat).</span>
+              <span>
+                <i /> LOCAL-FIRST BY DESIGN
+              </span>
+            </footer>
+          </div>
+        </main>
+      </PlayerCardProvider>
       {chatOpen && section !== 'Ask' && (
         <aside className="chat-dock">
           <ChatBox

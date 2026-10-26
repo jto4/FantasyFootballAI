@@ -165,6 +165,54 @@ export function createAdviceRouter(
         });
       }
     });
+  const playerFailure = (res: import('express').Response, error: unknown) => {
+    const missing =
+      error instanceof Error && /not in the connected league|player pool/.test(error.message);
+    res.status(missing ? 404 : 502).json({
+      error: missing
+        ? error instanceof Error && /player pool/.test(error.message)
+          ? 'That player is not in this league’s player pool.'
+          : 'That team is not in the connected league.'
+        : 'Player details could not be prepared. Try again shortly.',
+    });
+  };
+  const playerId = (value: unknown) =>
+    typeof value === 'string' && value.length > 0 && value.length <= 64 ? value : undefined;
+  // Player card: one player's weekly projection, numbers, recent games and headlines.
+  router.get('/api/players/card', async (req, res) => {
+    const { player, ...rest } = req.query;
+    const query = leagueTeamQuery(rest);
+    const id = playerId(player);
+    if (!query || !id) return res.status(400).json({ error: 'Choose a league, team and player.' });
+    try {
+      res.json(await service.playerCard(query.league, query.team, id));
+    } catch (error) {
+      playerFailure(res, error);
+    }
+  });
+  // Start/sit: two to four players side by side with this week's win chance for each.
+  router.post('/api/players/compare', async (req, res) => {
+    const body = req.body as Record<string, unknown> | undefined;
+    const ids = Array.isArray(body?.players) ? body.players.map(playerId) : [];
+    const query =
+      body && typeof body === 'object' && !Array.isArray(body)
+        ? leagueTeamQuery({ league: body.league, team: body.team })
+        : undefined;
+    if (
+      !query ||
+      Object.keys(body!).some((key) => !['league', 'team', 'players'].includes(key)) ||
+      ids.length < 2 ||
+      ids.length > 4 ||
+      ids.some((id) => !id) ||
+      new Set(ids).size !== ids.length
+    )
+      return res.status(400).json({ error: 'Choose two to four different players to compare.' });
+    try {
+      res.json(await service.compare(query.league, query.team, ids as string[]));
+    } catch (error) {
+      playerFailure(res, error);
+    }
+  });
   router.get('/api/advice/weekly', (req, res) => {
     if (!leagueTeamQuery(req.query))
       return res.status(400).json({ error: 'Choose a connected league and team.' });

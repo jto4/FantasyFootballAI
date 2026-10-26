@@ -708,3 +708,9 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+.report-older {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}

@@ -29,8 +29,7 @@ import { useMediaQuery } from './hooks/useMediaQuery';
 import type { SearchDestination } from './search-catalog';
 import './advice.css';
 import './props.css';
-import { PropsBoard, type PropHandoff } from './PropsBoard';
-import { clearPropHandoff, peekPropHandoff, stashPropHandoff } from './prop-handoff';
+import { clearPropHandoff, peekPropHandoff } from './prop-handoff';
 import { BetFields } from './BetFields';
 import { BetLimit } from './BetLimit';
 import { TradeIdeasPanel, WaiverDayPanel } from './RosterMoves';
@@ -70,9 +69,7 @@ export function AdvicePage({
   const [tradeTeamId, setTradeTeamId] = useState(league?.teams[1]?.id ?? '');
   const [week, setWeek] = useState('');
   const [tradeThroughWeek, setTradeThroughWeek] = useState('18');
-  const [view, setView] = useState<'decision' | 'history' | 'props' | 'research' | 'signals'>(
-    initialView,
-  );
+  const [view, setView] = useState<'decision' | 'history' | 'research' | 'signals'>(initialView);
   const [pendingProp, setPendingProp] = useState(peekPropHandoff);
   const [candidates, setCandidates] = useState<string[]>([]);
   const [dropPlayerId, setDropPlayerId] = useState('');
@@ -253,14 +250,6 @@ export function AdvicePage({
     clearPropHandoff();
     setPendingProp(undefined);
   }, [pendingProp, options, mode]);
-  function analyzeProp(pick: PropHandoff) {
-    if (mode === 'betting') {
-      setPendingProp(pick);
-      return;
-    }
-    stashPropHandoff(pick);
-    onNavigate({ section: 'Advice', adviceMode: 'betting', adviceId: '' });
-  }
   const mine = allPlayers.filter((player) => player.teamId === teamId);
   const other = allPlayers.filter((player) => player.teamId === tradeTeamId);
   const commonStartingSpot = starterSlots(league?.settings.roster_positions).slots.some((slot) =>
@@ -825,7 +814,7 @@ export function AdvicePage({
                 setQuote={setQuote}
                 changed={changed}
                 onExploreSignals={() => setView('signals')}
-                onOpenProps={() => setView('props')}
+                onOpenProps={() => void onNavigate({ section: 'Props' })}
               />
             )}
             <label>
@@ -1127,7 +1116,7 @@ export function AdvicePage({
             aria-current={view === key ? 'page' : undefined}
             className={view === key ? 'active' : undefined}
             disabled={busy || testingConnection || checkingReadiness}
-            onClick={() => setView(key)}
+            onClick={() => (key === 'props' ? void onNavigate({ section: 'Props' }) : setView(key))}
           >
             {label}
           </button>
@@ -1261,13 +1250,6 @@ export function AdvicePage({
           </>
         ) : null}
       </div>
-      {view === 'props' && (
-        <PropsBoard
-          leagueId={league?.id}
-          myTeamName={league?.teams.find((t) => t.id === (preferredTeamId ?? teamId))?.name}
-          onAnalyze={analyzeProp}
-        />
-      )}
       {view === 'signals' && (
         <Suspense fallback={<LoadingStatus message="Loading Market Signals…" />}>
           <MarketSignalsPanel />

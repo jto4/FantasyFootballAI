@@ -1,4 +1,5 @@
 import { record, type LiveMatchup } from '@sidekick/core';
+import { PlayerName } from './PlayerCard';
 import { useApi } from './hooks/useApi';
 import { points, type MatchupSide, type WeeklyBriefing } from './weekly-briefing';
 
@@ -168,7 +169,8 @@ export function MatchupCard({
                     <td>
                       {mine ? (
                         <>
-                          <span className="matchup-position">{mine.position}</span> {mine.name}
+                          <span className="matchup-position">{mine.position}</span>{' '}
+                          <PlayerName id={mine.id} name={mine.name} />
                         </>
                       ) : null}
                     </td>
@@ -193,7 +195,8 @@ export function MatchupCard({
                     <td>
                       {theirs ? (
                         <>
-                          <span className="matchup-position">{theirs.position}</span> {theirs.name}
+                          <span className="matchup-position">{theirs.position}</span>{' '}
+                          <PlayerName id={theirs.id} name={theirs.name} />
                         </>
                       ) : null}
                     </td>

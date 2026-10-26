@@ -47,8 +47,8 @@ describe('credentials settings section', () => {
     );
 
     expect(markup).toContain('AI API key');
-    expect(markup).toContain('CONFIGURED');
-    expect(markup).toContain('NOT SET');
+    expect(markup).toContain('Saved');
+    expect(markup).toContain('Not set');
     expect(markup).toContain('Test access');
     expect(markup).toContain('placeholder="Enter to replace"');
     expect(markup).toContain('Stability AI image generation key');

@@ -308,6 +308,14 @@ const definitions: [string, SettingsSection, string, string, string, boolean?][]
     'notifications alerts quiet hours do not disturb lead time injury inactive bye game day summary',
   ],
   [
+    'notification-history',
+    'personalize',
+    'Recent alerts',
+    'Game-day notifications the app has shown, to read a missed one again.',
+    'notification history alerts missed recent past notifications log',
+    true,
+  ],
+  [
     'lineup-strategy',
     'personalize',
     'Lineup strategy',
@@ -487,6 +495,26 @@ export function navigationItems(desktop: boolean): SearchItem[] {
       'advice intelligent analysis confidence stats',
     ],
     [
+      'Props',
+      'Every player prop this week next to Sidekick’s projection, with graded leans.',
+      'props player props betting lines over under sportsbook leans odds',
+    ],
+    [
+      'Sunday',
+      'All my leagues: every matchup, problems to fix and shared players on one page.',
+      'all leagues every league multiple leagues sunday game day overview starters',
+    ],
+    [
+      'Start/sit',
+      'Compare two to four players: projection, range, chance to play and win chance.',
+      'start sit compare who should i start versus vs players lineup decision',
+    ],
+    [
+      'Trade calculator',
+      'Value a trade for both sides, including players you would have to release.',
+      'trade calculator value trade compare trade fair trade analyzer',
+    ],
+    [
       'Dynasty',
       'Long-term player values, dynasty trades, rookie drafts, taxi squad and keepers.',
       'dynasty keeper rookie draft picks taxi squad trade value age long term rebuild',
@@ -554,7 +582,13 @@ export function navigationItems(desktop: boolean): SearchItem[] {
     ...pages.map(([title, description, aliases]) => ({
       id: `page:${title}`,
       title:
-        title === 'League desk' ? 'Home' : title === 'Members & memory' ? 'League members' : title!,
+        title === 'League desk'
+          ? 'Home'
+          : title === 'Members & memory'
+            ? 'League members'
+            : title === 'Sunday'
+              ? 'All my leagues'
+              : title!,
       description: description!,
       aliases: aliases!,
       location: 'Workspace',

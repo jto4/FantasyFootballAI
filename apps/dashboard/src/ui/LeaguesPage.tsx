@@ -161,7 +161,8 @@ function relativeAge(iso: string, now = Date.now()) {
   if (minutes < 1) return 'just now';
   const format = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
   if (minutes < 60) return format.format(-minutes, 'minute');
-  if (minutes < 48 * 60) return format.format(-Math.round(minutes / 60), 'hour');
-  if (minutes < 14 * 24 * 60) return format.format(-Math.round(minutes / 1440), 'day');
+  // Whole hours and days counted down, the same way the header's "updated … ago" counts.
+  if (minutes < 48 * 60) return format.format(-Math.floor(minutes / 60), 'hour');
+  if (minutes < 14 * 24 * 60) return format.format(-Math.floor(minutes / 1440), 'day');
   return `on ${new Date(iso).toLocaleDateString()}`;
 }

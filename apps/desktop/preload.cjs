@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('sidekickDesktop', {
   getTheme: () => ipcRenderer.sendSync('sidekick:get-theme'),
   getTeamSelections: () => ipcRenderer.sendSync('sidekick:get-team-selections'),
   setTeamSelections: (teams) => ipcRenderer.invoke('sidekick:set-team-selections', teams),
+  getNotificationHistory: () => ipcRenderer.invoke('sidekick:get-notification-history'),
   setTheme: (theme) => ipcRenderer.invoke('sidekick:set-theme', theme),
   getLaunchAtLogin: () => ipcRenderer.invoke('sidekick:get-launch-at-login'),
   setLaunchAtLogin: (enabled) => ipcRenderer.invoke('sidekick:set-launch-at-login', enabled),

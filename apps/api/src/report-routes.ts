@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { JobConflict, type createGenerationQueue } from './generation-jobs.js';
-import { isDraftEdit, isReportSendRequest } from '@sidekick/core';
+import { isDraftEdit, isReportSendRequest, olderDraftIds } from '@sidekick/core';
 import { Router } from 'express';
 import { DeliveryFailure } from '@sidekick/integrations';
 import type { ReportKind, ActionSetting } from '@sidekick/core';
@@ -24,6 +24,29 @@ export function createReportRouter({
 }) {
   const router = Router();
   const { deliver, updateDeliveryState, beginDelivery, completeDelivery } = deliveryService;
+  // Deletes drafts superseded by a newer draft of the same report (never sent or sending).
+  router.post('/api/reports/clear-older-drafts', async (req, res) => {
+    const body = req.body as Record<string, unknown> | undefined;
+    if (
+      body !== undefined &&
+      (typeof body !== 'object' ||
+        Array.isArray(body) ||
+        Object.keys(body).some((key) => key !== 'league') ||
+        (body.league !== undefined &&
+          (typeof body.league !== 'string' || body.league.length > 256)))
+    )
+      return res.status(400).json({ error: 'Choose a league or leave it empty for all.' });
+    const league = typeof body?.league === 'string' ? body.league : undefined;
+    let removed = 0;
+    await store.update((state) => {
+      const older = olderDraftIds(
+        state.reports.filter((report) => !league || report.leagueId === league),
+      );
+      removed = older.size;
+      if (removed) state.reports = state.reports.filter((report) => !older.has(report.id));
+    });
+    res.json({ removed });
+  });
   router.post('/api/reports/:kind', async (req, res) => {
     if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body))
       return res.status(400).json({ error: 'Enter valid report details.' });

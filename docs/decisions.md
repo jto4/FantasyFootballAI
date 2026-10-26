@@ -692,3 +692,27 @@ of 2026: width from 2026 for TE (70% → 79% on the held-out weeks), WR (78% →
 Win-probability Brier on 2026 weeks 5+: 0.233 against 0.25 for a coin flip, with the variance
 scale still 1.4. Mean absolute error over all 2026 skill-player games: 5.39 (8-game average
 5.66).
+
+## Player tools (October 26, 2026)
+
+- **Player card**: any player's name opens a side panel built from the shared weekly computation
+  (projection, range, chance to play, the numbers behind it, recent games, headlines that name
+  him in full, dynasty value, Watch and Nudge). No AI.
+- **Start/sit**: two to four players with this week's win chance for each in the lineup. "The
+  spot" is every compared player now in the lineup (at least one), filled by that player plus the
+  best of the rest by expected points. Not shown once games start.
+- **All my leagues**: every league with a chosen team, matched across platforms by name and
+  position; flags a player starting in one league and benched in another.
+- **Trade calculator for redraft**: the dynasty calculator with a "season" horizon that counts
+  only the rest of this season above replacement (from recent form) and ignores picks.
+- **Waiver bids**: FAAB budgets are read from Sleeper (FAAB leagues only) and ESPN. The bid range
+  is a stated rule of thumb, about 1% of the remaining budget per point a pickup adds over the
+  rest of the regular season, capped at half; there is no bidding history to fit it on.
+- **Win chance over time** on Live is kept in memory while the app runs (a point per change, at
+  most every two minutes); a restart mid-game starts the line again.
+- **Notification history** is kept by the desktop shell next to the sent-alert keys (200 newest,
+  owner-only file, validated on read) and shown in Settings → Personalize.
+- **What changed since your last visit** is a per-device note in browser storage, compared within
+  the same NFL week only.
+- **Reports** hide drafts replaced by a newer draft of the same report for the same league, and
+  can delete them in one confirmed step; sent and in-delivery reports are never touched.

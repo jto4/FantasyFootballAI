@@ -170,3 +170,12 @@
 .props-record span {
   display: block;
 }
+
+.props-method-inline {
+  margin-top: 4px;
+  font-size: 12px;
+}
+.props-method-inline summary {
+  color: var(--muted);
+  cursor: pointer;
+}

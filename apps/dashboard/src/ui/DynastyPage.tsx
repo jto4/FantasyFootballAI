@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { PlayerName } from './PlayerCard';
 import { record, type LeagueConnection, type PickTier, type RookiePick } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { useApi } from './hooks/useApi';
@@ -232,15 +233,19 @@ function PlayerChecklist({
   );
 }
 
-function TradeCalculator({
-  report,
+export function TradeCalculator({
+  season,
   league,
   teamId,
+  horizon = 'dynasty',
 }: {
-  report: DynastyReport;
+  season: number;
   league: LeagueConnection;
   teamId: string;
+  /** "season": the rest of this season only (redraft), without picks. */
+  horizon?: 'season' | 'dynasty';
 }) {
+  const seasonOnly = horizon === 'season';
   const [partner, setPartner] = useState('');
   const [give, setGive] = useState<string[]>([]);
   const [receive, setReceive] = useState<string[]>([]);
@@ -272,8 +277,9 @@ function TradeCalculator({
             league: league.id,
             team: teamId,
             ...(partner ? { partner } : {}),
-            give: { playerIds: give, picks: givePicks },
-            receive: { playerIds: receive, picks: receivePicks },
+            give: { playerIds: give, picks: seasonOnly ? [] : givePicks },
+            receive: { playerIds: receive, picks: seasonOnly ? [] : receivePicks },
+            ...(seasonOnly ? { horizon: 'season' } : {}),
           }),
         }),
       );
@@ -289,8 +295,10 @@ function TradeCalculator({
     <section className="dynasty-card dynasty-trade" aria-labelledby="dynasty-trade-title">
       <h2 id="dynasty-trade-title">Trade calculator</h2>
       <p className="dynasty-note">
-        Values count this season and the next three. Taking more players than you send costs the
-        players you would have to release.
+        {seasonOnly
+          ? 'Values count the rest of this season: points above a replacement starter from recent form. '
+          : 'Values count this season and the next three. '}
+        Taking more players than you send costs the players you would have to release.
       </p>
       <div className="dynasty-trade-sides">
         <div>
@@ -301,7 +309,7 @@ function TradeCalculator({
             chosen={give}
             onToggle={toggle(give, setGive)}
           />
-          <PickEditor picks={givePicks} onChange={setGivePicks} season={report.league.season} />
+          {!seasonOnly && <PickEditor picks={givePicks} onChange={setGivePicks} season={season} />}
         </div>
         <div>
           <h3>You get</h3>
@@ -332,11 +340,9 @@ function TradeCalculator({
               onToggle={toggle(receive, setReceive)}
             />
           )}
-          <PickEditor
-            picks={receivePicks}
-            onChange={setReceivePicks}
-            season={report.league.season}
-          />
+          {!seasonOnly && (
+            <PickEditor picks={receivePicks} onChange={setReceivePicks} season={season} />
+          )}
         </div>
       </div>
       <button
@@ -362,8 +368,12 @@ function TradeCalculator({
             {view.releaseCost ? `, release cost ${num(view.releaseCost)}` : ''}).
           </p>
           <p>
-            This season: {view.thisSeasonNet >= 0 ? '+' : ''}
-            {num(view.thisSeasonNet)} points above replacement.
+            {seasonOnly ? null : (
+              <>
+                This season: {view.thisSeasonNet >= 0 ? '+' : ''}
+                {num(view.thisSeasonNet)} points above replacement.
+              </>
+            )}
             {view.released.length
               ? ` You would release ${view.released.map((p) => p.name).join(', ')}.`
               : ''}
@@ -509,7 +519,9 @@ export function DynastyPage({
                   {roster.map((p) => (
                     <tr key={p.id}>
                       <td>
-                        <strong>{p.name}</strong>
+                        <strong>
+                          <PlayerName id={p.id} name={p.name} />
+                        </strong>
                         <small>
                           {p.position}
                           {p.nflTeam ? ` · ${p.nflTeam}` : ''}
@@ -538,7 +550,7 @@ export function DynastyPage({
             )}
           </section>
 
-          <TradeCalculator report={report} league={league!} teamId={teamId!} />
+          <TradeCalculator season={report.league.season} league={league!} teamId={teamId!} />
 
           <div className="dynasty-grid">
             <section className="dynasty-card" aria-labelledby="dynasty-plan-title">
@@ -628,7 +640,9 @@ export function DynastyPage({
                   {report.rookies.board.map((r) => (
                     <tr key={r.id}>
                       <td>
-                        <strong>{r.name}</strong>
+                        <strong>
+                          <PlayerName id={r.id} name={r.name} />
+                        </strong>
                         <small>
                           {r.position}
                           {r.nflTeam ? ` · ${r.nflTeam}` : ''}

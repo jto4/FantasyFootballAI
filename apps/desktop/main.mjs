@@ -22,6 +22,7 @@ import { pathToFileURL } from 'node:url';
 import { resolveVerificationProfile } from '@sidekick/integrations';
 import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
 import { startGameDayAlerts } from './game-day-alerts.mjs';
+import { createNotificationHistory } from './notification-history.mjs';
 import { contextMenuTemplate } from './context-menu.mjs';
 import {
   getTeamSelectionPreference,
@@ -103,6 +104,13 @@ const startupPreference = join(app.getPath('appData'), app.getName(), 'startup.j
 const appearancePreference = join(app.getPath('appData'), app.getName(), 'appearance.json');
 const teamPreference = join(app.getPath('appData'), app.getName(), 'team-selection.json');
 const gameDayAlertState = join(app.getPath('appData'), app.getName(), 'game-day-alerts.json');
+const notificationHistory = createNotificationHistory(
+  join(app.getPath('appData'), app.getName(), 'notification-history.json'),
+);
+ipcMain.handle('sidekick:get-notification-history', async (event) => {
+  assertTrustedDashboard(event);
+  return notificationHistory.list();
+});
 let teamSelections = {};
 let teamSelectionWrites = Promise.resolve();
 ipcMain.on('sidekick:get-team-selections', (event) => {
@@ -673,6 +681,7 @@ function startLineupNotifications() {
       return response.json();
     },
     notify: ({ title, body, hash }) => {
+      void notificationHistory.add({ title, body, hash });
       const notification = new Notification({ title, body });
       notification.on('click', () => openDashboardAt(hash));
       notification.show();

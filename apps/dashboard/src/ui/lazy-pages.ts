@@ -11,6 +11,10 @@ export const pageLoaders = {
   advice: () => import('./AdvicePage'),
   live: () => import('./LivePage'),
   dynasty: () => import('./DynastyPage'),
+  props: () => import('./PropsPage'),
+  sunday: () => import('./SundayPage'),
+  compare: () => import('./ComparePage'),
+  trade: () => import('./TradePage'),
 };
 export const HelpPage = lazy(() =>
   import('./HelpPage').then((module) => ({ default: module.HelpPage })),
@@ -49,4 +53,17 @@ export const LivePage = lazy(() =>
 
 export const DynastyPage = lazy(() =>
   pageLoaders.dynasty().then((module) => ({ default: module.DynastyPage })),
+);
+
+export const PropsPage = lazy(() =>
+  pageLoaders.props().then((module) => ({ default: module.PropsPage })),
+);
+export const SundayPage = lazy(() =>
+  pageLoaders.sunday().then((module) => ({ default: module.SundayPage })),
+);
+export const ComparePage = lazy(() =>
+  pageLoaders.compare().then((module) => ({ default: module.ComparePage })),
+);
+export const TradePage = lazy(() =>
+  pageLoaders.trade().then((module) => ({ default: module.TradePage })),
 );

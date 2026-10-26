@@ -191,3 +191,21 @@
     grid-template-columns: 1fr;
   }
 }
+.trade-horizon {
+  display: flex;
+  gap: 4px;
+}
+.trade-horizon button {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.trade-horizon button[aria-pressed='true'] {
+  border-color: var(--orange);
+  color: var(--ink);
+  font-weight: 600;
+}

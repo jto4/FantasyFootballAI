@@ -12,9 +12,9 @@ describe('credential store status', () => {
   });
 
   it('does not describe a failed read as an empty credential store', () => {
-    expect(credentialStatusLabel(null, undefined)).toBe('CHECKING');
-    expect(credentialStatusLabel(false, undefined)).toBe('STORE UNAVAILABLE');
-    expect(credentialStatusLabel(true, false)).toBe('NOT SET');
-    expect(credentialStatusLabel(true, true)).toBe('CONFIGURED');
+    expect(credentialStatusLabel(null, undefined)).toBe('Checking');
+    expect(credentialStatusLabel(false, undefined)).toBe('Keychain unavailable');
+    expect(credentialStatusLabel(true, false)).toBe('Not set');
+    expect(credentialStatusLabel(true, true)).toBe('Saved');
   });
 });

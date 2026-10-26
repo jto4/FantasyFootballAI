@@ -223,6 +223,7 @@ export function createDynastyService(deps: DynastyDependencies) {
     partnerId?: string;
     give: DynastyTradeSide;
     receive: DynastyTradeSide;
+    horizon?: 'season' | 'dynasty';
   }) {
     const found = findLeague(input.leagueId, input.teamId);
     if (!found) throw new Error('That team is not in the connected league.');
@@ -245,6 +246,7 @@ export function createDynastyService(deps: DynastyDependencies) {
       receive: input.receive,
       roster: mine,
       ...(limit ? { rosterLimit: limit } : {}),
+      ...(input.horizon ? { horizon: input.horizon } : {}),
     });
     const theirs = partner
       ? compareDynastyTrade(context, dynastySettings, {
@@ -252,12 +254,38 @@ export function createDynastyService(deps: DynastyDependencies) {
           receive: input.give,
           roster: ids(partner),
           ...(limit ? { rosterLimit: limit } : {}),
+          ...(input.horizon ? { horizon: input.horizon } : {}),
         })
       : undefined;
     return { yours, ...(theirs ? { theirs } : {}) };
   }
 
-  return { overview, trade };
+  /** One player's long-term value, for the player card. */
+  async function playerValue(leagueId: string, playerId: string) {
+    const league = deps.store.snapshot().leagues.find((l) => l.id === leagueId);
+    if (!league) throw new Error('That team is not in the connected league.');
+    const { context } = await load(league);
+    const value = context.values.get(playerId);
+    const ranked = value
+      ? [...context.values.values()]
+          .filter((v) => v.position === value.position)
+          .sort((a, b) => b.value - a.value)
+          .findIndex((v) => v.id === playerId) + 1
+      : undefined;
+    return {
+      format: leagueFormat(league, deps.store.settingsSnapshot?.().preferences),
+      ...(value
+        ? {
+            value: value.value,
+            seasons: value.aboveReplacement,
+            positionRank: ranked,
+            ...(value.age !== undefined ? { age: value.age } : {}),
+          }
+        : {}),
+    };
+  }
+
+  return { overview, trade, playerValue };
 }
 
 function numberSetting(value: unknown) {
@@ -408,6 +436,26 @@ export function createDynastyRouter(deps: DynastyDependencies) {
         .json({ error: missing ? 'That team is not in the connected league.' : failure });
     }
   });
+  router.get('/api/dynasty/player', async (req, res) => {
+    const { league, player } = req.query;
+    if (
+      Object.keys(req.query).some((key) => key !== 'league' && key !== 'player') ||
+      typeof league !== 'string' ||
+      typeof player !== 'string' ||
+      league.length > 256 ||
+      !player ||
+      player.length > 64
+    )
+      return res.status(400).json({ error: 'Choose a connected league and player.' });
+    try {
+      res.json(await service.playerValue(league, player));
+    } catch (error) {
+      const missing = error instanceof Error && /not in the connected league/.test(error.message);
+      res
+        .status(missing ? 404 : 502)
+        .json({ error: missing ? 'That league is not connected.' : failure });
+    }
+  });
   router.post('/api/dynasty/trade', async (req, res) => {
     const body = req.body as Record<string, unknown> | undefined;
     const give = tradeSide(body?.give);
@@ -416,8 +464,9 @@ export function createDynastyRouter(deps: DynastyDependencies) {
       !body ||
       typeof body !== 'object' ||
       Object.keys(body).some(
-        (k) => !['league', 'team', 'partner', 'give', 'receive'].includes(k),
+        (k) => !['league', 'team', 'partner', 'give', 'receive', 'horizon'].includes(k),
       ) ||
+      (body.horizon !== undefined && body.horizon !== 'season' && body.horizon !== 'dynasty') ||
       typeof body.league !== 'string' ||
       typeof body.team !== 'string' ||
       (body.partner !== undefined && typeof body.partner !== 'string') ||
@@ -435,6 +484,9 @@ export function createDynastyRouter(deps: DynastyDependencies) {
           leagueId: body.league,
           teamId: body.team,
           ...(typeof body.partner === 'string' ? { partnerId: body.partner } : {}),
+          ...(body.horizon === 'season' || body.horizon === 'dynasty'
+            ? { horizon: body.horizon }
+            : {}),
           give,
           receive,
         }),

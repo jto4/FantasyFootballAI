@@ -8,6 +8,7 @@ import {
   deliveryText,
   reportVisuals,
   type ReportKind,
+  olderDraftIds,
 } from '@sidekick/core';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { AppSettings, LeagueConnection, SavedReport } from '@sidekick/core';
@@ -230,7 +231,38 @@ export function ReportsPage({
       if (activeDetail.current === scope) setSaving(false);
     }
   }
-  const filtered = history.items;
+  // Drafts replaced by a newer draft of the same report stay out of the way unless asked for.
+  const [showOlder, setShowOlder] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const older = olderDraftIds(history.items);
+  const filtered = showOlder ? history.items : history.items.filter((item) => !older.has(item.id));
+  async function clearOlder() {
+    if (
+      !(await confirmAction(
+        `This deletes ${older.size} older ${older.size === 1 ? 'draft' : 'drafts'} that a newer draft of the same report replaced. Sent reports and the newest draft of each are kept.`,
+        { title: 'Delete older drafts?', confirmLabel: 'Delete older drafts', tone: 'danger' },
+      ))
+    )
+      return;
+    setClearing(true);
+    try {
+      await requestJson(
+        '/api/reports/clear-older-drafts',
+        (value): value is { removed: number } =>
+          Boolean(value && typeof value === 'object' && 'removed' in value),
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(leagueFilter === 'all' ? {} : { league: leagueFilter }),
+        },
+      );
+      await onSaved();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'Older drafts could not be deleted.');
+    } finally {
+      setClearing(false);
+    }
+  }
   const wide = useMediaQuery('(min-width: 1000px)');
   const [sort, setSort] = useState<{
     key: 'title' | 'kind' | 'league' | 'status' | 'createdAt';
@@ -508,6 +540,24 @@ export function ReportsPage({
             </select>
           </label>
         </div>
+        {older.size > 0 && (
+          <p className="report-older">
+            {showOlder
+              ? `Showing ${older.size} older ${older.size === 1 ? 'draft' : 'drafts'} replaced by newer ones.`
+              : `${older.size} older ${older.size === 1 ? 'draft is' : 'drafts are'} hidden; a newer draft of the same report replaced ${older.size === 1 ? 'it' : 'them'}.`}{' '}
+            <button type="button" className="text-button" onClick={() => setShowOlder((v) => !v)}>
+              {showOlder ? 'Hide them' : 'Show them'}
+            </button>{' '}
+            <button
+              type="button"
+              className="text-button"
+              disabled={clearing}
+              onClick={() => void clearOlder()}
+            >
+              Delete them
+            </button>
+          </p>
+        )}
         {wide && sorted.length > 0 ? (
           <table className="report-table">
             <caption className="visually-hidden">

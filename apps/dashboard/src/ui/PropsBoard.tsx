@@ -5,6 +5,7 @@ import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
 import { formatOdds } from './display-preferences';
 import { ErrorNotice } from './ErrorNotice';
+import './props.css';
 
 export type PropHandoff = {
   gameId: string;
@@ -71,16 +72,21 @@ export function PropsBoard({
   leagueId,
   myTeamName,
   onAnalyze,
+  initialPlayer = '',
 }: {
   leagueId: string | undefined;
   myTeamName: string | undefined;
   onAnalyze: (pick: PropHandoff) => void;
+  /** Opens filtered to one player (from his player card), across every prop, not just leans. */
+  initialPlayer?: string;
 }) {
   const [revision, setRevision] = useState(0);
   const [gameId, setGameId] = useState('');
   const [stat, setStat] = useState('');
-  const [query, setQuery] = useState('');
-  const [scope, setScope] = useState<'all' | 'leans' | 'fantasy' | 'mine'>('leans');
+  const [query, setQuery] = useState(initialPlayer);
+  const [scope, setScope] = useState<'all' | 'leans' | 'fantasy' | 'mine'>(
+    initialPlayer ? 'all' : 'leans',
+  );
   const {
     data: board,
     error,
@@ -139,25 +145,28 @@ export function PropsBoard({
           <div>
             <strong>Lean record {tallyText(board.record.overall)}</strong>
             <span>
+              {board.record.overall.winRate !== undefined
+                ? `Right ${Math.round(board.record.overall.winRate * 100)}% of the time; at −110 you need ${Math.round(board.record.breakEven * 1000) / 10}% to make money. `
+                : `At −110 you need ${Math.round(board.record.breakEven * 1000) / 10}% right to make money. `}
               {graded < 50
-                ? `${graded} graded so far; too few to judge. `
+                ? `Only ${graded} graded so far, too few to judge.`
                 : board.record.overall.winRate !== undefined &&
                     board.record.overall.winRate > board.record.breakEven
-                  ? 'Above break-even so far. Keep watching before trusting it. '
-                  : 'Not beating break-even. Treat leans as conversation, not bets. '}
-              Break-even at −110 is {Math.round(board.record.breakEven * 1000) / 10}%.
-              {board.record.pending ? ` ${board.record.pending} waiting on games.` : ''}
+                  ? 'Ahead of that so far; keep watching before trusting it.'
+                  : 'Not ahead of that; treat leans as conversation, not bets.'}
+              {board.record.pending ? ` ${board.record.pending} still waiting on games.` : ''}
             </span>
-            <span>
-              {board.record.brier !== undefined
-                ? `Model accuracy (Brier) ${board.record.brier} over ${board.record.pricedGames} props; a coin flip scores 0.25 and lower is better. `
-                : ''}
-              {board.model
-                ? board.model.fitted
-                  ? `The model claims ${Math.round(board.model.marketWeight * 100)}% of its disagreement with the line, fitted from ${board.model.gradedForFit} graded props.`
-                  : `The model claims ${Math.round(board.model.marketWeight * 100)}% of its disagreement with the line until 150 props are graded (${board.model.gradedForFit} so far).`
-                : ''}
-            </span>
+            <details className="props-method-inline">
+              <summary>How sure is the model?</summary>
+              <span>
+                {board.record.brier !== undefined
+                  ? `Its over/under chances score ${board.record.brier} over ${board.record.pricedGames} graded props (0.25 is a coin flip; lower is better). `
+                  : ''}
+                {board.model
+                  ? `It moves ${Math.round(board.model.marketWeight * 100)}% of the way from the sportsbook line toward its own projection${board.model.fitted ? `, a share fitted on ${board.model.gradedForFit} graded props.` : ` until 150 props are graded (${board.model.gradedForFit} so far).`}`
+                  : ''}
+              </span>
+            </details>
           </div>
           <ul>
             {(['strong', 'moderate', 'slight'] as const).map((s) => (

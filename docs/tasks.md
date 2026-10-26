@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 26 (player tools): player card from any name, start/sit compare, all-leagues Sunday
+  page, redraft trade calculator, FAAB bid guide, since-last-visit changes, Live win-chance line,
+  notification history; Props get their own page; older report drafts grouped and clearable;
+  Ask, credential labels, league-age wording and top-bar width tidied.
 - October 26 (UI trust): Home's matchup uses Live's box-score numbers once games start; one AI
   connection status on Home and Settings; the accuracy card needs 30 results per source before
   naming a winner and drops retired ESPN records; Live marks starters who sat out as Out; a

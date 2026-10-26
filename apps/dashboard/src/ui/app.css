@@ -1430,10 +1430,8 @@ p {
   margin: 4px 0 7px;
 }
 .credential-status {
-  font:
-    7px 'DM Mono',
-    monospace;
-  letter-spacing: 0.4px;
+  color: var(--muted);
+  font-size: 12px;
 }
 .credential-status.ready {
   color: var(--green);
@@ -3542,5 +3540,46 @@ kbd {
   }
   .run-side {
     justify-items: start;
+  }
+}
+.live-chance-chart {
+  margin: 10px 0 0;
+}
+.live-chance-chart svg {
+  display: block;
+  width: 100%;
+  height: 120px;
+}
+.live-chance-chart figcaption {
+  color: var(--muted);
+  font-size: 12px;
+}
+.live-chance-mid {
+  stroke: var(--chart-grid);
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+.live-chance-line {
+  fill: none;
+  stroke: var(--chart-highlight);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.live-chance-dot {
+  fill: var(--chart-highlight);
+}
+
+.page-title-block.compact {
+  margin-bottom: 12px;
+}
+.page-title-block.compact h1 {
+  font-size: 30px;
+  letter-spacing: -0.8px;
+}
+
+/* Laptop and wider: room for "ESPN · 12 teams · updated 3 days ago" without cutting it off. */
+@media (min-width: 1000px) {
+  .league-select {
+    min-width: 290px;
   }
 }

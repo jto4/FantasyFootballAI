@@ -30,6 +30,7 @@ test('a beginner connects a league and AI, chooses a report, reviews it, and exp
       'Ask',
       'Reports',
       'Live',
+      'Props',
       'Schedule',
       'Settings',
     ]);

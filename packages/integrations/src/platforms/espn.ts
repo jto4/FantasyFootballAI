@@ -178,6 +178,22 @@ export function normalizeEspnLeague(
       if (points !== undefined) (positionScoring[position] ??= {})[statId] = points;
     }
   }
+  // FAAB: the league's budget and what each team has spent (absent in non-FAAB leagues).
+  const waiverBudget = boundedInteger(
+    asRecord(settings.acquisitionSettings)?.acquisitionBudget,
+    1,
+    100_000,
+  );
+  const faab = (team: Record<string, unknown>) => {
+    const spent = boundedInteger(
+      asRecord(team.transactionCounter)?.acquisitionBudgetSpent,
+      0,
+      100_000,
+    );
+    return waiverBudget && spent !== undefined
+      ? { faabRemaining: Math.max(0, waiverBudget - spent) }
+      : {};
+  };
   const teams: LeagueConnection['teams'] = data.teams.map((entry, index) => {
     const team = asRecord(entry) ?? {};
     const teamId = boundedId(team.id, 40) ?? String(index);
@@ -191,6 +207,7 @@ export function normalizeEspnLeague(
       ),
       losses: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.losses),
       pointsFor: numberOrUndefined(asRecord(asRecord(team.record)?.overall)?.pointsFor),
+      ...faab(team),
     };
   });
   const rosterTeams = Array.isArray(supplemental?.teams) ? supplemental.teams : [];
@@ -235,6 +252,7 @@ export function normalizeEspnLeague(
       ...(seasonComplete !== undefined ? { seasonComplete } : {}),
       ...(rosterPositions ? { roster_positions: rosterPositions } : {}),
       ...espnFormat(asRecord(settings.draftSettings), rosterPositions),
+      ...(waiverBudget ? { waiverBudget } : {}),
       ...(regularMatchupPeriods ? { regularSeasonWeeks: regularMatchupPeriods } : {}),
       ...(playoffTeams ? { playoffTeams } : {}),
       ...(inferredPlayoffStartWeek !== undefined

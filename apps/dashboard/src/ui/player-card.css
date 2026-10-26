@@ -1,0 +1,140 @@
+/* Player card: a side panel opened from any player's name. */
+.player-name-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 3px;
+}
+.player-name-link:hover,
+.player-name-link:focus-visible {
+  color: var(--orange);
+  text-decoration-color: currentColor;
+}
+.modal-scrim:has(> .player-card-drawer) {
+  place-items: stretch end;
+  padding: 0;
+}
+.player-card-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(440px, 100vw);
+  height: 100%;
+  overflow-y: auto;
+  padding: 22px;
+  border-left: 1px solid var(--line);
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: -10px 0 30px var(--shadow);
+}
+.player-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.player-card-head h2 {
+  margin: 2px 0 4px;
+  font-size: 24px;
+}
+.player-card-sub,
+.player-card-muted,
+.player-card-drawer small {
+  color: var(--muted);
+  font-size: 13px;
+}
+.player-card-sub {
+  margin: 0;
+}
+.player-card-body {
+  display: grid;
+  gap: 18px;
+}
+.player-card-body h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.player-card-body p {
+  margin: 0;
+}
+.player-card-projection {
+  display: grid;
+  gap: 2px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+.player-card-projection span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.player-card-projection strong {
+  font-size: 32px;
+}
+.player-card-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 92px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.player-card-bars li {
+  display: grid;
+  flex: 1;
+  justify-items: center;
+  gap: 4px;
+}
+.player-card-bars span {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: var(--chart-context);
+}
+.player-card-bars li:first-child span {
+  background: var(--chart-highlight);
+}
+.player-card-numbers {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: 13px;
+}
+.player-card-numbers div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.player-card-numbers dt {
+  color: var(--muted);
+}
+.player-card-numbers dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.player-card-news {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.player-card-news li {
+  display: grid;
+  gap: 2px;
+}
+.player-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}

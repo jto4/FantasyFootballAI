@@ -37,6 +37,8 @@ export interface Team {
   losses?: number | undefined;
   pointsFor?: number | undefined;
   rosterSize?: number | undefined;
+  /** FAAB budget left, when the league uses blind bidding. */
+  faabRemaining?: number | undefined;
   rosterPlayerIds?: string[] | undefined;
   roster?: RosterPlayer[] | undefined;
 }

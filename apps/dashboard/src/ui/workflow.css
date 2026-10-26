@@ -1411,3 +1411,19 @@
   width: 64px;
   margin-right: 4px;
 }
+
+.notification-history {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.notification-history li {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+}
+.notification-history small {
+  color: var(--muted);
+}

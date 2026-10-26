@@ -10,9 +10,9 @@ export function credentialStatusLabel(
   storeAvailable: boolean | null,
   configured: boolean | undefined,
 ): string {
-  if (storeAvailable === null) return 'CHECKING';
-  if (!storeAvailable) return 'STORE UNAVAILABLE';
-  return configured ? 'CONFIGURED' : 'NOT SET';
+  if (storeAvailable === null) return 'Checking';
+  if (!storeAvailable) return 'Keychain unavailable';
+  return configured ? 'Saved' : 'Not set';
 }
 
 function isCredentialStatus(value: unknown): value is CredentialStatus {

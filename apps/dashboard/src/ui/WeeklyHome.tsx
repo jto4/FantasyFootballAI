@@ -1,4 +1,5 @@
 import { platformName } from './platform-name';
+import { PlayerName } from './PlayerCard';
 import { Fragment, useEffect, useState } from 'react';
 import { AdviceScorecard } from './AdviceScorecard';
 import { NextUpCard } from './NextUpCard';
@@ -13,6 +14,8 @@ import {
 import { formatDateTime } from './date-format';
 import { isWeeklyBriefing, points, type WeeklyBriefing } from './weekly-briefing';
 import { MatchupCard } from './MatchupCard';
+import { faabBid, regularWeeksLeft } from '@sidekick/core';
+import { readVisit, saveVisit, visitChanges, visitDigest } from './visit-changes';
 import { WatchlistCard } from './WatchlistCard';
 export function WeeklyHome({
   league,
@@ -26,7 +29,10 @@ export function WeeklyHome({
   onResults,
   onLive,
   onPersonalize,
+  onNavigate,
 }: {
+  /** Opens another page (Start/sit, Trade calculator). */
+  onNavigate?: (section: string) => void;
   league: LeagueConnection | undefined;
   settings: AppSettings;
   teamId?: string | undefined;
@@ -47,6 +53,7 @@ export function WeeklyHome({
   const [briefing, setBriefing] = useState<WeeklyBriefing>();
   const [briefingError, setBriefingError] = useState<unknown>();
   const [briefingAttempt, setBriefingAttempt] = useState(0);
+  const [changes, setChanges] = useState<{ since: string; lines: string[] }>();
   useEffect(() => {
     const controller = new AbortController();
     setBriefing(undefined);
@@ -61,7 +68,15 @@ export function WeeklyHome({
         60_000,
       )
         .then((data) => {
-          if (!controller.signal.aborted) setBriefing(data);
+          if (controller.signal.aborted) return;
+          setBriefing(data);
+          // Compare with the last visit, then remember this one for next time.
+          const previous = readVisit(league.id, teamId);
+          const current = visitDigest(data, new Date().toISOString());
+          const rostered = new Set(league.teams.flatMap((t) => (t.roster ?? []).map((p) => p.id)));
+          const lines = visitChanges(previous, current, rostered);
+          setChanges(lines.length && previous ? { since: previous.at, lines } : undefined);
+          saveVisit(league.id, teamId, current);
         })
         .catch((failure: unknown) => {
           if (!controller.signal.aborted) setBriefingError(failure ?? 'The weekly check failed.');
@@ -150,6 +165,16 @@ export function WeeklyHome({
         </p>
       ) : (
         <>
+          {changes && (
+            <section className="visit-changes" aria-label="Since your last visit">
+              <h3>Since your last visit · {formatDateTime(changes.since)}</h3>
+              <ul>
+                {changes.lines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </section>
+          )}
           {/* The roster's date and refresh sit under the top card, or first when it is hidden. */}
           {!nextUpShown && rosterFreshness}
           {cards.map((card) => {
@@ -204,11 +229,20 @@ export function WeeklyHome({
                           <ul className="weekly-answer">
                             {briefing.lineup.changes.map((change) => (
                               <li key={change.start.id}>
-                                <strong>Start {change.start.name}</strong> (
-                                {points(change.start.points)})
-                                {change.bench
-                                  ? ` over ${change.bench.name}${change.bench.points !== undefined ? ` (${points(change.bench.points)})` : ''}`
-                                  : ''}
+                                <strong>
+                                  Start <PlayerName id={change.start.id} name={change.start.name} />
+                                </strong>{' '}
+                                ({points(change.start.points)})
+                                {change.bench ? (
+                                  <>
+                                    {' '}
+                                    over{' '}
+                                    <PlayerName id={change.bench.id} name={change.bench.name} />
+                                    {change.bench.points !== undefined
+                                      ? ` (${points(change.bench.points)})`
+                                      : ''}
+                                  </>
+                                ) : null}
                               </li>
                             ))}
                           </ul>
@@ -234,7 +268,16 @@ export function WeeklyHome({
                         )}
                         <button className="primary-button" onClick={() => onAdvice('lineup')}>
                           Check my lineup
-                        </button>
+                        </button>{' '}
+                        {onNavigate && (
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => onNavigate('Start/sit')}
+                          >
+                            Compare players
+                          </button>
+                        )}
                       </article>
                       <article>
                         <h3>Availability to review</h3>
@@ -242,7 +285,7 @@ export function WeeklyHome({
                           <ul>
                             {briefing.availability.slice(0, 5).map((p) => (
                               <li key={p.id}>
-                                {p.name}: {p.status}
+                                <PlayerName id={p.id} name={p.name} />: {p.status}
                                 {p.basis === 'this-week-report' ? ' · this week’s report' : ''}
                               </li>
                             ))}
@@ -272,22 +315,51 @@ export function WeeklyHome({
                         <h3>Waivers and trades</h3>
                         {briefing?.waivers.length ? (
                           <ul className="weekly-answer">
-                            {briefing.waivers.map((w) => (
-                              <li key={w.id}>
-                                <strong>{w.name}</strong> ({w.position}) · +{points(w.gain)} pts if
-                                added
-                              </li>
-                            ))}
+                            {briefing.waivers.map((w) => {
+                              const bid =
+                                team?.faabRemaining !== undefined
+                                  ? faabBid({
+                                      gain: w.gain,
+                                      weeksLeft: regularWeeksLeft(league, briefing.week),
+                                      remaining: team.faabRemaining,
+                                    })
+                                  : undefined;
+                              return (
+                                <li key={w.id}>
+                                  <strong>
+                                    <PlayerName id={w.id} name={w.name} />
+                                  </strong>{' '}
+                                  ({w.position}) · +{points(w.gain)} pts if added
+                                  {bid ? (
+                                    <small className="faab-bid">
+                                      {' '}
+                                      · bid ${bid.low}–${bid.high}
+                                    </small>
+                                  ) : null}
+                                </li>
+                              );
+                            })}
                           </ul>
                         ) : null}
                         <p>
-                          Check your waiver priority and FAAB in {platformName(league.platform)}.
+                          {team?.faabRemaining !== undefined
+                            ? `$${team.faabRemaining} of FAAB left. Bids are a rule of thumb: about 1% of what is left per point he adds over the rest of the regular season.`
+                            : `Check your waiver priority and FAAB in ${platformName(league.platform)}.`}
                         </p>
                         <button className="small-button" onClick={() => onAdvice('waivers')}>
                           Find waiver pickups
                         </button>{' '}
+                        {onNavigate && (
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => onNavigate('Trade calculator')}
+                          >
+                            Trade calculator
+                          </button>
+                        )}{' '}
                         <button className="text-button" onClick={() => onAdvice('trade')}>
-                          Compare a trade
+                          Ask AI about a trade
                         </button>
                       </article>
                     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PlayerName } from './PlayerCard';
 import { record, type LeagueConnection, type LiveMatchup, type LiveSide } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
@@ -14,7 +15,9 @@ type LiveReport = {
   gamesAvailable: boolean;
   matchupWeek?: number;
   matchup?: LiveMatchup;
+  history?: ChancePoint[];
 };
+type ChancePoint = { at: string; chance: number; you?: number; opponent?: number };
 const isLiveReport = (x: unknown): x is LiveReport =>
   record(x) &&
   typeof x.leagueName === 'string' &&
@@ -43,7 +46,9 @@ function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
         {side.starters.map((s) => (
           <li key={s.id} className={`live-starter ${s.state}`}>
             <span>
-              <strong>{s.name}</strong>
+              <strong>
+                <PlayerName id={s.id} name={s.name} />
+              </strong>
               <small>
                 {s.position}
                 {s.nflTeam ? ` · ${s.nflTeam}` : ''}
@@ -65,6 +70,39 @@ function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
         ))}
       </ul>
     </section>
+  );
+}
+
+/** Win chance through the week as a line: 50% dashed, the latest point marked. */
+export function WinChanceChart({ history }: { history: ChancePoint[] }) {
+  if (history.length < 2) return null;
+  const width = 640,
+    height = 120,
+    pad = 6;
+  const times = history.map((p) => Date.parse(p.at));
+  const start = Math.min(...times),
+    span = Math.max(1, Math.max(...times) - start);
+  const x = (t: number) => pad + ((t - start) / span) * (width - 2 * pad);
+  const y = (chance: number) => pad + (1 - chance) * (height - 2 * pad);
+  const path = history
+    .map((p, i) => `${i ? 'L' : 'M'}${x(times[i]!).toFixed(1)},${y(p.chance).toFixed(1)}`)
+    .join(' ');
+  const last = history.at(-1)!;
+  const first = history[0]!;
+  return (
+    <figure className="live-chance-chart">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`Win chance went from ${Math.round(first.chance * 100)}% to ${Math.round(last.chance * 100)}%`}
+        preserveAspectRatio="none"
+      >
+        <line x1={pad} x2={width - pad} y1={y(0.5)} y2={y(0.5)} className="live-chance-mid" />
+        <path d={path} className="live-chance-line" />
+        <circle cx={x(times.at(-1)!)} cy={y(last.chance)} r={4} className="live-chance-dot" />
+      </svg>
+      <figcaption>{formatDateTime(first.at)} → now · dashed line is 50%</figcaption>
+    </figure>
   );
 }
 
@@ -204,6 +242,7 @@ export function LivePage({
                 From the score so far plus estimates for players yet to play, with spreads fitted on
                 past results. Players mid-game add a rough allowance, so treat it as a guide.
               </small>
+              {report.history && <WinChanceChart history={report.history} />}
             </section>
           )}
           {report.matchupWeek !== undefined && report.matchupWeek !== report.week && (

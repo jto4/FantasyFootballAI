@@ -1,6 +1,7 @@
 import { Fragment, type RefObject } from 'react';
 import type { LeagueConnection, ReportSummary } from '@sidekick/core';
 import {
+  ArrowLeftRight,
   CalendarDays,
   ChevronDown,
   CircleHelp,
@@ -11,8 +12,11 @@ import {
   Radio,
   Settings,
   ShieldCheck,
+  LayoutGrid,
+  Scale,
   Sparkles,
   Sprout,
+  Ticket,
   MessagesSquare,
   Users,
   Zap,
@@ -30,6 +34,7 @@ const menu = [
   { section: 'Ask', label: 'Ask', icon: MessagesSquare },
   { section: 'Reports', label: 'Reports', icon: FileText },
   { section: 'Live', label: 'Live', icon: Radio },
+  { section: 'Props', label: 'Props', icon: Ticket },
   { section: 'Schedule', label: 'Schedule', icon: CalendarDays },
   { section: 'Settings', label: 'Settings', icon: Settings },
 ];
@@ -37,7 +42,9 @@ const menu = [
 const tools = [
   { section: 'Leagues', label: 'Leagues', icon: Users, labs: false },
   { section: 'Dynasty', label: 'Dynasty', icon: Sprout, labs: false },
-  { section: 'Help', label: 'Help', icon: CircleHelp, labs: false },
+  { section: 'Sunday', label: 'All my leagues', icon: LayoutGrid, labs: false },
+  { section: 'Start/sit', label: 'Start/sit', icon: Scale, labs: false },
+  { section: 'Trade calculator', label: 'Trade calculator', icon: ArrowLeftRight, labs: false },
   { section: 'Members & memory', label: 'League members', icon: MessageCircle, labs: true },
   { section: 'Imports', label: 'Imports', icon: FileText, labs: true },
 ];
@@ -96,9 +103,9 @@ export function AppSidebar({
             key={label}
             aria-current={section === destination ? 'page' : undefined}
             onClick={() => navigate(destination)}
-            // The phone bottom bar has no room for Ask (the top bar's Ask button opens chat there)
-            // or Dynasty (under More tools there).
-            className={`nav-item ${section === destination ? 'active' : ''}${destination === 'Ask' || destination === 'Dynasty' ? ' nav-item-desktop' : ''}`}
+            // The phone bottom bar has no room for Ask (the top bar's Ask button opens chat there),
+            // Props (Advice links to it) or Dynasty (under More tools there).
+            className={`nav-item ${section === destination ? 'active' : ''}${['Ask', 'Dynasty', 'Props'].includes(destination) ? ' nav-item-desktop' : ''}`}
           >
             <Icon size={17} strokeWidth={1.8} />
             <span>{label}</span>

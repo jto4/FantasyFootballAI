@@ -440,13 +440,23 @@ export function compareDynastyTrade(
     receive: DynastyTradeSide;
     roster: string[];
     rosterLimit?: number;
+    /**
+     * "season" values only what is left of this season (redraft leagues; picks count nothing);
+     * "dynasty" (the default) adds the next three seasons.
+     */
+    horizon?: 'season' | 'dynasty';
   },
 ) {
+  const season = input.horizon === 'season';
+  const worth = (p: DynastyPlayerValue) => (season ? p.aboveReplacement[0] : p.value);
   const side = (s: DynastyTradeSide) => {
     const players = s.playerIds
       .map((id) => context.values.get(id))
-      .filter((v): v is DynastyPlayerValue => Boolean(v));
-    const picks = s.picks.map((pick) => ({ pick, ...pickValue(context, settings, pick) }));
+      .filter((v): v is DynastyPlayerValue => Boolean(v))
+      .map((p) => ({ ...p, value: worth(p) }));
+    const picks = season
+      ? []
+      : s.picks.map((pick) => ({ pick, ...pickValue(context, settings, pick) }));
     return {
       players,
       picks: picks.map((p) => ({
@@ -470,6 +480,7 @@ export function compareDynastyTrade(
     .filter((id) => !input.give.playerIds.includes(id))
     .map((id) => context.values.get(id))
     .filter((v): v is DynastyPlayerValue => Boolean(v))
+    .map((p) => ({ ...p, value: worth(p) }))
     .sort((a, b) => a.value - b.value);
   const released = releasable.slice(0, Math.min(over, releasable.length));
   const releaseCost = round1(released.reduce((sum, p) => sum + p.value, 0));

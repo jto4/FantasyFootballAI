@@ -217,3 +217,52 @@ it('checks trades both ways and rejects players the team does not have', async (
   ).toBe(400);
   expect((await post({ league: 'dyn', team: 'a', give: {}, receive: {} })).status).toBe(400);
 });
+
+it('values a redraft trade on the rest of this season only, and one player for the card', async () => {
+  const url = await serve();
+  const response = await fetch(`${url}/api/dynasty/trade`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      league: 'dyn',
+      team: 'a',
+      horizon: 'season',
+      give: { playerIds: ['p0'] },
+      receive: { playerIds: ['p4'], picks: [{ season: 2027, round: 1 }] },
+    }),
+  });
+  expect(response.status).toBe(200);
+  const result = (await response.json()) as {
+    yours: {
+      give: { value: number; players: { aboveReplacement: number[] }[] };
+      receive: { picks: unknown[] };
+    };
+  };
+  // Season values ignore picks and use only what is left of this season.
+  expect(result.yours.receive.picks).toEqual([]);
+  expect(result.yours.give.value).toBeCloseTo(
+    result.yours.give.players[0]!.aboveReplacement[0]!,
+    1,
+  );
+  const bad = await fetch(`${url}/api/dynasty/trade`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      league: 'dyn',
+      team: 'a',
+      horizon: 'forever',
+      give: { playerIds: ['p0'] },
+      receive: {},
+    }),
+  });
+  expect(bad.status).toBe(400);
+  const player = (await (await fetch(`${url}/api/dynasty/player?league=dyn&player=p3`)).json()) as {
+    format: string;
+    value?: number;
+    positionRank?: number;
+  };
+  expect(player.format).toBe('dynasty');
+  expect(player.value).toBeGreaterThan(0);
+  expect(player.positionRank).toBeGreaterThan(0);
+  expect((await fetch(`${url}/api/dynasty/player?league=nope&player=p3`)).status).toBe(404);
+});

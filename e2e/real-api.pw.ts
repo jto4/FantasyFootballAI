@@ -160,6 +160,8 @@ test('report history paginates and background polling preserves an unsaved edito
     });
     await page.goto(workspace.url);
     await page.getByRole('button', { name: 'Reports', exact: true }).click();
+    // Every report here is a draft of the same kind, so older ones start hidden.
+    await page.getByRole('button', { name: 'Show them', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Review report', exact: true })).toHaveCount(20);
     await page.getByRole('button', { name: 'Load more reports' }).click();
     await expect(page.getByRole('button', { name: 'Review report', exact: true })).toHaveCount(40);
