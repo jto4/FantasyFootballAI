@@ -249,6 +249,14 @@ describe('league-specific player scoring', () => {
 });
 
 describe('legal starting lineups', () => {
+  it('starts a healthy player over a Questionable one with a slightly higher projection', () => {
+    const questionable = { ...player('hurt', 'WR', 14), playChance: 0.68 };
+    const result = optimizeLineup([questionable, player('healthy', 'WR', 12)], ['WR']);
+    // 14 × 0.68 = 9.5 expected, so the healthy 12 starts, and totals count expected points.
+    expect(result.assignments).toEqual([{ slot: 'WR 1', playerId: 'healthy', points: 12 }]);
+    const forced = optimizeLineup([questionable], ['WR']);
+    expect(forced.points).toBeCloseTo(9.52);
+  });
   it('reserves the only TE for TE and never uses a player twice', () => {
     const result = optimizeLineup(
       [player('tight-end', 'TE', 20), player('runner', 'RB', 18), player('receiver', 'WR', 15)],

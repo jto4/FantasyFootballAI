@@ -283,7 +283,13 @@ export interface PlayerAdviceEvidence {
   position: string;
   team?: string;
   status?: string;
+  /** Expected points if he plays (weekly projections discount Questionable players who play). */
   projectedPoints?: number;
+  /**
+   * Chance he plays, set only when below 1 (listed Questionable). Lineups, team totals and win
+   * chance use `projectedPoints × playChance` (see `expectedPoints`).
+   */
+  playChance?: number;
   projectionScope?: 'week' | 'season' | 'remaining-season';
   projectionPeriod?: import('./domain-types.js').ProjectionPeriod;
   projectionMethod?:

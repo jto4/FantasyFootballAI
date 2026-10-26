@@ -8,6 +8,7 @@ import {
   matchupWinProbability,
   projectionContext,
   projectionRange,
+  questionableKeys,
   ruledOutKeys,
   teamGame,
   vacatedCarryShare,
@@ -240,4 +241,90 @@ it('lowers offensive and kicker projections in forecast wind, not defenses', () 
     weather,
   )!;
   expect(kicker.points).toBeCloseTo(6.4);
+});
+
+it('discounts a Questionable player who plays and reports his chance to play', () => {
+  const receiver = [1, 2, 3].map((week): PlayerGameStats => ({
+    playerId: '00-0000020',
+    name: 'Fictional Receiver',
+    position: 'WR',
+    team: 'SEA',
+    opponent: 'LA',
+    gameId: game(week).id,
+    season: 2026,
+    week,
+    seasonType: 'REG',
+    stats: { targets: 8, receptions: 6, receiving_yards: 80, receiving_tds: 0 },
+  }));
+  const questionable = questionableKeys([
+    {
+      gsisId: '00-0000020',
+      season: 2026,
+      week: 4,
+      seasonType: 'REG',
+      reportStatus: 'Questionable',
+    },
+    { gsisId: '00-0000021', season: 2026, week: 4, reportStatus: 'Out' },
+    {
+      gsisId: '00-0000022',
+      season: 2026,
+      week: 4,
+      seasonType: 'POST',
+      reportStatus: 'Questionable',
+    },
+  ]);
+  expect([...questionable]).toEqual(['2026:4:00-0000020']);
+  const context = projectionContext(
+    { players: receiver, games },
+    { snaps: new Map(), depth: new Map(), questionable },
+  );
+  const input = {
+    playerId: '00-0000020',
+    position: 'WR',
+    team: 'SEA',
+    game: games[3]!,
+    history: receiver,
+  };
+  const params = { playChance: 0.7, whenPlaying: 0.85 };
+  const plain = projectFantasyPoints(halfPpr, input, context, propModelSettings)!;
+  const listed = projectFantasyPoints(
+    halfPpr,
+    input,
+    context,
+    propModelSettings,
+    undefined,
+    0,
+    undefined,
+    params,
+  )!;
+  expect(plain.playChance).toBeUndefined();
+  expect(listed.playChance).toBe(0.7);
+  expect(listed.points).toBeCloseTo(plain.points * 0.85, 1);
+  expect(listed.stats.receptions! / plain.stats.receptions!).toBeCloseTo(0.85);
+  // A different week is not affected.
+  const nextWeek = projectFantasyPoints(
+    halfPpr,
+    { ...input, game: game(5) },
+    context,
+    propModelSettings,
+    undefined,
+    0,
+    undefined,
+    params,
+  );
+  expect(nextWeek?.playChance).toBeUndefined();
+});
+
+it('counts the chance a starter sits in win probability', () => {
+  const spreads = { WR: { sdIntercept: 2, sdSlope: 0.5, low: -1.2, high: 1.3 } };
+  const side = (estimate: number, playChance?: number) => ({
+    settled: 0,
+    remaining: [{ position: 'WR', estimate, ...(playChance !== undefined ? { playChance } : {}) }],
+  });
+  const sure = matchupWinProbability([side(12), side(10)], spreads, 1)!;
+  const doubtful = matchupWinProbability([side(12, 0.7), side(10)], spreads, 1)!;
+  // 0.7 × 12 = 8.4 expected against 10: now the underdog.
+  expect(sure).toBeGreaterThan(0.5);
+  expect(doubtful).toBeLessThan(0.5);
+  expect(matchupWinProbability([side(10, 1), side(10)], spreads, 1)).toBe(0.5);
 });

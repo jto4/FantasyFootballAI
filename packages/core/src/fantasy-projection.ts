@@ -21,6 +21,8 @@ export interface UsageInput {
   ruledOut?: Set<string>;
   /** Forecast wind at kickoff by game ID (outdoor venues only; issued about 48 hours ahead). */
   windKph?: Map<string, number>;
+  /** `season:week:playerId` for players listed Questionable on that week's injury report. */
+  questionable?: Set<string>;
 }
 
 /** Offense loses `windCoefficient` of its projection per 10 km/h of wind above the threshold. */
@@ -64,6 +66,29 @@ export function ruledOutKeys(
   return keys;
 }
 
+/** Keys for players listed Questionable, from the same nflverse injury report rows. */
+export function questionableKeys(
+  rows: {
+    gsisId?: string;
+    season: number;
+    week: number;
+    seasonType?: string;
+    reportStatus: string;
+  }[],
+): Set<string> {
+  const keys = new Set<string>();
+  for (const row of rows)
+    if (row.gsisId && row.seasonType !== 'POST' && /^questionable$/i.test(row.reportStatus.trim()))
+      keys.add(`${row.season}:${row.week}:${row.gsisId}`);
+  return keys;
+}
+
+/** Questionable players: how often they play, and how much of their projection they score then. */
+export interface QuestionableParams {
+  playChance: number;
+  whenPlaying: number;
+}
+
 /** Settings for kicker and D/ST projections, fitted offline like the stat models. */
 export interface SpecialTeamsParams {
   /** Games until a past game counts half as much. */
@@ -86,6 +111,7 @@ export interface ProjectionContext {
   depth: Map<string, DepthEntry[]>;
   ruledOut: Set<string>;
   windKph: Map<string, number>;
+  questionable: Set<string>;
   /** Projected stats per player and game, reused while this data snapshot lasts. */
   memo: Map<
     string,
@@ -117,6 +143,7 @@ export function projectionContext(
     byTeamGame,
     depth: usage?.depth ?? new Map(),
     ruledOut: usage?.ruledOut ?? new Set<string>(),
+    questionable: usage?.questionable ?? new Set<string>(),
     windKph: usage?.windKph ?? new Map<string, number>(),
     memo: new Map(),
   };
@@ -233,6 +260,8 @@ export function projectFantasyPoints(
   /** Running backs: exponent on 1 / (1 − vacated carry share); 0 turns the adjustment off. */
   vacatedCarryExponent = 0,
   weather?: WeatherParams,
+  /** Discount for players listed Questionable; off when absent. */
+  questionable?: QuestionableParams,
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
@@ -271,10 +300,16 @@ export function projectFantasyPoints(
   // Wind was fitted on the scored total; league scoring is linear in the stats, so scaling every
   // stat gives the same total and keeps the stat lines consistent with it.
   const wind = windFactor(context, input.game, weather);
-  if (wind !== 1)
+  // Questionable players who play score less than usual (fitted on 2025, checked on 2026); the
+  // chance they sit is returned separately so the shown projection stays "if he plays".
+  const listed =
+    questionable !== undefined &&
+    context.questionable.has(`${input.game.season}:${input.game.week}:${input.playerId}`);
+  const factor = wind * (listed ? questionable.whenPlaying : 1);
+  if (factor !== 1)
     for (const key of Object.keys(projected.stats) as FootballStatKey[]) {
       const value = projected.stats[key];
-      if (value !== undefined) projected.stats[key] = value * wind;
+      if (value !== undefined) projected.stats[key] = value * factor;
     }
   // Stats the model does not project (first downs, bonuses) leave scoring unsupported, not zero.
   const scored = scoreHistoricalGame(scoring, {
@@ -297,6 +332,7 @@ export function projectFantasyPoints(
         sampleGames: projected.sampleGames,
         vacatedCarryShare: vacated,
         windFactor: wind,
+        ...(listed ? { playChance: questionable.playChance } : {}),
       };
 }
 
@@ -379,6 +415,13 @@ export function projectionRange(
   };
 }
 
+/** A starter yet to play: projection if he plays, and the chance he plays when below 1. */
+export interface MatchupStarter {
+  position: string;
+  estimate?: number;
+  playChance?: number;
+}
+
 /**
  * Chance one side outscores the other, treating each remaining starter's result as independent
  * with the fitted spread (summed variance scaled up for correlation) and settled points as fixed.
@@ -386,8 +429,8 @@ export function projectionRange(
  */
 export function matchupWinProbability(
   sides: [
-    { settled: number; remaining: { position: string; estimate?: number }[] },
-    { settled: number; remaining: { position: string; estimate?: number }[] },
+    { settled: number; remaining: MatchupStarter[] },
+    { settled: number; remaining: MatchupStarter[] },
   ],
   spreads: Partial<Record<string, OutcomeSpread>>,
   varianceScale: number,
@@ -401,8 +444,11 @@ export function matchupWinProbability(
       if (starter.estimate === undefined) return undefined;
       const range = projectionRange(starter.position, starter.estimate, spreads);
       if (!range) return undefined;
-      mean += sign * starter.estimate;
-      variance += range.sd ** 2;
+      // A player who may sit is a mix of zero and his projection: mean pμ, variance
+      // pσ² + p(1 − p)μ².
+      const p = starter.playChance ?? 1;
+      mean += sign * p * starter.estimate;
+      variance += p * range.sd ** 2 + p * (1 - p) * starter.estimate ** 2;
     }
   }
   if (variance === 0) return mean > 0 ? 1 : mean < 0 ? 0 : 0.5;

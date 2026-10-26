@@ -27,6 +27,15 @@ function Estimate({ starter }: { starter: MatchupSide['starters'][number] }) {
           {starter.range.low.toFixed(0)}–{starter.range.high.toFixed(0)}
         </span>
       )}
+      {starter.playChance !== undefined && (
+        <span
+          className="matchup-range matchup-questionable"
+          title="Listed Questionable: the estimate is if he plays; the team total counts the chance he sits"
+        >
+          {' '}
+          Q · {Math.round(starter.playChance * 100)}% to play
+        </span>
+      )}
     </>
   );
 }

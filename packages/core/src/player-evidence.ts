@@ -31,6 +31,7 @@ import {
 import {
   fantasyModelWeight,
   fantasyOutcomeSpread,
+  questionableSettings,
   specialTeamsSettings,
   vacatedCarryExponent,
   weatherSettings,
@@ -66,6 +67,7 @@ const isEspnProjection = (row: PlayerProjection) =>
 export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvidence[] {
   const windOn = input.preferences?.projectionAdjustments?.wind !== false;
   const carriesOn = input.preferences?.projectionAdjustments?.vacatedCarries !== false;
+  const questionableOn = input.preferences?.projectionAdjustments?.questionable !== false;
   const forecast =
     input.scope === 'week' ? undefined : prepareFantasyForecast(input.league, input.data, input);
   const history = historicalPlayerGames(input.data, input);
@@ -350,6 +352,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               propUsageNorms,
               carriesOn ? vacatedCarryExponent : 0,
               windOn ? weatherSettings : undefined,
+              questionableOn ? questionableSettings : undefined,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -487,7 +490,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
           metric(id, label, value, 'points/week', {
             sourceIds: evidence.projectionSourceIds,
             description:
-              'Spread of past results around projections like this one, fitted on 2025 and checked on 2026 (70–85% of results landed inside, by position).',
+              'Spread of past results around projections like this one, fitted on 2025 with widths checked against 2026 (about 80% of results landed inside; quarterbacks a little more).',
           });
       const ownStats =
         'stats' in own ? (own.stats as Partial<Record<FootballStatKey, number>>) : {};
@@ -521,6 +524,20 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               'Forecast wind at kickoff (issued about 48 hours ahead, outdoor stadiums only) lowers offensive and kicker projections, about 10% per 10 km/h above 10 km/h (fitted on 2025, checked on 2026).',
           },
         );
+      const playChance = (own as { playChance?: number }).playChance;
+      if (playChance !== undefined && playChance < 1) {
+        evidence.playChance = playChance;
+        metric(
+          'play-chance',
+          'Chance he plays (listed Questionable)',
+          Math.round(playChance * 100),
+          'percent',
+          {
+            sourceIds: evidence.projectionSourceIds,
+            description: `Questionable players played ${Math.round(playChance * 100)}% of the time in 2025 and scored about ${Math.round((1 - questionableSettings.whenPlaying) * 100)}% under their projection when they did; the projection includes that, and lineups and win chance also count the chance he sits (fitted on 2025, checked on 2026).`,
+          },
+        );
+      }
       const vacated = (own as { vacatedCarryShare?: number }).vacatedCarryShare ?? 0;
       if (vacated)
         metric(
@@ -535,7 +552,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
           },
         );
       evidence.warnings.push(
-        'Sidekick projections assume the player is active. Running backs get extra carries when a teammate back is listed Out or Doubtful, and forecast wind is applied inside 36 hours of kickoff; other injuries, late role changes and weather news after the last data refresh are not included.',
+        'Sidekick projections are for a player who plays. Players listed Questionable are discounted and counted at their chance of playing in lineups; running backs get extra carries when a teammate back is listed Out or Doubtful, and forecast wind is applied inside 36 hours of kickoff. Late role changes and news after the last data refresh are not included.',
       );
     } else if (input.scope !== 'week') {
       const estimate = forecast?.(

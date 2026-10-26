@@ -10,6 +10,8 @@ export interface LiveStarterInput {
   position: string;
   nflTeam?: string;
   estimate?: number;
+  /** Chance he plays, when listed Questionable; counted until his game starts. */
+  playChance?: number;
   /** Points so far from the NFL box score under this league's rules; set once a game starts. */
   livePoints?: number;
 }
@@ -82,9 +84,12 @@ export function liveMatchup(
       if (state === 'pre' || state === 'unknown') {
         if (starter.estimate === undefined) unknownRemaining = true;
         else {
-          remaining += starter.estimate;
+          const p = starter.playChance ?? 1;
+          remaining += p * starter.estimate;
           const range = projectionRange(starter.position, starter.estimate, fantasyOutcomeSpread);
-          variance += matchupVarianceScale * (range?.sd ?? 0.45 * starter.estimate) ** 2;
+          const sd = range?.sd ?? 0.45 * starter.estimate;
+          // A mix of zero and the estimate (see matchupWinProbability).
+          variance += matchupVarianceScale * (p * sd ** 2 + p * (1 - p) * starter.estimate ** 2);
         }
       }
       return { ...starter, state, ...(game?.detail ? { detail: game.detail } : {}) };

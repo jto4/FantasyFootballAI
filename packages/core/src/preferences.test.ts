@@ -150,3 +150,16 @@ it('accepts league format choices only for connected leagues', async () => {
   const pruned = prunePreferences({ leagueFormats: { kept: 'keeper', gone: 'dynasty' } }, leagues);
   expect(pruned?.leagueFormats).toEqual({ kept: 'keeper' });
 });
+
+it('accepts the Questionable switch and treats it as a projection change', async () => {
+  const { hasProjectionChanges } = await import('./preferences.js');
+  const off = { projectionAdjustments: { questionable: false } };
+  expect(isValidPreferences(off, new Set())).toBe(true);
+  expect(isValidPreferences({ projectionAdjustments: { questionable: 'no' } }, new Set())).toBe(
+    false,
+  );
+  expect(hasProjectionChanges(off, 'league')).toBe(true);
+  expect(hasProjectionChanges({ projectionAdjustments: { questionable: true } }, 'league')).toBe(
+    false,
+  );
+});

@@ -79,3 +79,20 @@ it('totals box-score points when the platform has no score, and only when every 
   expect(live.opponent.points).toBeUndefined();
   expect(live.winChance).toBeUndefined();
 });
+
+it('counts a Questionable starter at his chance to play until his game starts', () => {
+  const live = liveMatchup(
+    {
+      you: {
+        teamId: 'a',
+        name: 'A',
+        points: 0,
+        starters: [{ ...starters('y', ['TEN'])[0]!, playChance: 0.5 }],
+      },
+      opponent: { teamId: 'b', name: 'B', points: 0, starters: starters('o', ['CLE'], 6) },
+    },
+    games,
+  );
+  expect(live.you.projectedFinal).toBe(5);
+  expect(live.winChance).toBeLessThan(0.5);
+});

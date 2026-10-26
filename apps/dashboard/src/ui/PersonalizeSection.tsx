@@ -628,6 +628,19 @@ export function PersonalizeSection({
             />{' '}
             Give running backs carries when a teammate back is ruled out
           </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={preferences.projectionAdjustments?.questionable !== false}
+              onChange={(event) =>
+                set('projectionAdjustments', {
+                  ...preferences.projectionAdjustments,
+                  questionable: event.target.checked,
+                })
+              }
+            />{' '}
+            Discount players listed Questionable and count the chance they sit
+          </label>
         </div>
       </section>
 

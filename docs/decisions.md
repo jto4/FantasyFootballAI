@@ -663,3 +663,32 @@ keeper cost assumes the round a player was drafted in this year (rules vary; the
 The rookie plan assumes reverse-standings order and a room that drafts by value, since traded
 picks are not read. Player ages and draft slots come from the nflverse players file through the
 download cache, kept as a compact list.
+
+## Questionable players and refit ranges (October 26, 2026)
+
+**Questionable discount.** Players listed Questionable on the NFL injury report (nflverse, the
+feed already used for Out/Doubtful) now get two adjustments, fitted on 2025 and tested on 2026
+by `scripts/research/fantasy-projection-backtest.mjs`
+(`docs/research/2026-10-26-fantasy-projection-backtest.json`):
+
+- **If he plays**, the projection is multiplied by 0.85 (least squares on 2025's 189 listed
+  players who averaged 5+ points). On the 46 who played in 2026, RMSE fell from 5.64 to 5.31 and
+  mean absolute error from 4.62 to 4.20.
+- **Chance he plays**: 68% in 2025 (63% so far in 2026). The shown projection stays "if he
+  plays"; lineups, team totals and win chance count projection × chance, and win chance adds the
+  extra variance of a player who may score zero (pσ² + p(1 − p)μ²). Counting sit-outs as zero,
+  2026 error on listed players fell from 6.29 to 4.97.
+
+Home's matchup shows "Q · 68% to play" next to the player. Personalize can switch the discount
+off, which, like the other switches, keeps recorded predictions on the unadjusted model. The 2025
+fits that depend on projections (wind, ranges) were refit with the discount applied; wind moved
+from −10% to −9% per 10 km/h and is still adopted on 2026.
+
+**Ranges.** Three fits per position were compared on 2026 weeks 5+ (seen by none): the 2025
+fit, a refit on 2025 plus 2026 weeks 1–4, and the 2025 shape with its width set on 2026 weeks
+1–4. A change had to move coverage at least a point closer to 80%. Adopted, then rebuilt with all
+of 2026: width from 2026 for TE (70% → 79% on the held-out weeks), WR (78% → 81%) and D/ST
+(86% → 81%). QB (88%), RB (79%) and K (77%) keep the 2025 fit; no candidate narrowed QB ranges.
+Win-probability Brier on 2026 weeks 5+: 0.233 against 0.25 for a coin flip, with the variance
+scale still 1.4. Mean absolute error over all 2026 skill-player games: 5.39 (8-game average
+5.66).

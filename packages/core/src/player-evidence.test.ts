@@ -1,3 +1,4 @@
+import { questionableSettings } from './fantasy-projection-settings.js';
 import { expect, it } from 'vitest';
 import type { LeagueConnection, PlayerProjection, RosterPlayer } from './domain-types.js';
 import type { FootballDataSnapshot, FootballGame, PlayerGameStats } from './advice-types.js';
@@ -255,7 +256,33 @@ it('projects the week with the app’s own model, with supporting sample/workloa
     sourceIds: ['market-add'],
   });
   expect(evidence.metrics.find((metric) => metric.id.endsWith(':market-drops'))).toBeUndefined();
-  expect(evidence.warnings.join(' ')).toContain('assume the player is active');
+  expect(evidence.warnings.join(' ')).toContain('for a player who plays');
+  expect(evidence.playChance).toBeUndefined();
+});
+
+it('discounts a player listed Questionable and records his chance to play, unless switched off', () => {
+  const usage = {
+    snaps: new Map<string, number>(),
+    depth: new Map(),
+    questionable: new Set(['2026:5:gsis-1']),
+  };
+  const healthy = buildPlayerEvidence(input)[0]!;
+  const listed = buildPlayerEvidence({ ...input, usage })[0]!;
+  expect(listed.playChance).toBe(questionableSettings.playChance);
+  expect(listed.projectedPoints! / healthy.projectedPoints!).toBeCloseTo(
+    questionableSettings.whenPlaying,
+    2,
+  );
+  expect(listed.metrics.find((m) => m.id.endsWith(':play-chance'))?.value).toBe(
+    Math.round(questionableSettings.playChance * 100),
+  );
+  const off = buildPlayerEvidence({
+    ...input,
+    usage,
+    preferences: { projectionAdjustments: { questionable: false } },
+  })[0]!;
+  expect(off.playChance).toBeUndefined();
+  expect(off.projectedPoints).toBeCloseTo(healthy.projectedPoints!, 5);
 });
 
 it('applies an owner nudge to the decision value while the model metric keeps its own number', () => {

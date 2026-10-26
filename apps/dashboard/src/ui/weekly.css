@@ -328,6 +328,10 @@ p.weekly-answer {
   font-size: 12px;
   white-space: nowrap;
 }
+.matchup-questionable {
+  display: block;
+  color: var(--warning);
+}
 .matchup-lineups th:nth-child(n + 2):nth-child(-n + 3),
 .matchup-estimate {
   min-width: 56px;

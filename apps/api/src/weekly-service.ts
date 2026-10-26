@@ -114,6 +114,8 @@ export interface MatchupSide {
     name: string;
     position: string;
     estimate?: number;
+    /** Chance he plays, when listed Questionable; team totals count estimate × playChance. */
+    playChance?: number;
     /** 10th–90th percentile of past results around estimates like this one. */
     range?: { low: number; high: number };
     started?: boolean;
@@ -346,6 +348,7 @@ export function createWeeklyService(
       const players = lineup.map((id) => {
         const player = byId.get(id) ?? allRostered.get(id);
         const estimate = week === leagueWeek ? byId.get(id)?.projectedPoints : undefined;
+        const playChance = week === leagueWeek ? byId.get(id)?.playChance : undefined;
         // An estimate withheld because the game has begun means the player's points are already in
         // the team score.
         const started =
@@ -360,6 +363,7 @@ export function createWeeklyService(
           name: player?.name ?? 'Unknown player',
           position,
           ...(estimate !== undefined ? { estimate } : {}),
+          ...(playChance !== undefined && estimate !== undefined ? { playChance } : {}),
           ...(range ? { range: { low: range.low, high: range.high } } : {}),
           ...(started ? { started: true } : {}),
         };
@@ -378,7 +382,8 @@ export function createWeeklyService(
         players.length &&
         remaining.every((p) => p.estimate !== undefined) &&
         (!anyStarted || entry.points !== undefined)
-          ? (anyStarted ? entry.points! : 0) + remaining.reduce((sum, p) => sum + p.estimate!, 0)
+          ? (anyStarted ? entry.points! : 0) +
+            remaining.reduce((sum, p) => sum + p.estimate! * (p.playChance ?? 1), 0)
           : undefined;
       return {
         teamId: entry.teamId,

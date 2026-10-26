@@ -1,4 +1,5 @@
 import {
+  questionableKeys,
   ruledOutKeys,
   type FootballGame,
   type LineupStrategy,
@@ -12,7 +13,7 @@ import type {
 } from '@sidekick/integrations';
 
 /**
- * Snap counts, depth charts, the week's Out/Doubtful list and forecast wind for the projection
+ * Snap counts, depth charts, the week's Out/Doubtful and Questionable lists and forecast wind for the projection
  * model. Each part is optional; projections still work without them. The merged object is reused
  * while its inputs are unchanged so the model's per-snapshot cache keeps hitting.
  */
@@ -37,7 +38,9 @@ export function projectionUsage(deps: {
     if (hit?.key === key) return hit.value;
     const value = {
       ...base,
-      ...(hasInjuries ? { ruledOut: ruledOutKeys(injury!.rows) } : {}),
+      ...(hasInjuries
+        ? { ruledOut: ruledOutKeys(injury!.rows), questionable: questionableKeys(injury!.rows) }
+        : {}),
       ...(wind?.size ? { windKph: wind } : {}),
     };
     merged.set(base, { key, value });

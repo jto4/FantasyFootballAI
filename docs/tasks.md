@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 26 (model): Questionable players discounted when they play and counted at their chance
+  to play in lineups and win chance (fitted on 2025, checked on 2026); TE, WR and D/ST ranges
+  widened or narrowed to cover 80% on held-out 2026 weeks.
 - October 26 (dynasty): redraft, keeper and dynasty detection with an owner override; long-term
   values from backtested age curves, rookie draft slots and pick values; Dynasty page with a
   trade calculator, rookie board and draft plan, taxi and keeper help; Ask lookup.

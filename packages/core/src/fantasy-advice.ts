@@ -12,6 +12,7 @@ import type {
 } from './advice-types.js';
 import {
   adviceConfidence,
+  expectedPoints,
   optimizeLineup,
   playerNameKey,
   keptStarterIds,
@@ -775,7 +776,7 @@ function strategyLineup(
       roster,
       slots,
       locked,
-      (player) => (player.projectedPoints ?? 0) + k * sd(player),
+      (player) => (expectedPoints(player) ?? 0) + k * sd(player),
     );
   if (strategy === 'safe') return weighted(-0.5);
   if (strategy === 'upside') return weighted(0.5);
@@ -792,6 +793,7 @@ function strategyLineup(
     remaining: opponentStarters.map((p) => ({
       position: p!.position,
       estimate: p!.projectedPoints!,
+      ...(p!.playChance !== undefined ? { playChance: p!.playChance } : {}),
     })),
   };
   let best: { lineup: ReturnType<typeof optimizeLineup>; chance: number } | undefined;
@@ -802,10 +804,17 @@ function strategyLineup(
       [
         {
           settled: 0,
-          remaining: lineup.assignments.map((a) => ({
-            position: byId.get(a.playerId)?.position ?? '',
-            estimate: a.points,
-          })),
+          remaining: lineup.assignments.map((a) => {
+            const player = byId.get(a.playerId);
+            // Assignments carry expected points; win chance wants the if-he-plays projection.
+            return a.locked || player?.playChance === undefined
+              ? { position: player?.position ?? '', estimate: a.points }
+              : {
+                  position: player.position,
+                  estimate: player.projectedPoints!,
+                  playChance: player.playChance,
+                };
+          }),
         },
         opponentSide,
       ],

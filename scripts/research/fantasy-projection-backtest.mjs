@@ -25,6 +25,7 @@ import {
   projectionContext,
   propModelSettings,
   ruledOutKeys,
+  questionableKeys,
   propUsageNorms,
   scoreHistoricalGame,
   snapKey,
@@ -47,12 +48,13 @@ for (const season of [2024, 2025, 2026]) {
   ))
     depth.set(id, [...(depth.get(id) ?? []), ...entries]);
 }
-const ruledOut = new Set();
-for (const season of [2025, 2026])
-  for (const key of ruledOutKeys(
-    parseNFLInjuryReports(readFileSync(join(usageDir, `inj${season}.csv`), 'utf8'), season),
-  ))
-    ruledOut.add(key);
+const injuryRows = [2025, 2026].flatMap((season) =>
+  parseNFLInjuryReports(readFileSync(join(usageDir, `inj${season}.csv`), 'utf8'), season),
+);
+const ruledOut = ruledOutKeys(injuryRows);
+// Questionable players are left out of the context so projections here stay undiscounted; the
+// discount is fitted below and applied explicitly.
+const questionable = questionableKeys(injuryRows);
 // Forecast wind issued about 48 hours before each 2025–2026 game at fixed outdoor venues (the
 // archive the betting model uses), so no game's own weather leaks into its projection.
 const windKph = new Map();
@@ -177,6 +179,9 @@ function evaluate(league, name) {
       weather,
     );
     if (actual === undefined || !ours) continue;
+    // As in the app: Questionable players who play are discounted.
+    if (questionable.has(`${row.season}:${row.week}:${row.playerId}`))
+      ours.points *= questionableResult.settings.whenPlaying;
     const f = espn.get(`${row.week}:${playerNameKey(row.name)}:${nflTeamKey(row.team)}`);
     const espnPoints = f ? score(league, { ...row, stats: { ...zeros, ...f.stats } }) : undefined;
     cases.push({
@@ -436,6 +441,9 @@ function outcomeSpread() {
       )?.points;
     } else continue;
     const actual = score(pos === 'K' ? halfPpr : afton, row);
+    // Production discounts Questionable players who play, so the spread is fitted around that.
+    if (projected !== undefined && questionable.has(`${row.season}:${row.week}:${row.playerId}`))
+      projected *= questionableResult.settings.whenPlaying;
     if (projected !== undefined && actual !== undefined)
       cases.push({ pos, season: row.season, week: row.week, game, projected, actual });
   }
@@ -482,10 +490,12 @@ function outcomeSpread() {
   const spread = {};
   const report = {};
   const r = (x, d = 3) => Math.round(x * 10 ** d) / 10 ** d;
-  for (const pos of ['QB', 'RB', 'WR', 'TE', 'K', 'DST']) {
-    const train = cases.filter((c) => c.pos === pos && c.season === 2025);
-    const test = cases.filter((c) => c.pos === pos && c.season === 2026);
-    if (train.length < 50) continue;
+  // Ranges: three candidates per position, judged on 2026 weeks 5+ (which none of them saw):
+  // the 2025 fit; a refit on 2025 plus 2026 weeks 1–4; and the 2025 shape with its width set on
+  // 2026 weeks 1–4. The winner is then rebuilt with all of 2026. Each fit is SD = a + b ×
+  // projection by least squares on |error|·√(π/2), with the 10th/90th percentiles of the
+  // standardized error.
+  const fitSpread = (train) => {
     const xs = train.map((c) => c.projected);
     const ys = train.map((c) => Math.abs(c.actual - c.projected) * Math.sqrt(Math.PI / 2));
     const mx = xs.reduce((a, b) => a + b, 0) / xs.length;
@@ -501,30 +511,80 @@ function outcomeSpread() {
     const sd = (p) => Math.max(1, intercept + slope * p);
     const z = train.map((c) => (c.actual - c.projected) / sd(c.projected)).sort((a, b) => a - b);
     const q = (p) => z[Math.round(p * (z.length - 1))];
-    spread[pos] = {
-      sdIntercept: r(intercept),
-      sdSlope: r(slope, 4),
-      low: r(q(0.1)),
-      high: r(q(0.9)),
+    return { sdIntercept: r(intercept), sdSlope: r(slope, 4), low: r(q(0.1)), high: r(q(0.9)) };
+  };
+  const coverage = (fit, list) => {
+    const sd = (p) => Math.max(1, fit.sdIntercept + fit.sdSlope * p);
+    return r(
+      list.filter(
+        (c) =>
+          c.actual >= c.projected + fit.low * sd(c.projected) &&
+          c.actual <= c.projected + fit.high * sd(c.projected),
+      ).length / list.length,
+    );
+  };
+  for (const pos of ['QB', 'RB', 'WR', 'TE', 'K', 'DST']) {
+    const of = (season, test) =>
+      cases.filter((c) => c.pos === pos && c.season === season && test(c.week));
+    const train2025 = of(2025, () => true);
+    if (train2025.length < 50) continue;
+    const early2026 = of(2026, (w) => w <= 4);
+    const late2026 = of(2026, (w) => w >= 5);
+    // Width: the 2025 shape scaled so it covers 80% of the given 2026 games.
+    const widen = (fit, list) => {
+      let best = 1;
+      for (let m = 0.6; m <= 1.6001; m += 0.02)
+        if (
+          Math.abs(coverage({ ...fit, low: fit.low * m, high: fit.high * m }, list) - 0.8) <
+          Math.abs(coverage({ ...fit, low: fit.low * best, high: fit.high * best }, list) - 0.8)
+        )
+          best = m;
+      return { ...fit, low: r(fit.low * best), high: r(fit.high * best) };
     };
-    const covered = test.filter(
-      (c) =>
-        c.actual >= c.projected + spread[pos].low * sd(c.projected) &&
-        c.actual <= c.projected + spread[pos].high * sd(c.projected),
-    ).length;
+    const only2025 = fitSpread(train2025);
+    const candidates = {
+      '2025 only': [only2025, () => only2025],
+      'refit on 2025 and 2026': [
+        fitSpread([...train2025, ...early2026]),
+        () => fitSpread([...train2025, ...of(2026, () => true)]),
+      ],
+      '2025 shape, width set on 2026': [
+        widen(only2025, early2026),
+        () =>
+          widen(
+            only2025,
+            of(2026, () => true),
+          ),
+      ],
+    };
+    const distance = (fit) => Math.abs(coverage(fit, late2026) - 0.8);
+    // A change must beat the 2025 fit on the held-out weeks by at least a point of coverage.
+    let chosen = '2025 only';
+    for (const [name, [fit]] of Object.entries(candidates))
+      if (distance(fit) < distance(candidates[chosen][0]) - 0.01) chosen = name;
+    spread[pos] = candidates[chosen][1]();
     report[pos] = {
-      train: train.length,
-      test: test.length,
-      rangeCoverage2026: r(covered / test.length),
+      train2025: train2025.length,
+      test2026Weeks5Plus: late2026.length,
+      coverageWeeks5Plus: Object.fromEntries(
+        Object.entries(candidates).map(([name, [fit]]) => [name, coverage(fit, late2026)]),
+      ),
+      adopted: chosen,
+      coverage2026: coverage(
+        spread[pos],
+        of(2026, () => true),
+      ),
     };
   }
   // Win probability on random lineup pairs (QB, 3 RB, 2 WR, TE, D/ST) from the same week.
   const phi = (x) => 0.5 * (1 + erf(x / Math.SQRT2));
   let seed = 7;
   const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-  const pairs = (season) => {
+  const pairs = (season, fromWeek = 1) => {
     const out = [];
-    const weeks = [...new Set(cases.filter((c) => c.season === season).map((c) => c.week))];
+    const weeks = [
+      ...new Set(cases.filter((c) => c.season === season && c.week >= fromWeek).map((c) => c.week)),
+    ];
     for (const week of weeks) {
       const pool = Object.fromEntries(
         ['QB', 'RB', 'WR', 'TE', 'DST'].map((p) => [
@@ -571,8 +631,9 @@ function outcomeSpread() {
   const brier = (list, k) =>
     list.reduce((s, c) => s + (phi(c.mean / Math.sqrt(k * c.variance)) - c.won) ** 2, 0) /
     list.length;
+  // Tested on 2026 weeks 5+, which no range fit saw.
   const train = pairs(2025),
-    test = pairs(2026);
+    test = pairs(2026, 5);
   let varianceScale = 1;
   for (const k of [0.8, 0.9, 1, 1.1, 1.2, 1.4, 1.6])
     if (brier(train, k) < brier(train, varianceScale)) varianceScale = k;
@@ -622,12 +683,95 @@ function erf(x) {
       Math.exp(-x * x);
   return sign * y;
 }
+// Questionable players (nflverse injury report): the share who play, and a multiplier on the
+// projection for those who do (least squares through the origin). Fitted on 2025; the multiplier
+// is adopted only if it also lowers RMSE on 2026 Questionable players who played.
+function questionableFit(league) {
+  const cases = [];
+  const seen = new Set();
+  for (const injury of injuryRows) {
+    const key = `${injury.season}:${injury.week}:${injury.gsisId}`;
+    if (!questionable.has(key) || seen.has(key) || injury.seasonType === 'POST') continue;
+    seen.add(key);
+    const pos = footballPosition(injury.position);
+    if (!['QB', 'RB', 'WR', 'TE'].includes(pos)) continue;
+    const history = context.byPlayer.get(injury.gsisId) ?? [];
+    const at = injury.season * 100 + injury.week;
+    const prior = history.filter((h) => order(h) < at).sort((a, b) => order(b) - order(a));
+    if (prior.length < 3) continue;
+    const recent = prior
+      .slice(0, 8)
+      .map((h) => score(league, h))
+      .filter((p) => p !== undefined);
+    if (!(recent.reduce((a, b) => a + b, 0) / recent.length >= 5)) continue;
+    const team = nflTeamKey(injury.team);
+    const game = [...context.league.games.values()].find(
+      (g) =>
+        g.season === injury.season &&
+        g.week === injury.week &&
+        g.seasonType === 'REG' &&
+        [g.home, g.away].map(nflTeamKey).includes(team),
+    );
+    if (!game) continue;
+    const row = history.find((h) => h.gameId === game.id);
+    // No stats row in a game his team played counts as not playing (snap-only games are rare
+    // for players averaging five or more points).
+    if (!row && !data.players.some((r) => r.gameId === game.id)) continue;
+    const projected = projectFantasyPoints(
+      league,
+      { playerId: injury.gsisId, position: pos, team: injury.team, game, history },
+      context,
+      propModelSettings,
+      propUsageNorms,
+      vacated.exponent,
+    )?.points;
+    const actual = row ? score(league, row) : 0;
+    if (projected === undefined || actual === undefined) continue;
+    cases.push({ season: injury.season, pos, played: Boolean(row), projected, actual });
+  }
+  const r = (x, d = 3) => Math.round(x * 10 ** d) / 10 ** d;
+  const train = cases.filter((c) => c.season === 2025);
+  const test = cases.filter((c) => c.season === 2026);
+  const playedTrain = train.filter((c) => c.played);
+  const playedTest = test.filter((c) => c.played);
+  const k =
+    playedTrain.reduce((s, c) => s + c.actual * c.projected, 0) /
+    playedTrain.reduce((s, c) => s + c.projected ** 2, 0);
+  const rmse = (list, m) =>
+    Math.sqrt(list.reduce((s, c) => s + (c.actual - m * c.projected) ** 2, 0) / list.length);
+  const mae = (list, m) =>
+    list.reduce((s, c) => s + Math.abs(c.actual - m * c.projected), 0) / list.length;
+  const adopted = playedTest.length && rmse(playedTest, k) < rmse(playedTest, 1) ? k : 1;
+  const playChance = playedTrain.length / train.length;
+  return {
+    settings: { playChance: r(playChance), whenPlaying: r(adopted) },
+    report: {
+      train: train.length,
+      test: test.length,
+      playChance: { fitted2025: r(playChance), observed2026: r(playedTest.length / test.length) },
+      whenPlaying: { fitted2025: r(k), adopted: r(adopted) },
+      playedTest2026: {
+        n: playedTest.length,
+        rmse: { discounted: r(rmse(playedTest, k)), undiscounted: r(rmse(playedTest, 1)) },
+        mae: { discounted: r(mae(playedTest, k)), undiscounted: r(mae(playedTest, 1)) },
+      },
+      // Expected points with sitting out counted as zero, every 2026 Questionable player.
+      expectedTest2026: {
+        mae: {
+          expected: r(mae(test, adopted * playChance)),
+          undiscounted: r(mae(test, 1)),
+        },
+      },
+    },
+  };
+}
 const specialTeamsDefaults = {
   K: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
   DST: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
 };
 
 const vacated = vacatedCarries(afton);
+const questionableResult = questionableFit(afton);
 const special = specialTeams(halfPpr);
 const outcomes = outcomeSpread();
 const weather = outcomes.wind;
@@ -639,6 +783,7 @@ const result = {
   specialTeams: { halfPpr: special.report, afton: aftonSpecial.report },
   vacatedCarries: { afton: vacated },
   outcomeSpread: outcomes.report,
+  questionable: questionableResult.report,
 };
 console.log(JSON.stringify(result, null, 2));
 if (outFile && !outFile.startsWith('--')) writeFileSync(outFile, JSON.stringify(result, null, 2));
@@ -646,7 +791,7 @@ if (process.argv.includes('--emit'))
   writeFileSync(
     'packages/core/src/fantasy-projection-settings.ts',
     `// Generated by scripts/research/fantasy-projection-backtest.mjs --emit; see docs/decisions.md.\n` +
-      `import type {\n  OutcomeSpread,\n  SpecialTeamsParams,\n  WeatherParams,\n} from './fantasy-projection.js';\n\n` +
+      `import type {\n  OutcomeSpread,\n  QuestionableParams,\n  SpecialTeamsParams,\n  WeatherParams,\n} from './fantasy-projection.js';\n\n` +
       `/** Weight on the stat model versus the player's recent fantasy average, by position. */\n` +
       `export const fantasyModelWeight: Record<'QB' | 'RB' | 'WR' | 'TE', number> = ${JSON.stringify(
         Object.fromEntries(
@@ -657,6 +802,8 @@ if (process.argv.includes('--emit'))
       `export const vacatedCarryExponent = ${vacated.exponent};\n\n` +
       `/** Error SD = sdIntercept + sdSlope × projection; low/high are 10th/90th standardized errors. */\n` +
       `export const fantasyOutcomeSpread: Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST', OutcomeSpread> = ${JSON.stringify(outcomes.spread, null, 2)};\n\n` +
+      `/** Questionable on the NFL injury report: chance of playing, and the projection multiplier when he plays. */\n` +
+      `export const questionableSettings: QuestionableParams = ${JSON.stringify(questionableResult.settings)};\n\n` +
       `/** Forecast wind effect on QB/RB/WR/TE/K projections; a coefficient of 0 means off. */\n` +
       `export const weatherSettings: WeatherParams = ${JSON.stringify(outcomes.wind)};\n\n` +
       `/** Inflates summed lineup variance for win probability (fitted on random 2025 lineup pairs). */\n` +

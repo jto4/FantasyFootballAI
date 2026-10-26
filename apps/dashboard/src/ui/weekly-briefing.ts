@@ -33,6 +33,8 @@ export type MatchupSide = {
     name: string;
     position: string;
     estimate?: number;
+    /** Chance he plays, when listed Questionable; team totals count estimate × playChance. */
+    playChance?: number;
     /** 10th–90th percentile of past results around estimates like this one. */
     range?: { low: number; high: number };
     started?: boolean;

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { projectionUsage } from './projection-usage.js';
 
-it('adds the week’s Out/Doubtful list to usage data and reuses the merged object', async () => {
+it('adds the week’s Out/Doubtful and Questionable lists to usage data and reuses the merged object', async () => {
   const usage = { snaps: new Map([['x', 0.5]]), depth: new Map() };
   let retrievedAt = '2026-10-20T00:00:00.000Z';
   const rows = [
@@ -18,6 +18,7 @@ it('adds the week’s Out/Doubtful list to usage data and reuses the merged obje
   const first = await usageFor(2026);
   expect(first?.snaps).toBe(usage.snaps);
   expect([...(first?.ruledOut ?? [])]).toEqual(['2026:7:00-0000010']);
+  expect([...(first?.questionable ?? [])]).toEqual(['2026:7:00-0000011']);
   expect(await usageFor(2026)).toBe(first);
   retrievedAt = '2026-10-21T00:00:00.000Z';
   expect(await usageFor(2026)).not.toBe(first);

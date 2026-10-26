@@ -38,6 +38,7 @@ export const briefingFixture: WeeklyBriefing = {
           name: 'Fictional Back',
           position: 'RB',
           estimate: 13.1,
+          playChance: 0.68,
           range: { low: 4.7, high: 23.9 },
         },
         {

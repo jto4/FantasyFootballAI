@@ -409,11 +409,20 @@ export function starterSlots(input: unknown): {
  * players (starters whose games have begun) must keep a starting spot; their remaining value is
  * unknown, so they count as 0 and only the other slots are optimized around them.
  */
+/** Points counting the chance he sits out: what lineups and team totals add up. */
+export function expectedPoints(
+  player: Pick<PlayerAdviceEvidence, 'projectedPoints' | 'playChance'>,
+) {
+  return player.projectedPoints === undefined
+    ? undefined
+    : player.projectedPoints * (player.playChance ?? 1);
+}
+
 export function optimizeLineup(
   roster: PlayerAdviceEvidence[],
   rawSlots: unknown,
   locked: ReadonlySet<string> = new Set(),
-  /** What to maximize per player (a lineup strategy); totals still report projected points. */
+  /** What to maximize per player (a lineup strategy); totals still report expected points. */
   value?: (player: PlayerAdviceEvidence) => number,
 ): LineupEstimate {
   const { slots, warnings } = starterSlots(rawSlots);
@@ -435,7 +444,7 @@ export function optimizeLineup(
   const scoreOf = value;
   for (const player of ordered) {
     const isLocked = locked.has(player.id);
-    const projected = isLocked ? 0 : player.projectedPoints;
+    const projected = isLocked ? 0 : expectedPoints(player);
     if (projected === undefined || !Number.isFinite(projected)) continue;
     const before = [...choices.entries()];
     // A locked player cannot be left out, so only states that seat them survive.
