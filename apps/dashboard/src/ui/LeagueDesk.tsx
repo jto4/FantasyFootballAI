@@ -24,6 +24,8 @@ type Props = {
   league: LeagueConnection | undefined;
   aiReady: boolean;
   aiChecking?: boolean;
+  /** The automatic AI connection check failed (shown once, at the top of Home). */
+  aiFailed?: boolean;
   requiredSetupComplete: number;
   generatingKind: string;
   refreshingNews: boolean;
@@ -50,6 +52,7 @@ export function LeagueDesk({
   league,
   aiReady,
   aiChecking = false,
+  aiFailed = false,
   requiredSetupComplete,
   generatingKind,
   refreshingNews,
@@ -92,7 +95,8 @@ export function LeagueDesk({
   const shown = (id: HomeCardId) => !hidden.has(id);
   return (
     <>
-      <section className="welcome-row">
+      {/* Once a league is connected the title is one line, so this week's answer leads. */}
+      <section className={league ? 'welcome-row compact' : 'welcome-row'}>
         <div>
           <p className="date-kicker">
             THE LEAGUE DESK <span>·</span>{' '}
@@ -106,11 +110,11 @@ export function LeagueDesk({
               : 'YOUR LOCAL WORKSPACE'}
           </p>
           <h1>Sunday’s league desk</h1>
-          <p className="intro">
-            {league
-              ? `Your ${league.displayName} weekly decisions, league drama and receipts.`
-              : 'Set up your first league and choose how your new league-mate should work.'}
-          </p>
+          {!league && (
+            <p className="intro">
+              Set up your first league and choose how your new league-mate should work.
+            </p>
+          )}
         </div>
       </section>
       {weekly}
@@ -141,72 +145,77 @@ export function LeagueDesk({
           </button>
         </section>
       )}
-      <section
-        // Once a league is connected, the next step is a one-line banner below the weekly answer.
-        className={`next-action-card ${league ? 'next-action-compact' : ''}`}
-        aria-labelledby="next-action-title"
-      >
-        <p className="section-overline">YOUR NEXT STEP</p>
-        <h2 id="next-action-title">
-          {!league
-            ? 'Connect your fantasy league'
-            : generatingKind
-              ? 'Your report is being created'
-              : !aiReady
-                ? aiChecking
-                  ? 'Checking your AI connection'
-                  : 'Finish connecting your AI writer'
-                : draftCount
-                  ? 'Want a fresh take?'
-                  : 'Create a report for your league'}
-        </h2>
-        <p>
-          {!league
-            ? 'Paste a league link and we’ll help you get started.'
-            : generatingKind
-              ? 'Its progress is saved. You can keep using the app while it finishes.'
-              : !aiReady
-                ? 'We’ll check that your AI connection works before creating a report.'
-                : draftCount
-                  ? 'Your drafts are above. Write a new one if the league has moved on since.'
-                  : `Choose a report for ${league.displayName}. You’ll review the draft before anything is sent.`}
-        </p>
-        <button
-          ref={setupWizardTriggerRef}
-          type="button"
-          className="primary-button"
-          disabled={Boolean(league && !generatingKind && aiChecking)}
-          onClick={() => {
-            if (league && generatingKind) navigate('Reports');
-            else if (!league || !aiReady) openSetupWizard();
-            else void createReport('power-rankings');
-          }}
+      {/* A failed AI check already has its own notice at the top of Home. */}
+      {!(league && !generatingKind && !aiReady && aiFailed) && (
+        <section
+          // Once a league is connected, the next step is a one-line banner below the weekly answer.
+          className={`next-action-card ${league ? 'next-action-compact' : ''}`}
+          aria-labelledby="next-action-title"
         >
-          {!league
-            ? 'Guided setup'
-            : generatingKind
-              ? 'View report progress'
-              : !aiReady
-                ? aiChecking
-                  ? 'Checking connection…'
-                  : 'Finish AI setup'
-                : 'Create a report'}{' '}
-          <span aria-hidden="true">→</span>
-        </button>
-        {!aiReady && !draftCount && (
-          <small>{requiredSetupComplete} of 2 connections ready. You can finish setup later.</small>
-        )}
-        {league && (
-          <button type="button" className="text-button" onClick={() => navigate('Leagues')}>
-            Manage leagues
+          <p className="section-overline">YOUR NEXT STEP</p>
+          <h2 id="next-action-title">
+            {!league
+              ? 'Connect your fantasy league'
+              : generatingKind
+                ? 'Your report is being created'
+                : !aiReady
+                  ? aiChecking
+                    ? 'Checking your AI connection'
+                    : 'Finish connecting your AI writer'
+                  : draftCount
+                    ? 'Want a fresh take?'
+                    : 'Create a report for your league'}
+          </h2>
+          <p>
+            {!league
+              ? 'Paste a league link and we’ll help you get started.'
+              : generatingKind
+                ? 'Its progress is saved. You can keep using the app while it finishes.'
+                : !aiReady
+                  ? 'We’ll check that your AI connection works before creating a report.'
+                  : draftCount
+                    ? 'Your drafts are above. Write a new one if the league has moved on since.'
+                    : `Choose a report for ${league.displayName}. You’ll review the draft before anything is sent.`}
+          </p>
+          <button
+            ref={setupWizardTriggerRef}
+            type="button"
+            className="primary-button"
+            disabled={Boolean(league && !generatingKind && aiChecking)}
+            onClick={() => {
+              if (league && generatingKind) navigate('Reports');
+              else if (!league || !aiReady) openSetupWizard();
+              else void createReport('power-rankings');
+            }}
+          >
+            {!league
+              ? 'Guided setup'
+              : generatingKind
+                ? 'View report progress'
+                : !aiReady
+                  ? aiChecking
+                    ? 'Checking connection…'
+                    : 'Finish AI setup'
+                  : 'Create a report'}{' '}
+            <span aria-hidden="true">→</span>
           </button>
-        )}
-        {!league && onSample && (
-          <button type="button" className="text-button sample-entry" onClick={onSample}>
-            Try a sample league
-          </button>
-        )}
-      </section>
+          {!aiReady && !draftCount && (
+            <small>
+              {requiredSetupComplete} of 2 connections ready. You can finish setup later.
+            </small>
+          )}
+          {league && (
+            <button type="button" className="text-button" onClick={() => navigate('Leagues')}>
+              Manage leagues
+            </button>
+          )}
+          {!league && onSample && (
+            <button type="button" className="text-button sample-entry" onClick={onSample}>
+              Try a sample league
+            </button>
+          )}
+        </section>
+      )}
       {status && (
         <details
           className="home-disclosure"

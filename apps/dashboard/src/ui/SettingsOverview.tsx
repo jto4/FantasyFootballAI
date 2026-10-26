@@ -20,7 +20,9 @@ export function SettingsOverview({
   configured,
   credentialStoreAvailable,
   onOpen,
+  aiConnectionFailed = false,
 }: {
+  aiConnectionFailed?: boolean;
   settings: AppSettings;
   leagues: LeagueConnection[];
   configured: (provider: string) => boolean;
@@ -53,11 +55,13 @@ export function SettingsOverview({
     {
       label: 'AI writer',
       ok:
-        runtime === 'anthropic-api'
+        !aiConnectionFailed &&
+        (runtime === 'anthropic-api'
           ? configured('anthropic')
-          : runtime !== 'api' || configured('openai'),
+          : runtime !== 'api' || configured('openai')),
       detail:
-        runtime === 'anthropic-api'
+        (aiConnectionFailed ? 'Connection check failed · ' : '') +
+        (runtime === 'anthropic-api'
           ? configured('anthropic')
             ? `Claude API · ${settings.aiRuntime?.model ?? ''}`
             : 'Anthropic API key needed'
@@ -69,7 +73,7 @@ export function SettingsOverview({
                 ? 'Apple Foundation Models'
                 : configured('openai')
                   ? `API · ${settings.aiRuntime?.model ?? 'model not set'}`
-                  : 'API key needed',
+                  : 'API key needed'),
       target: 'ai',
     },
     {

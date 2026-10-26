@@ -177,7 +177,14 @@ export function WeeklyHome({
               case 'matchup':
                 return team ? (
                   <Fragment key={card.id}>
-                    {briefing && <MatchupCard briefing={briefing} />}
+                    {briefing && (
+                      <MatchupCard
+                        briefing={briefing}
+                        leagueId={league.id}
+                        teamId={teamId}
+                        {...(onLive ? { onLive } : {})}
+                      />
+                    )}
                     {briefing?.notes.length ? (
                       <ul className="weekly-notes">
                         {briefing.notes.map((note) => (

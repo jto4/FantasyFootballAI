@@ -328,7 +328,9 @@ export function createWeeklyService(
       );
     if (startersWeek !== undefined && startersWeek !== week)
       notes.push(`Compared with your week ${startersWeek} starters.`);
-    if (!known && considered.length)
+    if (!known && played && played === considered.length)
+      notes.push(`Every week ${week} game on your roster has started; Live has the scores.`);
+    else if (!known && considered.length)
       notes.push(
         league.connectionMode === 'snapshot'
           ? `No week ${week} point estimates yet. Import an updated ESPN page so Sidekick knows this week’s roster, or connect ESPN access for automatic refresh.`
@@ -817,6 +819,24 @@ export function createWeeklyService(
       });
       return scored.points === undefined ? undefined : Math.round(scored.points * 100) / 100;
     };
+    /**
+     * A starter with no box-score line in a game under way whose status says he is not playing
+     * (Out, inactive, reserve). A listed player with no stats yet keeps his "0" instead.
+     */
+    const sitsOut = (player: { id: string; position?: string; nflTeam?: string }) => {
+      const box = boxFor(player.nflTeam);
+      if (!box) return false;
+      const espnId =
+        leagueRow.platform === 'espn'
+          ? player.id
+          : loaded.players.find((p) => p.id === player.id)?.espnId;
+      if (!espnId) return false;
+      return satOut({
+        position: player.position,
+        status: loaded.players.find((p) => p.id === player.id)?.status,
+        inBoxScore: Boolean(box.players[espnId]),
+      });
+    };
     // Imported snapshots froze the platform score before kickoff, so box scores replace it.
     const sideInput = (side: MatchupSide) => ({
       teamId: side.teamId,
@@ -831,6 +851,7 @@ export function createWeeklyService(
           ...s,
           ...(nflTeam ? { nflTeam } : {}),
           ...(points !== undefined ? { livePoints: points } : {}),
+          ...(sitsOut({ ...s, ...(nflTeam ? { nflTeam } : {}) }) ? { out: true as const } : {}),
         };
       }),
     });
@@ -934,4 +955,17 @@ export function plannedReplacement(
   if (!planned) return undefined;
   if (changes.length > 1 && position(planned.start.id) !== position(starterId)) return undefined;
   return { id: planned.start.id, name: planned.start.name, estimate: planned.start.points };
+}
+
+/**
+ * A starter whose game is under way, who has no box-score line and is listed as not playing
+ * (Out, inactive, reserve or Doubtful). Without the listing, no line just means no stats yet.
+ */
+export function satOut(input: {
+  position?: string | undefined;
+  status?: string | undefined;
+  inBoxScore: boolean;
+}) {
+  if (input.inBoxScore || footballPosition(input.position) === 'DST') return false;
+  return isInactiveFootballStatus(input.status) || /^doubtful$/i.test(input.status?.trim() ?? '');
 }

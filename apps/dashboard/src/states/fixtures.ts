@@ -244,6 +244,38 @@ export function stubApi() {
   window.fetch = async (input: RequestInfo | URL) => {
     const url = new URL(String(input instanceof Request ? input.url : input), location.origin);
     const league = url.searchParams.get('league');
+    if (url.pathname === '/api/live')
+      return new Response(
+        JSON.stringify({
+          leagueName: 'Fictional League',
+          week: 8,
+          imported: true,
+          gamesAvailable: true,
+          matchupWeek: 8,
+          matchup: {
+            you: {
+              teamId: 'team',
+              name: 'Fictional Ones',
+              points: 99.2,
+              projectedFinal: 99.2,
+              starters: [],
+              yetToPlay: 0,
+              playing: 0,
+            },
+            opponent: {
+              teamId: 'other',
+              name: 'Fictional Twos',
+              points: 97.4,
+              projectedFinal: 109.4,
+              starters: [],
+              yetToPlay: 1,
+              playing: 0,
+            },
+            winChance: 0.12,
+          },
+        }),
+        { headers: { 'content-type': 'application/json' } },
+      );
     if (url.pathname === '/api/dynasty')
       return new Response(JSON.stringify(dynastyFixture), {
         headers: { 'content-type': 'application/json' },
@@ -303,3 +335,20 @@ export function stubApi() {
     return new Response(JSON.stringify({ error: 'Not stubbed in the gallery.' }), { status: 404 });
   };
 }
+
+/** Mid-week: saved league scores are stale (6.3 to 0), so the card must show Live's numbers. */
+export const underwayBriefingFixture: WeeklyBriefing = {
+  ...briefingFixture,
+  matchup: {
+    ...briefingFixture.matchup!,
+    you: {
+      ...briefingFixture.matchup!.you,
+      points: 6.3,
+      starters: briefingFixture.matchup!.you.starters.map(({ estimate: _e, range: _r, ...p }) => ({
+        ...p,
+        started: true as const,
+      })),
+    },
+    opponent: { ...briefingFixture.matchup!.opponent, points: 0 },
+  },
+};

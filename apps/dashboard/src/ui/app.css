@@ -2183,6 +2183,14 @@ body {
   line-height: 1.55;
 }
 
+.welcome-row.compact {
+  margin-bottom: 16px;
+}
+.welcome-row.compact h1 {
+  font-size: 30px;
+  letter-spacing: -0.8px;
+}
+
 .primary-button {
   min-height: 40px;
   height: auto;

@@ -517,6 +517,21 @@
   margin-top: 12px;
   font-size: 13px;
 }
+.friendly-error.compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 14px;
+  margin: 0 0 14px;
+}
+.friendly-error.compact p {
+  margin: 0;
+}
+.friendly-error.compact details {
+  flex-basis: 100%;
+  margin-top: 0;
+}
 .settings-page > .page-title-block {
   padding: 16px 0;
 }

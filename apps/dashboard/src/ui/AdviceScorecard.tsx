@@ -15,6 +15,10 @@ const sourceNames: Record<string, string> = {
   'rolling-form-v1': 'App’s own model',
   'rolling-baseline-v1': 'App’s own model (baseline)',
 };
+/** Sources the app no longer uses; their old records stay in Full results, not on Home. */
+const retiredMethods = new Set(['public-projection-v1']);
+/** Below this many graded player-weeks per source, no source is called the most accurate. */
+export const minimumComparisonSamples = 30;
 const sourceName = (method: string) =>
   sourceNames[method] ?? (method.startsWith('import') ? 'Your imported projections' : method);
 const points = (n: number) =>
@@ -26,6 +30,34 @@ async function load(signal: AbortSignal) {
     requestJson('/api/advice/journal', isAdviceJournalReport, { signal }),
   ]);
   return { performance, journal };
+}
+
+/**
+ * Projection error by source for Home, weighted by sample count so a large league and a small one
+ * count in proportion. `best` names the most accurate source only once every source shown has
+ * enough graded player-weeks for the comparison to mean something.
+ */
+export function scorecardSources(groups: PredictionPerformance['groups']) {
+  const bySource = new Map<string, { samples: number; error: number }>();
+  for (const group of groups)
+    if (
+      group.kind === 'fantasy' &&
+      !retiredMethods.has(group.method) &&
+      group.mae !== undefined &&
+      group.samples > 0
+    ) {
+      const name = sourceName(group.method),
+        row = bySource.get(name) ?? { samples: 0, error: 0 };
+      row.samples += group.samples;
+      row.error += group.mae * group.samples;
+      bySource.set(name, row);
+    }
+  const sources = [...bySource.entries()]
+    .map(([name, row]) => ({ name, samples: row.samples, mae: row.error / row.samples }))
+    .sort((a, b) => a.mae - b.mae);
+  const comparable =
+    sources.length > 1 && sources.every((source) => source.samples >= minimumComparisonSamples);
+  return { sources, best: comparable ? sources[0]!.name : undefined };
 }
 
 /**
@@ -47,19 +79,7 @@ export function AdviceScorecard({ onOpen }: { onOpen: () => void }) {
     return () => controller.abort();
   }, []);
   if (!data) return null;
-  // Weighted by sample count so a large league and a small one count in proportion.
-  const bySource = new Map<string, { samples: number; error: number }>();
-  for (const group of data.performance.groups)
-    if (group.kind === 'fantasy' && group.mae !== undefined && group.samples > 0) {
-      const name = sourceName(group.method),
-        row = bySource.get(name) ?? { samples: 0, error: 0 };
-      row.samples += group.samples;
-      row.error += group.mae * group.samples;
-      bySource.set(name, row);
-    }
-  const sources = [...bySource.entries()]
-    .map(([name, row]) => ({ name, samples: row.samples, mae: row.error / row.samples }))
-    .sort((a, b) => a.mae - b.mae);
+  const { sources, best } = scorecardSources(data.performance.groups);
   const graded = data.journal.decisions.filter(
     (d) => d.status === 'settled' && d.actualChange !== undefined,
   );
@@ -83,17 +103,25 @@ export function AdviceScorecard({ onOpen }: { onOpen: () => void }) {
           <div>
             <h4>Projection accuracy</h4>
             {sources.length ? (
-              <ul>
-                {sources.map((source, index) => (
-                  <li key={source.name}>
-                    <strong>{source.name}</strong>: off by {points(source.mae)} points on average ·{' '}
-                    {source.samples} player-weeks
-                    {index === 0 && sources.length > 1 && (
-                      <span className="scorecard-best"> Most accurate so far</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ul>
+                  {sources.map((source) => (
+                    <li key={source.name}>
+                      <strong>{source.name}</strong>: off by {points(source.mae)} points on average
+                      · {source.samples} {source.samples === 1 ? 'player-week' : 'player-weeks'}
+                      {source.name === best && (
+                        <span className="scorecard-best"> Most accurate so far</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {sources.length > 1 && !best && (
+                  <small>
+                    Too few results to call a winner yet ({minimumComparisonSamples} player-weeks
+                    each).
+                  </small>
+                )}
+              </>
             ) : (
               <p>No projections have been graded yet.</p>
             )}

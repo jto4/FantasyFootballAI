@@ -1,6 +1,15 @@
+import { record, type LiveMatchup } from '@sidekick/core';
+import { useApi } from './hooks/useApi';
 import { points, type MatchupSide, type WeeklyBriefing } from './weekly-briefing';
 
-function Side({ side, align }: { side: MatchupSide; align: 'start' | 'end' }) {
+type LiveReport = { matchupWeek?: number; matchup?: LiveMatchup };
+const isLiveReport = (x: unknown): x is LiveReport =>
+  record(x) &&
+  (x.matchup === undefined ||
+    (record(x.matchup) && record(x.matchup.you) && record(x.matchup.opponent)));
+
+type Score = { name: string; points?: number; projected?: number };
+function Side({ side, align }: { side: Score; align: 'start' | 'end' }) {
   return (
     <div className={`matchup-side matchup-side-${align}`}>
       <p className="matchup-team">{side.name}</p>
@@ -40,13 +49,51 @@ function Estimate({ starter }: { starter: MatchupSide['starters'][number] }) {
   );
 }
 
-/** Head-to-head view of the league's current week; never mixes in another week's estimates. */
-export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
+/**
+ * Head-to-head view of the league's current week; never mixes in another week's estimates. Once
+ * any starter's game has begun, the score, projection and win chance come from Live (NFL box
+ * scores), the same numbers the Live page shows, since saved league scores can be days old.
+ */
+export function MatchupCard({
+  briefing,
+  leagueId,
+  teamId,
+  onLive,
+}: {
+  briefing: WeeklyBriefing;
+  leagueId?: string | undefined;
+  teamId?: string | undefined;
+  onLive?: (() => void) | undefined;
+}) {
   const matchup = briefing.matchup;
+  const underway = Boolean(
+    matchup && [...matchup.you.starters, ...matchup.opponent.starters].some((p) => p.started),
+  );
+  const { data: live } = useApi(
+    underway && leagueId && teamId
+      ? `/api/live?${new URLSearchParams({ league: leagueId, team: teamId })}`
+      : undefined,
+    isLiveReport,
+    { timeoutMs: 60_000 },
+  );
   if (!matchup) return null;
   const { you, opponent } = matchup;
-  const both = you.projected !== undefined && opponent.projected !== undefined;
-  const edge = both ? you.projected! - opponent.projected! : undefined;
+  const liveMatchup = live?.matchup && live.matchupWeek === matchup.week ? live.matchup : undefined;
+  const score = (side: MatchupSide, other?: LiveMatchup['you']): Score =>
+    other
+      ? {
+          name: side.name,
+          ...(other.points !== undefined ? { points: other.points } : {}),
+          ...(other.projectedFinal !== undefined ? { projected: other.projectedFinal } : {}),
+        }
+      : side;
+  const mine = score(you, liveMatchup?.you);
+  const theirs = score(opponent, liveMatchup?.opponent);
+  // While games are on, saved scores are not shown as current: wait for Live's numbers.
+  const waiting = underway && !liveMatchup;
+  const both = !waiting && mine.projected !== undefined && theirs.projected !== undefined;
+  const edge = both ? mine.projected! - theirs.projected! : undefined;
+  const chance = underway ? liveMatchup?.winChance : matchup.winProbability;
   const rows = Math.max(you.starters.length, opponent.starters.length);
   const stale = matchup.week !== briefing.week;
   return (
@@ -61,31 +108,41 @@ export function MatchupCard({ briefing }: { briefing: WeeklyBriefing }) {
               ? `You’re projected to win by ${points(edge)}`
               : `You’re projected to lose by ${points(-edge)}`}
       </h3>
-      {matchup.winProbability !== undefined && (
+      {chance !== undefined && (
         <div className="matchup-chance">
           <p>
-            <strong>{Math.round(matchup.winProbability * 100)}%</strong> chance you win
+            <strong>{Math.round(chance * 100)}%</strong> chance you win
           </p>
           <span className="matchup-chance-bar" aria-hidden="true">
-            <span style={{ width: `${Math.round(matchup.winProbability * 100)}%` }} />
+            <span style={{ width: `${Math.round(chance * 100)}%` }} />
           </span>
           <small>
-            Before kickoff, from each starter’s estimate and how far past results strayed from
-            similar estimates. Teammates’ scores are treated as unrelated.
+            {underway
+              ? 'Live: the score so far from NFL box scores, plus estimates for starters yet to play.'
+              : 'Before kickoff, from each starter’s estimate and how far past results strayed from similar estimates. Teammates’ scores are treated as unrelated.'}
+            {underway && onLive ? (
+              <>
+                {' '}
+                <button type="button" className="text-button" onClick={onLive}>
+                  Open Live
+                </button>
+              </>
+            ) : null}
           </small>
         </div>
       )}
+      {waiting && <p className="matchup-note">Games are under way; checking live scores…</p>}
       {stale && (
         <p className="matchup-note">
           From the league’s week {matchup.week} data; update the league for week {briefing.week}.
         </p>
       )}
       <div className="matchup-scoreline">
-        <Side side={you} align="start" />
+        <Side side={waiting ? { name: you.name } : mine} align="start" />
         <span className="matchup-vs" aria-hidden="true">
           vs
         </span>
-        <Side side={opponent} align="end" />
+        <Side side={waiting ? { name: opponent.name } : theirs} align="end" />
       </div>
       {rows > 0 && (
         <details className="matchup-lineups">

@@ -14,6 +14,8 @@ export interface LiveStarterInput {
   playChance?: number;
   /** Points so far from the NFL box score under this league's rules; set once a game starts. */
   livePoints?: number;
+  /** Not in the box score of a game under way and listed as not playing (Out, inactive). */
+  out?: true;
 }
 
 export interface LiveSide {

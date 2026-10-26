@@ -18,7 +18,7 @@ import { DynastyPage } from '../ui/DynastyPage';
 import type { LeagueConnection } from '@sidekick/core';
 import { initializeTheme } from '../ui/theme';
 import type { WeeklyBriefing } from '../ui/weekly-briefing';
-import { alertsFixture, briefingFixture, stubApi } from './fixtures';
+import { alertsFixture, briefingFixture, stubApi, underwayBriefingFixture } from './fixtures';
 
 /*
  * Development-only gallery of UI states that are hard to reach in the live app: errors, slow
@@ -93,6 +93,15 @@ function Gallery() {
       </State>
       <State name="error-load" title="LoadError (wraps ErrorNotice)">
         <LoadError message="Could not load profiles." onRetry={noop} />
+      </State>
+      <State name="error-friendly-compact" title="Compact notice above a page">
+        <FriendlyError
+          message="Your AI connection needs attention before you can create a report."
+          detail="Codex could not complete the test."
+          action="Fix AI connection"
+          onAction={noop}
+          compact
+        />
       </State>
       <State name="error-friendly" title="FriendlyError with an action">
         <FriendlyError
@@ -171,6 +180,14 @@ function Gallery() {
       <h2>Matchup</h2>
       <State name="matchup" title="Win chance and likely ranges">
         <MatchupCard briefing={briefingFixture} />
+      </State>
+      <State name="matchup-live" title="Games under way: Live's scores, not saved ones">
+        <MatchupCard
+          briefing={underwayBriefingFixture}
+          leagueId="league"
+          teamId="team"
+          onLive={noop}
+        />
       </State>
       <h2>Dynasty</h2>
       <State name="dynasty" title="Long-term values, rookie plan and taxi">

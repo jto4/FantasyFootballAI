@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { weeklyGameWithheldWarning, type PlayerAdviceEvidence } from '@sidekick/core';
-import { benchReplacement, plannedReplacement } from './weekly-service.js';
+import { benchReplacement, plannedReplacement, satOut } from './weekly-service.js';
 
 const player = (
   id: string,
@@ -65,4 +65,16 @@ it('trusts the optimizer’s swap only when it is unambiguous', () => {
   expect(
     plannedReplacement([change('wr9', 'wr1', 7), change('rb9', 'te1', 8)], 'wr1', byId)?.id,
   ).toBe('wr9');
+});
+
+it('calls a starter Out only when he is missing from the box score and listed as not playing', () => {
+  expect(satOut({ position: 'WR', status: 'Out', inBoxScore: false })).toBe(true);
+  expect(satOut({ position: 'RB', status: 'Doubtful', inBoxScore: false })).toBe(true);
+  expect(satOut({ position: 'WR', status: 'Injured Reserve', inBoxScore: false })).toBe(true);
+  // No stats yet, but nothing says he is out.
+  expect(satOut({ position: 'WR', status: 'Questionable', inBoxScore: false })).toBe(false);
+  expect(satOut({ position: 'WR', inBoxScore: false })).toBe(false);
+  // Listed Out but he played after all.
+  expect(satOut({ position: 'WR', status: 'Out', inBoxScore: true })).toBe(false);
+  expect(satOut({ position: 'DST', status: 'Out', inBoxScore: false })).toBe(false);
 });

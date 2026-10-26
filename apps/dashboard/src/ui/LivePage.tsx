@@ -50,7 +50,7 @@ function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
               </small>
             </span>
             <span className="live-state">
-              {s.detail ?? stateLabel[s.state]}
+              {s.out ? 'Out · did not play' : (s.detail ?? stateLabel[s.state])}
               {s.state === 'pre' && s.estimate !== undefined ? ` · est. ${points(s.estimate)}` : ''}
             </span>
             {(s.state === 'in' || s.state === 'post') && (

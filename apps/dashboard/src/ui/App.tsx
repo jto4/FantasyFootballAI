@@ -964,6 +964,7 @@ export function App() {
               detail={aiCheckError}
               action="Fix AI connection"
               onAction={openSetupWizard}
+              compact
             />
           )}
           {!stateLoaded && section !== 'Help' ? (
@@ -1072,6 +1073,7 @@ export function App() {
                   setTestedRuntimeSignature(JSON.stringify(testedRuntime));
                   setAiCheckError('');
                 }}
+                aiConnectionFailed={Boolean(aiCheckError)}
                 focusTarget={settingsFocusTarget}
                 searchSettingId={route.settingId}
                 searchFocusRevision={searchFocusRevision}
@@ -1247,6 +1249,7 @@ export function App() {
                 league={league}
                 aiReady={aiReady}
                 aiChecking={aiChecking}
+                aiFailed={Boolean(aiCheckError)}
                 requiredSetupComplete={requiredSetupComplete}
                 generatingKind={generatingKind}
                 refreshingNews={refreshingNews}

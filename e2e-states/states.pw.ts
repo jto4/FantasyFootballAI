@@ -7,6 +7,7 @@ const states: [name: string, ready?: string][] = [
   ['error-network', 'Could not reach the local service'],
   ['error-load'],
   ['error-friendly'],
+  ['error-friendly-compact', 'Fix AI connection'],
   ['loading-lines'],
   ['loading-cards'],
   ['empty'],
@@ -20,6 +21,7 @@ const states: [name: string, ready?: string][] = [
   ['watchlist', 'Fictional Injured'],
   ['watchlist-empty', 'Add players'],
   ['matchup', 'chance you win'],
+  ['matchup-live', '12%'],
   ['dynasty', 'Fictional First Back'],
 ];
 

@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 26 (UI trust): Home's matchup uses Live's box-score numbers once games start; one AI
+  connection status on Home and Settings; the accuracy card needs 30 results per source before
+  naming a winner and drops retired ESPN records; Live marks starters who sat out as Out; a
+  shorter Home header and a one-line AI notice.
 - October 26 (model): Questionable players discounted when they play and counted at their chance
   to play in lineups and win chance (fitted on 2025, checked on 2026); TE, WR and D/ST ranges
   widened or narrowed to cover 80% on held-out 2026 weeks.

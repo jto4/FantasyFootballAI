@@ -54,6 +54,8 @@ type SettingsPageProps = {
   searchFocusRevision?: number;
   onSearchSettingClear?: () => void;
   onGuidedSetup?: () => void;
+  /** The last automatic AI connection check failed; the overview must not show it as ready. */
+  aiConnectionFailed?: boolean;
 };
 const sectionLabels: Record<SettingsSection, string> = {
   ai: 'AI',
@@ -86,6 +88,7 @@ export function SettingsPage({
   searchFocusRevision = 0,
   onSearchSettingClear,
   onGuidedSetup,
+  aiConnectionFailed = false,
 }: SettingsPageProps) {
   const aiHeadingRef = useRef<HTMLHeadingElement>(null);
   const voiceHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -502,6 +505,7 @@ export function SettingsPage({
           secretState.some((item) => item.provider === provider && item.configured)
         }
         credentialStoreAvailable={credentialStoreAvailable}
+        aiConnectionFailed={aiConnectionFailed}
         onOpen={async (key) => {
           if (
             backupDirty &&
