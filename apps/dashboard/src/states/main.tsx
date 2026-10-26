@@ -14,6 +14,8 @@ import { MatchupCard } from '../ui/MatchupCard';
 import { NextUpCard } from '../ui/NextUpCard';
 import { WaitStatus } from '../ui/WaitStatus';
 import { WatchlistCard } from '../ui/WatchlistCard';
+import { DynastyPage } from '../ui/DynastyPage';
+import type { LeagueConnection } from '@sidekick/core';
 import { initializeTheme } from '../ui/theme';
 import type { WeeklyBriefing } from '../ui/weekly-briefing';
 import { alertsFixture, briefingFixture, stubApi } from './fixtures';
@@ -28,6 +30,20 @@ stubApi();
 
 const reference = '3f2a9c1e-1111-4222-8333-944455556666';
 const noop = () => undefined;
+const dynastyLeague = {
+  id: 'dynasty',
+  platform: 'sleeper',
+  name: 'Fictional Dynasty League',
+  displayName: 'Fictional Dynasty League',
+  teamCount: 2,
+  scoring: {},
+  settings: {},
+  teams: [
+    { id: 'team', name: 'Fictional Ones', roster: [] },
+    { id: 'two', name: 'Fictional Twos', roster: [] },
+  ],
+  connectedAt: '2026-10-01T00:00:00.000Z',
+} as unknown as LeagueConnection;
 
 function State({ name, title, children }: { name: string; title: string; children: ReactNode }) {
   return (
@@ -155,6 +171,15 @@ function Gallery() {
       <h2>Matchup</h2>
       <State name="matchup" title="Win chance and likely ranges">
         <MatchupCard briefing={briefingFixture} />
+      </State>
+      <h2>Dynasty</h2>
+      <State name="dynasty" title="Long-term values, rookie plan and taxi">
+        <DynastyPage
+          league={dynastyLeague}
+          teamId="team"
+          onChooseTeam={noop}
+          onPersonalize={noop}
+        />
       </State>
       <h2>Confirmations</h2>
       <State name="confirm-buttons" title="Open a confirmation">

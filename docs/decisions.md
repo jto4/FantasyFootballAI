@@ -626,3 +626,40 @@ as rank changes only, after checking that every lookup the model makes gives the
 Weekly results are shared for two minutes across Home, alerts and Live; that is also the
 longest a public-data refresh can take to show there. Background polling slows down when no
 game is near. Measurements are in `docs/performance.md`.
+
+## Dynasty and keeper leagues (October 26, 2026)
+
+Leagues are marked redraft, keeper or dynasty: Sleeper's league type, ESPN's keeper count
+(keeping nearly the whole roster counts as dynasty), Yahoo as redraft, and an owner override in
+Personalize. Sleeper taxi and reserve lists become roster positions. A Dynasty page shows
+long-term values, a trade calculator, a rookie board and draft plan, pick values, and taxi and
+keeper help; Ask can look the same values up.
+
+**Value** is expected league points above a replacement starter (the best player left after
+every team fills its lineup, flex going to the deeper position): rest of this season plus the
+next three, each later season worth 15% less. Fitted by `scripts/research/dynasty-backtest.mjs`
+on nflverse 2010–2020 and tested on 2021–2025 (full results in
+`docs/research/2026-10-26-dynasty-backtest.json`):
+
+- **Age curves**: one model per position and horizon from points per game, games and age, with
+  missed seasons counted as zero. Three-season error against "same as last season": QB 194 vs
+  236, RB 125 vs 174, WR 99 vs 140, TE 72 vs 92 points; rank correlation better at every
+  position. One season ahead it is better everywhere except QB error (80 vs 78). Next-season
+  multiplier at 31 vs 27: RB 0.74, WR 0.75, TE 0.82, QB 0.92.
+- **Outcome spread**: future seasons price the chance of beating replacement from the actual
+  scatter of outcomes (by third of projection), not the average alone. Points above a
+  replacement line per player, actual vs model: RB 32.6 vs 26.9 (point estimate 22.2), TE 21.0
+  vs 20.7 (15.9), picks 27.5 vs 25.6 (10.5). WR and QB come out a little high (WR 22.3 vs 26.5);
+  the QB center itself ran high in 2021+, which this does not fix.
+- **Rookies**: first three seasons from NFL draft slot by position; error vs the class average
+  QB 148 vs 242, RB 114 vs 163, WR 103 vs 148, TE 56 vs 79. Rookies and second-year players blend
+  the slot with their own games by games/(games + 8), a heuristic.
+- **Picks**: the n-th rookie taken historically (classes ordered by draft-slot value), priced as
+  a receiver; error 141 vs 185 for a flat average. Future picks use the middle of the round
+  unless early or late is chosen, discounted by season.
+
+Trades charge the value of players released to make room when taking more than you send. The
+keeper cost assumes the round a player was drafted in this year (rules vary; the page says so).
+The rookie plan assumes reverse-standings order and a room that drafts by value, since traded
+picks are not read. Player ages and draft slots come from the nflverse players file through the
+download cache, kept as a compact list.

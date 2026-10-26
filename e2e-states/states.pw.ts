@@ -20,6 +20,7 @@ const states: [name: string, ready?: string][] = [
   ['watchlist', 'Fictional Injured'],
   ['watchlist-empty', 'Add players'],
   ['matchup', 'chance you win'],
+  ['dynasty', 'Fictional First Back'],
 ];
 
 test.beforeEach(async ({ page }, info) => {

@@ -36,6 +36,9 @@ What changed:
   65 MB daily depth-chart file is kept only as rank changes (148,775 → 3,102 entries, 166 KB;
   identical answers on 980,288 lookups), the Sleeper list only with the fields used. The
   folder is capped at 300 MB, least-recently-used first.
+- **Dynasty values**: the nflverse players file (~7 MB) is kept in the cache as 1,368 skill
+  players' age and draft facts (~180 KB); valuing every player takes about 60 ms and is reused
+  for ten minutes per league.
 - **Shared weekly results**: Home, starter alerts and Live reuse one computation for two
   minutes, rebuilt sooner when the league, imported projections or settings change.
 - **Hot paths**: projected stats are memoized per player and game for each data snapshot;

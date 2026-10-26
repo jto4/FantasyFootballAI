@@ -10,6 +10,7 @@ export const pageLoaders = {
   memory: () => import('./MemoryPage'),
   advice: () => import('./AdvicePage'),
   live: () => import('./LivePage'),
+  dynasty: () => import('./DynastyPage'),
 };
 export const HelpPage = lazy(() =>
   import('./HelpPage').then((module) => ({ default: module.HelpPage })),
@@ -44,4 +45,8 @@ export const DeliveryTask = lazy(() =>
 
 export const LivePage = lazy(() =>
   pageLoaders.live().then((module) => ({ default: module.LivePage })),
+);
+
+export const DynastyPage = lazy(() =>
+  pageLoaders.dynasty().then((module) => ({ default: module.DynastyPage })),
 );

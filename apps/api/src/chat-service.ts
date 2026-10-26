@@ -129,6 +129,13 @@ export const chatTools: Record<string, ChatTool> = {
       };
     },
   },
+  dynasty_values: {
+    description:
+      'Long-term (dynasty/keeper) player values for this season and the next three, team outlook (contender or rebuild), rookie board and rookie-draft plan, what draft picks are worth, taxi squad and keeper suggestions.',
+    args: { team: 'Optional team name; defaults to the user’s team' },
+    label: (a, ctx) => `Valuing ${labelTeam(ctx, a.team)} over the next seasons`,
+    run: leagueTeam('/api/dynasty'),
+  },
   my_week: {
     description: 'This week’s lineup check: suggested start/sit changes and top waiver adds.',
     args: { team: 'Optional team name' },

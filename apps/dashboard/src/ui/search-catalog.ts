@@ -315,6 +315,13 @@ const definitions: [string, SettingsSection, string, string, string, boolean?][]
     'lineup strategy floor ceiling upside safe risk variance boom bust win probability',
   ],
   [
+    'personalize-league-format',
+    'personalize',
+    'League format',
+    'Mark a league as redraft, keeper or dynasty.',
+    'dynasty keeper redraft league format type taxi rookie picks long term',
+  ],
+  [
     'projection-preferences',
     'personalize',
     'Projection adjustments and player nudges',
@@ -478,6 +485,11 @@ export function navigationItems(desktop: boolean): SearchItem[] {
       'Advice',
       'Analyze fantasy decisions and NFL bets with supporting evidence.',
       'advice intelligent analysis confidence stats',
+    ],
+    [
+      'Dynasty',
+      'Long-term player values, dynasty trades, rookie drafts, taxi squad and keepers.',
+      'dynasty keeper rookie draft picks taxi squad trade value age long term rebuild',
     ],
     [
       'Help',

@@ -234,6 +234,7 @@ export function normalizeEspnLeague(
       ...(currentWeek !== undefined ? { currentWeek } : {}),
       ...(seasonComplete !== undefined ? { seasonComplete } : {}),
       ...(rosterPositions ? { roster_positions: rosterPositions } : {}),
+      ...espnFormat(asRecord(settings.draftSettings), rosterPositions),
       ...(regularMatchupPeriods ? { regularSeasonWeeks: regularMatchupPeriods } : {}),
       ...(playoffTeams ? { playoffTeams } : {}),
       ...(inferredPlayoffStartWeek !== undefined
@@ -488,5 +489,22 @@ function espnDraft(
     season,
     ...(status ? { status } : {}),
     picks,
+  };
+}
+
+/**
+ * ESPN has no league type: a keeper count marks a keeper league, and keeping (nearly) the
+ * whole roster marks a dynasty league.
+ */
+export function espnFormat(
+  draftSettings: Record<string, unknown> | undefined,
+  rosterPositions: string[] | undefined,
+) {
+  const keepers = boundedInteger(draftSettings?.keeperCount, 0, 50) ?? 0;
+  if (!keepers) return { leagueFormat: 'redraft' };
+  const rosterSize = (rosterPositions ?? []).filter((slot) => !/^IR$/i.test(slot)).length;
+  return {
+    leagueFormat: rosterSize && keepers >= rosterSize - 2 ? 'dynasty' : 'keeper',
+    maxKeepers: keepers,
   };
 }

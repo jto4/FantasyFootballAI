@@ -31,7 +31,7 @@ import { LeagueDesk, type HomeDisclosures } from './LeagueDesk';
 import type { SendPreview } from './ReportsPage';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { parseLeagueInput, detectLeagueLink, type Platform } from '@sidekick/core';
+import { parseLeagueInput, detectLeagueLink, leagueFormat, type Platform } from '@sidekick/core';
 import { SetupWizard } from './SetupWizard';
 import { resolveActiveLeague } from './league-selection';
 import { suggestedSetupStep } from './setup';
@@ -62,6 +62,7 @@ import {
   MemoryPage,
   DeliveryTask,
   LivePage,
+  DynastyPage,
 } from './lazy-pages';
 
 // The address at launch, before routing normalizes it.
@@ -860,6 +861,9 @@ export function App() {
         serviceStatus={serviceStatus}
         onNavigate={navigate}
         onStop={() => void stopApplication()}
+        dynastyLeague={
+          league ? leagueFormat(league, state.settings.preferences) !== 'redraft' : false
+        }
       />
 
       <main className="main-area">
@@ -978,6 +982,20 @@ export function App() {
                 teamId={homeTeamId}
                 onLeagues={() => navigate('Leagues')}
                 onChooseTeam={chooseTeam}
+              />
+            </Suspense>
+          ) : section === 'Dynasty' ? (
+            <Suspense fallback={<LoadingStatus message="Opening dynasty view…" />}>
+              <DynastyPage
+                league={league}
+                teamId={homeTeamId}
+                onChooseTeam={chooseTeam}
+                onPersonalize={() =>
+                  void searchNavigate({
+                    section: 'Settings',
+                    settingId: 'personalize-league-format',
+                  })
+                }
               />
             </Suspense>
           ) : section === 'Help' ? (

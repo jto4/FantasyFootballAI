@@ -65,6 +65,9 @@ export {
 } from './platforms.js';
 export { readBoundedJson } from './http.js';
 export { nflDraftPicksUrl, parseNFLDraftPicks } from './nfl-draft-data.js';
+export { nflPlayersUrl, parsePlayerBios, PublicPlayerBios } from './player-bios.js';
+export { sleeperFormat } from './platforms/sleeper.js';
+export { espnFormat } from './platforms/espn.js';
 export {
   PublicPlayerForecasts,
   publicPlayerForecastUrl,

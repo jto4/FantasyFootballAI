@@ -638,7 +638,7 @@ function matchupStarterIds(
   const starters: string[] = [];
   for (const player of roster) {
     const slot = player.rosterPosition?.trim().toUpperCase().replace(/[ _-]/g, '') ?? '';
-    if (['BN', 'BENCH', 'BE', 'IR', 'IR+', 'NA', 'RES', 'SUSP'].includes(slot)) continue;
+    if (['BN', 'BENCH', 'BE', 'IR', 'IR+', 'NA', 'RES', 'SUSP', 'TAXI'].includes(slot)) continue;
     // An unrecognized or missing slot makes the whole roster snapshot incomplete for projections.
     if (!slot || !normalizeProjectionPosition(slot)) return [];
     starters.push(player.id);

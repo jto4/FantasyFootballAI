@@ -1,0 +1,219 @@
+{
+  "lastSeason": 2026,
+  "ageCurves": {
+    "fittedOn": "2010–2020 seasons",
+    "nextSeasonTest": {
+      "QB": {
+        "players": 214,
+        "maeModel": 79.7,
+        "maeSameAsLastSeason": 78.2,
+        "meanBias": 18.4,
+        "rankModel": 0.606,
+        "rankSameAsLastSeason": 0.601
+      },
+      "RB": {
+        "players": 388,
+        "maeModel": 48.2,
+        "maeSameAsLastSeason": 53.7,
+        "meanBias": 2,
+        "rankModel": 0.704,
+        "rankSameAsLastSeason": 0.668
+      },
+      "WR": {
+        "players": 584,
+        "maeModel": 39,
+        "maeSameAsLastSeason": 43.3,
+        "meanBias": 9.2,
+        "rankModel": 0.74,
+        "rankSameAsLastSeason": 0.709
+      },
+      "TE": {
+        "players": 285,
+        "maeModel": 29.7,
+        "maeSameAsLastSeason": 31.9,
+        "meanBias": 2.2,
+        "rankModel": 0.677,
+        "rankSameAsLastSeason": 0.647
+      }
+    },
+    "threeSeasonTest": {
+      "QB": {
+        "players": 108,
+        "maeModel": 194.2,
+        "maeSameAsLastSeason": 236.1,
+        "meanBias": 23.3,
+        "rankModel": 0.654,
+        "rankSameAsLastSeason": 0.628
+      },
+      "RB": {
+        "players": 207,
+        "maeModel": 125.2,
+        "maeSameAsLastSeason": 174.1,
+        "meanBias": 3.4,
+        "rankModel": 0.705,
+        "rankSameAsLastSeason": 0.632
+      },
+      "WR": {
+        "players": 302,
+        "maeModel": 99,
+        "maeSameAsLastSeason": 139.6,
+        "meanBias": 19.1,
+        "rankModel": 0.756,
+        "rankSameAsLastSeason": 0.703
+      },
+      "TE": {
+        "players": 152,
+        "maeModel": 72.2,
+        "maeSameAsLastSeason": 91.9,
+        "meanBias": 3.1,
+        "rankModel": 0.753,
+        "rankSameAsLastSeason": 0.699
+      }
+    },
+    "aboveReplacementTest": {
+      "QB": {
+        "200": {
+          "actual": 28.1,
+          "withSpread": 39.2,
+          "pointOnly": 37.8
+        },
+        "250": {
+          "actual": 14.4,
+          "withSpread": 24.6,
+          "pointOnly": 23.7
+        }
+      },
+      "RB": {
+        "100": {
+          "actual": 32.6,
+          "withSpread": 26.9,
+          "pointOnly": 22.2
+        },
+        "150": {
+          "actual": 17.7,
+          "withSpread": 13.8,
+          "pointOnly": 8.2
+        }
+      },
+      "WR": {
+        "100": {
+          "actual": 22.3,
+          "withSpread": 26.5,
+          "pointOnly": 23.2
+        },
+        "150": {
+          "actual": 9.3,
+          "withSpread": 13.5,
+          "pointOnly": 10.6
+        }
+      },
+      "TE": {
+        "60": {
+          "actual": 21,
+          "withSpread": 20.7,
+          "pointOnly": 15.9
+        },
+        "100": {
+          "actual": 8.2,
+          "withSpread": 9.5,
+          "pointOnly": 5.1
+        }
+      }
+    },
+    "ageMultiplierVs27": {
+      "QB": {
+        "23": 1.095,
+        "25": 1.045,
+        "27": 1,
+        "29": 0.959,
+        "31": 0.922,
+        "33": 0.889
+      },
+      "RB": {
+        "23": 1.326,
+        "25": 1.155,
+        "27": 1,
+        "29": 0.861,
+        "31": 0.737,
+        "33": 0.627
+      },
+      "WR": {
+        "23": 1.32,
+        "25": 1.15,
+        "27": 1,
+        "29": 0.869,
+        "31": 0.753,
+        "33": 0.653
+      },
+      "TE": {
+        "23": 1.18,
+        "25": 1.091,
+        "27": 1,
+        "29": 0.91,
+        "31": 0.822,
+        "33": 0.737
+      }
+    }
+  },
+  "rookies": {
+    "fittedOn": "2011–2018 classes",
+    "test": {
+      "QB": {
+        "rookies": 48,
+        "maeModel": 147.6,
+        "maeClassAverage": 241.6,
+        "rmseModel": 205.5,
+        "rmseClassAverage": 289.4,
+        "rankModel": 0.603
+      },
+      "RB": {
+        "rookies": 145,
+        "maeModel": 113.6,
+        "maeClassAverage": 163.3,
+        "rmseModel": 144.6,
+        "rmseClassAverage": 202.5,
+        "rankModel": 0.554
+      },
+      "WR": {
+        "rookies": 204,
+        "maeModel": 103.4,
+        "maeClassAverage": 148.1,
+        "rmseModel": 137.4,
+        "rmseClassAverage": 183.5,
+        "rankModel": 0.648
+      },
+      "TE": {
+        "rookies": 94,
+        "maeModel": 55.9,
+        "maeClassAverage": 78.6,
+        "rmseModel": 74.6,
+        "rmseClassAverage": 101.6,
+        "rankModel": 0.609
+      }
+    }
+  },
+  "pickSlots": {
+    "fittedOn": "2011–2018 classes",
+    "test": {
+      "slots": 240,
+      "maeModel": 140.5,
+      "maeFlatAverage": 185,
+      "rmseModel": 172.9,
+      "rmseFlatAverage": 224.1,
+      "rank": 0.633,
+      "above100": {
+        "actual": 27.5,
+        "withOutcomes": 25.6,
+        "pointOnly": 10.5
+      }
+    },
+    "examples": {
+      "1": 667,
+      "3": 508,
+      "6": 407,
+      "12": 307,
+      "24": 206,
+      "36": 148
+    }
+  }
+}

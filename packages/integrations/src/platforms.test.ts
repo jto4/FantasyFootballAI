@@ -37,6 +37,7 @@ describe('Sleeper league connector', () => {
           return json({
             'player-1': { full_name: 'Quarterback One', position: 'QB', team: 'BUF' },
             'player-2': { full_name: 'Receiver Two', position: 'WR', team: 'NYJ' },
+            'player-3': { full_name: 'Taxi Rookie', position: 'WR', team: 'NYJ' },
           });
         if (url.endsWith('/state/nfl')) return json({ season: 2026, display_week: 0 });
         throw new Error(`Unexpected Sleeper request: ${url}`);
@@ -76,14 +77,22 @@ describe('Sleeper league connector', () => {
             draft_id: 'draft-1',
             roster_positions: ['QB', 'RB', 'WR', 'FLEX', 'SUPER_FLEX'],
             scoring_settings: { pass_td: 4, rec: 0.5 },
-            settings: { playoff_week_start: 15, private_cookie: 'must-not-enter-report-context' },
+            settings: {
+              playoff_week_start: 15,
+              private_cookie: 'must-not-enter-report-context',
+              type: 2,
+              taxi_slots: 2,
+              taxi_years: 1,
+            },
           });
         if (url.endsWith('/league/league-1/rosters'))
           return json([
             {
               roster_id: 1,
               owner_id: 'owner-1',
-              players: ['player-1'],
+              players: ['player-1', 'player-3'],
+              // Taxi entries outside `players` are ignored.
+              taxi: ['player-3', 'player-9'],
               settings: { wins: 3, losses: 1, fpts: 401, fpts_decimal: 25 },
             },
             {
@@ -142,7 +151,7 @@ describe('Sleeper league connector', () => {
         roster_positions: expect.arrayContaining(['SUPER_FLEX']),
       }),
       teams: [
-        expect.objectContaining({ id: '1', owner: 'Ada', pointsFor: 401.25, rosterSize: 1 }),
+        expect.objectContaining({ id: '1', owner: 'Ada', pointsFor: 401.25, rosterSize: 2 }),
         expect.objectContaining({ id: '2', owner: 'Linus', pointsFor: 390.05, rosterSize: 1 }),
       ],
       matchups: [
@@ -157,6 +166,10 @@ describe('Sleeper league connector', () => {
       }),
     });
     expect(league.settings).not.toHaveProperty('private_cookie');
+    expect(league.settings).toMatchObject({ leagueFormat: 'dynasty', taxiSlots: 2, taxiYears: 1 });
+    const roster = league.teams[0]!.roster!;
+    expect(roster.find((p) => p.id === 'player-3')?.rosterPosition).toBe('TAXI');
+    expect(roster.find((p) => p.id === 'player-1')?.rosterPosition).toBeUndefined();
   });
 
   it('fails clearly when league access is unavailable', async () => {

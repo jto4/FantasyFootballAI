@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 26 (dynasty): redraft, keeper and dynasty detection with an owner override; long-term
+  values from backtested age curves, rookie draft slots and pick values; Dynasty page with a
+  trade calculator, rookie board and draft plan, taxi and keeper help; Ask lookup.
 - October 24 (efficiency): download cache with conditional requests (115 MB → 4.8 MB per start),
   shared weekly results, memoized projections, fewer disk writes, slower background polling when
   no game is near.

@@ -1,0 +1,193 @@
+/* Dynasty page: long-term values, trades, rookies, taxi and keepers. */
+.dynasty-page {
+  display: grid;
+  gap: 16px;
+}
+.dynasty-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.dynasty-card h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+.dynasty-card h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.dynasty-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.dynasty-outlook {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.dynasty-outlook div {
+  display: grid;
+  gap: 2px;
+}
+.dynasty-outlook span,
+.dynasty-outlook small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.dynasty-outlook strong {
+  font-size: 24px;
+}
+.dynasty-outlook p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.dynasty-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.dynasty-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.dynasty-table th {
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.dynasty-table td {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+}
+.dynasty-table td strong,
+.dynasty-table td small {
+  display: block;
+}
+.dynasty-table td small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.dynasty-method summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+}
+.dynasty-method p {
+  max-width: 72ch;
+  color: var(--muted);
+  font-size: 13px;
+}
+.dynasty-table td:not(:first-child),
+.dynasty-table th:not(:first-child) {
+  text-align: right;
+  white-space: nowrap;
+}
+.dynasty-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.dynasty-trade-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.dynasty-checklist {
+  display: grid;
+  gap: 4px;
+  max-height: 240px;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.dynasty-checklist legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.dynasty-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.dynasty-checklist small {
+  color: var(--muted);
+}
+.dynasty-partner {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dynasty-picks-edit {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+.dynasty-pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.dynasty-verdict {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--muted);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--muted) 8%, transparent);
+}
+.dynasty-verdict.gain {
+  border-left-color: var(--green);
+}
+.dynasty-verdict.loss {
+  border-left-color: var(--pink);
+}
+.dynasty-verdict p {
+  margin: 0 0 4px;
+}
+.dynasty-plan {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dynasty-plan li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.dynasty-plan li.suggested strong::after {
+  content: ' · keep';
+  color: var(--green);
+  font-size: 12px;
+}
+.dynasty-plan small {
+  color: var(--muted);
+}
+.dynasty-pick {
+  min-width: 44px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+@media (max-width: 800px) {
+  .dynasty-grid,
+  .dynasty-trade-sides,
+  .dynasty-outlook {
+    grid-template-columns: 1fr;
+  }
+}

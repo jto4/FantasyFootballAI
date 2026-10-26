@@ -46,6 +46,8 @@ export interface UserPreferences {
   projectionAdjustments?: { wind?: boolean; vacatedCarries?: boolean };
   playerNudges?: PlayerNudge[];
   watchlist?: PlayerRef[];
+  /** Overrides the detected redraft, keeper or dynasty format, by league id. */
+  leagueFormats?: Record<string, 'redraft' | 'keeper' | 'dynasty'>;
   props?: {
     /** Minimum edge over the break-even rate, in percentage points, before a lean is shown. */
     minEdgePoints?: number;
@@ -146,6 +148,7 @@ export function isValidPreferences(
       'projectionAdjustments',
       'playerNudges',
       'watchlist',
+      'leagueFormats',
       'props',
       'notifications',
       'ai',
@@ -158,6 +161,7 @@ export function isValidPreferences(
     projectionAdjustments,
     playerNudges,
     watchlist,
+    leagueFormats,
     props,
     notifications,
     ai,
@@ -166,6 +170,18 @@ export function isValidPreferences(
   if (
     lineupStrategy !== undefined &&
     !['balanced', 'safe', 'upside', 'win-chance'].includes(String(lineupStrategy))
+  )
+    return false;
+  if (
+    leagueFormats !== undefined &&
+    !(
+      isObject(leagueFormats) &&
+      Object.keys(leagueFormats).length <= 50 &&
+      Object.entries(leagueFormats).every(
+        ([id, format]) =>
+          leagueIds.has(id) && ['redraft', 'keeper', 'dynasty'].includes(String(format)),
+      )
+    )
   )
     return false;
   if (
@@ -296,7 +312,7 @@ export function isValidPreferences(
 }
 
 /**
- * Preferences without watchlist entries and nudges for leagues that are no longer connected, so
+ * Preferences without watchlist entries, nudges and format choices for leagues that are no longer connected, so
  * removing a league never leaves settings that fail validation (and never discards the rest).
  */
 export function prunePreferences(
@@ -313,6 +329,10 @@ export function prunePreferences(
   const next: Record<string, unknown> = { ...record };
   if (record.watchlist !== undefined) next.watchlist = kept(record.watchlist);
   if (record.playerNudges !== undefined) next.playerNudges = kept(record.playerNudges);
+  if (isObject(record.leagueFormats))
+    next.leagueFormats = Object.fromEntries(
+      Object.entries(record.leagueFormats).filter(([id]) => leagueIds.has(id)),
+    );
   return next as UserPreferences;
 }
 

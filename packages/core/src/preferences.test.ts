@@ -139,3 +139,14 @@ it('knows when recorded predictions must leave out the owner’s changes', async
   ).toBe(true);
   expect(hasProjectionChanges({ projectionAdjustments: { wind: false } }, 'league')).toBe(true);
 });
+
+it('accepts league format choices only for connected leagues', async () => {
+  const { prunePreferences } = await import('./preferences.js');
+  const leagues = new Set(['kept']);
+  expect(isValidPreferences({ leagueFormats: { kept: 'dynasty' } }, leagues)).toBe(true);
+  expect(isValidPreferences({ leagueFormats: { gone: 'dynasty' } }, leagues)).toBe(false);
+  expect(isValidPreferences({ leagueFormats: { kept: 'bestball' } }, leagues)).toBe(false);
+  expect(isValidPreferences({ leagueFormats: ['dynasty'] }, leagues)).toBe(false);
+  const pruned = prunePreferences({ leagueFormats: { kept: 'keeper', gone: 'dynasty' } }, leagues);
+  expect(pruned?.leagueFormats).toEqual({ kept: 'keeper' });
+});

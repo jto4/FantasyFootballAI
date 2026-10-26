@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import {
   defaultNotificationPreferences,
   homeCardLabels,
+  leagueFormat,
+  leagueFormats,
   orderedHomeCards,
+  type LeagueFormat,
   type AITask,
   type LeagueConnection,
   type LineupStrategy,
@@ -79,6 +82,12 @@ export const knownSportsbooks = [
   'BetOnline.ag',
   'Bovada',
 ];
+
+const formatNames: Record<LeagueFormat, string> = {
+  redraft: 'Redraft',
+  keeper: 'Keeper',
+  dynasty: 'Dynasty',
+};
 
 const strategies: { id: LineupStrategy; label: string; detail: string }[] = [
   { id: 'balanced', label: 'Balanced', detail: 'Start the highest projections. The default.' },
@@ -544,6 +553,47 @@ export function PersonalizeSection({
           never move.
         </small>
       </section>
+
+      {leagues.length > 0 && (
+        <section
+          className="personalize-block"
+          data-search-target="personalize-league-format"
+          tabIndex={-1}
+        >
+          <h3>League format</h3>
+          <small>
+            Keeper and dynasty leagues get long-term values on the Dynasty page. Leave it on
+            detected unless the platform reports it wrong.
+          </small>
+          <div className="personalize-grid">
+            {leagues.map((league) => {
+              const detected = leagueFormat(league);
+              const chosen = preferences.leagueFormats?.[league.id];
+              return (
+                <label key={league.id}>
+                  {league.displayName}
+                  <select
+                    value={chosen ?? ''}
+                    onChange={(event) => {
+                      const next = { ...preferences.leagueFormats };
+                      if (event.target.value) next[league.id] = event.target.value as LeagueFormat;
+                      else delete next[league.id];
+                      set('leagueFormats', Object.keys(next).length ? next : undefined);
+                    }}
+                  >
+                    <option value="">Detected: {formatNames[detected]}</option>
+                    {leagueFormats.map((format) => (
+                      <option key={format} value={format}>
+                        {formatNames[format]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section
         className="personalize-block"

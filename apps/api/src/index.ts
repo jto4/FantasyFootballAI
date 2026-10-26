@@ -67,6 +67,7 @@ import {
   SignedInClaudeConnection,
   SignedInCodexConnection,
   getSleeperPlayerCatalog,
+  PublicPlayerBios,
 } from '@sidekick/integrations';
 import { LocalStore } from './store.js';
 import { leagueSyncErrorMessage } from './sync-errors.js';
@@ -99,6 +100,7 @@ import { startIntervalPoll } from './interval-poll.js';
 
 import { createStateRouter } from './state-routes.js';
 import { createProjectionRouter } from './projection-routes.js';
+import { createDynastyRouter } from './dynasty-routes.js';
 import { createAdviceRouter } from './advice-routes.js';
 import { createCredentialHealthRouter } from './credential-health-routes.js';
 import { createBackupRouter } from './backup-routes.js';
@@ -163,6 +165,8 @@ const publicPropLines = new PublicPropLines(
 const publicPregameEvidence = new PublicPregameEvidence();
 // Snap counts and depth charts for the prop model; loaded on first use and cached for 12 hours.
 const publicUsageData = new PublicUsageData();
+// Ages and NFL draft slots for dynasty values; loaded on first use.
+const publicPlayerBios = new PublicPlayerBios();
 let footballNewsRefreshTimer: NodeJS.Timeout | undefined;
 let conversationRetentionTimer: NodeJS.Timeout | undefined;
 let blueBubblesAutoSyncTimer: NodeJS.Timeout | undefined;
@@ -235,6 +239,14 @@ app.use(
   }),
 );
 app.use(createProjectionRouter({ store }));
+app.use(
+  createDynastyRouter({
+    store,
+    data: publicFootballData,
+    bios: publicPlayerBios,
+    catalog: getSleeperPlayerCatalog,
+  }),
+);
 app.use(
   createLeagueRouter({
     store,

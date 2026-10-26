@@ -12,6 +12,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Sprout,
   MessagesSquare,
   Users,
   Zap,
@@ -35,6 +36,7 @@ const menu = [
 // Labs tools (chat memory and imports) sit after the everyday tools under their own label.
 const tools = [
   { section: 'Leagues', label: 'Leagues', icon: Users, labs: false },
+  { section: 'Dynasty', label: 'Dynasty', icon: Sprout, labs: false },
   { section: 'Help', label: 'Help', icon: CircleHelp, labs: false },
   { section: 'Members & memory', label: 'League members', icon: MessageCircle, labs: true },
   { section: 'Imports', label: 'Imports', icon: FileText, labs: true },
@@ -59,7 +61,10 @@ export function AppSidebar({
   serviceStatus,
   onNavigate: navigate,
   onStop,
+  dynastyLeague = false,
 }: {
+  /** The active league is keeper or dynasty: its page joins the main menu on desktop. */
+  dynastyLeague?: boolean;
   asideRef: RefObject<HTMLElement | null>;
   section: string;
   showTools: boolean;
@@ -79,13 +84,21 @@ export function AppSidebar({
         </span>
       </div>
       <nav className="nav-list">
-        {menu.map(({ section: destination, label, icon: Icon }) => (
+        {(dynastyLeague
+          ? [
+              ...menu.slice(0, 5),
+              { section: 'Dynasty', label: 'Dynasty', icon: Sprout },
+              ...menu.slice(5),
+            ]
+          : menu
+        ).map(({ section: destination, label, icon: Icon }) => (
           <button
             key={label}
             aria-current={section === destination ? 'page' : undefined}
             onClick={() => navigate(destination)}
-            // The phone bottom bar has no room for Ask; the top bar's Ask button opens chat there.
-            className={`nav-item ${section === destination ? 'active' : ''}${destination === 'Ask' ? ' nav-item-desktop' : ''}`}
+            // The phone bottom bar has no room for Ask (the top bar's Ask button opens chat there)
+            // or Dynasty (under More tools there).
+            className={`nav-item ${section === destination ? 'active' : ''}${destination === 'Ask' || destination === 'Dynasty' ? ' nav-item-desktop' : ''}`}
           >
             <Icon size={17} strokeWidth={1.8} />
             <span>{label}</span>
@@ -101,26 +114,28 @@ export function AppSidebar({
             More<span className="more-tools-full"> tools</span>
           </summary>
           <div className="more-tools-menu">
-            {tools.map(({ section: destination, label, icon: Icon, labs }, index) => (
-              <Fragment key={destination}>
-                {labs && !tools[index - 1]?.labs && (
-                  <span className="nav-group-label" aria-hidden="true">
-                    Labs
-                  </span>
-                )}
-                <button
-                  type="button"
-                  className={`nav-item ${section === destination ? 'active' : ''}`}
-                  onClick={() => {
-                    if (isPhoneLayout()) onShowToolsChange(false);
-                    navigate(destination);
-                  }}
-                >
-                  <Icon size={17} />
-                  <span>{label}</span>
-                </button>
-              </Fragment>
-            ))}
+            {tools
+              .filter((tool) => tool.section !== 'Dynasty' || !dynastyLeague || isPhoneLayout())
+              .map(({ section: destination, label, icon: Icon, labs }, index, shown) => (
+                <Fragment key={destination}>
+                  {labs && !shown[index - 1]?.labs && (
+                    <span className="nav-group-label" aria-hidden="true">
+                      Labs
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className={`nav-item ${section === destination ? 'active' : ''}`}
+                    onClick={() => {
+                      if (isPhoneLayout()) onShowToolsChange(false);
+                      navigate(destination);
+                    }}
+                  >
+                    <Icon size={17} />
+                    <span>{label}</span>
+                  </button>
+                </Fragment>
+              ))}
           </div>
         </details>
       </nav>

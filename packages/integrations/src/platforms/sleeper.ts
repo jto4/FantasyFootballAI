@@ -154,6 +154,11 @@ export class SleeperConnector implements LeagueConnector {
       const rosterId = boundedId(roster.roster_id, 40) ?? String(index);
       const record = asRecord(roster.settings) ?? {};
       const rosterPlayerIds = validIds(roster.players);
+      // Taxi and reserve lists are subsets of `players`; anything else is ignored.
+      const taxiIds = new Set(validIds(roster.taxi).filter((p) => rosterPlayerIds.includes(p)));
+      const reserveIds = new Set(
+        validIds(roster.reserve).filter((p) => rosterPlayerIds.includes(p)),
+      );
       const pointsWhole = numberOrUndefined(record.fpts);
       const pointsFraction = boundedInteger(record.fpts_decimal, 0, 99) ?? 0;
       return {
@@ -165,6 +170,8 @@ export class SleeperConnector implements LeagueConnector {
         ...(pointsWhole !== undefined ? { pointsFor: pointsWhole + pointsFraction / 100 } : {}),
         rosterSize: rosterPlayerIds.length || undefined,
         ...(rosterPlayerIds.length ? { rosterPlayerIds } : {}),
+        taxiIds,
+        reserveIds,
       };
     });
     const playerCatalogPromise = sharedSleeperPlayerCatalog.get().catch(() => undefined);
@@ -185,13 +192,19 @@ export class SleeperConnector implements LeagueConnector {
           boundedInteger(rawSettings.playoff_week_start, 1, 30),
         )
       : [];
-    const teams = rosterRows.map((team) => ({
+    const teams = rosterRows.map(({ taxiIds, reserveIds, ...team }) => ({
       ...team,
       ...(playerCatalog && team.rosterPlayerIds
         ? {
             roster: team.rosterPlayerIds.flatMap((playerId) => {
               const player = playerCatalog!.get(playerId);
-              return player ? [player] : [];
+              if (!player) return [];
+              // Catalog entries are shared across leagues, so a roster spot goes on a copy.
+              return taxiIds.has(playerId)
+                ? [{ ...player, rosterPosition: 'TAXI' }]
+                : reserveIds.has(playerId)
+                  ? [{ ...player, rosterPosition: 'IR' }]
+                  : [player];
             }),
           }
         : {}),
@@ -215,6 +228,7 @@ export class SleeperConnector implements LeagueConnector {
           : {}),
         ...(seasonStatus ? { seasonStatus } : {}),
         ...(weeklyMatchups ? { currentWeek: weeklyMatchups.week } : {}),
+        ...sleeperFormat(rawSettings),
       },
       teams,
       ...(draft ? { draft } : {}),
@@ -223,6 +237,20 @@ export class SleeperConnector implements LeagueConnector {
       connectedAt: new Date().toISOString(),
     };
   }
+}
+
+/** Sleeper league type: 0 redraft, 1 keeper, 2 dynasty; taxi settings apply to dynasty. */
+export function sleeperFormat(settings: Record<string, unknown>) {
+  const type = boundedInteger(settings.type, 0, 2);
+  const leagueFormat = type === 2 ? 'dynasty' : type === 1 ? 'keeper' : 'redraft';
+  const maxKeepers = boundedInteger(settings.max_keepers, 0, 50);
+  const taxiSlots = boundedInteger(settings.taxi_slots, 0, 20);
+  const taxiYears = boundedInteger(settings.taxi_years, 0, 10);
+  return {
+    leagueFormat,
+    ...(leagueFormat !== 'redraft' && maxKeepers ? { maxKeepers } : {}),
+    ...(taxiSlots ? { taxiSlots, ...(taxiYears ? { taxiYears } : {}) } : {}),
+  };
 }
 
 async function sleeperLeagueDraft(

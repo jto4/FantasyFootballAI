@@ -168,3 +168,5 @@ export * from './prop-usage.js';
 export * from './fantasy-projection.js';
 export * from './fantasy-projection-settings.js';
 export * from './preferences.js';
+export * from './dynasty.js';
+export { dynastySettings } from './dynasty-settings.js';
