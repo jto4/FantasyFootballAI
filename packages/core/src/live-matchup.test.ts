@@ -96,3 +96,32 @@ it('counts a Questionable starter at his chance to play until his game starts', 
   expect(live.you.projectedFinal).toBe(5);
   expect(live.winChance).toBeLessThan(0.5);
 });
+
+it('counts a starter listed Out before his game as zero, not as an unknown estimate', () => {
+  const out = {
+    id: 'yo',
+    name: 'Out Receiver',
+    position: 'WR',
+    nflTeam: 'TEN',
+    out: true as const,
+  };
+  const live = liveMatchup(
+    {
+      you: { teamId: 'a', name: 'A', points: 0, starters: [...starters('y', ['CLE']), out] },
+      opponent: { teamId: 'b', name: 'B', points: 0, starters: starters('o', ['CLE']) },
+    },
+    games,
+  );
+  expect(live.you.projectedFinal).toBe(10);
+  expect(live.winChance).toBeCloseTo(0.5, 1);
+  // Without the Out listing a missing estimate still withholds the projection.
+  const unknown = { id: 'yo', name: 'Out Receiver', position: 'WR', nflTeam: 'TEN' };
+  const withheld = liveMatchup(
+    {
+      you: { teamId: 'a', name: 'A', points: 0, starters: [...starters('y', ['CLE']), unknown] },
+      opponent: { teamId: 'b', name: 'B', points: 0, starters: starters('o', ['CLE']) },
+    },
+    games,
+  );
+  expect(withheld.you.projectedFinal).toBeUndefined();
+});

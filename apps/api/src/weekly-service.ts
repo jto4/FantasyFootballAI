@@ -118,6 +118,8 @@ export interface MatchupSide {
     estimate?: number;
     /** Chance he plays, when listed Questionable; team totals count estimate × playChance. */
     playChance?: number;
+    /** Listed Out or inactive before his game: counted as zero, with no estimate. */
+    out?: true;
     /** 10th–90th percentile of past results around estimates like this one. */
     range?: { low: number; high: number };
     started?: boolean;
@@ -362,6 +364,13 @@ export function createWeeklyService(
           estimate !== undefined
             ? projectionRange(position, estimate, fantasyOutcomeSpread)
             : undefined;
+        // A starter listed Out (or inactive, on reserve) has no estimate; he scores zero, so he
+        // counts as zero in the team total and win chance instead of hiding them.
+        const out =
+          week === leagueWeek &&
+          !started &&
+          estimate === undefined &&
+          isInactiveFootballStatus(byId.get(id)?.status ?? player?.status);
         return {
           id,
           name: player?.name ?? 'Unknown player',
@@ -370,6 +379,7 @@ export function createWeeklyService(
           ...(playChance !== undefined && estimate !== undefined ? { playChance } : {}),
           ...(range ? { range: { low: range.low, high: range.high } } : {}),
           ...(started ? { started: true } : {}),
+          ...(out ? { out: true as const } : {}),
         };
       });
       // Platforms list starters in their own order; sort by position so both sides line up.
@@ -379,16 +389,7 @@ export function createWeeklyService(
         return index < 0 ? order.length : index;
       };
       players.sort((a, b) => rank(a.position) - rank(b.position));
-      const remaining = players.filter((p) => !p.started);
-      const anyStarted = remaining.length < players.length;
-      // Points so far plus estimates for starters yet to play; unknown if either part is missing.
-      const projected =
-        players.length &&
-        remaining.every((p) => p.estimate !== undefined) &&
-        (!anyStarted || entry.points !== undefined)
-          ? (anyStarted ? entry.points! : 0) +
-            remaining.reduce((sum, p) => sum + p.estimate! * (p.playChance ?? 1), 0)
-          : undefined;
+      const projected = projectedTeamTotal(players, entry.points);
       return {
         teamId: entry.teamId,
         name: league.teams.find((t) => t.id === entry.teamId)?.name ?? entry.teamId,
@@ -408,8 +409,8 @@ export function createWeeklyService(
               pregame && you.starters.length && opponent.starters.length
                 ? matchupWinProbability(
                     [
-                      { settled: 0, remaining: you.starters },
-                      { settled: 0, remaining: opponent.starters },
+                      { settled: 0, remaining: you.starters.filter((p) => !p.out) },
+                      { settled: 0, remaining: opponent.starters.filter((p) => !p.out) },
                     ],
                     fantasyOutcomeSpread,
                     matchupVarianceScale,
@@ -1163,4 +1164,23 @@ export function satOut(input: {
 }) {
   if (input.inBoxScore || footballPosition(input.position) === 'DST') return false;
   return isInactiveFootballStatus(input.status) || /^doubtful$/i.test(input.status?.trim() ?? '');
+}
+
+/**
+ * Points so far plus estimates for starters yet to play (Questionable ones at their chance to
+ * play). A starter listed Out counts as zero. Unknown when a remaining starter has no estimate,
+ * or when games have begun and the score so far is missing.
+ */
+export function projectedTeamTotal(
+  starters: { estimate?: number; playChance?: number; started?: boolean; out?: true }[],
+  points: number | undefined,
+) {
+  const anyStarted = starters.some((p) => p.started);
+  const remaining = starters.filter((p) => !p.started && !p.out);
+  if (!starters.length || remaining.some((p) => p.estimate === undefined)) return undefined;
+  if (anyStarted && points === undefined) return undefined;
+  return (
+    (anyStarted ? points! : 0) +
+    remaining.reduce((sum, p) => sum + p.estimate! * (p.playChance ?? 1), 0)
+  );
 }

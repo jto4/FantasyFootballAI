@@ -14,7 +14,10 @@ export interface LiveStarterInput {
   playChance?: number;
   /** Points so far from the NFL box score under this league's rules; set once a game starts. */
   livePoints?: number;
-  /** Not in the box score of a game under way and listed as not playing (Out, inactive). */
+  /**
+   * Not playing: listed Out or inactive before his game, or missing from the box score of a game
+   * under way while listed so. Counts as zero points, never as an unknown estimate.
+   */
   out?: true;
 }
 
@@ -83,7 +86,7 @@ export function liveMatchup(
       const team = starter.nflTeam ? nflTeamKey(starter.nflTeam) : undefined;
       const game = team ? byTeam.get(team) : undefined;
       const state: LiveGameState = game ? game.state : team && byes.has(team) ? 'bye' : 'unknown';
-      if (state === 'pre' || state === 'unknown') {
+      if ((state === 'pre' || state === 'unknown') && !starter.out) {
         if (starter.estimate === undefined) unknownRemaining = true;
         else {
           const p = starter.playChance ?? 1;

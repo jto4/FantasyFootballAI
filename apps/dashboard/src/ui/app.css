@@ -1438,6 +1438,8 @@ p {
 }
 .credential-edit {
   display: flex;
+  /* Test and Remove drop below the field on narrow phones instead of sticking out. */
+  flex-wrap: wrap;
   gap: 5px;
   margin-top: 8px;
 }
@@ -1670,7 +1672,7 @@ p {
 }
 .schedule-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 25px;
 }
@@ -1862,7 +1864,7 @@ p {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .schedule-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 560px) {
@@ -1880,7 +1882,7 @@ p {
     padding-left: 0;
   }
   .schedule-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .management-row {
     flex-wrap: wrap;

@@ -179,6 +179,10 @@ export function MatchupCard({
                         <Estimate starter={mine} />
                       ) : mine?.started ? (
                         'Played'
+                      ) : mine?.out ? (
+                        <span className="matchup-out" title="Listed Out: counted as zero">
+                          Out · 0
+                        </span>
                       ) : (
                         '—'
                       )}
@@ -188,6 +192,10 @@ export function MatchupCard({
                         <Estimate starter={theirs} />
                       ) : theirs?.started ? (
                         'Played'
+                      ) : theirs?.out ? (
+                        <span className="matchup-out" title="Listed Out: counted as zero">
+                          Out · 0
+                        </span>
                       ) : (
                         '—'
                       )}

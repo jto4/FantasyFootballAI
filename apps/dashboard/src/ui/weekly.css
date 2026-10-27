@@ -495,3 +495,9 @@ p.weekly-answer {
   padding-left: 18px;
   font-size: 13px;
 }
+
+.matchup-out {
+  color: var(--pink);
+  font-size: 12px;
+  white-space: nowrap;
+}

@@ -35,6 +35,8 @@ export type MatchupSide = {
     estimate?: number;
     /** Chance he plays, when listed Questionable; team totals count estimate × playChance. */
     playChance?: number;
+    /** Listed Out or inactive before his game: counted as zero, with no estimate. */
+    out?: true;
     /** 10th–90th percentile of past results around estimates like this one. */
     range?: { low: number; high: number };
     started?: boolean;

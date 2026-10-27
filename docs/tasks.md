@@ -14,11 +14,15 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 27 (matchup totals): a starter listed Out or inactive counts as zero in Home's
+  projected total and win chance, and on Live, instead of hiding them; the matchup table marks
+  him "Out · 0".
 - October 27 (screen sizes): every main page checked at 320, 375, 768, 1024, 1280, 1920 and
   2560 px wide with no sideways scrolling (`e2e/responsive.pw.ts`); fixed grids that could not
   shrink on phones (Home news, Live, Dynasty), a phone tab bar whose labels collided, Advice tabs
   that wrapped to three rows, cramped Home summary columns on tablets and laptops, and unstyled
-  pickers in the trade calculator.
+  pickers in the trade calculator. Linux CI then caught two more (a Settings button row at
+  320 px and Schedule cards at 1024 px), fixed the same way.
 - October 26 (player tools): player card from any name, start/sit compare, all-leagues Sunday
   page, redraft trade calculator, FAAB bid guide, since-last-visit changes, Live win-chance line,
   notification history; Props get their own page; older report drafts grouped and clearable;

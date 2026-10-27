@@ -1,6 +1,12 @@
 import { expect, it } from 'vitest';
 import { weeklyGameWithheldWarning, type PlayerAdviceEvidence } from '@sidekick/core';
-import { benchReplacement, newsMentions, plannedReplacement, satOut } from './weekly-service.js';
+import {
+  benchReplacement,
+  newsMentions,
+  plannedReplacement,
+  projectedTeamTotal,
+  satOut,
+} from './weekly-service.js';
 
 const player = (
   id: string,
@@ -101,4 +107,15 @@ it('finds headlines that name the player in full, newest first', () => {
     newsMentions([item('Travis Etienne returns', '2026-10-25T10:00:00Z')], 'Travis Etienne Jr.'),
   ).toHaveLength(1);
   expect(newsMentions([item('Kicker news', '2026-10-25T10:00:00Z')], 'Kicker')).toEqual([]);
+});
+
+it('counts a starter listed Out as zero instead of hiding the team total', () => {
+  const starters = [{ estimate: 15 }, { estimate: 10, playChance: 0.5 }, { out: true as const }];
+  expect(projectedTeamTotal(starters, undefined)).toBe(20);
+  // A starter with no estimate and no Out listing still makes the total unknown.
+  expect(projectedTeamTotal([...starters, {}], undefined)).toBeUndefined();
+  // Once games start, the score so far is added; without it the total is unknown.
+  expect(projectedTeamTotal([{ started: true }, { estimate: 8 }, { out: true }], 21.5)).toBe(29.5);
+  expect(projectedTeamTotal([{ started: true }, { estimate: 8 }], undefined)).toBeUndefined();
+  expect(projectedTeamTotal([], 0)).toBeUndefined();
 });
