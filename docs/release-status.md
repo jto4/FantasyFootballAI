@@ -1,15 +1,49 @@
 # Release status
 
-This is the source of truth for current readiness. Last reviewed: 2026-10-14 (real report quality installer).
-The project remains a contributor preview; this change does not establish a signed,
-public, device-verified desktop release.
+This is the source of truth for current readiness. Last reviewed: 2026-10-27 (status of the
+October 22–26 source). The last installer-verified review is 2026-10-14. The project remains a
+contributor preview; it is not a signed, public, device-verified desktop release.
 
 ## Current source
 
-Source changes after this review (October 22–23: Ask Sidekick chat, props
-board and prop model, prop line ledger, live box-score scoring, own weekly projections, locked
-starters, desktop right-click menu) are not recorded here as installer-verified; see the
-completed summary in [tasks](tasks.md).
+**Verdict (2026-10-27): not ready for public release.** Usable by the owner as an unsigned local
+build. The gates below are open.
+
+Source added October 22–26, summarized in [tasks](tasks.md) and [decisions](decisions.md):
+
+- Ask Sidekick chat; props board, prop model and prop line ledger; live box-score scoring; the
+  app's own weekly projections (ESPN projections removed); locked starters; desktop right-click
+  menu.
+- Win probability and likely ranges; forecast-wind and vacated-carries adjustments; game-day
+  inactive alerts.
+- UI states (no false all-clear, one error style, in-app confirmations, long-wait timers) with a
+  screenshot-tested state gallery.
+- Personalization (display, Home layout, watchlist, notifications, lineup strategy, projection
+  switches and nudges, prop thresholds and sportsbooks, AI tone and per-task model).
+- Efficiency: download cache with conditional requests, shared weekly results, memoized
+  projections.
+- Dynasty and keeper support (format detection, backtested multi-season values, rookie and pick
+  values, trades, rookie plan, taxi and keeper help).
+- Questionable-player discount and refit range widths (fitted on 2025, tested on 2026).
+- Home and Live agree once games start; one AI connection status; accuracy card minimums.
+- Player card, start/sit compare, all-leagues page, redraft trade calculator, FAAB bid guide,
+  since-last-visit changes, Live win-chance line, desktop notification history; Props on their own
+  page; older report drafts grouped.
+
+Evidence for this source, as of commit `1f18125` plus the Windows test fix:
+
+- Local macOS ARM: lint, format, typecheck, all workspace unit tests, 254 desktop/mobile browser
+  cases and 50 UI-state screenshots pass; `npm run desktop:make` builds and passes its packaged
+  API/MCP/headless smoke checks. The rebuilt app was checked by hand against one imported ESPN
+  league (Afton, week 7).
+- Hosted CI failed on Windows from October 24 to 26 because one test asserted Unix file
+  permission bits, which Windows does not have; the assertion is now skipped there like the
+  repository's other permission checks. Linux, macOS, minimum-Node and all three package smokes
+  passed throughout.
+- Not covered: no installer-level review was recorded for this source; Sleeper, Yahoo, taxi,
+  keeper and FAAB behavior were tested only with fixtures; the Live win-chance history, waiver
+  bids and notification history have not been seen with live data; the owner's AI connection check
+  was failing at review time.
 
 The current macOS ARM preview includes the real-data report fixes: eligibility-safe matchup sums,
 season-aware news/catalog/projection context, renamed-league/sync evidence retention, actual draft
@@ -98,16 +132,17 @@ interactive owner-device or live-provider coverage.
 
 ## Gates before publication
 
-| Gate                         | Required evidence                                                                                          | Current limit                                                                                                                          |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Current cross-platform build | Run updated source/package CI, including browser journeys and the minimum runtime                          | October 4 matrix covers the previous integrated source; current operations slice has local checks, with hosted/Intel packaging pending |
-| Signed distribution          | Credentialed Developer ID/notarization and Windows Authenticode jobs, verified downloadable assets         | Signing logic exists; credentialed release verification remains open                                                                   |
-| Native lifecycle             | Install, launch, Settings data move, tray/quit, sign-in, upgrade, and packaged MCP on owner devices        | Intel Mac and Windows/Linux interactive checks remain open; September macOS evidence is historical                                     |
-| Native updates               | Upgrade from a prior signed version using published architecture-matched assets                            | No verified signed published-release update cycle                                                                                      |
-| Live fantasy providers       | Owner-authorized Yahoo/ESPN/Sleeper scenarios, representative scoring and lineup/season semantics          | Fixtures and previous limited checks do not establish live account coverage                                                            |
-| Live AI and delivery         | Actual selected API/CLI, Resend, Twilio Conversations/direct SMS, BlueBubbles/webhook, and image providers | Browser mocks and adapter tests cannot establish live delivery or model behavior                                                       |
-| Performance                  | Repeat current-source performance smoke; slower hardware and live inference/sync                           | Synthetic local benchmark only; broader hardware/provider measurements remain                                                          |
-| Release review               | Complete code/security checklists for the exact published commit and inspect support claims                | Focused local manual review recorded; publication review remains separate                                                              |
+| Gate                         | Required evidence                                                                                          | Current limit                                                                                                                      |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Current cross-platform build | Run updated source/package CI, including browser journeys and the minimum runtime                          | Hosted CI covers October 26 source once the Windows test fix lands; Intel Mac packaging and interactive Windows/Linux runs pending |
+| Signed distribution          | Credentialed Developer ID/notarization and Windows Authenticode jobs, verified downloadable assets         | Signing logic exists; credentialed release verification remains open                                                               |
+| Native lifecycle             | Install, launch, Settings data move, tray/quit, sign-in, upgrade, and packaged MCP on owner devices        | Intel Mac and Windows/Linux interactive checks remain open; September macOS evidence is historical                                 |
+| Native updates               | Upgrade from a prior signed version using published architecture-matched assets                            | No verified signed published-release update cycle                                                                                  |
+| Live fantasy providers       | Owner-authorized Yahoo/ESPN/Sleeper scenarios, representative scoring and lineup/season semantics          | One imported ESPN league checked by hand; Sleeper/Yahoo, dynasty/keeper/taxi and FAAB leagues fixture-only                         |
+| Live AI and delivery         | Actual selected API/CLI, Resend, Twilio Conversations/direct SMS, BlueBubbles/webhook, and image providers | Browser mocks and adapter tests only; the owner's Codex connection check was failing on 2026-10-27                                 |
+| Performance                  | Repeat current-source performance smoke; slower hardware and live inference/sync                           | Synthetic local benchmark only; broader hardware/provider measurements remain                                                      |
+| Release review               | Complete code/security checklists for the exact published commit and inspect support claims                | Three code reviews on October 24–25; no installer-level or publication review of the October 26 source                             |
+| Owner usability              | Recorded sessions with willing commissioners on the current build                                          | No sessions held                                                                                                                   |
 
 Do not turn these gates into completed tasks without recorded evidence. Automated security
 scans remain excluded by the owner. See [release process](release-process.md) for the

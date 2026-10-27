@@ -54,9 +54,11 @@ it('revalidates with ETags, reads unchanged files from disk and falls back when 
   expect(offline).toMatchObject({ value: '3,4,5', stale: true });
   expect(offline.validatedAt).toBe(new Date(3_000).toISOString());
   expect(parses).toBe(4);
-  // Private files only.
-  for (const name of await readdir(directory))
-    expect((await stat(join(directory, name))).mode & 0o077).toBe(0);
+  // Private files only. Windows has no POSIX permission bits (its files report 0o666), so the
+  // mode check applies elsewhere; there the folder sits in the per-user app data directory.
+  if (process.platform !== 'win32')
+    for (const name of await readdir(directory))
+      expect((await stat(join(directory, name))).mode & 0o077).toBe(0);
 });
 
 it('stores a derived form, and without a cache folder simply downloads', async () => {
