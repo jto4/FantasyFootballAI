@@ -14,6 +14,11 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 27 (screen sizes): every main page checked at 320, 375, 768, 1024, 1280, 1920 and
+  2560 px wide with no sideways scrolling (`e2e/responsive.pw.ts`); fixed grids that could not
+  shrink on phones (Home news, Live, Dynasty), a phone tab bar whose labels collided, Advice tabs
+  that wrapped to three rows, cramped Home summary columns on tablets and laptops, and unstyled
+  pickers in the trade calculator.
 - October 26 (player tools): player card from any name, start/sit compare, all-leagues Sunday
   page, redraft trade calculator, FAAB bid guide, since-last-visit changes, Live win-chance line,
   notification history; Props get their own page; older report drafts grouped and clearable;

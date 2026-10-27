@@ -981,7 +981,7 @@
 /* Settings: one row of setup health above the section tabs; each chip opens its fix. */
 .settings-overview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
   gap: 8px;
   margin: 0 0 14px;
   padding: 0;
@@ -1352,7 +1352,7 @@
 }
 .personalize-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
   gap: 10px 16px;
   margin: 0;
   padding: 0;

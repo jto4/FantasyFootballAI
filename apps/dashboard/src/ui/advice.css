@@ -728,3 +728,17 @@
   font-weight: 600;
   margin-bottom: 10px;
 }
+
+/* Phones: the workspace tabs stay one row and scroll sideways rather than wrapping to three. */
+@media (max-width: 800px) {
+  .advice-view-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .advice-view-nav button {
+    flex: none;
+    padding: 12px 12px;
+    white-space: nowrap;
+  }
+}

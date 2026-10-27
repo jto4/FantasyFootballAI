@@ -1,6 +1,8 @@
 /* Dynasty page: long-term values, trades, rookies, taxi and keepers. */
 .dynasty-page {
   display: grid;
+  /* A wide table scrolls inside its own box instead of stretching the page on phones. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 .dynasty-card {
@@ -208,4 +210,17 @@
   border-color: var(--orange);
   color: var(--ink);
   font-weight: 600;
+}
+
+.dynasty-page select {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+}
+.dynasty-partner select {
+  width: 100%;
 }

@@ -266,18 +266,20 @@ export function WeeklyHome({
                                 : 'Starter assignments unknown.'}
                           </p>
                         )}
-                        <button className="primary-button" onClick={() => onAdvice('lineup')}>
-                          Check my lineup
-                        </button>{' '}
-                        {onNavigate && (
-                          <button
-                            type="button"
-                            className="text-button"
-                            onClick={() => onNavigate('Start/sit')}
-                          >
-                            Compare players
+                        <div className="weekly-actions">
+                          <button className="primary-button" onClick={() => onAdvice('lineup')}>
+                            Check my lineup
                           </button>
-                        )}
+                          {onNavigate && (
+                            <button
+                              type="button"
+                              className="text-button"
+                              onClick={() => onNavigate('Start/sit')}
+                            >
+                              Compare players
+                            </button>
+                          )}
+                        </div>
                       </article>
                       <article>
                         <h3>Availability to review</h3>
@@ -346,21 +348,23 @@ export function WeeklyHome({
                             ? `$${team.faabRemaining} of FAAB left. Bids are a rule of thumb: about 1% of what is left per point he adds over the rest of the regular season.`
                             : `Check your waiver priority and FAAB in ${platformName(league.platform)}.`}
                         </p>
-                        <button className="small-button" onClick={() => onAdvice('waivers')}>
-                          Find waiver pickups
-                        </button>{' '}
-                        {onNavigate && (
-                          <button
-                            type="button"
-                            className="text-button"
-                            onClick={() => onNavigate('Trade calculator')}
-                          >
-                            Trade calculator
+                        <div className="weekly-actions">
+                          <button className="small-button" onClick={() => onAdvice('waivers')}>
+                            Find waiver pickups
                           </button>
-                        )}{' '}
-                        <button className="text-button" onClick={() => onAdvice('trade')}>
-                          Ask AI about a trade
-                        </button>
+                          {onNavigate && (
+                            <button
+                              type="button"
+                              className="text-button"
+                              onClick={() => onNavigate('Trade calculator')}
+                            >
+                              Trade calculator
+                            </button>
+                          )}
+                          <button className="text-button" onClick={() => onAdvice('trade')}>
+                            Ask AI about a trade
+                          </button>
+                        </div>
                       </article>
                     </div>
                   </Fragment>

@@ -38,6 +38,9 @@ Use **Stop app** at the bottom of the dashboard sidebar to stop the API, schedul
 - `npm run test:ui-states` screenshots every gallery state in light and dark appearance and
   compares them with `e2e-states/__screenshots__/` (macOS renders). After an intended visual
   change, run it with `-- --update-snapshots` and review the image diffs before committing.
+- `e2e/responsive.pw.ts` (part of `npx playwright test`) opens every main page at 320 to 2560 px
+  wide and fails on sideways scrolling or anything sticking out of the window. Set
+  `RESPONSIVE_SHOTS=<folder>` to save a screenshot of each page and width for review.
 - To see failures in the real app during `npm run dev`, set `SIDEKICK_FAULTS` before starting
   it, for example `SIDEKICK_FAULTS="fail:/api/alerts=502;slow:/api/advice/briefing=8000"`.
   Rules are `fail:<path>=<status>`, `slow:<path>=<ms>`, `drop:<path>` (connection closed) and

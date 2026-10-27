@@ -206,28 +206,30 @@ export function SundayPage({
           {rows.length > 0 && (
             <section aria-labelledby="sunday-starters">
               <h2 id="sunday-starters">Your starters, all leagues</h2>
-              <table className="sunday-table">
-                <thead>
-                  <tr>
-                    <th>Player</th>
-                    <th>Starting in</th>
-                    <th>Benched in</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.key}>
-                      <td>
-                        {row.name} <small>{row.position}</small>
-                      </td>
-                      <td>{row.starting.join(', ')}</td>
-                      <td>{row.benched.join(', ') || '—'}</td>
-                      <td>{row.status ?? ''}</td>
+              <div className="sunday-table-wrap">
+                <table className="sunday-table">
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Starting in</th>
+                      <th>Benched in</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => (
+                      <tr key={row.key}>
+                        <td>
+                          {row.name} <small>{row.position}</small>
+                        </td>
+                        <td>{row.starting.join(', ')}</td>
+                        <td>{row.benched.join(', ') || '—'}</td>
+                        <td>{row.status ?? ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
           )}
         </>

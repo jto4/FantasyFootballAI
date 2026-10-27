@@ -2,6 +2,7 @@
 .compare-page,
 .sunday-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 .compare-pick {
@@ -27,7 +28,7 @@
 }
 .compare-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 12px;
 }
 .compare-card,
@@ -74,7 +75,7 @@
 }
 .sunday-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 12px;
 }
 .sunday-card h2 {
@@ -108,6 +109,9 @@
   border-radius: 4px;
   background: var(--warning-bg);
 }
+.sunday-table-wrap {
+  overflow-x: auto;
+}
 .sunday-table {
   width: 100%;
   border-collapse: collapse;
@@ -130,4 +134,14 @@
   display: flex;
   gap: 14px;
   margin-top: 8px;
+}
+
+.compare-page select {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
 }
