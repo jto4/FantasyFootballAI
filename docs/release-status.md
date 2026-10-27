@@ -39,7 +39,8 @@ Evidence for this source, as of commit `1f18125` plus the Windows test fix:
 - Hosted CI failed on Windows from October 24 to 26 because one test asserted Unix file
   permission bits, which Windows does not have; the assertion is now skipped there like the
   repository's other permission checks. Linux, macOS, minimum-Node and all three package smokes
-  passed throughout.
+  passed throughout. A report-library browser test assumed the power-rankings schedule card came
+  first, which holds only on Mondays; it now checks that both weekly drafts are scheduled.
 - Not covered: no installer-level review was recorded for this source; Sleeper, Yahoo, taxi,
   keeper and FAAB behavior were tested only with fixtures; the Live win-chance history, waiver
   bids and notification history have not been seen with live data; the owner's AI connection check

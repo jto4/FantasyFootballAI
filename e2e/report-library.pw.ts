@@ -300,10 +300,14 @@ test('manual imports offer explicit saved-data drafts and Home explains expired 
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();
     // Schedule is lazy-loaded; wait for its first card before reading the heading order.
     await expect(page.getByRole('heading', { level: 2, name: 'Power rankings' })).toBeVisible();
-    expect((await page.locator('.schedule-card h2').allTextContents()).slice(0, 2)).toEqual([
-      'Power rankings',
-      'Matchup preview',
-    ]);
+    // Both weekly drafts are scheduled. Cards run in next-run order, so which comes first
+    // depends on the day the test runs.
+    for (const name of ['Power rankings', 'Matchup preview'])
+      await expect(
+        page.locator('.schedule-card').filter({
+          has: page.getByRole('heading', { level: 2, name, exact: true }),
+        }),
+      ).toContainText('Next planned run');
     await page.screenshot({ path: info.outputPath('saved-data-schedule.png'), fullPage: true });
     await expect(
       page
