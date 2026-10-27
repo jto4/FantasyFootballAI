@@ -29,3 +29,12 @@ export function FriendlyError({
     </div>
   );
 }
+
+/**
+ * The API returns Codex version problems as fixed, path-free sentences that already say what
+ * to do, so those are shown as the message; any other AI failure keeps the generic message and
+ * moves the raw text under "Details for support".
+ */
+export function aiProblemMessage(error: string, fallback: string) {
+  return /^(ChatGPT updated its Codex|This Codex version)/.test(error) ? error : fallback;
+}

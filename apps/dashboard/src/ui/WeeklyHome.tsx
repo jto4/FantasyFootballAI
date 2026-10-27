@@ -24,7 +24,6 @@ export function WeeklyHome({
   onTeamChange,
   onAdvice,
   onRefresh,
-  onSetup,
   onSavedAdvice,
   onResults,
   onLive,
@@ -39,7 +38,6 @@ export function WeeklyHome({
   onTeamChange: (id: string) => void;
   onAdvice: (mode: AdviceMode) => void;
   onRefresh: () => void;
-  onSetup: () => void;
   onSavedAdvice: (id: string, mode: AdviceMode) => void;
   onResults?: () => void;
   onLive?: () => void;
@@ -135,6 +133,8 @@ export function WeeklyHome({
     </p>
   ) : null;
   const nextUpShown = cards.some((card) => card.id === 'next-up' && card.visible);
+  // Before a league exists the setup card below is the one next step; a second prompt here repeated it.
+  if (!league) return null;
   return (
     <section className="weekly-home" aria-labelledby="weekly-home-title">
       <div className="weekly-home-heading">
@@ -142,286 +142,273 @@ export function WeeklyHome({
           <p className="section-overline">YOUR WEEK{week ? ` · WEEK ${week}` : ''}</p>
           <h2 id="weekly-home-title">What needs your attention?</h2>
         </div>
-        {league && (
-          <label>
-            Your team
-            <select value={teamId ?? ''} onChange={(e) => onTeamChange(e.target.value)}>
-              <option value="">Choose your team</option>
-              {league.teams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
+        <label>
+          Your team
+          <select value={teamId ?? ''} onChange={(e) => onTeamChange(e.target.value)}>
+            <option value="">Choose your team</option>
+            {league.teams.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
-      {!league ? (
-        <p>
-          Connect a league to get started.{' '}
-          <button className="text-button" onClick={onSetup}>
-            Connect my league
-          </button>
-        </p>
-      ) : (
-        <>
-          {changes && (
-            <section className="visit-changes" aria-label="Since your last visit">
-              <h3>Since your last visit · {formatDateTime(changes.since)}</h3>
-              <ul>
-                {changes.lines.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {/* The roster's date and refresh sit under the top card, or first when it is hidden. */}
-          {!nextUpShown && rosterFreshness}
-          {cards.map((card) => {
-            if (!card.visible) return null;
-            switch (card.id) {
-              case 'next-up':
-                return (
-                  <Fragment key={card.id}>
-                    {teamId && onLive && (
-                      <NextUpCard
-                        leagueId={league.id}
-                        teamId={teamId}
-                        briefing={briefing}
-                        briefingError={briefingError}
-                        onRetryBriefing={() => setBriefingAttempt((n) => n + 1)}
-                        stale={freshness === 'stale'}
-                        onAdvice={onAdvice}
-                        onRefresh={onRefresh}
-                        onLive={onLive}
-                      />
-                    )}
-                    {rosterFreshness}
-                  </Fragment>
-                );
-              case 'matchup':
-                return team ? (
-                  <Fragment key={card.id}>
-                    {briefing && (
-                      <MatchupCard
-                        briefing={briefing}
-                        leagueId={league.id}
-                        teamId={teamId}
-                        {...(onLive ? { onLive } : {})}
-                      />
-                    )}
-                    {briefing?.notes.length ? (
-                      <ul className="weekly-notes">
-                        {briefing.notes.map((note) => (
-                          <li key={note}>{note}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </Fragment>
-                ) : null;
-              case 'week-summary':
-                return team ? (
-                  <Fragment key={card.id}>
-                    <div className="weekly-home-grid">
-                      <article>
-                        <h3>Lineup check</h3>
-                        {briefing?.lineup.changes.length ? (
-                          <ul className="weekly-answer">
-                            {briefing.lineup.changes.map((change) => (
-                              <li key={change.start.id}>
-                                <strong>
-                                  Start <PlayerName id={change.start.id} name={change.start.name} />
-                                </strong>{' '}
-                                ({points(change.start.points)})
-                                {change.bench ? (
-                                  <>
-                                    {' '}
-                                    over{' '}
-                                    <PlayerName id={change.bench.id} name={change.bench.name} />
-                                    {change.bench.points !== undefined
-                                      ? ` (${points(change.bench.points)})`
-                                      : ''}
-                                  </>
-                                ) : null}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : briefing?.lineup.complete ? (
-                          <p className="weekly-answer">
-                            <strong>Your lineup looks set.</strong>
-                            {/* Once some starters have played, project the final, not just who is left. */}
-                            {briefing.matchup?.you.starters.some((p) => p.started) &&
-                            briefing.matchup.you.projected !== undefined
-                              ? ` ${points(briefing.matchup.you.projected)} projected, with ${points(briefing.matchup.you.points ?? 0)} already in.`
-                              : briefing.lineup.points !== undefined
-                                ? ` ${points(briefing.lineup.points)} projected points.`
-                                : ''}
-                          </p>
-                        ) : (
-                          <p>
-                            {incomplete
-                              ? 'Roster incomplete · refresh first.'
-                              : starters.length
-                                ? `${starters.length} recorded starters.`
-                                : 'Starter assignments unknown.'}
-                          </p>
-                        )}
-                        <div className="weekly-actions">
-                          <button className="primary-button" onClick={() => onAdvice('lineup')}>
-                            Check my lineup
-                          </button>
-                          {onNavigate && (
-                            <button
-                              type="button"
-                              className="text-button"
-                              onClick={() => onNavigate('Start/sit')}
-                            >
-                              Compare players
-                            </button>
-                          )}
-                        </div>
-                      </article>
-                      <article>
-                        <h3>Availability to review</h3>
-                        {briefing?.availability.length ? (
-                          <ul>
-                            {briefing.availability.slice(0, 5).map((p) => (
-                              <li key={p.id}>
-                                <PlayerName id={p.id} name={p.name} />: {p.status}
-                                {p.basis === 'this-week-report' ? ' · this week’s report' : ''}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : alerts.length ? (
-                          <ul>
-                            {alerts.slice(0, 5).map((p) => (
-                              <li key={p.id}>
-                                {p.name}: {availabilityFlag(p.injuryStatus, p.status)}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>No injury flags on this roster.</p>
-                        )}
-                        {alerts.length > 5 && (
-                          <p>
-                            {alerts.length - 5} more flagged players. Open the lineup check to see
-                            all.
-                          </p>
-                        )}
-                        <small>
-                          From your last roster update. Check game-day status before kickoff.
-                        </small>
-                      </article>
-                      <article>
-                        <h3>Waivers and trades</h3>
-                        {briefing?.waivers.length ? (
-                          <ul className="weekly-answer">
-                            {briefing.waivers.map((w) => {
-                              const bid =
-                                team?.faabRemaining !== undefined
-                                  ? faabBid({
-                                      gain: w.gain,
-                                      weeksLeft: regularWeeksLeft(league, briefing.week),
-                                      remaining: team.faabRemaining,
-                                    })
-                                  : undefined;
-                              return (
-                                <li key={w.id}>
-                                  <strong>
-                                    <PlayerName id={w.id} name={w.name} />
-                                  </strong>{' '}
-                                  ({w.position}) · +{points(w.gain)} pts if added
-                                  {bid ? (
-                                    <small className="faab-bid">
-                                      {' '}
-                                      · bid ${bid.low}–${bid.high}
-                                    </small>
-                                  ) : null}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        ) : null}
-                        <p>
-                          {team?.faabRemaining !== undefined
-                            ? `$${team.faabRemaining} of FAAB left. Bids are a rule of thumb: about 1% of what is left per point he adds over the rest of the regular season.`
-                            : `Check your waiver priority and FAAB in ${platformName(league.platform)}.`}
+      <>
+        {changes && (
+          <section className="visit-changes" aria-label="Since your last visit">
+            <h3>Since your last visit · {formatDateTime(changes.since)}</h3>
+            <ul>
+              {changes.lines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {/* The roster's date and refresh sit under the top card, or first when it is hidden. */}
+        {!nextUpShown && rosterFreshness}
+        {cards.map((card) => {
+          if (!card.visible) return null;
+          switch (card.id) {
+            case 'next-up':
+              return (
+                <Fragment key={card.id}>
+                  {teamId && onLive && (
+                    <NextUpCard
+                      leagueId={league.id}
+                      teamId={teamId}
+                      briefing={briefing}
+                      briefingError={briefingError}
+                      onRetryBriefing={() => setBriefingAttempt((n) => n + 1)}
+                      stale={freshness === 'stale'}
+                      onAdvice={onAdvice}
+                      onRefresh={onRefresh}
+                      onLive={onLive}
+                    />
+                  )}
+                  {rosterFreshness}
+                </Fragment>
+              );
+            case 'matchup':
+              return team ? (
+                <Fragment key={card.id}>
+                  {briefing && (
+                    <MatchupCard
+                      briefing={briefing}
+                      leagueId={league.id}
+                      teamId={teamId}
+                      {...(onLive ? { onLive } : {})}
+                    />
+                  )}
+                  {briefing?.notes.length ? (
+                    <ul className="weekly-notes">
+                      {briefing.notes.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </Fragment>
+              ) : null;
+            case 'week-summary':
+              return team ? (
+                <Fragment key={card.id}>
+                  <div className="weekly-home-grid">
+                    <article>
+                      <h3>Lineup check</h3>
+                      {briefing?.lineup.changes.length ? (
+                        <ul className="weekly-answer">
+                          {briefing.lineup.changes.map((change) => (
+                            <li key={change.start.id}>
+                              <strong>
+                                Start <PlayerName id={change.start.id} name={change.start.name} />
+                              </strong>{' '}
+                              ({points(change.start.points)})
+                              {change.bench ? (
+                                <>
+                                  {' '}
+                                  over <PlayerName id={change.bench.id} name={change.bench.name} />
+                                  {change.bench.points !== undefined
+                                    ? ` (${points(change.bench.points)})`
+                                    : ''}
+                                </>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : briefing?.lineup.complete ? (
+                        <p className="weekly-answer">
+                          <strong>Your lineup looks set.</strong>
+                          {/* Once some starters have played, project the final, not just who is left. */}
+                          {briefing.matchup?.you.starters.some((p) => p.started) &&
+                          briefing.matchup.you.projected !== undefined
+                            ? ` ${points(briefing.matchup.you.projected)} projected, with ${points(briefing.matchup.you.points ?? 0)} already in.`
+                            : briefing.lineup.points !== undefined
+                              ? ` ${points(briefing.lineup.points)} projected points.`
+                              : ''}
                         </p>
-                        <div className="weekly-actions">
-                          <button className="small-button" onClick={() => onAdvice('waivers')}>
-                            Find waiver pickups
+                      ) : (
+                        <p>
+                          {incomplete
+                            ? 'Roster incomplete · refresh first.'
+                            : starters.length
+                              ? `${starters.length} recorded starters.`
+                              : 'Starter assignments unknown.'}
+                        </p>
+                      )}
+                      <div className="weekly-actions">
+                        <button className="primary-button" onClick={() => onAdvice('lineup')}>
+                          Check my lineup
+                        </button>
+                        {onNavigate && (
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => onNavigate('Start/sit')}
+                          >
+                            Compare players
                           </button>
-                          {onNavigate && (
-                            <button
-                              type="button"
-                              className="text-button"
-                              onClick={() => onNavigate('Trade calculator')}
-                            >
-                              Trade calculator
-                            </button>
-                          )}
-                          <button className="text-button" onClick={() => onAdvice('trade')}>
-                            Ask AI about a trade
-                          </button>
-                        </div>
-                      </article>
-                    </div>
-                  </Fragment>
-                ) : null;
-              case 'watchlist':
-                return team && teamId ? (
-                  <WatchlistCard
-                    key={card.id}
-                    leagueId={league.id}
-                    teamId={teamId}
-                    count={
-                      (settings.preferences?.watchlist ?? []).filter(
-                        (w) => w.leagueId === league.id,
-                      ).length
-                    }
-                    onManage={() => onPersonalize?.('watchlist')}
-                  />
-                ) : null;
-              case 'decisions':
-                return team ? (
-                  <Fragment key={card.id}>
-                    <section>
-                      <h3>Saved decisions to revisit</h3>
-                      {decisionError ? (
-                        <p role="status">{decisionError}</p>
-                      ) : decisions.length ? (
+                        )}
+                      </div>
+                    </article>
+                    <article>
+                      <h3>Availability to review</h3>
+                      {briefing?.availability.length ? (
                         <ul>
-                          {decisions.map((d) => (
-                            <li key={d.id}>
-                              <button
-                                type="button"
-                                className="text-button"
-                                onClick={() => onSavedAdvice(d.id, d.mode)}
-                              >
-                                {d.headline}
-                              </button>{' '}
-                              · {formatDateTime(d.createdAt)}
+                          {briefing.availability.slice(0, 5).map((p) => (
+                            <li key={p.id}>
+                              <PlayerName id={p.id} name={p.name} />: {p.status}
+                              {p.basis === 'this-week-report' ? ' · this week’s report' : ''}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : alerts.length ? (
+                        <ul>
+                          {alerts.slice(0, 5).map((p) => (
+                            <li key={p.id}>
+                              {p.name}: {availabilityFlag(p.injuryStatus, p.status)}
                             </li>
                           ))}
                         </ul>
                       ) : (
-                        <p>No saved decisions this week.</p>
+                        <p>No injury flags on this roster.</p>
                       )}
-                    </section>
-                  </Fragment>
-                ) : null;
-              case 'scorecard':
-                return team && onResults ? (
-                  <AdviceScorecard key={card.id} onOpen={onResults} />
-                ) : null;
-              default:
-                return null;
-            }
-          })}
-          {!team && <p>Choose your team to get started.</p>}
-        </>
-      )}
+                      {alerts.length > 5 && (
+                        <p>
+                          {alerts.length - 5} more flagged players. Open the lineup check to see
+                          all.
+                        </p>
+                      )}
+                      <small>
+                        From your last roster update. Check game-day status before kickoff.
+                      </small>
+                    </article>
+                    <article>
+                      <h3>Waivers and trades</h3>
+                      {briefing?.waivers.length ? (
+                        <ul className="weekly-answer">
+                          {briefing.waivers.map((w) => {
+                            const bid =
+                              team?.faabRemaining !== undefined
+                                ? faabBid({
+                                    gain: w.gain,
+                                    weeksLeft: regularWeeksLeft(league, briefing.week),
+                                    remaining: team.faabRemaining,
+                                  })
+                                : undefined;
+                            return (
+                              <li key={w.id}>
+                                <strong>
+                                  <PlayerName id={w.id} name={w.name} />
+                                </strong>{' '}
+                                ({w.position}) · +{points(w.gain)} pts if added
+                                {bid ? (
+                                  <small className="faab-bid">
+                                    {' '}
+                                    · bid ${bid.low}–${bid.high}
+                                  </small>
+                                ) : null}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : null}
+                      <p>
+                        {team?.faabRemaining !== undefined
+                          ? `$${team.faabRemaining} of FAAB left. Bids are a rule of thumb: about 1% of what is left per point he adds over the rest of the regular season.`
+                          : `Check your waiver priority and FAAB in ${platformName(league.platform)}.`}
+                      </p>
+                      <div className="weekly-actions">
+                        <button className="small-button" onClick={() => onAdvice('waivers')}>
+                          Find waiver pickups
+                        </button>
+                        {onNavigate && (
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={() => onNavigate('Trade calculator')}
+                          >
+                            Trade calculator
+                          </button>
+                        )}
+                        <button className="text-button" onClick={() => onAdvice('trade')}>
+                          Ask AI about a trade
+                        </button>
+                      </div>
+                    </article>
+                  </div>
+                </Fragment>
+              ) : null;
+            case 'watchlist':
+              return team && teamId ? (
+                <WatchlistCard
+                  key={card.id}
+                  leagueId={league.id}
+                  teamId={teamId}
+                  count={
+                    (settings.preferences?.watchlist ?? []).filter((w) => w.leagueId === league.id)
+                      .length
+                  }
+                  onManage={() => onPersonalize?.('watchlist')}
+                />
+              ) : null;
+            case 'decisions':
+              return team ? (
+                <Fragment key={card.id}>
+                  <section>
+                    <h3>Saved decisions to revisit</h3>
+                    {decisionError ? (
+                      <p role="status">{decisionError}</p>
+                    ) : decisions.length ? (
+                      <ul>
+                        {decisions.map((d) => (
+                          <li key={d.id}>
+                            <button
+                              type="button"
+                              className="text-button"
+                              onClick={() => onSavedAdvice(d.id, d.mode)}
+                            >
+                              {d.headline}
+                            </button>{' '}
+                            · {formatDateTime(d.createdAt)}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No saved decisions this week.</p>
+                    )}
+                  </section>
+                </Fragment>
+              ) : null;
+            case 'scorecard':
+              return team && onResults ? (
+                <AdviceScorecard key={card.id} onOpen={onResults} />
+              ) : null;
+            default:
+              return null;
+          }
+        })}
+        {!team && <p>Choose your team to get started.</p>}
+      </>
     </section>
   );
 }

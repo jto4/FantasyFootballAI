@@ -146,7 +146,7 @@ export function MatchupCard({
         <Side side={waiting ? { name: opponent.name } : theirs} align="end" />
       </div>
       {rows > 0 && (
-        <details className="matchup-lineups">
+        <details className="matchup-lineups" open>
           <summary>Compare starting lineups</summary>
           <table>
             <caption className="visually-hidden">

@@ -150,11 +150,9 @@ test('generating, editing, and sending a draft respects review and destination',
   page,
 }, testInfo) => {
   const context = await workspace(page);
-  await page.getByText('Report activity', { exact: true }).click();
   await page
     .getByRole('region', { name: 'Commissioner next actions' })
     .screenshot({ path: testInfo.outputPath('action-inbox.png') });
-  await page.getByText('League standings & news', { exact: true }).click();
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
   await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -273,7 +271,6 @@ test('unsaved settings and draft edits warn before leaving', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Home', exact: true }).click();
   await answerConfirm(page, true);
-  await page.getByText('League standings & news', { exact: true }).click();
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
   await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await page.getByRole('button', { name: 'Edit draft', exact: true }).click();
@@ -285,7 +282,6 @@ test('unsaved settings and draft edits warn before leaving', async ({ page }) =>
 
 test('a failed delivery remains visible and cannot be edited before retry', async ({ page }) => {
   const context = await workspace(page);
-  await page.getByText('League standings & news', { exact: true }).click();
   await page.getByRole('button', { name: 'Generate rankings draft' }).click();
   await page.getByRole('button', { name: 'Create draft', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();

@@ -2,7 +2,53 @@ import { useEffect, useState } from 'react';
 import { isAppSettings, settingsSectionPatch, type AppSettings } from '@sidekick/core';
 import { requestJson, requestResponse } from './api-client';
 import { isAppState, isCredentialProviders } from './app-state';
-import { FriendlyError } from './FriendlyError';
+import { FriendlyError, aiProblemMessage } from './FriendlyError';
+
+type KeyProvider = 'openai' | 'anthropic';
+const providers: Record<
+  KeyProvider,
+  {
+    name: string;
+    label: string;
+    about: string;
+    keysUrl: string;
+    runtime: NonNullable<AppSettings['aiRuntime']>;
+  }
+> = {
+  openai: {
+    name: 'OpenAI',
+    label: 'OpenAI API key',
+    about:
+      'Use an OpenAI account with API billing enabled. API usage is billed separately from ChatGPT.',
+    keysUrl: 'https://platform.openai.com/api-keys',
+    runtime: {
+      mode: 'api',
+      model: 'gpt-6-luna',
+      baseUrl: 'https://api.openai.com/v1',
+      command: '',
+      args: '',
+      temperature: 0.8,
+      maxOutputTokens: 4000,
+    },
+  },
+  anthropic: {
+    name: 'Claude',
+    label: 'Anthropic API key',
+    about:
+      'Use an Anthropic account with API credits. API usage is billed separately from a Claude subscription.',
+    keysUrl: 'https://console.anthropic.com/settings/keys',
+    runtime: {
+      mode: 'anthropic-api',
+      model: 'claude-opus-5-5',
+      // Not used for Claude, but saved settings require an https address.
+      baseUrl: 'https://api.anthropic.com',
+      command: '',
+      args: '',
+      temperature: 0.8,
+      maxOutputTokens: 4000,
+    },
+  },
+};
 
 export function GuidedAISetup({
   settings,
@@ -24,7 +70,14 @@ export function GuidedAISetup({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [ready, setReady] = useState(false);
-  const existing = Boolean(settings.aiRuntime && (settings.aiRuntime.mode !== 'api' || configured));
+  const [provider, setProvider] = useState<KeyProvider>(
+    settings.aiRuntime?.mode === 'anthropic-api' ? 'anthropic' : 'openai',
+  );
+  // A saved connection that keeps failing (for example an unverified Codex) can be replaced here.
+  const [replacing, setReplacing] = useState(false);
+  const chosen = providers[provider];
+  const existing =
+    !replacing && Boolean(settings.aiRuntime && (settings.aiRuntime.mode !== 'api' || configured));
   useEffect(() => {
     const abort = new AbortController();
     void requestJson('/api/credentials', isCredentialProviders, { signal: abort.signal })
@@ -53,23 +106,18 @@ export function GuidedAISetup({
       let saved = current.settings;
       if (key.trim()) {
         const credentials = await requestJson('/api/credentials', isCredentialProviders);
+        // The "openai" key slot also serves OpenAI-compatible services; never overwrite a key
+        // that another service is using.
         if (
-          credentials.some((provider) => provider.provider === 'openai' && provider.configured) &&
-          (current.settings.aiRuntime?.mode !== 'api' ||
-            current.settings.aiRuntime.baseUrl !== 'https://api.openai.com/v1')
+          provider === 'openai' &&
+          credentials.some((saved) => saved.provider === 'openai' && saved.configured) &&
+          current.settings.aiRuntime?.mode === 'api' &&
+          current.settings.aiRuntime.baseUrl !== 'https://api.openai.com/v1'
         )
           throw new Error(
             'Another AI connection is already saved. Test that connection or use Advanced to change providers.',
           );
-        const runtime: NonNullable<AppSettings['aiRuntime']> = {
-          mode: 'api',
-          model: 'gpt-6-luna',
-          baseUrl: 'https://api.openai.com/v1',
-          command: '',
-          args: '',
-          temperature: 0.8,
-          maxOutputTokens: 4000,
-        };
+        const runtime = chosen.runtime;
         saved = await requestJson('/api/settings/ai', isAppSettings, {
           method: 'PATCH',
           headers: {
@@ -80,14 +128,15 @@ export function GuidedAISetup({
             settingsSectionPatch({ ...current.settings, aiRuntime: runtime }, 'ai'),
           ),
         });
-        await requestResponse('/api/credentials/openai', {
+        await requestResponse(`/api/credentials/${provider}`, {
           method: 'PUT',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ value: key.trim() }),
         });
         setKey('');
         setConfigured(true);
-        onCredentialsChanged('openai');
+        setReplacing(false);
+        onCredentialsChanged(provider);
         onSaved(saved);
       }
       const test = await requestJson(
@@ -110,28 +159,38 @@ export function GuidedAISetup({
   }
   return (
     <section className="guided-ai-setup">
-      <h3>{existing ? 'Check your saved AI connection' : 'Connect with OpenAI'}</h3>
+      <h3>{existing ? 'Check your saved AI connection' : `Connect with ${chosen.name}`}</h3>
+      {!existing && (
+        <div className="segmented" role="radiogroup" aria-label="AI service">
+          {(Object.keys(providers) as KeyProvider[]).map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={provider === option}
+              className={provider === option ? 'active' : ''}
+              disabled={busy}
+              onClick={() => {
+                setProvider(option);
+                setKey('');
+                setError('');
+              }}
+            >
+              {providers[option].name}
+            </button>
+          ))}
+        </div>
+      )}
       <p>
         {existing
           ? 'We’ll send a small connection test. No league data is included.'
-          : 'Use an OpenAI account with API billing enabled. API usage is billed separately from ChatGPT.'}
+          : chosen.about}
       </p>
-      {!existing && (
-        <p>
-          <a
-            href="https://help.openai.com/en/articles/9039756-managing-billing-settings-on-chatgpt-web-and-platform"
-            target="_blank"
-            rel="noreferrer"
-          >
-            About OpenAI API billing
-          </a>
-        </p>
-      )}
       {!existing && (
         <ol>
           <li>
-            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer">
-              Create an OpenAI API key
+            <a href={chosen.keysUrl} target="_blank" rel="noreferrer">
+              Create {provider === 'openai' ? 'an OpenAI' : 'an Anthropic'} API key
             </a>{' '}
             in your own account.
           </li>
@@ -141,7 +200,7 @@ export function GuidedAISetup({
       )}
       {!existing && (
         <label>
-          OpenAI API key
+          {chosen.label}
           <input
             type="password"
             autoComplete="off"
@@ -158,7 +217,10 @@ export function GuidedAISetup({
       )}
       {error && (
         <FriendlyError
-          message="Your AI connection needs attention. Check your key and API billing, or open Advanced for another connection."
+          message={aiProblemMessage(
+            error,
+            'Your AI connection needs attention. Check your key and API billing, or open Advanced for another connection.',
+          )}
           detail={error}
           action="Try again"
           onAction={() => void connect()}
@@ -185,13 +247,25 @@ export function GuidedAISetup({
       {!existing && !key.trim() && (
         <small>Paste your API key to connect. You can finish setup later.</small>
       )}
-      <details>
-        <summary>Advanced: another AI service or a local tool</summary>
-        <p>Keep full control over your provider, model, server address, and local tools.</p>
-        <button type="button" className="small-button" disabled={busy} onClick={onAdvanced}>
-          Open AI settings
+      <p className="guided-ai-more">
+        {existing && (
+          <button
+            type="button"
+            className="text-button"
+            disabled={busy}
+            onClick={() => {
+              setReplacing(true);
+              setError('');
+              setReady(false);
+            }}
+          >
+            Use an API key instead
+          </button>
+        )}
+        <button type="button" className="text-button" disabled={busy} onClick={onAdvanced}>
+          Other services, local tools and models
         </button>
-      </details>
+      </p>
     </section>
   );
 }

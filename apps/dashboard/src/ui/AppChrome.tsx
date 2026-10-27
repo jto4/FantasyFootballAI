@@ -82,14 +82,19 @@ export function AppSidebar({
 }) {
   return (
     <aside ref={asideRef} className="sidebar">
-      <div className="brand">
-        <div className="brand-mark">
+      <button
+        type="button"
+        className="brand"
+        aria-label="Sunday Sidekick: go to Home"
+        onClick={() => navigate('League desk')}
+      >
+        <span className="brand-mark" aria-hidden="true">
           <Zap size={19} fill="currentColor" />
-        </div>
+        </span>
         <span>
           Sunday<span className="brand-light">Sidekick</span>
         </span>
-      </div>
+      </button>
       <nav className="nav-list">
         {(dynastyLeague
           ? [

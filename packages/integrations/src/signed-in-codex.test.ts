@@ -95,6 +95,12 @@ describe.skipIf(process.platform === 'win32')('signed-in Codex native protocol',
           : 'unavailable',
       );
     }
+    await f.set({ version: 'codex-cli 0.162.0-alpha.18' });
+    await expect(connection.provider()).rejects.toMatchObject({
+      code: 'unsupported-cli',
+      installedVersion: 'codex-cli 0.162.0-alpha.18',
+      message: expect.stringContaining('ChatGPT updated its Codex to 0.162.0-alpha.18'),
+    });
     await f.set({});
     expect(await connection.status()).toBe('signed-in');
     for (const row of await f.rows())
@@ -238,8 +244,13 @@ describe.skipIf(process.platform === 'win32')('signed-in Codex native protocol',
     );
     expect((await f.rows()).filter((row) => row.args.includes('exec'))).toHaveLength(0);
     await f.set({ version: 'codex-cli future-version' });
+    // The message names the installed version and the way out, without paths or output.
     await expect(provider.generate({ system: 'Rules', prompt: 'Fictional' })).rejects.toMatchObject(
-      { code: 'unsupported-cli' },
+      {
+        code: 'unsupported-cli',
+        installedVersion: 'codex-cli future-version',
+        message: expect.stringContaining('ChatGPT updated its Codex to future-version'),
+      },
     );
   });
   it('rejects missing completion, duplicate answers, tool execution, native failure and malformed streams without private output', async () => {

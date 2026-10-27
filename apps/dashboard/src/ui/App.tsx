@@ -11,7 +11,7 @@ import {
 } from '@sidekick/core';
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
-import { FriendlyError } from './FriendlyError';
+import { FriendlyError, aiProblemMessage } from './FriendlyError';
 import { describeError } from './error-text';
 import { ConfirmHost, confirmAction, discardOptions } from './ConfirmDialog';
 import { getDisplayPreferences } from './display-preferences';
@@ -1000,10 +1000,16 @@ export function App() {
             )}
             {aiCheckError && section === 'League desk' && (
               <FriendlyError
-                message="Your AI connection needs attention before you can create a report."
+                message={aiProblemMessage(
+                  aiCheckError,
+                  'Your AI connection needs attention before you can create a report.',
+                )}
                 detail={aiCheckError}
-                action="Fix AI connection"
-                onAction={openSetupWizard}
+                action="Choose AI connection"
+                onAction={() => {
+                  setSettingsFocusTarget('ai');
+                  navigate('Settings');
+                }}
                 compact
               />
             )}
@@ -1309,12 +1315,6 @@ export function App() {
                       }
                       onRefresh={() => {
                         if (league) void refreshLeague(league.id);
-                      }}
-                      onSetup={() => {
-                        setSetupInProgress(true);
-                        setSetupWizardStep(0);
-                        setSetupWizardOpen(false);
-                        setModal(true);
                       }}
                     />
                   }

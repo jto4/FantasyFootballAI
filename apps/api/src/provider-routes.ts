@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import type { AppSettings, AIProvider } from '@sidekick/core';
+import { SignedInCodexError } from '@sidekick/integrations';
 import {
   CredentialStoreUnavailableError,
   CredentialValidationError,
@@ -157,8 +158,12 @@ export function createProviderRouter(dependencies: ProviderRouteDependencies): R
         ...(settings.aiRuntime?.mode === 'codex-cli' ? { timeoutMs: 25_000 } : {}),
       });
       res.json({ ok: true });
-    } catch {
-      // Provider and CLI error details may contain local paths or credentials.
+    } catch (error) {
+      // Provider and CLI error details may contain local paths or credentials. Codex's own
+      // errors are fixed, path-free messages (an unverified version, a limit), so they say
+      // exactly what is wrong instead of a generic hint.
+      if (error instanceof SignedInCodexError)
+        return res.status(502).json({ error: error.message, code: `codex_${error.code}` });
       res.status(502).json({
         error:
           settings.aiRuntime?.mode === 'codex-cli'

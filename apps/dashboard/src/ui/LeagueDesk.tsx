@@ -230,7 +230,8 @@ export function LeagueDesk({
         <details
           className="home-disclosure"
           open={
-            !!generatingKind || (disclosures.activity ?? (draftCount > 0 || deliveryIssues > 0))
+            // Open unless the owner closed it this session; everyday content should not need a click.
+            !!generatingKind || (disclosures.activity ?? true)
           }
           onToggle={(event) => onDisclosureChange?.('activity', event.currentTarget.open)}
         >
@@ -253,7 +254,7 @@ export function LeagueDesk({
       {league && shown('league-news') && (
         <details
           className="home-disclosure league-extra"
-          open={disclosures.news ?? false}
+          open={disclosures.news ?? true}
           onToggle={(event) => onDisclosureChange?.('news', event.currentTarget.open)}
         >
           <summary>League standings & news</summary>

@@ -11,7 +11,6 @@ test('generation survives browser reload and saves one editable draft in SQLite'
   try {
     workspace.block();
     await page.goto(workspace.url);
-    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByText('Writing the report', { exact: true })).toBeVisible();
@@ -77,7 +76,6 @@ test('uncertain email retry retains original envelope after Settings destination
   const workspace = await apiWorkspace();
   try {
     await page.goto(workspace.url);
-    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeVisible();

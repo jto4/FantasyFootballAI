@@ -57,9 +57,7 @@ test('advice views preserve a draft and keep the lineup visible before optional 
     await result.getByText('Numbers & comparisons', { exact: true }).click();
     await expect(result.locator('.result-numbers table').first().first()).toBeVisible();
     await result.getByText('Numbers & comparisons', { exact: true }).click();
-    await result
-      .getByRole('heading', { name: 'What could change the decision', exact: true })
-      .click();
+    // Risks start open: no click needed.
     await expect(
       result
         .locator('.result-disclosure')
@@ -149,8 +147,7 @@ test('Home keeps pending work visible while settings and league details expand o
       .locator('.home-disclosure')
       .filter({ has: page.locator('summary', { hasText: /^Report activity/ }) });
     await expect(activity).toHaveJSProperty('open', true);
-    await expect(page.getByRole('heading', { name: 'Power rankings', exact: true })).toBeHidden();
-    await page.getByText('League standings & news', { exact: true }).click();
+    // Standings and news start open on Home; no click needed.
     await expect(
       page.getByRole('heading', { name: 'Power rankings', exact: true }).first(),
     ).toBeVisible();
@@ -188,7 +185,8 @@ test('primary navigation starts the new page at the top after a long Home view',
   const w = await apiWorkspace();
   try {
     await page.goto(w.url + '/#/desk');
-    await page.getByText('League standings & news', { exact: true }).click();
+    // Standings and news start open, which makes Home long once they render.
+    await expect(page.locator('.league-extra .ranking-panel')).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();

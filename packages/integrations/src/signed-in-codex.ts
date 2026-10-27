@@ -19,6 +19,11 @@ const newProtocolVersions = new Set([
   'codex-cli 0.163.0-alpha.11.2',
 ]);
 const newProtocol = (version: string) => newProtocolVersions.has(version);
+/** A short, printable version line from `codex --version`, or undefined if it looks odd. */
+function cleanVersion(version: string) {
+  const line = version.trim().split('\n')[0]?.slice(0, 60) ?? '';
+  return /^codex-cli [\w.+-]+$/.test(line) ? line : undefined;
+}
 function verifiedVersion(version: string): boolean {
   return version === legacyVersion || (process.platform === 'darwin' && newProtocol(version));
 }
@@ -123,12 +128,14 @@ export class SignedInCodexError extends Error {
     public readonly code:
       'limit-reported' | 'invalid-response' | 'unsupported-cli' | 'isolation-unavailable',
     public readonly protocolFailure?: SignedInCodexProtocolFailure,
+    /** The installed `codex --version` text, for an unverified version (not sensitive). */
+    public readonly installedVersion?: string,
   ) {
     super(
       code === 'limit-reported'
         ? 'Codex reported a limit. Check availability in the installed Codex CLI before retrying.'
         : code === 'unsupported-cli'
-          ? 'This Codex CLI version has not been verified for isolated advice. Use the saved AI connection or check the supported version in Help.'
+          ? `${installedVersion ? `ChatGPT updated its Codex to ${installedVersion.replace(/^codex-cli\s*/, '')}, which Sunday Sidekick has not verified yet` : 'This Codex version has not been verified yet'}: each version is checked to send only what the app supplies. Choose another AI connection in Settings → AI (for example an API key) until it is.`
           : code === 'isolation-unavailable'
             ? 'Codex advice could not isolate local instructions and skills. Use the saved AI connection or check the installed skills before retrying.'
             : 'The signed-in Codex response could not be verified.',
@@ -466,7 +473,8 @@ class SignedInCodexProvider implements AIProvider {
         directory,
         1024,
       );
-      if (!verifiedVersion(version)) throw new SignedInCodexError('unsupported-cli');
+      if (!verifiedVersion(version))
+        throw new SignedInCodexError('unsupported-cli', undefined, cleanVersion(version));
       const instructions = join(directory, 'instructions.txt');
       const args = await isolatedCodexArguments(instructions, request.signal, version);
       await writeFile(instructions, request.system, { mode: 0o600 });
@@ -494,10 +502,17 @@ class SignedInCodexProvider implements AIProvider {
   }
 }
 
+type CodexLookup = {
+  status: SignedInAIStatus;
+  executable?: string;
+  /** Set when Codex is installed at a version that has not passed the isolation proof. */
+  unverifiedVersion?: string;
+};
+
 export class SignedInCodexConnection implements SignedInAIConnection {
-  private pending: Promise<{ status: SignedInAIStatus; executable?: string }> | undefined;
+  private pending: Promise<CodexLookup> | undefined;
   constructor(private readonly paths = installedPaths()) {}
-  private lookup(): Promise<{ status: SignedInAIStatus; executable?: string }> {
+  private lookup(): Promise<CodexLookup> {
     if (this.pending) return this.pending;
     const pending = this.inspect().catch(() => ({ status: 'unavailable' as const }));
     this.pending = pending;
@@ -506,7 +521,7 @@ export class SignedInCodexConnection implements SignedInAIConnection {
     });
     return pending;
   }
-  private async inspect(): Promise<{ status: SignedInAIStatus; executable?: string }> {
+  private async inspect(): Promise<CodexLookup> {
     for (const path of this.paths.filter(isAbsolute).slice(0, 33)) {
       try {
         await access(path, process.platform === 'win32' ? constants.F_OK : constants.X_OK);
@@ -525,7 +540,8 @@ export class SignedInCodexConnection implements SignedInAIConnection {
           directory,
           1024,
         );
-        if (!verifiedVersion(version)) return { status: 'unavailable' };
+        if (!verifiedVersion(version))
+          return { status: 'unavailable', unverifiedVersion: cleanVersion(version) ?? '' };
         await isolatedCodexLaunch(path, [], version);
         const status = await loginStatus(path, directory);
         return { status, ...(status === 'signed-in' ? { executable: path } : {}) };
@@ -538,6 +554,12 @@ export class SignedInCodexConnection implements SignedInAIConnection {
   }
   async provider(): Promise<AIProvider> {
     const found = await this.lookup();
+    if (found.unverifiedVersion !== undefined)
+      throw new SignedInCodexError(
+        'unsupported-cli',
+        undefined,
+        found.unverifiedVersion || undefined,
+      );
     if (found.status !== 'signed-in' || !found.executable)
       throw new Error(
         'Check the supported Codex CLI version and ChatGPT sign-in, then reload advice connections.',

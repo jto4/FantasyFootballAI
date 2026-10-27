@@ -30,6 +30,11 @@ body {
   display: flex;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
+  /* A button that goes Home; it should still look like the logo. */
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
 }
 .brand-mark {
   display: grid;
@@ -927,7 +932,7 @@ p {
   }
 }
 @media (max-width: 800px) {
-  .brand > span,
+  .brand > span:not(.brand-mark),
   .league-select,
   .nav-item span,
   .nav-dot,
@@ -1961,7 +1966,7 @@ body {
   color: var(--on-accent);
 }
 
-.brand > span {
+.brand > span:not(.brand-mark) {
   display: grid;
   line-height: 1.05;
 }
@@ -3612,4 +3617,55 @@ kbd {
     clip-path: inset(50%);
     white-space: nowrap;
   }
+}
+
+/* Guided setup: team picker, AI service choice, and the quieter links below the main action. */
+.setup-wizard-modal label {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.setup-wizard-modal select,
+.guided-ai-setup input {
+  width: 100%;
+  min-height: 40px;
+  font-weight: 400;
+}
+
+.segmented {
+  display: inline-flex;
+  justify-self: start;
+  width: fit-content;
+  margin: 4px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmented button {
+  min-height: 34px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--line);
+}
+
+.segmented button.active {
+  background: var(--orange);
+  color: var(--on-accent);
+}
+
+.guided-ai-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
 }

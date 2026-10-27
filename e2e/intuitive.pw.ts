@@ -15,6 +15,41 @@ async function guidedConnection(page: Page) {
   await page.getByRole('dialog').getByRole('button', { name: 'Connect a league' }).click();
 }
 
+test('guided setup can connect Claude instead of OpenAI', async ({ page }) => {
+  const workspace = await apiWorkspace(false, false);
+  const failures = errors(page);
+  try {
+    await page.goto(workspace.url);
+    // Before a league exists, Home shows one setup prompt rather than two.
+    await expect(page.getByRole('heading', { name: 'What needs your attention?' })).toHaveCount(0);
+    await guidedConnection(page);
+    await page
+      .getByRole('textbox', { name: 'LEAGUE ID OR URL' })
+      .fill('https://sleeper.com/leagues/123456');
+    await page.getByRole('dialog').getByRole('button', { name: 'Connect league' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('combobox', { name: 'Your team', exact: true })
+      .selectOption('1');
+    const ai = page.getByRole('dialog', { name: 'Connect your AI writer' });
+    await ai.getByRole('radio', { name: 'Claude' }).click();
+    await expect(ai.getByRole('heading', { name: 'Connect with Claude' })).toBeVisible();
+    await ai.getByLabel('Anthropic API key', { exact: true }).fill('fake-claude-key');
+    await ai.getByRole('button', { name: 'Connect and test' }).click();
+    await expect(page.getByRole('dialog')).toContainText('Your league and AI connection are ready');
+    expect(workspace.credentialWrites).toEqual([
+      { provider: 'anthropic', value: 'fake-claude-key' },
+    ]);
+    expect(workspace.store.settingsSnapshot().aiRuntime).toMatchObject({
+      mode: 'anthropic-api',
+      model: 'claude-opus-5-5',
+    });
+    expect(failures).toEqual([]);
+  } finally {
+    await workspace.close();
+  }
+});
+
 test('a beginner connects a league and AI, chooses a report, reviews it, and explicitly confirms sending', async ({
   page,
 }, info) => {
@@ -134,7 +169,6 @@ test('voice previews, schedule presets, explicit automation consent, and sticky 
     await page.getByRole('button', { name: 'Save Voice', exact: true }).click();
     await expect(page.locator('.settings-save-bar')).toContainText('Saved');
     await page.getByRole('button', { name: 'Schedules & sources', exact: true }).click();
-    await page.getByText('Report schedules', { exact: true }).click();
     const action = page
       .locator('.action-block')
       .filter({ has: page.getByText('Weekly power rankings', { exact: true }) });
@@ -278,7 +312,6 @@ test('delivery setup accepts ordinary fields, stores secure connection details, 
     await expect(card.getByLabel('Resend API key', { exact: true })).toHaveValue('');
     expect(workspace.sends).toHaveLength(0);
     await page.getByRole('button', { name: 'Home', exact: true }).click();
-    await page.getByText('League standings & news', { exact: true }).click();
     await expect(page.getByRole('button', { name: 'Generate rankings draft' })).toBeEnabled();
   } finally {
     await workspace.close();

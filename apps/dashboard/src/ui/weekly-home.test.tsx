@@ -34,7 +34,6 @@ it('keeps unknown availability and deadlines explicit and refuses a removed save
       onTeamChange: vi.fn(),
       onAdvice: vi.fn(),
       onRefresh: vi.fn(),
-      onSetup: vi.fn(),
       onSavedAdvice: vi.fn(),
     }),
   );
@@ -78,7 +77,6 @@ it('keeps neutral ESPN status out of alerts and retains a separate injury flag',
       onTeamChange: vi.fn(),
       onAdvice: vi.fn(),
       onRefresh: vi.fn(),
-      onSetup: vi.fn(),
       onSavedAdvice: vi.fn(),
     }),
   );

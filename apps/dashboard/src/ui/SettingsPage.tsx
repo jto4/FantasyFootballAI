@@ -23,7 +23,7 @@ import { CredentialsSection, type SecretState } from './CredentialsSection.js';
 import { AutomaticActionsSection } from './AutomaticActionsSection.js';
 import { DeliveryChannelsSection } from './DeliveryChannelsSection.js';
 import { writeImageProviderPreference } from './image-provider.js';
-import { FriendlyError } from './FriendlyError';
+import { FriendlyError, aiProblemMessage } from './FriendlyError';
 import { SettingsOverview } from './SettingsOverview';
 import { RefreshCw, Save } from 'lucide-react';
 import {
@@ -577,7 +577,10 @@ export function SettingsPage({
       )}
       {runtimeError && section === 'ai' && (
         <FriendlyError
-          message="Your AI connection needs attention. Check your saved key and connection settings, then test again."
+          message={aiProblemMessage(
+            runtimeError,
+            'Your AI connection needs attention. Check your saved key and connection settings, then test again.',
+          )}
           detail={runtimeError}
           action="Test connection again"
           onAction={() => {
@@ -595,7 +598,7 @@ export function SettingsPage({
       )}
       {section === 'delivery' && (
         <>
-          <details className="settings-disclosure">
+          <details className="settings-disclosure" open>
             <summary>Yahoo league connection</summary>
             <YahooConnectionSection
               headingRef={yahooHeadingRef}
@@ -636,7 +639,7 @@ export function SettingsPage({
             <summary>Diagnostics</summary>
             <DiagnosticsSection />
           </details>
-          <details className="settings-disclosure">
+          <details className="settings-disclosure" open>
             <summary>Automatic backups</summary>
             <RoutineBackupSection onNotice={setMessage} onDirtyChange={setBackupDirty} />
           </details>
@@ -794,7 +797,7 @@ export function SettingsPage({
       {section === 'schedules' && (
         <>
           <section className="settings-card">
-            <details className="settings-disclosure">
+            <details className="settings-disclosure" open>
               <summary>Report schedules</summary>
               <AutomaticActionsSection
                 actions={form.actions}
@@ -864,7 +867,7 @@ export function SettingsPage({
               The Leagues page warns at this age. Old snapshots remain available, but may no longer
               reflect current rosters or standings.
             </small>
-            <details className="settings-disclosure">
+            <details className="settings-disclosure" open>
               <summary>League calendar</summary>
               <LeagueCalendarSettings
                 leagues={leagues}

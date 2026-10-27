@@ -41,7 +41,8 @@ test('ESPN browser import is reachable, explicit about manual updates and does n
   });
   try {
     await page.goto(`${w.url}/#/desk`);
-    await page.getByRole('button', { name: 'Connect my league', exact: true }).click();
+    await page.getByRole('button', { name: 'Guided setup' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Connect a league' }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Fantasy platform').selectOption('espn');
     await dialog.getByLabel('LEAGUE ID OR URL', { exact: true }).fill('123');

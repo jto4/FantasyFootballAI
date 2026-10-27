@@ -238,7 +238,7 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           ))}
         </ul>
       </details>
-      <details className="result-disclosure">
+      <details className="result-disclosure" open>
         <summary>
           <h3>What could change the decision</h3> ({result.assessment.risks.length})
         </summary>

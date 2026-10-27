@@ -53,7 +53,6 @@ test('bookmark, reload, Back, and Forward recover a saved report and protect uns
   const errors = runtimeErrors(page);
   try {
     await page.goto(workspace.url);
-    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -96,7 +95,6 @@ test('cancels a running job and recovers an older pending request beyond recent 
   try {
     workspace.block();
     await page.goto(workspace.url);
-    await page.getByText('League standings & news', { exact: true }).click();
     await page.getByRole('button', { name: 'Generate rankings draft' }).click();
     await page.getByRole('button', { name: 'Create draft', exact: true }).click();
     await expect(page.getByText('Writing the report', { exact: true })).toBeVisible();
@@ -154,7 +152,6 @@ test('configures encrypted routine copies, validates an export, and downloads sa
   try {
     await page.goto(`${workspace.url}/#/settings?league=browser-league`);
     await page.getByRole('button', { name: 'Storage & desktop', exact: true }).click();
-    await page.getByText('Automatic backups', { exact: true }).click();
     await page.getByLabel('Enable scheduled backups', { exact: true }).check();
     await page
       .getByLabel('Scheduled backup passphrase', { exact: true })
