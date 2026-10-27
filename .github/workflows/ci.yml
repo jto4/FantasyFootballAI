@@ -1,8 +1,19 @@
 name: CI
 
+# Every push and pull request: the checks that catch ordinary code mistakes, on Linux only, in
+# parallel. Operating-system specifics (credential stores, background services, installers, the
+# minimum Node.js version) run in platform.yml when the files they depend on change.
 on:
   push:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'e2e-states/__screenshots__/**'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'e2e-states/__screenshots__/**'
 
 permissions:
   contents: read
@@ -12,59 +23,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  minimum-node-runtime:
-    name: Verify minimum Node.js 22.13.0 on macOS
-    runs-on: macos-latest
-    steps:
-      - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Install minimum supported Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 22.13.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify native credential store
-        run: npm run credentials:smoke
-
-      - name: Check TypeScript
-        run: npm run typecheck
-
-      - name: Check lint
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build production app
-        run: npm run build
-
-      - name: Measure synthetic performance at minimum Node.js version
-        env:
-          SIDEKICK_PERF_OUTPUT_FILE: performance-macos-node-22.13.json
-        run: node scripts/performance-smoke.mjs
-
-      - name: Upload minimum-runtime performance sample
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: performance-macos-node-22.13
-          path: performance-macos-node-22.13.json
-          if-no-files-found: error
-
-  verify:
-    name: Verify on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  checks:
+    name: Types, lint, format and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,24 +37,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - name: Install Linux credential-store dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install --yes dbus-x11 gnome-keyring libsecret-1-dev
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Verify native credential store
-        if: runner.os != 'Linux'
-        run: npm run credentials:smoke
-
-      - name: Verify Linux Secret Service credential store
-        if: runner.os == 'Linux'
-        run: |
-          dbus-run-session -- bash -euo pipefail -c "
-            printf '%s\n' 'sunday-sidekick-ci' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
-            npm run credentials:smoke
-          "
 
       - name: Check TypeScript
         run: npm run typecheck
@@ -106,75 +52,45 @@ jobs:
       - name: Run tests
         run: npm test
 
+  browser:
+    name: Browser journeys (${{ matrix.shard }}/2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build production app
         run: npm run build
 
-      - name: Install Chromium for browser journeys
+      # Chromium is reused between runs while the Playwright version is unchanged.
+      - name: Restore Chromium
+        id: chromium
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        if: steps.chromium.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      - name: Install Chromium system libraries
+        if: steps.chromium.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
       - name: Exercise desktop and mobile browser journeys
-        run: npx playwright test
-
-      - name: Start Linux user systemd manager
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          sudo systemctl start "user@$(id -u).service"
-          systemctl --user daemon-reload >/dev/null
-
-      - name: Exercise built service through Linux systemd
-        if: runner.os == 'Linux'
-        env:
-          SIDEKICK_LINUX_SERVICE_SMOKE: '1'
-        run: npm run test:linux-service
-
-      - name: Stop Linux user systemd manager
-        if: always() && runner.os == 'Linux'
-        run: |
-          sudo loginctl disable-linger "$(id -un)"
-          sudo systemctl stop "user@$(id -u).service" || true
-
-      - name: Exercise built service through Windows Task Scheduler
-        if: runner.os == 'Windows'
-        env:
-          SIDEKICK_WINDOWS_SERVICE_SMOKE: '1'
-        run: npm run test:windows-service
-
-      - name: Measure synthetic performance
-        env:
-          SIDEKICK_PERF_OUTPUT_FILE: performance-${{ runner.os }}-node-22.json
-        run: node scripts/performance-smoke.mjs
-
-      - name: Upload platform performance sample
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: performance-${{ runner.os }}-node-22
-          path: performance-${{ runner.os }}-node-22.json
-          if-no-files-found: error
-
-  package:
-    name: Smoke-check desktop package on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-      - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Install Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Install Linux package tools
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install --yes fakeroot dpkg-dev rpm xvfb libsecret-1-dev
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build and smoke-check desktop package
-        run: npm run desktop:make
+        run: npx playwright test --shard=${{ matrix.shard }}/2

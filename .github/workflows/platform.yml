@@ -1,0 +1,133 @@
+name: Platform checks
+
+# What differs by operating system: the native credential store, the per-user background
+# service, the desktop installer, Windows/macOS file-system behavior in the unit tests, and the
+# minimum supported Node.js. Runs when those parts change, weekly, before a release tag, and on
+# demand; ordinary code changes are covered by ci.yml on Linux.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - 'apps/desktop/**'
+      - 'apps/api/src/credentials*.ts'
+      - 'scripts/desktop-*.mjs'
+      - 'scripts/verify-*'
+      - 'scripts/*service*.mjs'
+      - 'scripts/credential-store-smoke.mjs'
+      - 'scripts/windows-task-scheduler*.mjs'
+      - 'scripts/macos-launch-agent*.mjs'
+      - 'scripts/linux-*.mjs'
+      - 'scripts/portable-symlinks*.mjs'
+      - 'scripts/runtime-check*.mjs'
+      - 'scripts/icloud-safe*.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.nvmrc'
+      - '.github/workflows/platform.yml'
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install Linux keyring and package tools
+        if: runner.os == 'Linux'
+        run: >-
+          sudo apt-get update && sudo apt-get install --yes dbus-x11 gnome-keyring
+          libsecret-1-dev fakeroot dpkg-dev rpm xvfb
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify native credential store
+        if: runner.os != 'Linux'
+        run: npm run credentials:smoke
+
+      - name: Verify Linux Secret Service credential store
+        if: runner.os == 'Linux'
+        run: |
+          dbus-run-session -- bash -euo pipefail -c "
+            printf '%s\n' 'sunday-sidekick-ci' | gnome-keyring-daemon --unlock --components=secrets >/dev/null
+            npm run credentials:smoke
+          "
+
+      # ci.yml already runs the tests on Linux.
+      - name: Run tests
+        if: runner.os != 'Linux'
+        run: npm test
+
+      - name: Start Linux user systemd manager
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          sudo systemctl start "user@$(id -u).service"
+          systemctl --user daemon-reload >/dev/null
+
+      - name: Exercise built service through Linux systemd
+        if: runner.os == 'Linux'
+        env:
+          SIDEKICK_LINUX_SERVICE_SMOKE: '1'
+        run: npm run test:linux-service
+
+      - name: Stop Linux user systemd manager
+        if: always() && runner.os == 'Linux'
+        run: |
+          sudo loginctl disable-linger "$(id -un)"
+          sudo systemctl stop "user@$(id -u).service" || true
+
+      - name: Exercise built service through Windows Task Scheduler
+        if: runner.os == 'Windows'
+        env:
+          SIDEKICK_WINDOWS_SERVICE_SMOKE: '1'
+        run: npm run test:windows-service
+
+      - name: Build and smoke-check desktop package
+        run: npm run desktop:make
+
+  minimum-node:
+    name: Minimum Node.js 22.13.0 on macOS
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install minimum supported Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.13.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test

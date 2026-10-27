@@ -1,5 +1,16 @@
 # Release process
 
+## Continuous integration
+
+- `ci.yml` runs on every push and pull request that changes code (Markdown and `docs/` changes
+  are skipped): types, lint, formatting and unit tests in one Linux job, and the browser journeys
+  split across two Linux jobs. It aims to finish in under 10 minutes.
+- `platform.yml` covers what differs by operating system: the native credential store, the
+  per-user background service, the desktop installer smoke check, the unit tests on macOS and
+  Windows, and the minimum Node.js version. It runs when desktop, packaging, service, credential
+  or dependency files change, every Monday, on version tags and on demand. Run it by hand before
+  tagging a release if it has not run on the release commit.
+
 Version tags (`v*`) run the desktop packaging matrix and assemble a draft GitHub Release. The
 tag must exactly match the root `package.json` version so installers and the update feed advertise
 the same version.

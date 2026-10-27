@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 27 (CI): every push now runs Linux-only checks in three parallel jobs (about 52
+  runner-minutes and 13 minutes of wall time down to roughly a quarter), skipping docs-only
+  changes; operating-system checks moved to `platform.yml` (weekly, tags, desktop/packaging
+  changes); per-push performance samples dropped; the Windows service test waits 60 s.
 - October 27 (repo size): `npm run desktop:make` now marks `apps/desktop/out` local-only for
   iCloud each time it recreates the folder (it had been re-uploading ~700 MB per build), and
   `.sidekick` and `apps/dashboard/dist-states` joined the local-only list.

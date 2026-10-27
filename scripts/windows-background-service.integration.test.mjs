@@ -122,7 +122,8 @@ async function getAvailableLoopbackPort() {
   return address.port;
 }
 
-async function waitForHealth(url, expectedBackgroundState, timeoutMs = 20_000) {
+// Hosted Windows runners can take well over 20 s to cold-start the service from Task Scheduler.
+async function waitForHealth(url, expectedBackgroundState, timeoutMs = 60_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
