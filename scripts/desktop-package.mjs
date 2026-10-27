@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createDesktopSmokePlan } from './desktop-smoke-plan.mjs';
 import { makeInternalSymlinksRelative } from './portable-symlinks.mjs';
+import { markLocalOnly } from './icloud-safe.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const staging = await mkdtemp(join(tmpdir(), 'sunday-sidekick-desktop-'));
@@ -155,6 +156,10 @@ async function makeInstaller() {
 
   await makeInternalSymlinksRelative(join(staging, 'out'));
   await rm(output, { recursive: true, force: true });
+  // Recreated folders lose the iCloud no-sync flag; set it before the ~700 MB build lands so
+  // a checkout in iCloud Drive never uploads it.
+  await mkdir(output, { recursive: true });
+  markLocalOnly(['apps/desktop/out'], root);
   await cp(join(staging, 'out'), output, { recursive: true, verbatimSymlinks: true });
   try {
     await smokeCheckPackage(output);

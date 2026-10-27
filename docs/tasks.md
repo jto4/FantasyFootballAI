@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 27 (repo size): `npm run desktop:make` now marks `apps/desktop/out` local-only for
+  iCloud each time it recreates the folder (it had been re-uploading ~700 MB per build), and
+  `.sidekick` and `apps/dashboard/dist-states` joined the local-only list.
 - October 27 (matchup totals): a starter listed Out or inactive counts as zero in Home's
   projected total and win chance, and on Live, instead of hiding them; the matchup table marks
   him "Out · 0".

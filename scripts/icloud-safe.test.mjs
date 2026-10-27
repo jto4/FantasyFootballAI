@@ -4,7 +4,8 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { removeConflictCopies } from './icloud-safe.mjs';
+import { spawnSync } from 'node:child_process';
+import { generatedPaths, markLocalOnly, removeConflictCopies } from './icloud-safe.mjs';
 
 test('removes generated and identical conflict copies and keeps differing ones', async () => {
   const root = await mkdtemp(join(tmpdir(), 'sidekick-icloud-'));
@@ -34,6 +35,30 @@ test('removes generated and identical conflict copies and keeps differing ones',
     assert.ok(existsSync(join(root, '.git/index')));
     assert.deepEqual(kept, [join('src', 'b 2.ts')]);
     assert.equal(removed.length, 5);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('marks build output and local verification folders as local-only', async (t) => {
+  assert.ok(generatedPaths.includes('apps/desktop/out'));
+  assert.ok(generatedPaths.includes('.sidekick'));
+  if (process.platform !== 'darwin') {
+    assert.deepEqual(markLocalOnly(['apps/desktop/out'], '/nonexistent'), []);
+    return t.skip('Extended attributes are a macOS feature.');
+  }
+  const root = await mkdtemp(join(tmpdir(), 'sidekick-icloud-'));
+  try {
+    await mkdir(join(root, 'apps/desktop/out'), { recursive: true });
+    assert.deepEqual(markLocalOnly(['apps/desktop/out', 'missing'], root), ['apps/desktop/out']);
+    const read = spawnSync(
+      'xattr',
+      ['-p', 'com.apple.fileprovider.ignore#P', join(root, 'apps/desktop/out')],
+      {
+        encoding: 'utf8',
+      },
+    );
+    assert.equal(read.stdout.trim(), '1');
   } finally {
     await rm(root, { recursive: true, force: true });
   }

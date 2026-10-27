@@ -21,13 +21,20 @@ export const generatedPaths = [
   'packages/integrations/dist',
   'apps/api/dist',
   'apps/dashboard/dist',
+  'apps/dashboard/dist-states',
   'apps/desktop/out',
   'apps/desktop/.bundle',
   'output',
+  // Local verification output (research runs, installer checks); never committed.
+  '.sidekick',
 ];
 const conflictName = /^(.+) [2-9](\.[^/]+)?$/;
 
-/** Marks existing folders as local-only for iCloud Drive. No-op outside macOS. */
+/**
+ * Marks existing folders as local-only for iCloud Drive. No-op outside macOS. The attribute
+ * belongs to the folder itself, so anything that deletes and recreates a folder (the desktop
+ * build) must mark it again; the build does so before copying anything in.
+ */
 export function markLocalOnly(paths = generatedPaths, root = rootPath) {
   if (process.platform !== 'darwin') return [];
   const marked = [];
