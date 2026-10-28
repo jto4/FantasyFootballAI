@@ -291,6 +291,10 @@ test('manual imports offer explicit saved-data drafts and Home explains expired 
     ).toBe(true);
     await w.store.update((s) => {
       s.leagues[0]!.snapshotImportedAt = '2020-01-01T00:00:00Z';
+      // Home describes only the next planned report; switch off the fixture's other reports so
+      // a saved-data draft is next whatever weekday the test runs on.
+      for (const action of s.settings.actions)
+        if (!['power-rankings', 'matchup-preview'].includes(action.kind)) action.enabled = false;
     });
     await page.goto(w.url + '/#/desk?league=browser-league');
     await page.getByText('Connections & scheduled reports', { exact: true }).click();
