@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 28 (Codex 0.165): ChatGPT's `codex-cli 0.165.0-alpha.1.2` adds no outside context but
+  repeats the app's instructions; the isolation proof accepts that exact repeat only (owner
+  approved), both captures passed, and the version is allowlisted.
 - October 27 (page tips): each main page shows a short, dismissible "how to use this page" with
   a Learn more link to its help answer; the top-bar lightbulb brings a page's tips back and Help
   can show them all again (remembered per browser only). The matchup lineups explain Est., ranges
@@ -90,7 +93,6 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
 - [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.
-- [ ] Verify ChatGPT's Codex 0.165.0-alpha.1.2 (or later) with `scripts/verify-codex-isolation.mjs` once it stops adding its own context; it currently fails `onlySuppliedText`.
 - [ ] Measure chat answer quality and speed on each AI connection with a fixed question set; Codex rounds take tens of seconds each.
 
 ### Product pass — October 21, 2026

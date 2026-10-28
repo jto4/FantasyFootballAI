@@ -55,6 +55,10 @@ canary leak, global AGENTS read denied, no MCP launch or saved session; GPT-6.1-
 reasoning) and the app's connection test, so it was added to the new-protocol allowlist with the
 same isolation arguments. A full model-quality rerun on 0.163 has not been done. ChatGPT's
 same-day update to `codex-cli 0.163.0-alpha.11.2` passed both captures again and was added too.
+On October 28, 2026 `codex-cli 0.165.0-alpha.1.2` passed both captures and the app's connection
+test and was added. It sends the supplied developer instructions twice, byte for byte; with the
+owner's approval the proof now accepts that one exact repeat and still fails any other text or
+item ([evidence](research/2026-10-28-codex-0.165-isolation.json)).
 
 Current readiness and gates live in [release status](release-status.md). This matrix retains detailed verification evidence; passing fixtures or package smokes do not prove live account behavior or interactive installation.
 

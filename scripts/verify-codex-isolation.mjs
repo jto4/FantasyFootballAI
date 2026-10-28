@@ -106,12 +106,21 @@ try {
         payloadKeys: Object.keys(payload),
         path: request.url,
         toolNames: declaredTools.map((tool) => tool.name ?? tool.type),
-        onlySuppliedText: JSON.stringify(inputTexts) === JSON.stringify([system, prompt]),
+        // Codex 0.165 repeats the supplied developer instructions verbatim. A byte-identical
+        // copy adds no outside context, so it passes; any other text or item still fails.
+        onlySuppliedText:
+          inputTexts.length >= 2 &&
+          inputTexts.length <= 3 &&
+          inputTexts.at(-1) === prompt &&
+          inputTexts.slice(0, -1).every((text) => text === system),
         onlySuppliedInput:
-          payload.input?.length === 2 &&
-          inputMessages.length === 2 &&
-          inputMessages[0].role === 'developer' &&
-          inputMessages[1].role === 'user',
+          payload.input?.length === inputMessages.length &&
+          inputMessages.length >= 2 &&
+          inputMessages.length <= 3 &&
+          inputMessages.slice(0, -1).every((item) => item.role === 'developer') &&
+          inputMessages.at(-1).role === 'user' &&
+          inputMessages.every((item) => item.content?.length === 1),
+        repeatedInstructions: inputTexts.filter((text) => text === system).length - 1,
         systemPresent: serialized.includes(system),
         canaryMatches: canaries.filter((canary) => serialized.includes(canary)),
         canaryLeak:
