@@ -213,6 +213,10 @@ export function MatchupCard({
               })}
             </tbody>
           </table>
+          <p className="matchup-key">
+            Est. is projected points; the small numbers are a likely low–high score. Q shows a
+            questionable player’s chance to play.
+          </p>
         </details>
       )}
     </section>

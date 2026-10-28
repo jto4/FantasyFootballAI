@@ -350,3 +350,41 @@ test('a successful manual connection test clears the earlier startup failure and
     await workspace.close();
   }
 });
+
+test('page tips explain each page, can be hidden, and come back from the lightbulb or Help', async ({
+  page,
+}, info) => {
+  const workspace = await apiWorkspace();
+  const failures = errors(page);
+  try {
+    await page.goto(workspace.url);
+    const homeTips = page.getByRole('complementary', { name: 'Tips: Start here each week' });
+    await expect(homeTips).toBeVisible();
+    await page.screenshot({ path: info.outputPath('home-tips.png') });
+    await homeTips.getByRole('button', { name: 'Hide tips for this page' }).click();
+    await expect(homeTips).toHaveCount(0);
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Sunday’s league desk' })).toBeVisible();
+    await expect(homeTips).toHaveCount(0);
+    await page.getByRole('button', { name: 'Show tips for this page' }).click();
+    await expect(homeTips).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Show tips for this page' })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Reports', exact: true }).click();
+    const reportTips = page.getByRole('complementary', { name: 'Tips: Making a report' });
+    await expect(reportTips).toContainText('Nothing is ever sent on its own');
+    await reportTips.getByRole('button', { name: 'Hide tips for this page' }).click();
+    await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+    await page
+      .getByRole('complementary', { name: 'Tips: Scheduling reports' })
+      .getByRole('button', { name: 'Learn more' })
+      .click();
+    await expect(page.locator('#help-schedule')).toHaveAttribute('open', '');
+    await page.getByRole('button', { name: 'Show all page tips again' }).click();
+    await page.getByRole('button', { name: 'Reports', exact: true }).click();
+    await expect(reportTips).toBeVisible();
+    expect(failures).toEqual([]);
+  } finally {
+    await workspace.close();
+  }
+});

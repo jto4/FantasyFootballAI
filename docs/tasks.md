@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- October 27 (page tips): each main page shows a short, dismissible "how to use this page" with
+  a Learn more link to its help answer; the top-bar lightbulb brings a page's tips back and Help
+  can show them all again (remembered per browser only). The matchup lineups explain Est., ranges
+  and Q.
 - October 27 (setup and clicks): the AI warning now names the actual cause when ChatGPT updates
   its bundled Codex to an unverified version (0.165.0-alpha.1.2 failed the isolation proof, so the
   allowlist is unchanged) and its button opens Settings → AI. Guided setup offers OpenAI or Claude

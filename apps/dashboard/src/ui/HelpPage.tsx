@@ -7,7 +7,10 @@ export function HelpPage({
   articleId = '',
   onNavigate,
   onSample,
+  onResetTips,
 }: {
+  /** Present when the owner has hidden one or more page tips. */
+  onResetTips?: () => void;
   articleId?: string;
   onNavigate: (destination: SearchDestination) => boolean | Promise<boolean>;
   onSample: () => void;
@@ -45,6 +48,14 @@ export function HelpPage({
           </p>
           <p className="help-shortcuts-hint">
             Press <kbd>?</kbd> anywhere to see keyboard shortcuts.
+            {onResetTips && (
+              <>
+                {' '}
+                <button type="button" className="text-button" onClick={onResetTips}>
+                  Show all page tips again
+                </button>
+              </>
+            )}
           </p>
         </div>
       </div>

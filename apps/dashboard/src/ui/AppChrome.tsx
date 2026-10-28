@@ -7,6 +7,7 @@ import {
   CircleHelp,
   FileText,
   Home,
+  Lightbulb,
   MessageCircle,
   Power,
   Radio,
@@ -209,7 +210,10 @@ export function AppTopbar({
   onFreshen,
   chatOpen = false,
   onChat,
+  onShowTips,
 }: {
+  /** Brings back the page's dismissed tips; absent while they show or the page has none. */
+  onShowTips?: () => void;
   chatOpen?: boolean;
   /** Opens or closes the docked chat panel; absent on the Ask page itself. */
   onChat?: () => void;
@@ -286,6 +290,17 @@ export function AppTopbar({
       <WorkspaceSearch leagues={leagues} reports={reports} onNavigate={onSearchNavigate} />
       <div className="top-actions">
         <span className="date-label">{dateLabel}</span>
+        {onShowTips && (
+          <button
+            type="button"
+            className="small-button"
+            title="Show tips for this page"
+            aria-label="Show tips for this page"
+            onClick={onShowTips}
+          >
+            <Lightbulb size={15} aria-hidden="true" />
+          </button>
+        )}
         {onChat && (
           <button
             type="button"

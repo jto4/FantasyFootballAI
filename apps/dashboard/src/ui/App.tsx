@@ -12,6 +12,7 @@ import {
 import { GuidedAISetup } from './GuidedAISetup';
 import { ReportComposer } from './ReportComposer';
 import { FriendlyError, aiProblemMessage } from './FriendlyError';
+import { PageGuide, pageGuides, usePageGuides } from './PageGuide';
 import { describeError } from './error-text';
 import { ConfirmHost, confirmAction, discardOptions } from './ConfirmDialog';
 import { getDisplayPreferences } from './display-preferences';
@@ -195,6 +196,7 @@ export function App() {
   const [composerKind, setComposerKind] = useState<ReportKind | null>(null);
   const [setupBusy, setSetupBusy] = useState(false);
   const [aiCheckError, setAiCheckError] = useState('');
+  const guides = usePageGuides();
   // A player name handed to the props board when it opens from a player card.
   const propsPlayer = useRef('');
   const [aiChecking, setAiChecking] = useState(false);
@@ -921,6 +923,9 @@ export function App() {
             {...(league ? { onFreshen: () => void refreshLeague(league.id) } : {})}
             chatOpen={chatOpen}
             {...(section !== 'Ask' ? { onChat: () => setChatOpen((open) => !open) } : {})}
+            {...(league && pageGuides[section] && guides.hidden(section)
+              ? { onShowTips: () => guides.show(section) }
+              : {})}
           />
 
           <div className="page-content">
@@ -1013,6 +1018,13 @@ export function App() {
                 compact
               />
             )}
+            {stateLoaded && league && !guides.hidden(section) && (
+              <PageGuide
+                section={section}
+                onDismiss={() => guides.dismiss(section)}
+                onHelp={(helpId) => void searchNavigate({ section: 'Help', helpId })}
+              />
+            )}
             {!stateLoaded && section !== 'Help' ? (
               stateLoading ? (
                 <LoadingStatus
@@ -1085,6 +1097,7 @@ export function App() {
                   articleId={route.helpId ?? ''}
                   onNavigate={searchNavigate}
                   onSample={() => setSampleOpen(true)}
+                  {...(guides.anyHidden ? { onResetTips: guides.reset } : {})}
                 />
               </Suspense>
             ) : section === 'Ask' ? (

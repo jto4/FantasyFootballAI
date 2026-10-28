@@ -3669,3 +3669,70 @@ kbd {
   gap: 16px;
   margin-top: 12px;
 }
+
+/* Page tips: a quiet, dismissible "how to use this page" above the page content. */
+.page-guide {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.page-guide-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--orange);
+}
+
+.page-guide > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-guide ol {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.page-guide li + li {
+  margin-top: 2px;
+}
+
+.page-guide p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.page-guide-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.page-guide-close:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.matchup-key {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
