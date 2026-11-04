@@ -1,10 +1,13 @@
 import { ReadyDrafts } from './ReadyDrafts';
+import { LeagueTrends } from './LeagueTrends';
+import { LeagueVisuals } from './LeagueVisuals';
 import type { RefObject, ReactNode } from 'react';
 import { Activity, CalendarDays, FileText, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import {
   leagueSeasonPhase,
   orderedHomeCards,
   rankTeams,
+  reportVisuals,
   type HomeCardId,
   type LeagueConnection,
 } from '@sidekick/core';
@@ -34,8 +37,6 @@ type Props = {
     target: 'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null,
   ) => void;
   navigate: (section: string) => void;
-  /** Opens the league charts in Reports. */
-  onCharts: () => void;
   createReport: (kind: string) => Promise<void>;
   refreshLeague: (id: string) => Promise<void>;
   refreshNews: () => Promise<void>;
@@ -60,7 +61,6 @@ export function LeagueDesk({
   openSetupWizard,
   setModal,
   navigate,
-  onCharts,
   createReport,
   refreshLeague,
   refreshNews,
@@ -263,12 +263,8 @@ export function LeagueDesk({
           onToggle={(event) => onDisclosureChange?.('news', event.currentTarget.open)}
         >
           <summary>League standings & news</summary>
-          <p className="home-charts-link">
-            Standings charts, trends and playoff odds live in Reports.{' '}
-            <button type="button" className="text-button" onClick={onCharts}>
-              See league charts
-            </button>
-          </p>
+          <LeagueVisuals data={reportVisuals(league)} syncedAt={league.lastSyncedAt} />
+          <LeagueTrends league={league} />
           <div className="section-heading">
             <div>
               <p className="section-overline">THE EARLY READ</p>

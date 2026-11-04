@@ -3746,11 +3746,6 @@ kbd {
   font-size: 13px;
 }
 
-.home-charts-link {
-  margin: 8px 0 16px;
-  color: var(--muted);
-}
-
 .roster-moves-verdict {
   margin: 8px 0 12px;
 }

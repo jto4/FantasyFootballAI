@@ -52,8 +52,6 @@ export function ReportsPage({
   onReviewChange,
   onCreate,
   onDeliverySetup,
-  initialView,
-  onInitialViewUsed,
   league,
   generating = false,
   onCreateKind,
@@ -75,16 +73,9 @@ export function ReportsPage({
   onCreateKind?: (kind: ReportKind) => void;
   onSchedule?: (kind: ReportKind) => void;
   onDeliverySetup?: () => void;
-  /** A tab to open on arrival, used once. */
-  initialView?: 'charts';
-  onInitialViewUsed?: () => void;
 }) {
   // Until the user picks a tab, show the library once any report exists and Create otherwise.
-  const [chosenView, setView] = useState<'create' | 'library' | 'charts' | undefined>(initialView);
-  useEffect(() => {
-    if (initialView) onInitialViewUsed?.();
-    // Only the arrival counts; the owner's own tab choices take over from there.
-  }, []);
+  const [chosenView, setView] = useState<'create' | 'library' | 'charts'>();
   const [leagueFilter, setLeagueFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(initialReportId ?? '');
