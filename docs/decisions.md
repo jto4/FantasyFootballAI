@@ -771,8 +771,13 @@ Tests on our own data, as no public source reports weekly accuracy gains for the
   also forecast by ESPN: mean absolute error 5.38 for the model, 5.26 with 60% of the gap closed,
   5.34 for ESPN. The 60% was chosen on week 7; on week 8 alone it was 5.75 → 5.61 (ESPN 5.56). Lines
   covered 277 of 297 fantasy-relevant players at closing. Two weeks only, and closing lines arrive
-  late in the week. Not built yet: it needs the owner's decision, since lines come from a sportsbook
-  rather than our own model. ESPN's forecasts stay excluded.
+  late in the week. Built at the owner's request: `propLineWeight` 0.6 in
+  `packages/core/src/fantasy-projection.ts`, applied last, after wind and injury discounts, from
+  the saved line ledger (averaged across books) with a Personalize switch. Players without a line
+  keep the model alone. A quarterback with a line skips the recent-average blend (6.05 against
+  6.15 with it, 6.37 today). The prop model does not use this, so leans stay an independent view of
+  the line. `fantasy-projection-backtest.mjs --lines=<file>` reruns the check through the real
+  code. ESPN's forecasts stay excluded.
 - **Not adopted (fitted on 2025, tested on 2026).** Lagged expected fantasy points and expected
   touchdowns from ffopportunity, and target, air-yards and WOPR level or trend: RMSE moved under
   1% and mostly got worse, except tight ends (about 1%). Implied total, spread and game total are

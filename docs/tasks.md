@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (prop lines in projections): weekly projections close 60% of the gap to saved
+  sportsbook prop lines (5.38 → 5.26 on weeks 7–8, against 5.34 for ESPN), with a Personalize
+  switch; players without a line keep the model alone.
 - November 4 (lineup slots): lineup swaps paired players by list order, so Home could say "Start
   Vikings D/ST over A.J. Brown". Swaps now pair by position, then by a shared slot, and otherwise
   stay unpaired. Compare gives no start/sit call for players who cannot share a spot, and slot names
@@ -103,7 +106,7 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
 - [ ] Replace the two remaining `window.prompt` calls (email subject and reply-to when sending a saved report) with in-app fields, and move the remaining string-only error displays (settings sections, imports) onto `ErrorNotice` with retry.
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
 - [ ] Each week, run `scripts/research/prop-line-review.mjs` on the saved lines. Rushing and quarterback volume props have no leans for now; retest them after a rushing model change, and if receiving props' Brier score stops being below 0.25 over several weeks, take them to weight 0 too.
-- [ ] Decide on using sportsbook prop lines as a projection input (see `decisions.md`, November 4): 5.38 → 5.26 on weeks 7–8; retest as more weeks of lines are saved.
+- [ ] Each week, rerun `fantasy-projection-backtest.mjs --lines=<file>`; `propLineWeight` rests on two weeks, so revisit it once 6+ weeks of lines are saved.
 - [ ] Before any public release, review data licences: CC BY-SA sources and Pro Football Reference terms for snap counts.
 - [ ] Retest the discount for teammates of a replaced quarterback once 2026 has more cases (tight ends fell about 25% in both seasons, on 16 games).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.

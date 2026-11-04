@@ -5,7 +5,10 @@ import {
   isUpcomingFootballGame,
   nflSeasonFor,
   playerNameKey,
+  propLineKey,
   type FootballGame,
+  type FootballStatKey,
+  type PlayerPropLines,
   type PropLine,
 } from '@sidekick/core';
 import type { PublicFootballData, PublicPropLines } from '@sidekick/integrations';
@@ -118,6 +121,27 @@ export class PropLineLedger {
         : this.db.prepare('SELECT payload FROM lines').all()
     ) as { payload: string }[];
     return rows.map((row) => JSON.parse(row.payload) as PropLineHistory);
+  }
+  /**
+   * The latest pre-kickoff line for each player and stat in these games, averaged across books,
+   * keyed by `propLineKey`. Reads only the games asked for, as the ledger grows all season.
+   */
+  latestLines(gameIds: string[]) {
+    const totals = new Map<string, Map<FootballStatKey, { sum: number; books: number }>>();
+    for (const gameId of gameIds)
+      for (const row of this.list(gameId)) {
+        const key = propLineKey(row.gameId, row.playerName);
+        const stats = totals.get(key) ?? new Map<FootballStatKey, { sum: number; books: number }>();
+        const seen = stats.get(row.stat) ?? { sum: 0, books: 0 };
+        stats.set(row.stat, { sum: seen.sum + row.closing.line, books: seen.books + 1 });
+        totals.set(key, stats);
+      }
+    return new Map<string, PlayerPropLines>(
+      [...totals].map(([key, stats]) => [
+        key,
+        Object.fromEntries([...stats].map(([stat, seen]) => [stat, seen.sum / seen.books])),
+      ]),
+    );
   }
   summary() {
     const row = this.db

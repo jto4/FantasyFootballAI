@@ -156,6 +156,9 @@ it('accepts the replacement quarterback switch and treats it as a projection cha
   const off = { projectionAdjustments: { replacementQuarterback: false } };
   expect(isValidPreferences(off, new Set())).toBe(true);
   expect(hasProjectionChanges(off, 'league')).toBe(true);
+  const noLines = { projectionAdjustments: { propLines: false } };
+  expect(isValidPreferences(noLines, new Set())).toBe(true);
+  expect(hasProjectionChanges(noLines, 'league')).toBe(true);
 });
 
 it('accepts the Questionable switch and treats it as a projection change', async () => {

@@ -8,12 +8,14 @@ import {
   matchupWinProbability,
   projectionContext,
   projectionRange,
+  propLineKey,
   questionableKeys,
   replacedQuarterback,
   ruledOutKeys,
   teamGame,
   vacatedCarryShare,
   windFactor,
+  type PlayerPropLines,
 } from './fantasy-projection.js';
 import { propModelSettings } from './prop-model-settings.js';
 
@@ -101,6 +103,54 @@ it('projects kickers and defenses from scored history and the betting total', ()
   expect(
     projectSpecialTeamsPoints('K', 'SEA', target, history.slice(0, 2), context, flat),
   ).toBeUndefined();
+});
+
+it('closes a share of the gap to prop lines, and only for stats it projects', () => {
+  const games = [1, 2, 3, 4].map((week) => game(week));
+  const receiver = (week: number): PlayerGameStats => ({
+    playerId: '00-0000030',
+    name: 'Fictional Catcher',
+    position: 'WR',
+    team: 'SEA',
+    opponent: 'LA',
+    gameId: game(week).id,
+    season: 2026,
+    week,
+    seasonType: 'REG',
+    stats: { targets: 8, receptions: 5, receiving_yards: 60, receiving_tds: 0 },
+  });
+  const history = [1, 2, 3].map(receiver);
+  const context = projectionContext(
+    { players: history, games },
+    { snaps: new Map(), depth: new Map() },
+  );
+  const project = (market?: { lines: PlayerPropLines; weight: number }) =>
+    projectFantasyPoints(
+      halfPpr,
+      { playerId: '00-0000030', position: 'WR', team: 'SEA', game: games[3]!, history },
+      context,
+      propModelSettings,
+      undefined,
+      0,
+      undefined,
+      undefined,
+      undefined,
+      market,
+    )!;
+  const own = project();
+  expect(own.lineShift).toBeUndefined();
+  const line = own.stats.receiving_yards! + 40;
+  const moved = project({ lines: { receiving_yards: line }, weight: 0.6 });
+  expect(moved.stats.receiving_yards).toBeCloseTo(own.stats.receiving_yards! + 24);
+  expect(moved.lineShift).toBeCloseTo(2.4);
+  expect(moved.stats.receptions).toBe(own.stats.receptions);
+  // An impossible line changes nothing.
+  const ignored = project({ lines: { receptions: -1 }, weight: 0.6 });
+  expect(ignored.lineShift).toBeUndefined();
+  expect(ignored.points).toBe(own.points);
+  expect(propLineKey('2026_09_LA_SEA', 'A.J. Brown')).toBe(
+    propLineKey('2026_09_LA_SEA', 'AJ Brown'),
+  );
 });
 
 it('projects a backup quarterback as a starter when the main passer is ruled out', () => {

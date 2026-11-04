@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import {
   buildAdviceReadiness,
   type AdviceDataReadiness,
+  type PlayerPropLines,
   adviceDecisionPolicy,
   enforceAdviceDecisionPolicy,
   analyzeBetHistory,
@@ -89,6 +90,8 @@ export interface AdviceDependencies {
   gameDayInjuries?: Pick<import('@sidekick/integrations').GameDayInjuries, 'get'>;
   /** Snap counts and depth charts for the prop model. */
   usage?: Pick<PublicUsageData, 'get'>;
+  /** Saved prop lines that weekly projections move toward; projections stand alone without. */
+  propLines?: (gameIds: string[]) => Map<string, PlayerPropLines>;
   now?: () => number;
 }
 
@@ -314,6 +317,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     const evidence = loaded.league
       ? buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          propLines: deps.propLines,
           preferences: deps.store.settingsSnapshot().preferences,
           league: loaded.league,
           players,
@@ -583,6 +587,7 @@ export function createAdviceService(deps: AdviceDependencies) {
     const evidence = league
       ? buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          propLines: deps.propLines,
           preferences: deps.store.settingsSnapshot().preferences,
           league,
           players: loaded.players,

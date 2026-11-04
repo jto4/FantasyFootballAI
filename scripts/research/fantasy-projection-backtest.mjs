@@ -28,6 +28,8 @@ import {
   ruledOutKeys,
   questionableKeys,
   propDepth,
+  propLineKey,
+  propLineWeight,
   propUsageNorms,
   replacedQuarterback,
   scoreHistoricalGame,
@@ -36,6 +38,7 @@ import {
 } from '../../packages/core/dist/index.js';
 
 const [usageDir, espnSettingsFile, outFile] = process.argv.slice(2);
+const linesFile = process.argv.find((a) => a.startsWith('--lines='))?.slice(8);
 const data = await new PublicFootballData().get(2026);
 const snaps = new Map();
 const depth = new Map();
@@ -861,6 +864,71 @@ function replacementQuarterbackFit(league) {
   };
 }
 
+// Blending toward saved closing prop lines (--lines=<GET /api/props/lines output>): each share of
+// the gap, through the real projection path, with ESPN on the same players as the benchmark.
+function propLineCheck(league, file) {
+  const lines = new Map();
+  for (const item of JSON.parse(readFileSync(file, 'utf8')).items) {
+    const key = propLineKey(item.gameId, item.playerName);
+    lines.set(key, { ...lines.get(key), [item.stat]: item.closing.line });
+  }
+  const cases = [];
+  for (const row of data.players) {
+    const pos = footballPosition(row.position);
+    if (row.season !== 2026 || row.seasonType !== 'REG' || !['QB', 'RB', 'WR', 'TE'].includes(pos))
+      continue;
+    const playerLines = lines.get(propLineKey(row.gameId, row.name));
+    const game = context.league.games.get(row.gameId);
+    const history = context.byPlayer.get(row.playerId) ?? [];
+    const prior = history.filter((h) => order(h) < order(row)).sort((a, b) => order(b) - order(a));
+    if (!playerLines || !game || prior.length < 3) continue;
+    const recent = prior
+      .slice(0, 8)
+      .map((h) => score(league, h))
+      .filter((p) => p !== undefined);
+    if (!(recent.reduce((a, b) => a + b, 0) / recent.length >= 5)) continue;
+    const actual = score(league, row);
+    const at = (weight) =>
+      projectFantasyPoints(
+        league,
+        { playerId: row.playerId, position: pos, team: row.team, game, history },
+        context,
+        propModelSettings,
+        propUsageNorms,
+        vacated.exponent,
+        weather,
+        undefined,
+        replacement.line,
+        weight ? { lines: playerLines, weight } : undefined,
+      )?.points;
+    if (actual === undefined || at(0) === undefined) continue;
+    const f = espn.get(`${row.week}:${playerNameKey(row.name)}:${nflTeamKey(row.team)}`);
+    const espnPoints = f ? score(league, { ...row, stats: { ...zeros, ...f.stats } }) : undefined;
+    cases.push({ week: row.week, actual, at, espnPoints });
+  }
+  const r = (x) => Math.round(x * 1000) / 1000;
+  const mae = (list, weight) =>
+    list.reduce((s, c) => s + Math.abs(c.actual - c.at(weight)), 0) / list.length;
+  const weeks = [...new Set(cases.map((c) => c.week))].sort((a, b) => a - b);
+  const of = (week) => cases.filter((c) => c.week === week);
+  const shares = [0, 0.2, 0.4, 0.6, 0.8, 1];
+  const chosen = shares.reduce((a, b) => (mae(of(weeks[0]), b) < mae(of(weeks[0]), a) ? b : a));
+  const shared = cases.filter((c) => c.espnPoints !== undefined);
+  return {
+    weeks,
+    players: cases.length,
+    maeByShare: Object.fromEntries(shares.map((s) => [s, r(mae(cases, s))])),
+    chosenOnFirstWeek: chosen,
+    lastWeekMae: Object.fromEntries([0, chosen].map((s) => [s, r(mae(of(weeks.at(-1)), s))])),
+    sameAsEspn: {
+      players: shared.length,
+      model: r(mae(shared, 0)),
+      withLines: r(mae(shared, propLineWeight)),
+      espn: r(shared.reduce((s, c) => s + Math.abs(c.actual - c.espnPoints), 0) / shared.length),
+    },
+  };
+}
+
 const specialTeamsDefaults = {
   K: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
   DST: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
@@ -882,6 +950,7 @@ const result = {
   outcomeSpread: outcomes.report,
   questionable: questionableResult.report,
   replacementQuarterback: replacement.report,
+  ...(linesFile ? { propLines: propLineCheck(afton, linesFile) } : {}),
 };
 console.log(JSON.stringify(result, null, 2));
 if (outFile && !outFile.startsWith('--')) writeFileSync(outFile, JSON.stringify(result, null, 2));

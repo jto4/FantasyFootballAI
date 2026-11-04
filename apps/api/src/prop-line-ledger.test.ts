@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { FootballGame, PropLine } from '@sidekick/core';
+import { propLineKey, type FootballGame, type PropLine } from '@sidekick/core';
 import { PropLineLedger, startPropLineCapture } from './prop-line-ledger.js';
 
 const game = (id: string, kickoffAt: string, week = 7): FootballGame => ({
@@ -95,5 +95,23 @@ it('captures every game of the week once a day and near-kickoff games on each ti
   expect(fetched).toEqual([soon.id]);
   capture.stop();
   expect(ledger.summary()).toEqual({ lines: 2, games: 2 });
+  ledger.close();
+});
+
+it('gives the latest line per player and stat for the chosen games, averaged across books', () => {
+  const ledger = new PropLineLedger(':memory:');
+  const sunday = game('2026_07_KC_SEA', '2026-10-26T00:20:00.000Z');
+  const other = game('2026_07_LA_SF', '2026-10-26T00:20:00.000Z');
+  const at = '2026-10-23T12:00:00.000Z';
+  ledger.record(
+    [line(sunday.id, 220.5), { ...line(sunday.id, 230.5), sportsbook: 'FanDuel' }],
+    [sunday],
+    at,
+  );
+  ledger.record([line(sunday.id, 224.5)], [sunday], '2026-10-24T12:00:00.000Z');
+  ledger.record([line(other.id, 199.5)], [other], at);
+  const lines = ledger.latestLines([sunday.id]);
+  expect([...lines.keys()]).toEqual([propLineKey(sunday.id, 'Patrick Mahomes')]);
+  expect(lines.get(propLineKey(sunday.id, 'Patrick Mahomes'))).toEqual({ passing_yards: 227.5 });
   ledger.close();
 });

@@ -215,6 +215,7 @@ export function createWeeklyService(
     );
     const evidence = buildPlayerEvidence({
       usage: await usageFor(loaded.season, loaded.data.games),
+      propLines: deps.propLines,
       preferences: deps.store.settingsSnapshot().preferences,
       league,
       players: loaded.players,
@@ -482,6 +483,7 @@ export function createWeeklyService(
     const recorded = hasProjectionChanges(deps.store.settingsSnapshot().preferences, league.id)
       ? buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          propLines: deps.propLines,
           league,
           players: loaded.players.filter((p) => mine.has(p.id)),
           projections: deps.store
@@ -507,6 +509,7 @@ export function createWeeklyService(
         tag: 'model',
         players: buildPlayerEvidence({
           usage: await usageFor(loaded.season, loaded.data.games),
+          propLines: deps.propLines,
           league,
           players: loaded.players.filter((p) => imported.has(p.id)),
           projections: [],
@@ -710,6 +713,7 @@ export function createWeeklyService(
     }
     const evidence = buildPlayerEvidence({
       usage: await usageFor(loaded.season, loaded.data.games),
+      propLines: deps.propLines,
       preferences: deps.store.settingsSnapshot().preferences,
       league,
       players: loaded.players,

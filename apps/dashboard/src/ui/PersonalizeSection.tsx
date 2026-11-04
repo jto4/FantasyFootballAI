@@ -646,6 +646,19 @@ export function PersonalizeSection({
           <label>
             <input
               type="checkbox"
+              checked={preferences.projectionAdjustments?.propLines !== false}
+              onChange={(event) =>
+                set('projectionAdjustments', {
+                  ...preferences.projectionAdjustments,
+                  propLines: event.target.checked,
+                })
+              }
+            />{' '}
+            Move projections toward sportsbook prop lines when they are available
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={preferences.projectionAdjustments?.questionable !== false}
               onChange={(event) =>
                 set('projectionAdjustments', {

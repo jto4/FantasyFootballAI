@@ -519,6 +519,7 @@ app.use(
     gameDayInjuries: new GameDayInjuries(),
     weather: new PublicGameWeather(),
     usage: publicUsageData,
+    propLines: (gameIds) => propLineLedger.latestLines(gameIds),
     pregame: publicPregameEvidence,
     catalog: getSleeperPlayerCatalog,
     news: footballNewsCache,

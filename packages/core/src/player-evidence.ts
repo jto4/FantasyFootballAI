@@ -25,7 +25,10 @@ import {
   projectSpecialTeamsPoints,
   projectionContext,
   projectionRange,
+  propLineKey,
+  propLineWeight,
   teamGame,
+  type PlayerPropLines,
   type UsageInput,
 } from './fantasy-projection.js';
 import {
@@ -54,6 +57,8 @@ export interface PlayerEvidenceInput {
   asOf: string;
   /** Snap counts and depth charts for the projection model; features stay off without them. */
   usage?: UsageInput | undefined;
+  /** Saved sportsbook prop lines for these games, by `propLineKey`; absent means none. */
+  propLines?: ((gameIds: string[]) => Map<string, PlayerPropLines>) | undefined;
   /** Owner preferences: model adjustments that are switched off and per-player nudges. */
   preferences?: UserPreferences | undefined;
 }
@@ -70,6 +75,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
   const carriesOn = input.preferences?.projectionAdjustments?.vacatedCarries !== false;
   const questionableOn = input.preferences?.projectionAdjustments?.questionable !== false;
   const replacementOn = input.preferences?.projectionAdjustments?.replacementQuarterback !== false;
+  const propLinesOn = input.preferences?.projectionAdjustments?.propLines !== false;
   const forecast =
     input.scope === 'week' ? undefined : prepareFantasyForecast(input.league, input.data, input);
   const history = historicalPlayerGames(input.data, input);
@@ -106,6 +112,10 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
     if (game.season === input.season && game.week === input.week && game.seasonType === 'REG')
       for (const side of new Set([nflTeamKey(game.home), nflTeamKey(game.away)]))
         weekGames.set(side, [...(weekGames.get(side) ?? []), game]);
+  const weekLines =
+    input.scope === 'week' && propLinesOn
+      ? input.propLines?.([...new Set([...weekGames.values()].flat().map((g) => g.id))])
+      : undefined;
   const nameCounts = new Map<string, number>();
   for (const player of input.players) {
     const key = playerNameKey(player.name);
@@ -326,6 +336,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
       projection && player.nflTeam
         ? teamGame(input.data.games, input.season, input.week, player.nflTeam)
         : undefined;
+    const playerLines = game && weekLines?.get(propLineKey(game.id, player.name));
     const own =
       !matched.length && projection && game && rows.length
         ? evidence.position === 'K' || evidence.position === 'DST'
@@ -356,6 +367,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               windOn ? weatherSettings : undefined,
               questionableOn ? questionableSettings : undefined,
               replacementOn ? replacementQuarterbackLine : undefined,
+              playerLines ? { lines: playerLines, weight: propLineWeight } : undefined,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -450,8 +462,10 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
         : undefined;
       // A backup's recent average is his mop-up games, which the replacement line is correcting.
       const replacing = (own as { replacedQuarterback?: string }).replacedQuarterback;
+      // With a line in the projection the average only dilutes it (QBs, weeks 7–8: 6.05 vs 6.15).
+      const lineShift = (own as { lineShift?: number }).lineShift;
       evidence.projectedPoints =
-        weight < 1 && recentAverage !== undefined && !replacing
+        weight < 1 && recentAverage !== undefined && !replacing && lineShift === undefined
           ? weight * own.points + (1 - weight) * recentAverage
           : own.points;
       evidence.projectionScope = 'week';
@@ -554,6 +568,17 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             sourceIds: evidence.projectionSourceIds,
             description:
               'Teammates listed Out or Doubtful on the NFL injury report; their recent carries raise this back’s rushing projection (fitted on 2025, checked on 2026).',
+          },
+        );
+      if (lineShift)
+        metric(
+          'prop-line-shift',
+          'Points moved toward this week’s sportsbook prop lines',
+          lineShift,
+          'points/week',
+          {
+            sourceIds: evidence.projectionSourceIds,
+            description: `The projection closes ${Math.round(propLineWeight * 100)}% of the gap to saved prop lines, which price late news the stat model lacks (chosen on week 7 of 2026, checked on week 8).`,
           },
         );
       if (replacing)

@@ -1,4 +1,4 @@
-import { footballPosition, nflTeamKey, scoreHistoricalGame } from './advice-math.js';
+import { footballPosition, nflTeamKey, playerNameKey, scoreHistoricalGame } from './advice-math.js';
 import type { FootballGame, FootballStatKey, PlayerGameStats } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
 import {
@@ -24,6 +24,19 @@ export interface UsageInput {
   /** `season:week:playerId` for players listed Questionable on that week's injury report. */
   questionable?: Set<string>;
 }
+
+/**
+ * Share of the gap to a sportsbook's prop line a weekly projection closes. Books price late role
+ * and injury news the stat model lacks: chosen on week 7 of 2026 and confirmed on week 8, it took
+ * average error from 5.38 to 5.26 (see docs/decisions.md). Not used by the prop model, whose leans
+ * must stay an independent opinion of the line.
+ */
+export const propLineWeight = 0.6;
+
+/** Saved prop lines for one player and game, from `propLineKey`. */
+export type PlayerPropLines = Partial<Record<FootballStatKey, number>>;
+export const propLineKey = (gameId: string, playerName: string) =>
+  `${gameId}:${playerNameKey(playerName)}`;
 
 /** Offense loses `windCoefficient` of its projection per 10 km/h of wind above the threshold. */
 export interface WeatherParams {
@@ -308,6 +321,8 @@ export function projectFantasyPoints(
   questionable?: QuestionableParams,
   /** A typical replacement starter's stat line, the floor for a backup stepping in; off when absent. */
   replacementLine?: Partial<Record<FootballStatKey, number>>,
+  /** This player's sportsbook prop lines and the share of the gap to close; off when absent. */
+  market?: { lines: PlayerPropLines; weight: number },
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
@@ -385,6 +400,15 @@ export function projectFantasyPoints(
       const value = projected.stats[key];
       if (value !== undefined) projected.stats[key] = value * factor;
     }
+  // Last, so wind and injury discounts cannot apply twice to a line that already prices them.
+  const unlined = scoreStats(projected.stats);
+  let lined = false;
+  for (const [stat, line] of Object.entries(market?.lines ?? {}) as [FootballStatKey, number][]) {
+    const own = projected.stats[stat];
+    if (own === undefined || !Number.isFinite(line) || line < 0) continue;
+    projected.stats[stat] = own + market!.weight * (line - own);
+    lined = true;
+  }
   const points = scoreStats(projected.stats);
   return points === undefined
     ? undefined
@@ -394,6 +418,9 @@ export function projectFantasyPoints(
         sampleGames: projected.sampleGames,
         vacatedCarryShare: vacated,
         ...(replaced ? { replacedQuarterback: replaced.name } : {}),
+        ...(lined && unlined !== undefined
+          ? { lineShift: Math.round((points - unlined) * 100) / 100 }
+          : {}),
         windFactor: wind,
         ...(listed ? { playChance: questionable.playChance } : {}),
       };

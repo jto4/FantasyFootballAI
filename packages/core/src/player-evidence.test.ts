@@ -1,4 +1,5 @@
 import { questionableSettings } from './fantasy-projection-settings.js';
+import { propLineKey } from './fantasy-projection.js';
 import { expect, it } from 'vitest';
 import type { LeagueConnection, PlayerProjection, RosterPlayer } from './domain-types.js';
 import type { FootballDataSnapshot, FootballGame, PlayerGameStats } from './advice-types.js';
@@ -283,6 +284,59 @@ it('discounts a player listed Questionable and records his chance to play, unles
   })[0]!;
   expect(off.playChance).toBeUndefined();
   expect(off.projectedPoints).toBeCloseTo(healthy.projectedPoints!, 5);
+});
+
+it('moves a week’s projection toward saved prop lines, unless switched off', () => {
+  const plain = buildPlayerEvidence(input)[0]!;
+  const asked: string[][] = [];
+  const propLines = (gameIds: string[]) => {
+    asked.push(gameIds);
+    return new Map([[propLineKey('next', player.name), { receiving_yards: 200 }]]);
+  };
+  const lined = buildPlayerEvidence({ ...input, propLines })[0]!;
+  expect(asked).toEqual([['next']]);
+  expect(lined.projectedPoints).toBeGreaterThan(plain.projectedPoints!);
+  expect(lined.metrics.find((m) => m.id.endsWith(':prop-line-shift'))?.value).toBeGreaterThan(0);
+  const off = buildPlayerEvidence({
+    ...input,
+    propLines,
+    preferences: { projectionAdjustments: { propLines: false } },
+  })[0]!;
+  expect(off.projectedPoints).toBe(plain.projectedPoints);
+  expect(asked).toHaveLength(1);
+});
+
+it('skips the recent-average blend for a quarterback with prop lines', () => {
+  const passer = {
+    ...input,
+    league: { ...league, scoring: { ...league.scoring, pass_yd: 0.04, pass_td: 4 } },
+    players: [{ ...player, position: 'QB' }],
+    data: {
+      ...data,
+      players: rows.map((row) => ({
+        ...row,
+        position: 'QB',
+        stats: {
+          ...row.stats,
+          receptions: 0,
+          receiving_yards: 0,
+          attempts: 30,
+          completions: 20,
+          passing_yards: 120 + 90 * row.week,
+          passing_tds: row.week === 4 ? 5 : 0,
+        },
+      })),
+    },
+  };
+  const own = (e: ReturnType<typeof buildPlayerEvidence>[number]) =>
+    e.metrics.find((m) => m.id.endsWith(':projected'))?.value;
+  const blended = buildPlayerEvidence(passer)[0]!;
+  const lined = buildPlayerEvidence({
+    ...passer,
+    propLines: () => new Map([[propLineKey('next', player.name), { passing_yards: 300 }]]),
+  })[0]!;
+  expect(blended.projectedPoints).not.toBeCloseTo(own(blended)!, 2);
+  expect(lined.projectedPoints).toBeCloseTo(own(lined)!, 2);
 });
 
 it('applies an owner nudge to the decision value while the model metric keeps its own number', () => {

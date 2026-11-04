@@ -48,6 +48,7 @@ export interface UserPreferences {
     vacatedCarries?: boolean;
     questionable?: boolean;
     replacementQuarterback?: boolean;
+    propLines?: boolean;
   };
   playerNudges?: PlayerNudge[];
   watchlist?: PlayerRef[];
@@ -198,10 +199,12 @@ export function isValidPreferences(
         'vacatedCarries',
         'questionable',
         'replacementQuarterback',
+        'propLines',
       ]) &&
       optionalBoolean(projectionAdjustments.wind) &&
       optionalBoolean(projectionAdjustments.vacatedCarries) &&
       optionalBoolean(projectionAdjustments.replacementQuarterback) &&
+      optionalBoolean(projectionAdjustments.propLines) &&
       optionalBoolean(projectionAdjustments.questionable)
     )
   )
@@ -362,6 +365,7 @@ export function hasProjectionChanges(
     preferences?.projectionAdjustments?.wind === false ||
     preferences?.projectionAdjustments?.vacatedCarries === false ||
     preferences?.projectionAdjustments?.questionable === false ||
-    preferences?.projectionAdjustments?.replacementQuarterback === false,
+    preferences?.projectionAdjustments?.replacementQuarterback === false ||
+    preferences?.projectionAdjustments?.propLines === false,
   );
 }
