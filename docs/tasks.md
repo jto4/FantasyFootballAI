@@ -14,6 +14,9 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (Linux RPM): rpm 6 runs `%install` from a new folder, which broke
+  electron-installer-redhat's relative copy (not fixed upstream through 4.0.0).
+  `scripts/desktop-package.mjs` patches that line in the staged tooling and fails if it changes.
 - November 3 (week 8 review): backups starting for a ruled-out quarterback are projected at no
   less than a typical replacement; rushing and quarterback volume props show no lean because the
   line beats the model there; leans are recorded in the background; the prop weight refit waits

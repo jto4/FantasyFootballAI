@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createDesktopSmokePlan } from './desktop-smoke-plan.mjs';
 import { makeInternalSymlinksRelative } from './portable-symlinks.mjs';
 import { markLocalOnly } from './icloud-safe.mjs';
+import { fixRpmSpecCopy } from './desktop-rpm-spec.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const staging = await mkdtemp(join(tmpdir(), 'sunday-sidekick-desktop-'));
@@ -134,6 +135,12 @@ async function installStagedDependencies() {
       await cp(join(staging, 'packages', name), path, { recursive: true });
     }
     await lstat(join(path, 'dist', 'index.js'));
+  }
+
+  // The RPM tooling is an optional Linux-only dependency.
+  if (process.platform === 'linux') {
+    const spec = join(staging, 'node_modules/electron-installer-redhat/resources/spec.ejs');
+    await writeFile(spec, fixRpmSpecCopy(await readFile(spec, 'utf8')));
   }
 }
 
