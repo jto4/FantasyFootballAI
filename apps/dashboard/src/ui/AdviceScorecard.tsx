@@ -6,6 +6,7 @@ import {
 } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { validPerformance } from './AdvicePerformance';
+import { formatNumber } from './number-format';
 
 const sourceNames: Record<string, string> = {
   'public-projection-v1': 'ESPN projections',
@@ -21,8 +22,7 @@ const retiredMethods = new Set(['public-projection-v1']);
 export const minimumComparisonSamples = 30;
 const sourceName = (method: string) =>
   sourceNames[method] ?? (method.startsWith('import') ? 'Your imported projections' : method);
-const points = (n: number) =>
-  new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+const points = (n: number) => formatNumber(n);
 
 async function load(signal: AbortSignal) {
   const [performance, journal] = await Promise.all([

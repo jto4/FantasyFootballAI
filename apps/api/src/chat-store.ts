@@ -1,6 +1,5 @@
-import Database from 'better-sqlite3';
-import { chmodSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import type Database from 'better-sqlite3';
+import { openLocalDatabase } from './local-database.js';
 import type { ChatMessage } from './chat-service.js';
 
 export interface ChatConversation {
@@ -48,17 +47,10 @@ export function isConversation(value: unknown): value is ChatConversation {
 export class ChatStore {
   private db: Database.Database;
   constructor(path: string) {
-    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    this.db = new Database(path);
-    this.db.pragma('journal_mode = WAL');
-    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
-    this.db.pragma('journal_size_limit = 1048576');
-    // Start each run with a trimmed log rather than the last run's high-water mark.
-    this.db.pragma('wal_checkpoint(TRUNCATE)');
-    this.db.exec(
+    this.db = openLocalDatabase(
+      path,
       'CREATE TABLE IF NOT EXISTS conversations (id TEXT PRIMARY KEY, updated_at TEXT NOT NULL, payload TEXT NOT NULL) STRICT',
     );
-    if (path !== ':memory:') chmodSync(path, 0o600);
   }
   list(): ChatConversationSummary[] {
     return (

@@ -1,7 +1,6 @@
 import { nflSeasonFor } from '@sidekick/core';
-import Database from 'better-sqlite3';
-import { chmodSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import type Database from 'better-sqlite3';
+import { openLocalDatabase } from './local-database.js';
 import { Router } from 'express';
 import {
   buildPropBoard,
@@ -46,17 +45,10 @@ export function isPropLeanRecord(value: unknown): value is PropLeanRecord {
 export class PropLeanStore {
   private db: Database.Database;
   constructor(path: string) {
-    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    this.db = new Database(path);
-    this.db.pragma('journal_mode = WAL');
-    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
-    this.db.pragma('journal_size_limit = 1048576');
-    // Start each run with a trimmed log rather than the last run's high-water mark.
-    this.db.pragma('wal_checkpoint(TRUNCATE)');
-    this.db.exec(
+    this.db = openLocalDatabase(
+      path,
       'CREATE TABLE IF NOT EXISTS leans (key TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT',
     );
-    if (path !== ':memory:') chmodSync(path, 0o600);
   }
   list(): PropLeanRecord[] {
     return (

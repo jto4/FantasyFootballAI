@@ -256,6 +256,10 @@ export function playerNameKey(name: string): string {
 }
 const nameKeys = new Map<string, string>();
 
+/** A platform's position as our lineups name it: Sleeper's DEF is the same slot as DST. */
+export const slotPosition = <T extends string | undefined>(position: T) =>
+  position === 'DEF' ? 'DST' : position;
+
 export function footballPosition(position: string | undefined): string {
   const key = position?.toUpperCase() ?? '';
   return key === 'DEF' ? 'DST' : key;
@@ -394,7 +398,7 @@ export function starterSlots(input: unknown): {
     const positions =
       flexibleSlots[label] ??
       (['QB', 'RB', 'WR', 'TE', 'K', 'DST', 'DEF'].includes(label)
-        ? [label === 'DEF' ? 'DST' : label]
+        ? [slotPosition(label)]
         : undefined);
     if (positions) slots.push({ label, positions });
     else warnings.push(`Unsupported starting position: ${raw.slice(0, 40)}.`);
@@ -403,8 +407,6 @@ export function starterSlots(input: unknown): {
     warnings.push('Lineup calculations require 1–12 supported starting slots.');
   return { slots, warnings };
 }
-
-const slotPosition = (position: string) => (position === 'DEF' ? 'DST' : position);
 
 /** Whether two positions can ever fill the same starting spot under this league's lineup. */
 export function sharesStarterSlot(rawSlots: unknown, first: string, second: string) {
@@ -488,11 +490,7 @@ export function optimizeLineup(
     for (const [mask, value] of before) {
       slots.forEach((slot, index) => {
         const bit = 1 << index;
-        if (
-          mask & bit ||
-          !slot.positions.includes(player.position === 'DEF' ? 'DST' : player.position)
-        )
-          return;
+        if (mask & bit || !slot.positions.includes(slotPosition(player.position))) return;
         const next = mask | bit,
           points = value.points + projected,
           score = value.score + (isLocked || !scoreOf ? projected : scoreOf(player));

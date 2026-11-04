@@ -6,6 +6,7 @@ import { PlayerPicker } from './PlayerPicker';
 import { PlayerName } from './PlayerCard';
 import { ErrorNotice } from './ErrorNotice';
 import { formatDateTime } from './date-format';
+import { formatNumber } from './number-format';
 import './compare.css';
 
 type Row = {
@@ -36,7 +37,7 @@ const isComparison = (x: unknown): x is Comparison =>
 type Pool = { players: { id: string; name: string; position: string; nflTeam?: string }[] };
 const isPool = (x: unknown): x is Pool => record(x) && Array.isArray(x.players);
 
-const num = (n: number) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+const num = (n: number) => formatNumber(n);
 
 /** Start/sit: two to four players side by side, decided by this week's win chance. No AI. */
 export function ComparePage({

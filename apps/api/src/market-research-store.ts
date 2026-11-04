@@ -1,24 +1,15 @@
-import Database from 'better-sqlite3';
-import { chmodSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import type Database from 'better-sqlite3';
+import { openLocalDatabase } from './local-database.js';
 import { isMarketResearchRecord, type MarketResearchRecord } from '@sidekick/core';
 
 /** Deliberately separate from app state: never enters advice, reports or prediction ledgers. */
 export class MarketResearchStore {
   private db: Database.Database;
   constructor(path: string) {
-    // Constructed at API startup, before the main store creates the data directory.
-    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    this.db = new Database(path);
-    this.db.pragma('journal_mode = WAL');
-    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
-    this.db.pragma('journal_size_limit = 1048576');
-    // Start each run with a trimmed log rather than the last run's high-water mark.
-    this.db.pragma('wal_checkpoint(TRUNCATE)');
-    this.db.exec(
+    this.db = openLocalDatabase(
+      path,
       'CREATE TABLE IF NOT EXISTS research (id TEXT PRIMARY KEY, payload TEXT NOT NULL) STRICT',
     );
-    if (path !== ':memory:') chmodSync(path, 0o600);
   }
   list(): MarketResearchRecord[] {
     return (

@@ -5,6 +5,7 @@ import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
 import { formatOdds } from './display-preferences';
 import { ErrorNotice } from './ErrorNotice';
+import { formatOptional } from './number-format';
 import './props.css';
 
 export type PropHandoff = {
@@ -57,8 +58,7 @@ const statLabels: Record<string, string> = {
   receiving_yards: 'Receiving yards',
   receptions: 'Receptions',
 };
-const num = (n?: number) =>
-  n === undefined ? '—' : new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+const num = (n?: number) => formatOptional(n);
 const signed = (n?: number) => (n === undefined ? '—' : `${n > 0 ? '+' : ''}${num(n)}`);
 const strengthOrder = { strong: 0, moderate: 1, slight: 2 };
 const tallyText = (t: Tally) =>

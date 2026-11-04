@@ -17,6 +17,7 @@ import {
   playerNameKey,
   keptStarterIds,
   starterSlots,
+  slotPosition,
 } from './advice-math.js';
 import { replacementBaselines } from './draft-replacement.js';
 import { isInactiveFootballStatus } from './player-availability.js';
@@ -167,9 +168,7 @@ export function buildFantasyAdvicePlan(
       ...new Set(
         slots.slots
           .filter((slot) =>
-            involved.every((player) =>
-              slot.positions.includes(player.position === 'DEF' ? 'DST' : player.position),
-            ),
+            involved.every((player) => slot.positions.includes(slotPosition(player.position))),
           )
           .map((slot) => slot.label),
       ),
@@ -291,9 +290,7 @@ export function buildFantasyAdvicePlan(
             player.projectedPoints !== undefined &&
             Number.isFinite(player.projectedPoints) &&
             !isInactiveFootballStatus(player.status) &&
-            slots.some((slot) =>
-              slot.positions.includes(player.position === 'DEF' ? 'DST' : player.position),
-            ),
+            slots.some((slot) => slot.positions.includes(slotPosition(player.position))),
         )
         .map((player) => ({
           playerId: player.id,
@@ -462,7 +459,7 @@ export function buildFantasyAdvicePlan(
     plan.candidates = selected
       .filter((player) => player.projectedPoints !== undefined)
       .map((player) => {
-        const baseline = baselines.get(player.position === 'DEF' ? 'DST' : player.position);
+        const baseline = baselines.get(slotPosition(player.position));
         const value = baseline !== undefined ? player.projectedPoints! - baseline : undefined;
         return {
           playerId: player.id,
@@ -483,11 +480,7 @@ export function buildFantasyAdvicePlan(
           `${player.name}: season points above positional replacement`,
           candidate.value,
           sourceIds(
-            players.filter(
-              (row) =>
-                (row.position === 'DEF' ? 'DST' : row.position) ===
-                (player.position === 'DEF' ? 'DST' : player.position),
-            ),
+            players.filter((row) => slotPosition(row.position) === slotPosition(player.position)),
           ),
           'Replacement is the next projected player after jointly allocating all league starting slots, including overlapping FLEX/Superflex eligibility. Bench demand and future draft choices remain unmodelled.',
         );
@@ -514,7 +507,7 @@ export function buildFantasyAdvicePlan(
     });
     const baselines = replacementBaselines(players, league);
     plan.candidates = matched.map(({ pick, player }) => {
-      const baseline = baselines.get(player.position === 'DEF' ? 'DST' : player.position);
+      const baseline = baselines.get(slotPosition(player.position));
       const value =
         player.projectedPoints !== undefined && baseline !== undefined
           ? player.projectedPoints - baseline
@@ -525,11 +518,7 @@ export function buildFantasyAdvicePlan(
           `${player.name}: current season points above positional replacement`,
           value,
           sourceIds(
-            players.filter(
-              (row) =>
-                (row.position === 'DEF' ? 'DST' : row.position) ===
-                (player.position === 'DEF' ? 'DST' : player.position),
-            ),
+            players.filter((row) => slotPosition(row.position) === slotPosition(player.position)),
           ),
           'Current full-season estimate minus replacement after jointly allocating all league starting slots. This is not draft-time value, the actual roster starting gain or a retrospective draft grade.',
         );

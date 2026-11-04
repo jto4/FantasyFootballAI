@@ -3,9 +3,9 @@ import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
 import { lineupSlotName } from './lineup-slot';
+import { formatNumber } from './number-format';
 
-const points = (n: number) =>
-  `${n >= 0 ? '+' : ''}${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n)}`;
+const points = (n: number) => `${n >= 0 ? '+' : ''}${formatNumber(n)}`;
 const strings = (x: unknown) => Array.isArray(x) && x.every((w) => typeof w === 'string');
 const isWaiverDay = (x: unknown): x is WaiverDay =>
   record(x) && Array.isArray(x.candidates) && Array.isArray(x.weakSpots) && strings(x.warnings);

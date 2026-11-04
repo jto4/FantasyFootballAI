@@ -5,6 +5,7 @@ import { requestJson } from './api-client';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
+import { formatOptional } from './number-format';
 import './dynasty.css';
 
 type Seasons = [number, number, number, number];
@@ -115,8 +116,7 @@ type TradeResult = { yours: TradeView; theirs?: TradeView };
 const isTradeResult = (x: unknown): x is TradeResult =>
   record(x) && record(x.yours) && typeof x.yours.net === 'number';
 
-const num = (n: number | undefined) =>
-  n === undefined ? '—' : new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
+const num = (n: number | undefined) => formatOptional(n, 0);
 const formatLabel = { redraft: 'Redraft', keeper: 'Keeper', dynasty: 'Dynasty' };
 const outlookText: Record<string, string> = {
   contender: 'Contender: built to win now.',

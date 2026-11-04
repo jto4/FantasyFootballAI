@@ -4,6 +4,7 @@ import { formatDateTime } from './date-format';
 import { describeError } from './error-text';
 import type { WeeklyBriefing } from './weekly-briefing';
 import { lineupSlotName } from './lineup-slot';
+import { formatNumber } from './number-format';
 
 type Alerts = {
   alerts: {
@@ -30,8 +31,7 @@ const swap = (r: { name: string; estimate: number } | undefined) =>
   r && typeof r.name === 'string' && Number.isFinite(r.estimate)
     ? ` Start ${r.name} instead (${r.estimate.toFixed(1)} projected).`
     : '';
-const points = (n: number) =>
-  `+${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n)}`;
+const points = (n: number) => `+${formatNumber(n)}`;
 
 /**
  * The single most important thing to do this week, chosen in order: a starter problem, stale

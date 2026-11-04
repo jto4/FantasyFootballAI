@@ -182,6 +182,21 @@ export function teamGame(games: FootballGame[], season: number, week: number, te
 // Built once per games list (per data snapshot) instead of scanning every game per player.
 const gameIndexes = new WeakMap<FootballGame[], Map<string, FootballGame>>();
 
+/** The team's last three regular-season games this season before this one, newest first. */
+function recentTeamGames(context: ProjectionContext, teamKey: string, game: FootballGame) {
+  const order = (g: FootballGame) => g.season * 100 + g.week;
+  return [...context.league.games.values()]
+    .filter(
+      (g) =>
+        g.season === game.season &&
+        g.seasonType === 'REG' &&
+        order(g) < order(game) &&
+        (nflTeamKey(g.home) === teamKey || nflTeamKey(g.away) === teamKey),
+    )
+    .sort((a, b) => order(b) - order(a))
+    .slice(0, 3);
+}
+
 /**
  * Share of the team's running-back carries over its last three games (same season) that belonged
  * to other running backs now ruled Out or Doubtful. A back who already missed those games has no
@@ -195,17 +210,7 @@ export function vacatedCarryShare(
 ): number {
   if (!context.ruledOut.size) return 0;
   const key = nflTeamKey(team);
-  const order = (g: FootballGame) => g.season * 100 + g.week;
-  const recent = [...context.league.games.values()]
-    .filter(
-      (g) =>
-        g.season === game.season &&
-        g.seasonType === 'REG' &&
-        order(g) < order(game) &&
-        (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
-    )
-    .sort((a, b) => order(b) - order(a))
-    .slice(0, 3);
+  const recent = recentTeamGames(context, key, game);
   let total = 0,
     vacated = 0;
   for (const g of recent)
@@ -239,17 +244,7 @@ export function replacedQuarterback(
   if (!context.ruledOut.size || depthRank === undefined || depthRank > 2) return undefined;
   if (context.ruledOut.has(`${game.season}:${game.week}:${playerId}`)) return undefined;
   const key = nflTeamKey(team);
-  const order = (g: FootballGame) => g.season * 100 + g.week;
-  const recent = [...context.league.games.values()]
-    .filter(
-      (g) =>
-        g.season === game.season &&
-        g.seasonType === 'REG' &&
-        order(g) < order(game) &&
-        (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
-    )
-    .sort((a, b) => order(b) - order(a))
-    .slice(0, 3);
+  const recent = recentTeamGames(context, key, game);
   const passers = new Map<string, { name: string; attempts: number }>();
   let total = 0;
   for (const g of recent)

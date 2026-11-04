@@ -1,6 +1,5 @@
-import Database from 'better-sqlite3';
-import { chmodSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import type Database from 'better-sqlite3';
+import { openLocalDatabase } from './local-database.js';
 import {
   isUpcomingFootballGame,
   nflSeasonFor,
@@ -78,19 +77,11 @@ const observation = (line: PropLine, at: string): PropLineObservation => ({
 export class PropLineLedger {
   private db: Database.Database;
   constructor(path: string) {
-    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    this.db = new Database(path);
-    this.db.pragma('journal_mode = WAL');
-    // Keep the write-ahead log from staying at its high-water mark (~4 MB) after checkpoints.
-    this.db.pragma('journal_size_limit = 1048576');
-    // Start each run with a trimmed log rather than the last run's high-water mark.
-    this.db.pragma('wal_checkpoint(TRUNCATE)');
-    this.db.exec(
-      'CREATE TABLE IF NOT EXISTS lines (key TEXT PRIMARY KEY, game_id TEXT NOT NULL, payload TEXT NOT NULL) STRICT',
+    // The index: projections read a week's games on every build, and the table grows all season.
+    this.db = openLocalDatabase(
+      path,
+      'CREATE TABLE IF NOT EXISTS lines (key TEXT PRIMARY KEY, game_id TEXT NOT NULL, payload TEXT NOT NULL) STRICT; CREATE INDEX IF NOT EXISTS lines_by_game ON lines (game_id)',
     );
-    // Projections read a week's games on every build, and the table grows all season.
-    this.db.exec('CREATE INDEX IF NOT EXISTS lines_by_game ON lines (game_id)');
-    if (path !== ':memory:') chmodSync(path, 0o600);
   }
   /** Records lines seen at `at`; lines for games that have already kicked off are ignored. */
   record(lines: PropLine[], games: FootballGame[], at: string) {

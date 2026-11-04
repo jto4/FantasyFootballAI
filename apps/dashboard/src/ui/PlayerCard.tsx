@@ -5,6 +5,7 @@ import { Dialog } from './Dialog';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
 import { formatDateTime } from './date-format';
+import { formatNumber } from './number-format';
 import './player-card.css';
 
 type Card = {
@@ -92,7 +93,7 @@ export function PlayerName({ id, name }: { id: string; name: string }) {
   );
 }
 
-const num = (n: number) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+const num = (n: number) => formatNumber(n);
 
 function PlayerCardDialog({
   host,

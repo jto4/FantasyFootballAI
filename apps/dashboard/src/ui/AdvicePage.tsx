@@ -7,6 +7,7 @@ import {
   isAdviceResult,
   nflTeamKey,
   playerNameKey,
+  slotPosition,
   starterSlots,
   type AdviceMode,
   type AdviceConnection,
@@ -255,7 +256,7 @@ export function AdvicePage({
   const commonStartingSpot = starterSlots(league?.settings.roster_positions).slots.some((slot) =>
     candidates.every((id) => {
       const player = mine.find((row) => row.id === id);
-      return player && slot.positions.includes(player.position === 'DEF' ? 'DST' : player.position);
+      return player && slot.positions.includes(slotPosition(player.position));
     }),
   );
   const picked = new Set(league?.draft?.picks.map((pick) => pick.playerId) ?? []);

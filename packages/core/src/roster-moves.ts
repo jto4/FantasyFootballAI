@@ -1,6 +1,12 @@
 import type { LineupEstimate, PlayerAdviceEvidence } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
-import { keptStarterIds, optimizeLineup, playerNameKey, starterSlots } from './advice-math.js';
+import {
+  keptStarterIds,
+  optimizeLineup,
+  playerNameKey,
+  slotPosition,
+  starterSlots,
+} from './advice-math.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 
 export interface WaiverDay {
@@ -160,7 +166,7 @@ export function rankWaivers(
   );
   const closest = [...startable].flatMap((position) =>
     candidates
-      .filter((c) => (c.position === 'DEF' ? 'DST' : c.position) === position)
+      .filter((c) => slotPosition(c.position) === position)
       .sort((a, b) => b.projected - a.projected)
       .slice(0, 2)
       .map(({ playerId, name, position, team, projected }) => ({

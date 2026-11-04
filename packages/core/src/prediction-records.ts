@@ -7,7 +7,13 @@ import {
   type SportsbookQuote,
   type FinalFootballResult,
 } from './sportsbook-types.js';
-import { americanOdds, nflTeamKey, playerNameKey, scoreHistoricalGame } from './advice-math.js';
+import {
+  americanOdds,
+  nflTeamKey,
+  playerNameKey,
+  scoreHistoricalGame,
+  slotPosition,
+} from './advice-math.js';
 import { closingLineValue } from './prop-lines.js';
 export const maximumPredictionRecords = 2000;
 export const maximumPredictionBytes = 8000000;
@@ -518,7 +524,7 @@ export function settlePredictionRecord(
         r.season === record.season &&
         r.week === target.week &&
         r.seasonType === 'REG' &&
-        r.position === (p.position === 'DEF' ? 'DST' : p.position) &&
+        r.position === slotPosition(p.position) &&
         nflTeamKey(r.team) === nflTeamKey(p.team) &&
         nflTeamKey(r.opponent) ===
           (nflTeamKey(p.team) === nflTeamKey(target.home)

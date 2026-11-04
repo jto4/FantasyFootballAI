@@ -10,7 +10,7 @@ import {
   type AdviceStatement,
 } from './advice-types.js';
 import { isProjectionPeriod } from './projection-period.js';
-import { starterSlots } from './advice-math.js';
+import { slotPosition, starterSlots } from './advice-math.js';
 import { isSportsbookQuote, quoteMatchesTerms } from './sportsbook-types.js';
 
 const modes = new Set(['draft-plan', 'draft-review', 'lineup', 'trade', 'waivers', 'betting']);
@@ -553,7 +553,7 @@ export function isAdviceResult(value: unknown): value is AdviceResult {
       parsedSlots.slots.some((slot) =>
         candidateIds.some((id) => {
           const player = evidencePlayers.find((player: { id: string }) => player.id === id)!;
-          return !slot.positions.includes(player.position === 'DEF' ? 'DST' : player.position);
+          return !slot.positions.includes(slotPosition(player.position));
         }),
       )
     )

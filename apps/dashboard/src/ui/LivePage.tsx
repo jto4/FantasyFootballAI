@@ -5,6 +5,7 @@ import { requestJson } from './api-client';
 import { formatDateTime } from './date-format';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
+import { formatOptional } from './number-format';
 
 type LiveReport = {
   leagueName: string;
@@ -24,8 +25,7 @@ const isLiveReport = (x: unknown): x is LiveReport =>
   typeof x.week === 'number' &&
   typeof x.gamesAvailable === 'boolean' &&
   (x.matchup === undefined || (record(x.matchup) && record(x.matchup.you)));
-const points = (n?: number) =>
-  n === undefined ? '—' : new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+const points = (n?: number) => formatOptional(n);
 /** ESPN's "11/9 - 8:15 PM EST" written the way the rest of the app writes dates. */
 export function kickoffLabel(detail: string | undefined) {
   const match = /^(\d{1,2})\/(\d{1,2}) - (.+)$/.exec(detail ?? '');

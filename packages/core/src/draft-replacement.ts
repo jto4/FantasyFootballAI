@@ -1,6 +1,6 @@
 import type { LeagueConnection } from './domain-types.js';
 import type { PlayerAdviceEvidence } from './advice-types.js';
-import { starterSlots } from './advice-math.js';
+import { slotPosition, starterSlots } from './advice-math.js';
 
 type Edge = { to: number; reverse: number; capacity: number; cost: number };
 
@@ -23,7 +23,7 @@ export function replacementBaselines(
   const positions = [...new Set(parsed.slots.flatMap((s) => s.positions))].sort();
   const pools = new Map(positions.map((position) => [position, [] as number[]]));
   for (const player of players) {
-    const position = player.position === 'DEF' ? 'DST' : player.position;
+    const position = slotPosition(player.position);
     if (
       player.projectionScope === 'season' &&
       player.projectedPoints !== undefined &&
