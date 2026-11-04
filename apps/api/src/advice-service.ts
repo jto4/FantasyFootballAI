@@ -5,6 +5,7 @@ import {
   buildAdviceReadiness,
   type AdviceDataReadiness,
   type PlayerPropLines,
+  playerNameKey,
   adviceDecisionPolicy,
   enforceAdviceDecisionPolicy,
   analyzeBetHistory,
@@ -1093,13 +1094,23 @@ export function createAdviceService(deps: AdviceDependencies) {
   /** Names for player pickers (Personalize): the league's pool, no AI provider involved. */
   async function playerList(leagueId: string) {
     const loaded = await load({ mode: 'waivers', leagueId });
+    // Players with games this season first, so pickers do not open on long-idle names.
+    const played = new Set(
+      loaded.data.players
+        .filter((row) => row.season === loaded.season)
+        .map((row) => playerNameKey(row.name)),
+    );
+    const active = (name: string) => (played.has(playerNameKey(name)) ? 0 : 1);
     return {
-      players: loaded.players.slice(0, 5_000).map((player) => ({
-        id: player.id,
-        name: player.name,
-        position: player.position ?? '',
-        ...(player.nflTeam ? { nflTeam: player.nflTeam } : {}),
-      })),
+      players: [...loaded.players]
+        .sort((a, b) => active(a.name) - active(b.name))
+        .slice(0, 5_000)
+        .map((player) => ({
+          id: player.id,
+          name: player.name,
+          position: player.position ?? '',
+          ...(player.nflTeam ? { nflTeam: player.nflTeam } : {}),
+        })),
     };
   }
   return {

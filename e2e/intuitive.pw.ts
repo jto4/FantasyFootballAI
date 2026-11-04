@@ -372,7 +372,7 @@ test('page tips explain each page, can be hidden, and come back from the lightbu
 
     await page.getByRole('button', { name: 'Reports', exact: true }).click();
     const reportTips = page.getByRole('complementary', { name: 'Tips: Making a report' });
-    await expect(reportTips).toContainText('Nothing is ever sent on its own');
+    await expect(reportTips).toContainText('Only schedules you set to auto-send');
     await reportTips.getByRole('button', { name: 'Hide tips for this page' }).click();
     await page.getByRole('button', { name: 'Schedule', exact: true }).click();
     await page

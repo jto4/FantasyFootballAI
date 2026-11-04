@@ -95,16 +95,27 @@ export function LeaguesPage({
                     : ' · refreshes automatically around kickoffs.'}
               </p>
               {imported && league.platform === 'espn' && onAddEspnLogin && (
-                <p className="league-auto-refresh">
-                  To stop re-importing: save your ESPN login once, then connect this league again
-                  with its link. It will then refresh on its own around kickoffs.{' '}
-                  <button type="button" className="text-button" onClick={onAddEspnLogin}>
-                    Add ESPN login
-                  </button>{' '}
-                  <button type="button" className="text-button" onClick={onConnect}>
-                    Connect again
-                  </button>
-                </p>
+                <div className="league-auto-refresh">
+                  <strong>Stop re-importing by hand</strong>
+                  <p>
+                    With your ESPN login saved, this league refreshes on its own around kickoffs,
+                    and scheduled reports stop failing on old data.
+                  </p>
+                  <ol>
+                    <li>
+                      <button type="button" className="small-button" onClick={onAddEspnLogin}>
+                        Add ESPN login
+                      </button>{' '}
+                      It is kept in this computer’s keychain.
+                    </li>
+                    <li>
+                      <button type="button" className="small-button" onClick={onConnect}>
+                        Connect again
+                      </button>{' '}
+                      Use this league’s link.
+                    </li>
+                  </ol>
+                </div>
               )}
               {league.lastSyncError && (
                 <p className="league-error">Last refresh failed: {league.lastSyncError}</p>

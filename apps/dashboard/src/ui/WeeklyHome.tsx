@@ -130,8 +130,23 @@ export function WeeklyHome({
       <button className="text-button" onClick={onRefresh}>
         {league.connectionMode === 'snapshot' ? 'Import updated roster' : 'Refresh roster'}
       </button>
+      {league.connectionMode === 'snapshot' && onNavigate && (
+        <>
+          {' · '}
+          <button className="text-button" onClick={() => onNavigate('Leagues')}>
+            Set up automatic refresh
+          </button>
+        </>
+      )}
     </p>
   ) : null;
+  // Sidekick can't change a lineup, so the next step is the platform's own lineup page.
+  const lineupUrl =
+    league?.platform === 'espn' && teamId
+      ? `https://fantasy.espn.com/football/team?${new URLSearchParams({ leagueId: league.id, teamId, seasonId: String(league.season) })}`
+      : league?.platform === 'sleeper'
+        ? `https://sleeper.com/leagues/${encodeURIComponent(league.id)}/team`
+        : undefined;
   const nextUpShown = cards.some((card) => card.id === 'next-up' && card.visible);
   // Before a league exists the setup card below is the one next step; a second prompt here repeated it.
   if (!league) return null;
@@ -213,7 +228,7 @@ export function WeeklyHome({
               return team ? (
                 <Fragment key={card.id}>
                   <div className="weekly-home-grid">
-                    <article>
+                    <article id="lineup-check" tabIndex={-1}>
                       <h3>Lineup check</h3>
                       {briefing?.lineup.changes.length ? (
                         <ul className="weekly-answer">
@@ -256,9 +271,20 @@ export function WeeklyHome({
                         </p>
                       )}
                       <div className="weekly-actions">
-                        <button className="primary-button" onClick={() => onAdvice('lineup')}>
-                          Check my lineup
-                        </button>
+                        {briefing?.lineup.changes.length && lineupUrl ? (
+                          <a
+                            className="primary-button"
+                            href={lineupUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Make changes on {platformName(league.platform)}
+                          </a>
+                        ) : (
+                          <button className="primary-button" onClick={() => onAdvice('lineup')}>
+                            Check my lineup
+                          </button>
+                        )}
                         {onNavigate && (
                           <button
                             type="button"
@@ -300,6 +326,8 @@ export function WeeklyHome({
                       )}
                       <small>
                         From your last roster update. Check game-day status before kickoff.
+                        {briefing?.availability.some((p) => /questionable/i.test(p.status)) &&
+                          ' Questionable players are discounted once the NFL injury report is out, usually late in the week.'}
                       </small>
                     </article>
                     <article>

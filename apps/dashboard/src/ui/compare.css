@@ -8,7 +8,27 @@
 .compare-pick {
   display: grid;
   gap: 12px;
-  max-width: 560px;
+}
+.compare-pick .advice-picker {
+  margin: 0;
+}
+.compare-pick .advice-picker > label {
+  display: grid;
+  gap: 6px;
+  max-width: 420px;
+  font-weight: 600;
+}
+.compare-pick .advice-picker > label input {
+  width: 100%;
+  min-height: 40px;
+  font-weight: 400;
+}
+.compare-pick .advice-player-choices {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.compare-pick .advice-player-choices small {
+  display: block;
+  color: var(--muted);
 }
 .compare-pick .primary-button {
   justify-self: start;
@@ -144,4 +164,17 @@
   background: var(--surface);
   color: var(--ink);
   font-size: 14px;
+}
+
+.sunday-flags button {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sunday-flags button:hover {
+  text-decoration: underline;
 }

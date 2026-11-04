@@ -1,10 +1,12 @@
 import type { LineupEstimate, PlayerAdviceEvidence } from './advice-types.js';
 import type { LeagueConnection } from './domain-types.js';
-import { keptStarterIds, optimizeLineup, playerNameKey } from './advice-math.js';
+import { keptStarterIds, optimizeLineup, playerNameKey, starterSlots } from './advice-math.js';
 import { isInactiveFootballStatus } from './player-availability.js';
 
 export interface WaiverDay {
   baseline?: number;
+  /** No free agent improves the lineup; candidates are then the best at each starting position. */
+  noUpgrade?: boolean;
   /** Lowest-scoring starting spots in the current best lineup: where an add helps most. */
   weakSpots: { slot: string; playerId: string; name: string; points: number }[];
   candidates: {
@@ -150,10 +152,30 @@ export function rankWaivers(
     (a, b) =>
       (b.drop?.netGain ?? -Infinity) - (a.drop?.netGain ?? -Infinity) || b.projected - a.projected,
   );
+  const helps = candidates.filter((c) => (c.drop?.netGain ?? c.gain ?? 0) > 0);
+  // With no upgrade, the highest projections would be whichever position scores most (a page of
+  // quarterbacks); the best at each position you can start is the useful list, with no drop.
+  const startable = new Set(
+    starterSlots(league.settings.roster_positions).slots.flatMap((slot) => slot.positions),
+  );
+  const closest = [...startable].flatMap((position) =>
+    candidates
+      .filter((c) => (c.position === 'DEF' ? 'DST' : c.position) === position)
+      .sort((a, b) => b.projected - a.projected)
+      .slice(0, 2)
+      .map(({ playerId, name, position, team, projected }) => ({
+        playerId,
+        name,
+        position,
+        ...(team ? { team } : {}),
+        projected,
+      })),
+  );
   return {
     ...(current ? { baseline: current.points } : {}),
+    ...(!helps.length && closest.length ? { noUpgrade: true } : {}),
     weakSpots,
-    candidates: candidates.slice(0, limit),
+    candidates: helps.length ? helps.slice(0, limit) : closest,
     warnings,
   };
 }

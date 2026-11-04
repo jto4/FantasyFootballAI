@@ -34,7 +34,7 @@ describe('SchedulePage', () => {
     );
 
     expect(markup).toContain('Calendar event was interrupted before completion');
-    expect(markup).toContain('Retry failed as drafts');
+    expect(markup).toContain('Try again');
   });
 
   it('keeps generation review-only and disables duplicate generation', () => {

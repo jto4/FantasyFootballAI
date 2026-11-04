@@ -1027,6 +1027,9 @@
 .settings-overview .status-ok {
   color: var(--green);
 }
+.settings-overview .status-idle {
+  color: var(--muted);
+}
 .settings-overview .status-attention {
   color: var(--warning);
 }

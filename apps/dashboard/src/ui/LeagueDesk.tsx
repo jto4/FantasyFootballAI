@@ -1,16 +1,13 @@
 import { ReadyDrafts } from './ReadyDrafts';
-import { LeagueTrends } from './LeagueTrends';
 import type { RefObject, ReactNode } from 'react';
 import { Activity, CalendarDays, FileText, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
 import {
   leagueSeasonPhase,
   orderedHomeCards,
   rankTeams,
-  reportVisuals,
   type HomeCardId,
   type LeagueConnection,
 } from '@sidekick/core';
-import { LeagueVisuals } from './LeagueVisuals';
 import type { AppState, NewsSnapshot } from './app-state';
 import { seasonKicker } from './season-copy';
 import { formatTime } from './date-format';
@@ -37,6 +34,8 @@ type Props = {
     target: 'ai' | 'voice' | 'yahoo' | 'credentials' | 'data' | null,
   ) => void;
   navigate: (section: string) => void;
+  /** Opens the league charts in Reports. */
+  onCharts: () => void;
   createReport: (kind: string) => Promise<void>;
   refreshLeague: (id: string) => Promise<void>;
   refreshNews: () => Promise<void>;
@@ -61,6 +60,7 @@ export function LeagueDesk({
   openSetupWizard,
   setModal,
   navigate,
+  onCharts,
   createReport,
   refreshLeague,
   refreshNews,
@@ -73,12 +73,17 @@ export function LeagueDesk({
   const seasonPhase = league ? leagueSeasonPhase(league) : 'unknown';
   const ranking = league ? rankTeams(league) : undefined;
   const rankedTeams = ranking?.basis ? ranking.teams : [];
+  // One per report type: an older draft of the same report has been replaced, not left waiting.
   const draftCount = league
-    ? (state.reportCounts?.[league.id]?.drafts ??
-      state.reports.filter(
-        (report) =>
-          report.leagueId === league.id && report.status === 'draft' && !report.deliveryState,
-      ).length)
+    ? new Set(
+        state.reports
+          .filter(
+            (report) =>
+              report.leagueId === league.id && report.status === 'draft' && !report.deliveryState,
+          )
+          .map((report) => report.kind),
+      ).size ||
+      (state.reportCounts?.[league.id]?.drafts ?? 0)
     : 0;
   const deliveryIssues = league
     ? (state.reportCounts?.[league.id]?.issues ??
@@ -258,8 +263,12 @@ export function LeagueDesk({
           onToggle={(event) => onDisclosureChange?.('news', event.currentTarget.open)}
         >
           <summary>League standings & news</summary>
-          <LeagueVisuals data={reportVisuals(league)} syncedAt={league.lastSyncedAt} />
-          <LeagueTrends league={league} />
+          <p className="home-charts-link">
+            Standings charts, trends and playoff odds live in Reports.{' '}
+            <button type="button" className="text-button" onClick={onCharts}>
+              See league charts
+            </button>
+          </p>
           <div className="section-heading">
             <div>
               <p className="section-overline">THE EARLY READ</p>
@@ -369,8 +378,8 @@ export function LeagueDesk({
                     })}
                   </div>
                   <div className="matchup-blurb">
-                    Current matchup scores are from the connected platform. Player projections and
-                    lineup advice are not available in saved league data.
+                    Current matchup scores are from the connected platform. Your own matchup, with
+                    projections and lineup advice, is at the top of Home.
                   </div>
                 </>
               ) : (

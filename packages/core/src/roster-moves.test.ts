@@ -45,8 +45,36 @@ it('ranks free agents by best-lineup gain with the cheapest drop', () => {
     drop: { playerId: 'rb-bench', netGain: 8 },
   });
   // A worse receiver adds nothing; a player without an estimate is never ranked.
-  expect(day.candidates.find((c) => c.playerId === 'fa-wr')!.drop!.netGain).toBe(0);
+  // A pickup that changes nothing is left out while another one helps.
+  expect(day.candidates.some((c) => c.playerId === 'fa-wr')).toBe(false);
   expect(day.candidates.some((c) => c.playerId === 'fa-none')).toBe(false);
+});
+
+it('says when no pickup helps and shows the best at each position you start', () => {
+  const day = rankWaivers(league({ me: ['qb1', 'rb1', 'wr1'] }), 'me', [
+    player('qb1', 'QB', 18),
+    player('rb1', 'RB', 12),
+    player('wr1', 'WR', 12),
+    player('fa-qb', 'QB', 17),
+    player('fa-qb2', 'QB', 16),
+    player('fa-qb3', 'QB', 15),
+    player('fa-rb', 'RB', 7),
+    player('fa-wr', 'WR', 6),
+    player('fa-te', 'TE', 9),
+  ]);
+  expect(day.noUpgrade).toBe(true);
+  expect(day.candidates.map((c) => c.playerId)).toEqual(['fa-qb', 'fa-qb2', 'fa-rb', 'fa-wr']);
+  expect(day.candidates.every((c) => c.drop === undefined)).toBe(true);
+});
+
+it('never offers a player who did not report to his team', () => {
+  const day = rankWaivers(league({ me: ['qb1', 'rb1', 'wr1'] }), 'me', [
+    player('qb1', 'QB', 10),
+    player('rb1', 'RB', 5),
+    player('wr1', 'WR', 5),
+    { ...player('holdout', 'WR', 20), status: 'Did not report' },
+  ]);
+  expect(day.candidates.some((c) => c.playerId === 'holdout')).toBe(false);
 });
 
 it('compares lineups with an unestimated spot only against the same missing spot', () => {
@@ -59,7 +87,7 @@ it('compares lineups with an unestimated spot only against the same missing spot
   expect(day.warnings[0]).toContain('No estimate yet for your QB spot');
   expect(day.candidates.find((c) => c.playerId === 'fa-rb')!.gain).toBe(4);
   // Filling the unknown QB changes which slots are missing, so it is not scored as a gain.
-  expect(day.candidates.find((c) => c.playerId === 'fa-qb')!.gain).toBeUndefined();
+  expect(day.candidates.some((c) => c.playerId === 'fa-qb')).toBe(false);
 });
 
 it('suggests only trades that improve both lineups, ranked by the smaller gain', () => {

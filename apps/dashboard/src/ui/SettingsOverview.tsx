@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Circle } from 'lucide-react';
 import type { AppSettings, LeagueConnection, SettingsSection } from '@sidekick/core';
 import { requestJson } from './api-client';
 import { isRoutineBackupStatus } from './operations-data';
@@ -9,6 +9,8 @@ type Item = {
   label: string;
   detail: string;
   ok: boolean;
+  /** An extra you can go without: off is shown plainly, not as a problem. */
+  optional?: boolean;
   /** Settings section that fixes it, or a page hash outside Settings. */
   target: SettingsSection | `#${string}`;
 };
@@ -49,7 +51,7 @@ export function SettingsOverview({
         ? 'Not connected'
         : live.length
           ? `${live.length} connected · refreshes automatically`
-          : `Imported from ${platformName(leagues[0]!.platform)} · no auto refresh`,
+          : `Imported from ${platformName(leagues[0]!.platform)} · set up auto refresh`,
       target: '#/leagues',
     },
     {
@@ -78,6 +80,7 @@ export function SettingsOverview({
     },
     {
       label: 'Email',
+      optional: true,
       ok: configured('resend') && Boolean(settings.emailRecipient),
       detail: !configured('resend')
         ? 'Not set up · copy reports instead'
@@ -99,6 +102,7 @@ export function SettingsOverview({
     },
     {
       label: 'Backups',
+      optional: true,
       ok: backups === true,
       detail: backups === undefined ? 'Checking…' : backups ? 'Automatic backups on' : 'Off',
       target: 'storage',
@@ -107,18 +111,20 @@ export function SettingsOverview({
   return (
     <ul className="settings-overview" aria-label="Setup status">
       {items.map((item) => {
-        const Icon = item.ok ? CheckCircle2 : AlertCircle;
+        // Optional extras that are simply off are not problems, so they don't borrow the warning.
+        const idle = !item.ok && item.optional;
+        const Icon = item.ok ? CheckCircle2 : idle ? Circle : AlertCircle;
         const content = (
           <>
             <Icon
               size={16}
               aria-hidden="true"
-              className={item.ok ? 'status-ok' : 'status-attention'}
+              className={item.ok ? 'status-ok' : idle ? 'status-idle' : 'status-attention'}
             />
             <span>
               <strong>{item.label}</strong>
               <small>
-                {item.ok ? '' : 'Needs attention · '}
+                {item.ok || idle ? '' : 'Needs attention · '}
                 {item.detail}
               </small>
             </span>

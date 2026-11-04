@@ -14,6 +14,12 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (app test fixes): from a full walk of the real app. Home's Fix my lineup goes to the
+  swaps, with a link to make them on the platform and the score and win chance after them; failed
+  reports say why; Home is about 40% shorter, with charts in Reports. Waivers say when no pickup
+  helps and show the best at each position. Compare, player cards, search (now finds rostered
+  players), dates, Settings status, Schedule history, All my leagues and contradictory text were
+  tidied, and automatic refresh is easier to find.
 - November 4 (prop lines in projections): weekly projections close 60% of the gap to saved
   sportsbook prop lines (5.38 → 5.26 on weeks 7–8, against 5.34 for ESPN), with a Personalize
   switch; players without a line keep the model alone.

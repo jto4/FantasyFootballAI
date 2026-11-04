@@ -26,6 +26,14 @@ const isLiveReport = (x: unknown): x is LiveReport =>
   (x.matchup === undefined || (record(x.matchup) && record(x.matchup.you)));
 const points = (n?: number) =>
   n === undefined ? '—' : new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+/** ESPN's "11/9 - 8:15 PM EST" written the way the rest of the app writes dates. */
+export function kickoffLabel(detail: string | undefined) {
+  const match = /^(\d{1,2})\/(\d{1,2}) - (.+)$/.exec(detail ?? '');
+  if (!match) return detail;
+  const month = new Date(2000, Number(match[1]) - 1).toLocaleString(undefined, { month: 'short' });
+  return `${month} ${match[2]}, ${match[3]}`;
+}
+
 const stateLabel = { pre: 'Not started', in: 'Playing', post: 'Final', bye: 'Bye', unknown: '' };
 
 function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
@@ -55,7 +63,11 @@ function Side({ side, mine }: { side: LiveSide; mine: boolean }) {
               </small>
             </span>
             <span className="live-state">
-              {s.out ? 'Out · did not play' : (s.detail ?? stateLabel[s.state])}
+              {s.out
+                ? s.state === 'post'
+                  ? 'Out · did not play'
+                  : 'Out'
+                : (kickoffLabel(s.detail) ?? stateLabel[s.state])}
               {s.state === 'pre' && s.estimate !== undefined ? ` · est. ${points(s.estimate)}` : ''}
             </span>
             {(s.state === 'in' || s.state === 'post') && (

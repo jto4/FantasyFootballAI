@@ -19,7 +19,9 @@ export type SearchItem = {
   title: string;
   description: string;
   location: string;
-  kind: 'Setting' | 'Page' | 'League' | 'Report' | 'Help' | 'Task';
+  kind: 'Setting' | 'Page' | 'League' | 'Report' | 'Help' | 'Task' | 'Player';
+  /** Opens this player's card instead of navigating. */
+  player?: { playerId: string; name: string };
   aliases: string;
   destination: SearchDestination;
 };

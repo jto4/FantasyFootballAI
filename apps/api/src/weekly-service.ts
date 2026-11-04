@@ -105,6 +105,8 @@ export interface WeeklyBriefing {
     opponent: MatchupSide;
     /** Chance you outscore the opponent, before any starter's game begins (see Live after). */
     winProbability?: number;
+    /** The same matchup with the suggested lineup changes made, before kickoff. */
+    ifFixed?: { projected: number; winProbability: number };
   };
 }
 
@@ -429,11 +431,48 @@ export function createWeeklyService(
                     matchupVarianceScale,
                   )
                 : undefined;
+            // The same matchup with the suggested swaps made, so Home can show what they are worth.
+            const fixedStarters =
+              changes.length && optimal?.complete
+                ? optimal.assignments.flatMap((row) => {
+                    const player = byId.get(row.playerId);
+                    return player?.projectedPoints === undefined
+                      ? []
+                      : [
+                          {
+                            position: player.position,
+                            estimate: player.projectedPoints,
+                            ...(player.playChance !== undefined
+                              ? { playChance: player.playChance }
+                              : {}),
+                          },
+                        ];
+                  })
+                : [];
+            const fixedChance =
+              pregame &&
+              chance !== undefined &&
+              fixedStarters.length === optimal?.assignments.length
+                ? matchupWinProbability(
+                    [
+                      { settled: 0, remaining: fixedStarters },
+                      { settled: 0, remaining: opponent.starters.filter((p) => !p.out) },
+                    ],
+                    fantasyOutcomeSpread,
+                    matchupVarianceScale,
+                  )
+                : undefined;
+            const fixedTotal = projectedTeamTotal(fixedStarters, you.points);
+            const ifFixed =
+              fixedChance !== undefined && fixedTotal !== undefined
+                ? { projected: fixedTotal, winProbability: fixedChance }
+                : undefined;
             return {
               week: current.week,
               you,
               opponent,
               ...(chance !== undefined ? { winProbability: chance } : {}),
+              ...(ifFixed ? { ifFixed } : {}),
             };
           })()
         : undefined;

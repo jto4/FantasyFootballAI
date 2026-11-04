@@ -173,8 +173,13 @@ export function SchedulePage({
             );
           const kindLabel =
             run.kind.charAt(0).toUpperCase() + run.kind.slice(1).replaceAll('-', ' ');
+          const leagueDetails = (run.leagueResults ?? []).flatMap((r) => r.detail ?? []);
+          // The run's own summary repeats a single league's message with its name in front.
           const details = new Set(
-            [run.detail, ...(run.leagueResults ?? []).map((r) => r.detail)].filter(Boolean),
+            [run.detail, ...leagueDetails].filter(
+              (detail) =>
+                detail && !(detail === run.detail && leagueDetails.some((d) => detail.endsWith(d))),
+            ),
           );
           return (
             <article
@@ -220,7 +225,7 @@ export function SchedulePage({
                       disabled={Boolean(retryingRunId)}
                       onClick={() => onRetry(run)}
                     >
-                      {retryingRunId === run.id ? 'Retrying…' : 'Retry failed as drafts'}
+                      {retryingRunId === run.id ? 'Retrying…' : 'Try again'}
                     </button>
                   )}
               </div>

@@ -3736,3 +3736,45 @@ kbd {
   color: var(--muted);
   font-size: 12px;
 }
+
+.matchup-fixed {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--success-bg);
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.home-charts-link {
+  margin: 8px 0 16px;
+  color: var(--muted);
+}
+
+.roster-moves-verdict {
+  margin: 8px 0 12px;
+}
+
+#lineup-check:focus {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.league-auto-refresh {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+}
+
+.league-auto-refresh p {
+  margin: 4px 0 8px;
+}
+
+.league-auto-refresh ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+}

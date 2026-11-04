@@ -66,6 +66,13 @@ export function NextUpCard({
   } = useApi(`/api/alerts?${new URLSearchParams({ league: leagueId, team: teamId })}`, isAlerts, {
     timeoutMs: 60_000,
   });
+  // The swaps are already worked out on this page, so go to them rather than to a new analysis.
+  const showLineup = () => {
+    const swaps = document.getElementById('lineup-check');
+    if (!swaps) return onAdvice('lineup');
+    swaps.scrollIntoView({ block: 'center' });
+    swaps.focus({ preventScroll: true });
+  };
   const problem = alerts?.alerts[0];
   const change = briefing?.lineup.changes[0];
   // A claim costs a roster spot and waiver priority, so tiny gains don't make the top card.
@@ -80,7 +87,7 @@ export function NextUpCard({
             ? `${alerts!.alerts.length - 1} more starter${alerts!.alerts.length > 2 ? 's need' : ' needs'} a look too.`
             : 'They’re in your starting lineup.') + swap(problem.replacement),
         action: 'Fix my lineup',
-        run: () => onAdvice('lineup'),
+        run: showLineup,
       }
     : stale || alerts?.snapshot?.stale
       ? {
@@ -96,7 +103,7 @@ export function NextUpCard({
             title: `Start ${change.start.name}${change.bench ? ` over ${change.bench.name}` : ''}`,
             body: swapReason(change),
             action: 'Review lineup',
-            run: () => onAdvice('lineup'),
+            run: showLineup,
           }
         : pickup
           ? {

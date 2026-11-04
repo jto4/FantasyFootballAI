@@ -6,6 +6,7 @@ import { requestJson } from './api-client';
 import { navigationItems, type SearchDestination, type SearchItem } from './search-catalog';
 import { searchItems, searchTerms } from './search';
 import { taskSearchItems } from './search-tasks';
+import { usePlayerCardOpener } from './PlayerCard';
 
 function reportItem(report: ReportSummary, leagues: LeagueConnection[]): SearchItem {
   return {
@@ -44,6 +45,7 @@ export function WorkspaceSearch({
   const [historyError, setHistoryError] = useState('');
   const [searchingHistory, setSearchingHistory] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const openPlayer = usePlayerCardOpener();
   const desktop = Boolean(typeof window !== 'undefined' && window.sidekickDesktop);
   const trimmed = query.trim();
   const historyQuery = searchTerms(trimmed)
@@ -62,8 +64,26 @@ export function WorkspaceSearch({
         destination: { section: 'League desk', leagueId: league.id },
       })),
       ...reports.map((report) => reportItem(report, leagues)),
+      ...(openPlayer
+        ? leagues.flatMap((league) =>
+            league.teams.flatMap((team) =>
+              (team.roster ?? []).map((player): SearchItem => ({
+                id: `player:${league.id}:${player.id}`,
+                title: player.name,
+                description: [player.position, player.nflTeam, team.name]
+                  .filter(Boolean)
+                  .join(' · '),
+                location: `Player card → ${league.displayName}`,
+                kind: 'Player',
+                aliases: `${player.position ?? ''} ${player.nflTeam ?? ''}`,
+                destination: { section: 'League desk', leagueId: league.id },
+                player: { playerId: player.id, name: player.name },
+              })),
+            ),
+          )
+        : []),
     ],
-    [desktop, leagues, reports],
+    [desktop, leagues, reports, openPlayer],
   );
   const local = trimmed ? searchItems(trimmed, items, 10) : [];
   const saved = history?.query === trimmed ? history : undefined;
@@ -79,8 +99,19 @@ export function WorkspaceSearch({
     setOpen(false);
   }
   function choose(item: SearchItem) {
+    if (item.player && openPlayer) {
+      openPlayer(item.player);
+      close();
+      return;
+    }
     void Promise.resolve(onNavigate(item.destination)).then((ok) => ok && close());
   }
+  // Closing is the end of that search; reopening should not show its old text.
+  useEffect(() => {
+    if (open) return;
+    setQuery('');
+    setActive(0);
+  }, [open]);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k' && !event.repeat) {
@@ -146,7 +177,7 @@ export function WorkspaceSearch({
         aria-label="Search the app"
       >
         <Search size={17} aria-hidden="true" />
-        <span>Search settings, reports, and more</span>
+        <span>Search players, settings and reports</span>
         <kbd>⌘ / Ctrl K</kbd>
       </button>
       {open && (
@@ -157,7 +188,8 @@ export function WorkspaceSearch({
         >
           <h2 id="workspace-search-title">What are you looking for?</h2>
           <p className="workspace-search-intro">
-            Use your own words. Find a setting, task, or help answer. Changes need your review.
+            Use your own words. Find a player, setting, task, or help answer. Changes need your
+            review.
           </p>
           <div className="workspace-search-field">
             <Search size={20} aria-hidden="true" />

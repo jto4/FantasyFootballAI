@@ -129,6 +129,7 @@ export function ComparePage({
             players={players}
             selected={chosen}
             maximum={4}
+            limit={20}
             onChange={setChosen}
           />
           <button
@@ -166,7 +167,7 @@ export function ComparePage({
                   {p.position}
                   {p.nflTeam ? ` · ${p.nflTeam}` : ''}
                   {p.inLineup ? ' · in your lineup' : ''}
-                  {p.status ? ` · ${p.status}` : ''}
+                  {p.status && !/^(normal|active)$/i.test(p.status) ? ` · ${p.status}` : ''}
                 </p>
                 <strong className="compare-points">
                   {p.started ? 'Played' : p.projected !== undefined ? num(p.projected) : '—'}

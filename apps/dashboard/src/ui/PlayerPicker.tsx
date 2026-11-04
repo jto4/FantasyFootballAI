@@ -7,6 +7,7 @@ export function PlayerPicker({
   players,
   selected,
   maximum = 20,
+  limit = 8,
   onChange,
 }: {
   label: string;
@@ -14,6 +15,8 @@ export function PlayerPicker({
   players: AdviceOptions['players'];
   selected: string[];
   maximum?: number;
+  /** How many choices to show before searching. */
+  limit?: number;
   onChange: (ids: string[]) => void;
 }) {
   const [query, setQuery] = useState('');
@@ -32,7 +35,7 @@ export function PlayerPicker({
         .toLowerCase()
         .includes(normalized),
     )
-    .slice(0, 8);
+    .slice(0, limit);
   return (
     <div className="advice-picker">
       <label htmlFor={id}>
@@ -92,7 +95,7 @@ export function PlayerPicker({
       </div>
       <p role="status">
         {matches.length
-          ? `Showing ${matches.length} matches · ${selected.length} selected`
+          ? `Showing ${matches.length} ${matches.length === 1 ? 'match' : 'matches'} · ${selected.length} selected`
           : 'No matching players in this snapshot.'}
       </p>
     </div>

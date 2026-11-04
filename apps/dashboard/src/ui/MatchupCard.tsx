@@ -132,6 +132,12 @@ export function MatchupCard({
           </small>
         </div>
       )}
+      {!underway && matchup.ifFixed && (
+        <p className="matchup-fixed">
+          With the suggested lineup: <strong>{points(matchup.ifFixed.projected)}</strong> projected,{' '}
+          <strong>{Math.round(matchup.ifFixed.winProbability * 100)}%</strong> chance you win.
+        </p>
+      )}
       {waiting && <p className="matchup-note">Games are under way; checking live scores…</p>}
       {stale && (
         <p className="matchup-note">

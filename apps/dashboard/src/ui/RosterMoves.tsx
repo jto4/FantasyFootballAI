@@ -61,14 +61,20 @@ export function WaiverDayPanel({
               {w}
             </p>
           ))}
+          {data.noUpgrade && (
+            <p className="roster-moves-verdict">
+              <strong>No pickup improves your lineup this week.</strong> Nobody available beats your
+              current starters.
+            </p>
+          )}
           {data.candidates.length > 0 && (
             <table>
               <thead>
                 <tr>
                   <th scope="col">Free agent</th>
                   <th scope="col">Estimate</th>
-                  <th scope="col">Lineup change</th>
-                  <th scope="col">Drop</th>
+                  {!data.noUpgrade && <th scope="col">Lineup change</th>}
+                  {!data.noUpgrade && <th scope="col">Drop</th>}
                   <th scope="col">
                     <span className="visually-hidden">Analyze</span>
                   </th>
@@ -81,14 +87,16 @@ export function WaiverDayPanel({
                       {c.name} <small>{[c.position, c.team].filter(Boolean).join(' · ')}</small>
                     </th>
                     <td>{points(c.projected).slice(1)}</td>
-                    <td className={(c.drop?.netGain ?? 0) > 0 ? 'gain' : undefined}>
-                      {c.drop
-                        ? points(c.drop.netGain)
-                        : c.gain !== undefined
-                          ? points(c.gain)
-                          : '—'}
-                    </td>
-                    <td>{c.drop?.name ?? '—'}</td>
+                    {!data.noUpgrade && (
+                      <td className={(c.drop?.netGain ?? 0) > 0 ? 'gain' : undefined}>
+                        {c.drop
+                          ? points(c.drop.netGain)
+                          : c.gain !== undefined
+                            ? points(c.gain)
+                            : '—'}
+                      </td>
+                    )}
+                    {!data.noUpgrade && <td>{c.drop?.name ?? '—'}</td>}
                     <td>
                       <button
                         type="button"
@@ -105,8 +113,9 @@ export function WaiverDayPanel({
             </table>
           )}
           <p className="roster-moves-note">
-            Changes are this week’s best-lineup estimate after the add and drop. FAAB budgets and
-            waiver order aren’t available from league imports.
+            {data.noUpgrade
+              ? 'The best free agents at each position you start. Waiver order isn’t available from league imports.'
+              : 'Changes are this week’s best-lineup estimate after the add and drop. Waiver order isn’t available from league imports.'}
           </p>
         </>
       )}

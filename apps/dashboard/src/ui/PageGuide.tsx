@@ -36,7 +36,7 @@ export const pageGuides: Record<string, Guide> = {
     steps: [
       'Create a draft, such as power rankings or a matchup preview.',
       'Read and edit it in review before anything goes out.',
-      'Choose where it goes and confirm. Nothing is ever sent on its own.',
+      'Choose where it goes and confirm. Only schedules you set to auto-send go out alone.',
     ],
     helpId: 'share',
   },

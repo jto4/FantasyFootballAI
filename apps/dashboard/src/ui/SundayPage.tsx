@@ -173,7 +173,14 @@ export function SundayPage({
                   {flags.length > 0 && (
                     <ul className="sunday-flags">
                       {flags.slice(0, 4).map((flag) => (
-                        <li key={flag}>{flag}</li>
+                        <li key={flag}>
+                          <button
+                            type="button"
+                            onClick={() => onOpenLeague(day.league.id, 'League desk')}
+                          >
+                            {flag}
+                          </button>
+                        </li>
                       ))}
                     </ul>
                   )}
@@ -203,7 +210,13 @@ export function SundayPage({
               Worth a second look.
             </p>
           )}
-          {rows.length > 0 && (
+          {days.length === 1 && (
+            <p className="compare-note">
+              Connect another league to see every matchup here and the players you share between
+              teams.
+            </p>
+          )}
+          {rows.length > 0 && days.length > 1 && (
             <section aria-labelledby="sunday-starters">
               <h2 id="sunday-starters">Your starters, all leagues</h2>
               <div className="sunday-table-wrap">

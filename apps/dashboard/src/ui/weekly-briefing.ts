@@ -20,7 +20,13 @@ export type WeeklyBriefing = {
   }[];
   waivers: { id: string; name: string; position: string; gain: number }[];
   notes: string[];
-  matchup?: { week: number; you: MatchupSide; opponent: MatchupSide; winProbability?: number };
+  matchup?: {
+    week: number;
+    you: MatchupSide;
+    opponent: MatchupSide;
+    winProbability?: number;
+    ifFixed?: { projected: number; winProbability: number };
+  };
 };
 
 export type MatchupSide = {

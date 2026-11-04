@@ -12,6 +12,8 @@ import {
   type ReportSummary,
   type ReportSchedule,
 } from '@sidekick/core';
+import { reportName } from './beginner-flow';
+import { formatDateTime, formatTime } from './date-format';
 import type { ScheduledRun } from './SchedulePage';
 
 function nextDate(
@@ -72,7 +74,8 @@ export function ActionInbox({
       (!league || report.leagueId === league.id) &&
       (report.deliveryState === 'failed' || report.deliveryState === 'uncertain'),
   );
-  const draftCount = counts?.drafts ?? drafts.length;
+  // Older drafts of the same report are replaced ones, so they are not waiting for anyone.
+  const draftCount = new Set(drafts.map((draft) => draft.kind)).size || (counts?.drafts ?? 0);
   const issueCount = counts?.issues ?? deliveries.length;
   const now = new Date();
   const staleAfterMs = (settings.leagueStaleAfterHours ?? 24) * 3600000;
@@ -162,15 +165,21 @@ export function ActionInbox({
           {next?.dataProblem
             ? next.dataProblem
             : next
-              ? `${next.date} at ${next.time} · ${next.timezone} · ${next.savedData ? 'Saved-data draft' : next.mode === 'automatic' ? 'Automatic delivery' : 'Draft for review'}`
+              ? `${formatDateTime(new Date(next.instant).toISOString())} · ${next.savedData ? 'Saved-data draft' : next.mode === 'automatic' ? 'Automatic delivery' : 'Draft for review'}`
               : 'Choose a schedule or generate a draft when needed.'}
         </p>
         {next?.dataProblem && (
           <small>
-            {next.title} · {next.date} at {next.time} · {next.timezone}
+            {next.title} · {formatDateTime(new Date(next.instant).toISOString())}
           </small>
         )}
-        {lastRun?.status === 'failed' && <p role="status">Latest job needs attention.</p>}
+        {lastRun?.status === 'failed' && (
+          <p role="status">
+            {reportName(lastRun.kind)} didn’t run on {formatTime(lastRun.startedAt)}.{' '}
+            {lastRun.leagueResults?.find((r) => r.leagueId === league?.id)?.detail ??
+              'Open the schedule to see why.'}
+          </p>
+        )}
         <button type="button" className="text-button" onClick={onSchedule}>
           Review schedule →
         </button>

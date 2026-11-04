@@ -8,6 +8,9 @@ import {
   type RosterPlayer,
 } from '@sidekick/core';
 
+/** Sleeper's short injury codes, in words for the status shown on player cards and lists. */
+const statusLabel = (status: string) => (status === 'DNR' ? 'Did not report' : status);
+
 export function playerPool(
   league: LeagueConnection | undefined,
   data: FootballDataSnapshot,
@@ -20,6 +23,8 @@ export function playerPool(
   for (const [sleeperId, player] of catalog) {
     if (
       !player.nflTeam ||
+      // Sleeper keeps a last team on retired players; they must not appear as available.
+      /^(inactive|retired)$/i.test(player.status ?? '') ||
       !['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'DST'].includes(player.position ?? '')
     )
       continue;
@@ -37,7 +42,7 @@ export function playerPool(
       ...(propIdentity ? { gsisId: propIdentity } : {}),
       id,
       sleeperId,
-      ...(player.injuryStatus ? { status: player.injuryStatus } : {}),
+      ...(player.injuryStatus ? { status: statusLabel(player.injuryStatus) } : {}),
     });
   }
   for (const player of roster) {
@@ -57,7 +62,7 @@ export function playerPool(
       ...matched,
       ...player,
       ...(matched?.sleeperId ? { sleeperId: matched.sleeperId } : {}),
-      ...(matched?.injuryStatus ? { status: matched.injuryStatus } : {}),
+      ...(matched?.injuryStatus ? { status: statusLabel(matched.injuryStatus) } : {}),
     });
   }
   if (!catalog.size) {

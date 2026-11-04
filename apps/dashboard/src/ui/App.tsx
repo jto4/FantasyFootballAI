@@ -197,6 +197,7 @@ export function App() {
   const [setupBusy, setSetupBusy] = useState(false);
   const [aiCheckError, setAiCheckError] = useState('');
   const guides = usePageGuides();
+  const [reportsStartView, setReportsStartView] = useState<'charts'>();
   // A player name handed to the props board when it opens from a player card.
   const propsPlayer = useRef('');
   const [aiChecking, setAiChecking] = useState(false);
@@ -1196,6 +1197,8 @@ export function App() {
             ) : section === 'Reports' ? (
               <Suspense fallback={<LoadingStatus message="Opening reports…" />}>
                 <ReportsPage
+                  {...(reportsStartView ? { initialView: reportsStartView } : {})}
+                  onInitialViewUsed={() => setReportsStartView(undefined)}
                   reports={state.reports}
                   jobs={state.generationJobs ?? []}
                   leagues={state.leagues}
@@ -1300,6 +1303,10 @@ export function App() {
             ) : (
               <>
                 <LeagueDesk
+                  onCharts={() => {
+                    setReportsStartView('charts');
+                    navigate('Reports');
+                  }}
                   disclosures={homeDisclosures}
                   onDisclosureChange={(key, open) =>
                     setHomeDisclosures((current) =>

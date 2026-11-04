@@ -71,6 +71,12 @@ export function PlayerCardProvider({
   );
 }
 
+/** Opens a player's card from outside a `PlayerName`; undefined until a team is chosen. */
+export function usePlayerCardOpener() {
+  const host = useContext(PlayerCardContext);
+  return host?.leagueId && host.teamId ? host.open : undefined;
+}
+
 /** A player's name that opens his card; plain text where no card is available. */
 export function PlayerName({ id, name }: { id: string; name: string }) {
   const host = useContext(PlayerCardContext);
@@ -183,7 +189,9 @@ function PlayerCardDialog({
                   : 'No estimate yet'}
               {card.playChance !== undefined && !card.started
                 ? ` · ${Math.round(card.playChance * 100)}% to play (Questionable)`
-                : ''}
+                : /questionable/i.test(card.status ?? '') && !card.started
+                  ? ' · Discounted once the NFL injury report is out'
+                  : ''}
             </small>
             {card.matchup && (
               <small>
@@ -211,14 +219,17 @@ function PlayerCardDialog({
             <section aria-labelledby="player-card-numbers">
               <h3 id="player-card-numbers">Behind the projection</h3>
               <dl className="player-card-numbers">
-                {card.numbers.map((n) => (
-                  <div key={n.label}>
-                    <dt>{n.label}</dt>
-                    <dd>
-                      {num(n.value)} {n.unit === 'percent' ? '%' : n.unit}
-                    </dd>
-                  </div>
-                ))}
+                {/* A zero is a stat this position does not produce (a quarterback's targets). */}
+                {card.numbers
+                  .filter((n) => n.value !== 0)
+                  .map((n) => (
+                    <div key={n.label}>
+                      <dt>{n.label}</dt>
+                      <dd>
+                        {num(n.value)} {n.unit === 'percent' ? '%' : n.unit}
+                      </dd>
+                    </div>
+                  ))}
               </dl>
             </section>
           )}
