@@ -761,3 +761,22 @@ board too. Rebuilt weeks are analysis only and are not added to the saved record
 of 100 top players, cutting the benchmark from about 1,200 games to 600. Small negatives now round
 to zero and a materially negative value withholds only that player-week. The app itself still
 downloads no ESPN forecasts.
+
+## Where projection accuracy can come from (November 4, 2026)
+
+Tests on our own data, as no public source reports weekly accuracy gains for these ideas.
+
+- **Sportsbook prop lines as an input: the one clear gain.** Moving a player's projected yards,
+  receptions, touchdowns and interceptions toward the saved closing lines, on 273 week 7–8 players
+  also forecast by ESPN: mean absolute error 5.38 for the model, 5.26 with 60% of the gap closed,
+  5.34 for ESPN. The 60% was chosen on week 7; on week 8 alone it was 5.75 → 5.61 (ESPN 5.56). Lines
+  covered 277 of 297 fantasy-relevant players at closing. Two weeks only, and closing lines arrive
+  late in the week. Not built yet: it needs the owner's decision, since lines come from a sportsbook
+  rather than our own model. ESPN's forecasts stay excluded.
+- **Not adopted (fitted on 2025, tested on 2026).** Lagged expected fantasy points and expected
+  touchdowns from ffopportunity, and target, air-yards and WOPR level or trend: RMSE moved under
+  1% and mostly got worse, except tight ends (about 1%). Implied total, spread and game total are
+  in the week 8 review above.
+- **Data limits.** nflverse participation (route data) has no in-season 2026 file. ffopportunity,
+  FTN charting and participation are CC BY-SA, and snap counts come from Pro Football Reference,
+  whose terms restrict tools built on scraped data; check these before any public release.
