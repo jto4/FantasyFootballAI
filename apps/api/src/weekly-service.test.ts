@@ -1,12 +1,17 @@
 import { expect, it } from 'vitest';
-import { weeklyGameWithheldWarning, type PlayerAdviceEvidence } from '@sidekick/core';
+import {
+  weeklyGameWithheldWarning,
+  type LeagueConnection,
+  type PlayerAdviceEvidence,
+} from '@sidekick/core';
 import {
   benchReplacement,
+  lineupChanges,
   newsMentions,
   plannedReplacement,
   projectedTeamTotal,
   satOut,
-} from './weekly-service.js';
+} from './weekly-lineup.js';
 
 const player = (
   id: string,
@@ -118,4 +123,34 @@ it('counts a starter listed Out as zero instead of hiding the team total', () =>
   expect(projectedTeamTotal([{ started: true }, { estimate: 8 }, { out: true }], 21.5)).toBe(29.5);
   expect(projectedTeamTotal([{ started: true }, { estimate: 8 }], undefined)).toBeUndefined();
   expect(projectedTeamTotal([], 0)).toBeUndefined();
+});
+
+it('pairs each swap with the player who can share its slot, and stays quiet with no starters', () => {
+  const byId = new Map(
+    [player('dst-in', 'DST', 10), player('dst-out', 'DST', 5), player('wr-out', 'WR', 0)].map(
+      (p) => [p.id, p],
+    ),
+  );
+  const input = {
+    league: { settings: { roster_positions: ['WR', 'DST'] } } as unknown as LeagueConnection,
+    optimal: {
+      complete: true,
+      assignments: [
+        { slot: 'DST 2', playerId: 'dst-in', points: 10 },
+        { slot: 'WR 1', playerId: 'wr-keep', points: 9 },
+      ],
+      missingSlots: [],
+      warnings: [],
+    },
+    byId,
+    roster: [],
+    name: (id: string) => id,
+  };
+  const changes = lineupChanges({ ...input, starters: new Set(['wr-keep', 'wr-out', 'dst-out']) });
+  expect(changes).toHaveLength(1);
+  expect(changes[0]).toMatchObject({
+    start: { id: 'dst-in' },
+    bench: { id: 'dst-out', points: 5 },
+  });
+  expect(lineupChanges({ ...input, starters: new Set() })).toEqual([]);
 });
