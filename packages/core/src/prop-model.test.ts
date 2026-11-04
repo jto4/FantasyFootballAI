@@ -85,13 +85,14 @@ it('anchors to the line and refits the weight only with enough graded props', ()
   // The line sits at 0.75 of the mean, so the model says 62.5% over; a 25% weight gives 53.1%.
   expect(probabilityOver(75, 100, outcome)).toBeCloseTo(0.625);
   expect(anchoredOverChance(75, 100, outcome, 0.25)).toBeCloseTo(0.53125);
-  const graded = Array.from({ length: 200 }, (_, i) => ({
+  const graded = Array.from({ length: 600 }, (_, i) => ({
     line: 75,
     mean: 100,
     stat: 'receiving_yards' as const,
     over: i % 4 !== 0,
   }));
-  expect(fitMarketWeight(graded.slice(0, 100), propModelSettings)).toBeUndefined();
+  // One week of leans is not enough: week 7's fit lost to the default on week 8.
+  expect(fitMarketWeight(graded.slice(0, 200), propModelSettings)).toBeUndefined();
   // Overs hit 75% of the time, so trusting the model fully fits best.
   expect(fitMarketWeight(graded, propModelSettings)?.weight).toBeGreaterThan(0.6);
 });
@@ -128,6 +129,30 @@ it('declines to price players outside the fitted population', () => {
   )!;
   expect(priced.overChance).toBeGreaterThan(0.5);
   expect(priced.overChance).toBeLessThan(0.6);
+});
+
+it('takes no side on stats where the line beats the model, but still gives a projection', () => {
+  const target = game(4);
+  const league = buildPropModelLeague([], [game(1), game(2), game(3), target]);
+  const back = (week: number) => ({
+    ...row(week, 0),
+    position: 'RB',
+    stats: { carries: 18, rushing_yards: 80 },
+  });
+  const priced = predictProp(
+    {
+      stat: 'carries',
+      position: 'RB',
+      team: 'SEA',
+      game: target,
+      history: [back(1), back(2), back(3)],
+      line: 9.5,
+    },
+    league,
+    propModelSettings.carries,
+  )!;
+  expect(priced.mean).toBeGreaterThan(9.5);
+  expect(priced.overChance).toBe(0.5);
 });
 
 it('scales the estimate by snap-share and depth-chart changes when those settings are on', () => {

@@ -210,6 +210,50 @@ export function vacatedCarryShare(
   return total ? Math.min(0.6, vacated / total) : 0;
 }
 
+/**
+ * The quarterback this player is stepping in for: the team's main passer over its last three
+ * games (same season, at least half the attempts) is ruled out this week and this player is next
+ * on the depth chart. An unknown depth rank is not a replacement, so a third-stringer is never
+ * lifted to a starter's line.
+ */
+export function replacedQuarterback(
+  context: ProjectionContext,
+  playerId: string,
+  team: string,
+  game: FootballGame,
+  depthRank: number | undefined,
+): { playerId: string; name: string } | undefined {
+  if (!context.ruledOut.size || depthRank === undefined || depthRank > 2) return undefined;
+  if (context.ruledOut.has(`${game.season}:${game.week}:${playerId}`)) return undefined;
+  const key = nflTeamKey(team);
+  const order = (g: FootballGame) => g.season * 100 + g.week;
+  const recent = [...context.league.games.values()]
+    .filter(
+      (g) =>
+        g.season === game.season &&
+        g.seasonType === 'REG' &&
+        order(g) < order(game) &&
+        (nflTeamKey(g.home) === key || nflTeamKey(g.away) === key),
+    )
+    .sort((a, b) => order(b) - order(a))
+    .slice(0, 3);
+  const passers = new Map<string, { name: string; attempts: number }>();
+  let total = 0;
+  for (const g of recent)
+    for (const row of context.byTeamGame.get(`${g.id}:${key}`) ?? []) {
+      if (footballPosition(row.position) !== 'QB') continue;
+      const attempts = row.stats.attempts ?? 0;
+      total += attempts;
+      const seen = passers.get(row.playerId);
+      passers.set(row.playerId, { name: row.name, attempts: (seen?.attempts ?? 0) + attempts });
+    }
+  const [leadId, lead] = [...passers].sort((a, b) => b[1].attempts - a[1].attempts)[0] ?? [];
+  if (!leadId || !lead || leadId === playerId || lead.attempts < total / 2) return undefined;
+  return context.ruledOut.has(`${game.season}:${game.week}:${leadId}`)
+    ? { playerId: leadId, name: lead.name }
+    : undefined;
+}
+
 const rushingStats = [
   'carries',
   'rushing_yards',
@@ -262,6 +306,8 @@ export function projectFantasyPoints(
   weather?: WeatherParams,
   /** Discount for players listed Questionable; off when absent. */
   questionable?: QuestionableParams,
+  /** A typical replacement starter's stat line, the floor for a backup stepping in; off when absent. */
+  replacementLine?: Partial<Record<FootballStatKey, number>>,
 ) {
   const position = footballPosition(input.position);
   if (!['QB', 'RB', 'WR', 'TE'].includes(position)) return undefined;
@@ -297,6 +343,34 @@ export function projectFantasyPoints(
       if (value !== undefined) projected.stats[stat] = value * factor;
     }
   }
+  // Stats the model does not project (first downs, bonuses) leave scoring unsupported, not zero.
+  const scoreStats = (stats: typeof projected.stats) =>
+    scoreHistoricalGame(scoring, {
+      playerId: input.playerId,
+      name: '',
+      position,
+      team: input.team,
+      opponent: '',
+      gameId: input.game.id,
+      season: input.game.season,
+      week: input.game.week,
+      seasonType: 'REG',
+      stats,
+    }).points;
+  // A backup's history is mostly mop-up snaps, so one stepping in is projected at no less than a
+  // typical replacement starter (fitted on 2025, checked on 2026). Only when that scores higher:
+  // the line's extra turnovers must not lower a passer whose own line is already better.
+  const stepIn =
+    position === 'QB' && replacementLine
+      ? replacedQuarterback(context, input.playerId, input.team, input.game, depth().now)
+      : undefined;
+  const lifted = stepIn ? { ...projected.stats } : undefined;
+  if (lifted)
+    for (const [stat, floor] of Object.entries(replacementLine!) as [FootballStatKey, number][])
+      lifted[stat] = Math.max(lifted[stat] ?? 0, floor);
+  const replaced =
+    lifted && (scoreStats(lifted) ?? 0) > (scoreStats(projected.stats) ?? 0) ? stepIn : undefined;
+  if (replaced) projected.stats = lifted!;
   // Wind was fitted on the scored total; league scoring is linear in the stats, so scaling every
   // stat gives the same total and keeps the stat lines consistent with it.
   const wind = windFactor(context, input.game, weather);
@@ -311,26 +385,15 @@ export function projectFantasyPoints(
       const value = projected.stats[key];
       if (value !== undefined) projected.stats[key] = value * factor;
     }
-  // Stats the model does not project (first downs, bonuses) leave scoring unsupported, not zero.
-  const scored = scoreHistoricalGame(scoring, {
-    playerId: input.playerId,
-    name: '',
-    position,
-    team: input.team,
-    opponent: '',
-    gameId: input.game.id,
-    season: input.game.season,
-    week: input.game.week,
-    seasonType: 'REG',
-    stats: projected.stats,
-  });
-  return scored.points === undefined
+  const points = scoreStats(projected.stats);
+  return points === undefined
     ? undefined
     : {
-        points: Math.round(scored.points * 100) / 100,
+        points: Math.round(points * 100) / 100,
         stats: projected.stats,
         sampleGames: projected.sampleGames,
         vacatedCarryShare: vacated,
+        ...(replaced ? { replacedQuarterback: replaced.name } : {}),
         windFactor: wind,
         ...(listed ? { playChance: questionable.playChance } : {}),
       };

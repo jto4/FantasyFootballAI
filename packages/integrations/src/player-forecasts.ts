@@ -198,15 +198,16 @@ export function parsePublicPlayerForecasts(
       )
         throw new Error('Invalid projected statistic.');
       // Derived category fantasy points and unused regression fields may be negative, and the
-      // publisher's model emits tiny negative event expectations (about -0.01 touchdowns).
-      // Those round to zero below; a materially negative event count is still rejected.
+      // publisher's model emits tiny negative event expectations (up to about -0.09 touchdowns).
+      // Those round to zero below. A materially negative event count withholds that one
+      // player-week: rejecting the page would lose a hundred sound forecasts over one bad row.
       // Net yardage may be negative. Never expose unknown numeric IDs.
       if (
         Object.keys(fields).some(
-          (key) => !['3', '24', '42'].includes(key) && Number(raw[key] ?? 0) < -0.05,
+          (key) => !['3', '24', '42'].includes(key) && Number(raw[key] ?? 0) < -0.25,
         )
       )
-        throw new Error('Invalid projected event count.');
+        continue;
       if (!Object.keys(raw).length) continue;
       const total = [...rules].reduce(
         (sum, [key, rule]) =>

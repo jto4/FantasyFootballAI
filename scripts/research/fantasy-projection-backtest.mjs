@@ -17,6 +17,7 @@ import {
   parsePersonnelSnaps,
 } from '../../packages/integrations/dist/index.js';
 import {
+  fantasyModelWeight,
   footballPosition,
   nflTeamKey,
   playerNameKey,
@@ -26,7 +27,9 @@ import {
   propModelSettings,
   ruledOutKeys,
   questionableKeys,
+  propDepth,
   propUsageNorms,
+  replacedQuarterback,
   scoreHistoricalGame,
   snapKey,
   windFactor,
@@ -177,6 +180,8 @@ function evaluate(league, name) {
       propUsageNorms,
       vacated.exponent,
       weather,
+      undefined,
+      replacement.line,
     );
     if (actual === undefined || !ours) continue;
     // As in the app: Questionable players who play are discounted.
@@ -187,12 +192,18 @@ function evaluate(league, name) {
     cases.push({
       pos,
       week: row.week,
+      name: row.name,
+      team: row.team,
+      questionable: questionable.has(`${row.season}:${row.week}:${row.playerId}`),
       actual,
       ours: ours.points,
       baseline,
       ...(espnPoints !== undefined ? { espn: espnPoints } : {}),
     });
   }
+  // Optional per-player rows for looking at one week: --cases=<file> (Afton scoring only).
+  const casesFile = process.argv.find((a) => a.startsWith('--cases='))?.slice(8);
+  if (casesFile && league === afton) writeFileSync(casesFile, JSON.stringify(cases));
   const mae = (list, key) =>
     Math.round((list.reduce((s, c) => s + Math.abs(c.actual - c[key]), 0) / list.length) * 100) /
     100;
@@ -225,8 +236,12 @@ function evaluate(league, name) {
         list.length;
       let best = 1;
       for (const w of [0, 0.25, 0.5, 0.75, 1]) if (err(early, w) < err(early, best)) best = w;
-      // A blend is adopted only if it also beats the model alone on the later weeks.
-      const adopted = err(late, best) < err(late, 1) ? best : 1;
+      // A blend is adopted only if it also beats the model alone on the later weeks, and the
+      // settled weight stays unless the later weeks clearly disagree (a refit must not flip it
+      // on noise: 0.05 points is well inside week-to-week variation).
+      const candidate = err(late, best) < err(late, 1) ? best : 1;
+      const current = fantasyModelWeight[pos];
+      const adopted = err(late, candidate) < err(late, current) - 0.05 ? candidate : current;
       return [
         pos,
         {
@@ -765,6 +780,87 @@ function questionableFit(league) {
     },
   };
 }
+// Backups stepping in for a ruled-out starter: the floor is the average stat line of 2025's
+// replacements, adopted only if it lowers their RMSE on 2026.
+function replacementQuarterbackFit(league) {
+  const cases = [];
+  for (const row of data.players) {
+    if (row.season < 2025 || row.seasonType !== 'REG' || footballPosition(row.position) !== 'QB')
+      continue;
+    const game = context.league.games.get(row.gameId);
+    const history = context.byPlayer.get(row.playerId) ?? [];
+    if (!game || history.filter((h) => order(h) < order(row)).length < 3) continue;
+    const rank = propDepth(
+      context.depth.get(row.playerId),
+      'QB',
+      game,
+      history,
+      context.league.games,
+    ).now;
+    const replaced = replacedQuarterback(context, row.playerId, row.team, game, rank);
+    if (!replaced) continue;
+    const actual = score(league, row);
+    const at = (line) =>
+      projectFantasyPoints(
+        league,
+        { playerId: row.playerId, position: 'QB', team: row.team, game, history },
+        context,
+        propModelSettings,
+        propUsageNorms,
+        vacated.exponent,
+        undefined,
+        undefined,
+        line,
+      );
+    const base = at(undefined);
+    if (actual === undefined || !base) continue;
+    cases.push({
+      season: row.season,
+      week: row.week,
+      name: row.name,
+      team: row.team,
+      row,
+      actual,
+      at,
+      base,
+    });
+  }
+  const train = cases.filter((c) => c.season === 2025);
+  const test = cases.filter((c) => c.season === 2026);
+  const line = {};
+  for (const key of Object.keys(train[0].base.stats)) {
+    const value = train.reduce((s, c) => s + (c.row.stats[key] ?? 0), 0) / train.length;
+    // A quarterback's rare catch in the sample is not part of a starter's line.
+    if (value > 0 && !/^rece/.test(key)) line[key] = Math.round(value * 1000) / 1000;
+  }
+  const rmse = (list, l) =>
+    Math.sqrt(list.reduce((s, c) => s + (c.actual - c.at(l).points) ** 2, 0) / list.length);
+  const mae = (list, l) =>
+    list.reduce((s, c) => s + Math.abs(c.actual - c.at(l).points), 0) / list.length;
+  const r = (x) => Math.round(x * 100) / 100;
+  const adopted = test.length && rmse(test, line) < rmse(test, undefined);
+  return {
+    line: adopted ? line : {},
+    report: {
+      train: train.length,
+      test: test.length,
+      trainRmse: { floored: r(rmse(train, line)), own: r(rmse(train, undefined)) },
+      testRmse: { floored: r(rmse(test, line)), own: r(rmse(test, undefined)) },
+      testMae: { floored: r(mae(test, line)), own: r(mae(test, undefined)) },
+      line,
+      adopted: Boolean(adopted),
+      testCases: test.map((c) => ({
+        name: c.name,
+        team: c.team,
+        week: c.week,
+        own: r(c.base.points),
+        floored: r(c.at(line).points),
+        actual: r(c.actual),
+      })),
+    },
+  };
+}
+
 const specialTeamsDefaults = {
   K: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
   DST: { halfLife: 8, kickerEnvExponent: 0, defenseOpponentCoefficient: 0 },
@@ -772,6 +868,7 @@ const specialTeamsDefaults = {
 
 const vacated = vacatedCarries(afton);
 const questionableResult = questionableFit(afton);
+const replacement = replacementQuarterbackFit(afton);
 const special = specialTeams(halfPpr);
 const outcomes = outcomeSpread();
 const weather = outcomes.wind;
@@ -784,6 +881,7 @@ const result = {
   vacatedCarries: { afton: vacated },
   outcomeSpread: outcomes.report,
   questionable: questionableResult.report,
+  replacementQuarterback: replacement.report,
 };
 console.log(JSON.stringify(result, null, 2));
 if (outFile && !outFile.startsWith('--')) writeFileSync(outFile, JSON.stringify(result, null, 2));
@@ -791,7 +889,7 @@ if (process.argv.includes('--emit'))
   writeFileSync(
     'packages/core/src/fantasy-projection-settings.ts',
     `// Generated by scripts/research/fantasy-projection-backtest.mjs --emit; see docs/decisions.md.\n` +
-      `import type {\n  OutcomeSpread,\n  QuestionableParams,\n  SpecialTeamsParams,\n  WeatherParams,\n} from './fantasy-projection.js';\n\n` +
+      `import type { FootballStatKey } from './advice-types.js';\nimport type {\n  OutcomeSpread,\n  QuestionableParams,\n  SpecialTeamsParams,\n  WeatherParams,\n} from './fantasy-projection.js';\n\n` +
       `/** Weight on the stat model versus the player's recent fantasy average, by position. */\n` +
       `export const fantasyModelWeight: Record<'QB' | 'RB' | 'WR' | 'TE', number> = ${JSON.stringify(
         Object.fromEntries(
@@ -804,6 +902,8 @@ if (process.argv.includes('--emit'))
       `export const fantasyOutcomeSpread: Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST', OutcomeSpread> = ${JSON.stringify(outcomes.spread, null, 2)};\n\n` +
       `/** Questionable on the NFL injury report: chance of playing, and the projection multiplier when he plays. */\n` +
       `export const questionableSettings: QuestionableParams = ${JSON.stringify(questionableResult.settings)};\n\n` +
+      `/** A typical replacement starter's stat line: the floor for a backup stepping in; empty means off. */\n` +
+      `export const replacementQuarterbackLine: Partial<Record<FootballStatKey, number>> = ${JSON.stringify(replacement.line)};\n\n` +
       `/** Forecast wind effect on QB/RB/WR/TE/K projections; a coefficient of 0 means off. */\n` +
       `export const weatherSettings: WeatherParams = ${JSON.stringify(outcomes.wind)};\n\n` +
       `/** Inflates summed lineup variance for win probability (fitted on random 2025 lineup pairs). */\n` +

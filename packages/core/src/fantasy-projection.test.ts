@@ -9,6 +9,7 @@ import {
   projectionContext,
   projectionRange,
   questionableKeys,
+  replacedQuarterback,
   ruledOutKeys,
   teamGame,
   vacatedCarryShare,
@@ -100,6 +101,84 @@ it('projects kickers and defenses from scored history and the betting total', ()
   expect(
     projectSpecialTeamsPoints('K', 'SEA', target, history.slice(0, 2), context, flat),
   ).toBeUndefined();
+});
+
+it('projects a backup quarterback as a starter when the main passer is ruled out', () => {
+  const passer = (id: string, week: number, attempts: number): PlayerGameStats => ({
+    playerId: id,
+    name: `Fictional Passer ${id}`,
+    position: 'QB',
+    team: 'SEA',
+    opponent: 'LA',
+    gameId: game(week).id,
+    season: 2026,
+    week,
+    seasonType: 'REG',
+    stats: {
+      attempts,
+      completions: attempts * 0.6,
+      passing_yards: attempts * 7,
+      passing_tds: attempts / 20,
+      passing_interceptions: attempts / 40,
+      carries: 1,
+      rushing_yards: 2,
+    },
+  });
+  const games = [1, 2, 3, 4].map((week) => game(week));
+  const starter = [1, 2, 3].map((w) => passer('00-0000020', w, 32));
+  const backup = [1, 2, 3].map((w) => passer('00-0000021', w, 2));
+  const thirdString = [1, 2, 3].map((w) => passer('00-0000022', w, 1));
+  const line = {
+    attempts: 27,
+    completions: 17,
+    passing_yards: 180,
+    passing_tds: 1,
+    passing_interceptions: 1,
+    carries: 4,
+    rushing_yards: 19,
+  };
+  const depth = new Map([
+    ['00-0000021', [{ pos: 'QB' as const, rank: 2, season: 2026, week: 4 }]],
+    ['00-0000022', [{ pos: 'QB' as const, rank: 3, season: 2026, week: 4 }]],
+  ]);
+  const data = { players: [...starter, ...backup, ...thirdString], games };
+  const project = (id: string, history: PlayerGameStats[], ruledOut: Set<string>) =>
+    projectFantasyPoints(
+      halfPpr,
+      { playerId: id, position: 'QB', team: 'SEA', game: games[3]!, history },
+      projectionContext(data, { snaps: new Map(), depth, ruledOut }),
+      propModelSettings,
+      undefined,
+      0,
+      undefined,
+      undefined,
+      line,
+    )!;
+  const out = new Set(['2026:4:00-0000020']);
+  const stepping = project('00-0000021', backup, out);
+  expect(stepping.replacedQuarterback).toBe('Fictional Passer 00-0000020');
+  expect(stepping.stats.attempts).toBe(27);
+  // No change with the starter healthy, for a third-stringer, or for the starter's own line.
+  const healthy = project('00-0000021', backup, new Set());
+  expect(healthy.replacedQuarterback).toBeUndefined();
+  expect(healthy.points).toBeLessThan(stepping.points);
+  expect(project('00-0000022', thirdString, out).replacedQuarterback).toBeUndefined();
+  expect(project('00-0000020', starter, out).replacedQuarterback).toBeUndefined();
+  // Only a stated second on the depth chart counts, and a better own line is never lowered.
+  const context = projectionContext(data, { snaps: new Map(), depth, ruledOut: out });
+  expect(replacedQuarterback(context, '00-0000021', 'SEA', games[3]!, undefined)).toBeUndefined();
+  const proven = projectFantasyPoints(
+    halfPpr,
+    { playerId: '00-0000021', position: 'QB', team: 'SEA', game: games[3]!, history: backup },
+    context,
+    propModelSettings,
+    undefined,
+    0,
+    undefined,
+    undefined,
+    { attempts: 1, passing_interceptions: 5 },
+  )!;
+  expect(proven.replacedQuarterback).toBeUndefined();
 });
 
 it('gives a running back the carries of a teammate back ruled out this week', () => {

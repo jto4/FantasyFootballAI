@@ -436,7 +436,7 @@ export function predictProp(
       input.line,
       model.mean,
       settings.outcome,
-      input.marketWeight ?? defaultMarketWeight,
+      lineOnlyPropStats.includes(input.stat) ? 0 : (input.marketWeight ?? defaultMarketWeight),
     ),
     sampleGames: model.sampleGames,
   };
@@ -478,6 +478,19 @@ export function propModelEligible(stat: PropModelStat, position: string, base: n
 export const defaultMarketWeight = 0.25;
 
 /**
+ * Stats where the book's line beats the model, so the model claims none of the disagreement and
+ * no lean appears. Rebuilt from pregame data at real closing lines, the best weight for these was
+ * 0 on week 7 of 2026 and again on week 8, and their leans went 35–79 (see docs/decisions.md).
+ */
+export const lineOnlyPropStats: readonly string[] = [
+  'carries',
+  'rushing_yards',
+  'attempts',
+  'completions',
+  'passing_yards',
+];
+
+/**
  * Chance of the over when the line is treated as the market's coin flip and the model may move
  * only `modelWeight` of the way from 50% toward its own chance.
  */
@@ -492,12 +505,13 @@ export function anchoredOverChance(
 
 /**
  * Refits the model's weight against the line from graded props by log loss. Returns undefined
- * until there are enough decided props to trust it.
+ * until there are enough decided props to trust it: one week's fit does not carry over (week 7 of
+ * 2026 chose 0.8 for receiving stats and lost to 0.25 on week 8), so this spans several weeks.
  */
 export function fitMarketWeight(
   graded: { line: number; mean: number; stat: PropModelStat; over: boolean }[],
   settings: PropModelSettings,
-  minimum = 150,
+  minimum = 500,
 ) {
   if (graded.length < minimum) return undefined;
   let best: { weight: number; logLoss: number } | undefined;

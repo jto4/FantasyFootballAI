@@ -2,7 +2,7 @@ import express from 'express';
 import type { AddressInfo } from 'node:net';
 import { afterEach, expect, it } from 'vitest';
 import type { FootballDataSnapshot, LeagueConnection } from '@sidekick/core';
-import { createPropBoardRouter, PropLeanStore } from './prop-board-routes.js';
+import { createPropBoard, PropLeanStore } from './prop-board-routes.js';
 import type { LocalStore } from './store.js';
 
 const servers: (() => void)[] = [];
@@ -56,50 +56,53 @@ it('builds the board for the next week, saves pre-kickoff leans, and grades fini
   };
   const leans = new PropLeanStore(':memory:');
   const app = express();
-  app.use(
-    createPropBoardRouter({
-      data: { get: async () => data },
-      props: {
-        props: async (g) => ({
-          gameId: g.id,
-          lines: [
+  const propBoard = createPropBoard({
+    data: { get: async () => data },
+    props: {
+      props: async (g) => ({
+        gameId: g.id,
+        lines: [
+          {
+            id: `espn:${g.id}:1:receiving_yards:40.5`,
+            gameId: g.id,
+            playerName: 'Fictional Receiver',
+            stat: 'receiving_yards',
+            line: 40.5,
+            sportsbook: 'DraftKings',
+            source: 'espn',
+            observedAt: '2026-10-23T00:00:00Z',
+          },
+        ],
+        priced: false,
+        warnings: [],
+      }),
+    },
+    store: {
+      snapshot: () =>
+        ({
+          leagues: [
             {
-              id: `espn:${g.id}:1:receiving_yards:40.5`,
-              gameId: g.id,
-              playerName: 'Fictional Receiver',
-              stat: 'receiving_yards',
-              line: 40.5,
-              sportsbook: 'DraftKings',
-              source: 'espn',
-              observedAt: '2026-10-23T00:00:00Z',
-            },
+              id: 'afton',
+              platform: 'espn',
+              teams: [
+                { id: '10', name: 'Horses', roster: [{ id: '1', name: 'Fictional Receiver' }] },
+              ],
+            } as unknown as LeagueConnection,
           ],
-          priced: false,
-          warnings: [],
-        }),
-      },
-      store: {
-        snapshot: () =>
-          ({
-            leagues: [
-              {
-                id: 'afton',
-                platform: 'espn',
-                teams: [
-                  { id: '10', name: 'Horses', roster: [{ id: '1', name: 'Fictional Receiver' }] },
-                ],
-              } as unknown as LeagueConnection,
-            ],
-          }) as ReturnType<LocalStore['snapshot']>,
-      },
-      leans,
-      now: () => now,
-    }),
-  );
+        }) as ReturnType<LocalStore['snapshot']>,
+    },
+    leans,
+    now: () => now,
+  });
+  app.use(propBoard.router);
   const server = app.listen(0, '127.0.0.1');
   await new Promise((resolve) => server.once('listening', resolve));
   servers.push(() => (server.close(), leans.close()));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+
+  // The background capture saves leans without anyone opening the Props page.
+  await propBoard.refresh();
+  expect(leans.list()).toHaveLength(1);
 
   const board = (await (await fetch(`${url}/api/props/board?league=afton`)).json()) as {
     week: number;

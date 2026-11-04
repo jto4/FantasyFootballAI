@@ -151,6 +151,13 @@ it('accepts league format choices only for connected leagues', async () => {
   expect(pruned?.leagueFormats).toEqual({ kept: 'keeper' });
 });
 
+it('accepts the replacement quarterback switch and treats it as a projection change', async () => {
+  const { hasProjectionChanges } = await import('./preferences.js');
+  const off = { projectionAdjustments: { replacementQuarterback: false } };
+  expect(isValidPreferences(off, new Set())).toBe(true);
+  expect(hasProjectionChanges(off, 'league')).toBe(true);
+});
+
 it('accepts the Questionable switch and treats it as a projection change', async () => {
   const { hasProjectionChanges } = await import('./preferences.js');
   const off = { projectionAdjustments: { questionable: false } };

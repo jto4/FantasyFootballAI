@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 3 (week 8 review): backups starting for a ruled-out quarterback are projected at no
+  less than a typical replacement; rushing and quarterback volume props show no lean because the
+  line beats the model there; leans are recorded in the background; the prop weight refit waits
+  for 500 graded props; ranges refit with week 8 (QB narrower). Details in `decisions.md`.
 - October 28 (Codex 0.165): ChatGPT's `codex-cli 0.165.0-alpha.1.2` adds no outside context but
   repeats the app's instructions; the isolation proof accepts that exact repeat only (owner
   approved), both captures passed, and the version is allowlisted.
@@ -91,7 +95,8 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
 - [ ] Close the gap to ESPN's accuracy (5.50 vs 5.28 points on the same games). Calibration, an early-season blend and QB-specific changes were tested and did not help; next candidates are teammate correlation in win probability, an in-game win chance from the game clock, a returning-teammate adjustment, using vacated carries in prop leans, and target redistribution once more injury seasons are available.
 - [ ] Replace the two remaining `window.prompt` calls (email subject and reply-to when sending a saved report) with in-app fields, and move the remaining string-only error displays (settings sections, imports) onto `ErrorNotice` with retry.
 - [ ] Once 3+ weeks of closing lines are saved, score the prop model against them (log loss and hit rate at the closing line).
-- [ ] After 150+ graded props, check the refit market weight and Brier score; if the model's Brier isn't below 0.25, set the weight to 0 (no leans).
+- [ ] Each week, run `scripts/research/prop-line-review.mjs` on the saved lines. Rushing and quarterback volume props have no leans for now; retest them after a rushing model change, and if receiving props' Brier score stops being below 0.25 over several weeks, take them to weight 0 too.
+- [ ] Retest the discount for teammates of a replaced quarterback once 2026 has more cases (tight ends fell about 25% in both seasons, on 16 games).
 - [ ] Re-run `node scripts/research/prop-model-backtest.mjs out.json --emit packages/core/src/prop-model-settings.ts` after the season to refit with a full 2026.
 - [ ] Measure chat answer quality and speed on each AI connection with a fixed question set; Codex rounds take tens of seconds each.
 

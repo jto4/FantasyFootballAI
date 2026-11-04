@@ -8,6 +8,7 @@ import {
   preferredBookLines,
   defaultMarketWeight,
   fitMarketWeight,
+  lineOnlyPropStats,
   propModelSettings,
   propModelStats,
   type PropModelStat,
@@ -69,7 +70,8 @@ function gradedForFit(records: PropLeanRecord[]) {
     r.result &&
     r.result.outcome !== 'push' &&
     r.modelMean !== undefined &&
-    (propModelStats as readonly string[]).includes(r.stat)
+    (propModelStats as readonly string[]).includes(r.stat) &&
+    !lineOnlyPropStats.includes(r.stat)
       ? [
           {
             line: r.line,
@@ -86,7 +88,10 @@ function marketWeightFromResults(records: PropLeanRecord[]) {
   return fitMarketWeight(gradedForFit(records), propModelSettings);
 }
 
-export function createPropBoardRouter(deps: {
+/** The board's data could not be loaded; the route answers 502. */
+class PropBoardDataError extends Error {}
+
+export function createPropBoard(deps: {
   data: Pick<PublicFootballData, 'get'>;
   props: Pick<PublicPropLines, 'props'>;
   store: Pick<LocalStore, 'snapshot'> & Partial<Pick<LocalStore, 'settingsSnapshot'>>;
@@ -108,18 +113,16 @@ export function createPropBoardRouter(deps: {
       if (result) deps.leans.save({ ...record, result });
     }
   }
-  router.get('/api/props/board', async (req, res) => {
-    if (
-      Object.keys(req.query).some((k) => k !== 'league') ||
-      (req.query.league !== undefined &&
-        (typeof req.query.league !== 'string' || req.query.league.length > 256))
-    )
-      return res.status(400).json({ error: 'Choose a valid league.' });
+  /**
+   * Builds the coming week's board, saves its pre-kickoff leans and grades finished ones. The
+   * background capture runs this too, so the record does not depend on opening the Props page.
+   */
+  async function refresh(leagueId?: string) {
     let data;
     try {
       data = await deps.data.get(seasonNow());
     } catch {
-      return res.status(502).json({ error: 'NFL schedule and stats could not be loaded.' });
+      throw new PropBoardDataError();
     }
     const at = new Date(now()).toISOString();
     const upcoming = data.games.filter(
@@ -151,7 +154,7 @@ export function createPropBoardRouter(deps: {
       warnings.push(
         'None of this week’s lines come from your chosen sportsbooks. Change them in Settings → Personalize.',
       );
-    const league = deps.store.snapshot().leagues.find((l) => l.id === req.query.league);
+    const league = deps.store.snapshot().leagues.find((l) => l.id === leagueId);
     const model = propModelFor(data, await deps.usage?.get(data.season).catch(() => undefined));
     const fitted = marketWeightFromResults(deps.leans.list());
     const rows = buildPropBoard({
@@ -217,7 +220,7 @@ export function createPropBoardRouter(deps: {
     }
     grade(data.players);
     if (!games.length) warnings.push('No upcoming regular-season games were found.');
-    res.json({
+    return {
       season: data.season,
       ...(games.length ? { week } : {}),
       generatedAt: at,
@@ -236,7 +239,21 @@ export function createPropBoardRouter(deps: {
         fitted: Boolean(fitted),
         gradedForFit: gradedForFit(deps.leans.list()).length,
       },
-    });
+    };
+  }
+  router.get('/api/props/board', async (req, res) => {
+    if (
+      Object.keys(req.query).some((k) => k !== 'league') ||
+      (req.query.league !== undefined &&
+        (typeof req.query.league !== 'string' || req.query.league.length > 256))
+    )
+      return res.status(400).json({ error: 'Choose a valid league.' });
+    try {
+      res.json(await refresh(req.query.league as string | undefined));
+    } catch (error) {
+      if (!(error instanceof PropBoardDataError)) throw error;
+      res.status(502).json({ error: 'NFL schedule and stats could not be loaded.' });
+    }
   });
   // Saved line and price history for research, optionally for one game.
   router.get('/api/props/lines', (req, res) => {
@@ -261,5 +278,8 @@ export function createPropBoardRouter(deps: {
       recent: records.filter((r) => r.result).slice(0, 40),
     });
   });
-  return router;
+  return { router, refresh };
 }
+
+export const createPropBoardRouter = (deps: Parameters<typeof createPropBoard>[0]) =>
+  createPropBoard(deps).router;

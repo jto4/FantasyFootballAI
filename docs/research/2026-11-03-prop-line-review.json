@@ -1,0 +1,114 @@
+{
+  "firstWeek": "7",
+  "lastWeek": "8",
+  "report": {
+    "attempts": {
+      "props": 49,
+      "mae": {
+        "model": 7.8,
+        "line": 7.15
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week8": 0
+      }
+    },
+    "carries": {
+      "props": 68,
+      "mae": {
+        "model": 5.07,
+        "line": 4.15
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week8": 0
+      }
+    },
+    "completions": {
+      "props": 51,
+      "mae": {
+        "model": 6.1,
+        "line": 5.58
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week8": 0
+      }
+    },
+    "passing_interceptions": {
+      "props": 42,
+      "mae": {
+        "model": 0.6,
+        "line": 0.64
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0.3,
+        "week8": 1
+      }
+    },
+    "passing_tds": {
+      "props": 50,
+      "mae": {
+        "model": 0.9,
+        "line": 0.92
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0.95,
+        "week8": 0.1
+      }
+    },
+    "passing_yards": {
+      "props": 48,
+      "mae": {
+        "model": 65.95,
+        "line": 65.13
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week8": 0
+      }
+    },
+    "receiving_yards": {
+      "props": 220,
+      "mae": {
+        "model": 24.43,
+        "line": 23.41
+      },
+      "leans": "60-33",
+      "bestWeight": {
+        "week7": 0.85,
+        "week8": 0.25
+      }
+    },
+    "receptions": {
+      "props": 222,
+      "mae": {
+        "model": 1.65,
+        "line": 1.63
+      },
+      "leans": "57-37",
+      "bestWeight": {
+        "week7": 0.75,
+        "week8": 0.25
+      }
+    },
+    "rushing_yards": {
+      "props": 97,
+      "mae": {
+        "model": 30.92,
+        "line": 25.77
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week8": 0
+      }
+    }
+  }
+}

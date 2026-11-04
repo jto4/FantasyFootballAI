@@ -163,8 +163,10 @@ export function PropsBoard({
                   ? `Its over/under chances score ${board.record.brier} over ${board.record.pricedGames} graded props (0.25 is a coin flip; lower is better). `
                   : ''}
                 {board.model
-                  ? `It moves ${Math.round(board.model.marketWeight * 100)}% of the way from the sportsbook line toward its own projection${board.model.fitted ? `, a share fitted on ${board.model.gradedForFit} graded props.` : ` until 150 props are graded (${board.model.gradedForFit} so far).`}`
-                  : ''}
+                  ? `It moves ${Math.round(board.model.marketWeight * 100)}% of the way from the sportsbook line toward its own projection${board.model.fitted ? `, a share fitted on ${board.model.gradedForFit} graded props.` : ` until 500 props are graded (${board.model.gradedForFit} so far).`}`
+                  : ''}{' '}
+                Rushing, carries and quarterback volume props show no lean: the sportsbook line has
+                beaten our model on those.
               </span>
             </details>
           </div>
@@ -327,7 +329,10 @@ export function PropsBoard({
                     {r.model ? (
                       <>
                         <strong>
-                          {Math.round(r.model.overChance * 100)}% over · fair {num(r.model.median)}
+                          {/* Exactly even means the line is taken as is (see lineOnlyPropStats). */}
+                          {r.model.overChance === 0.5
+                            ? `Our estimate ${num(r.model.median)}`
+                            : `${Math.round(r.model.overChance * 100)}% over · fair ${num(r.model.median)}`}
                         </strong>
                         {r.lean ? (
                           <span className={`lean-chip ${r.lean.strength}`}>

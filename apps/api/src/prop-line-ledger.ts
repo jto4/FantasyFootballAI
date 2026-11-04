@@ -143,6 +143,8 @@ export function startPropLineCapture(
     now?: () => number;
     /** The owner can switch background saving off in Personalize; checked on every tick. */
     enabled?: () => boolean;
+    /** Runs after each capture of games, so leans are saved without opening the Props page. */
+    afterCapture?: () => Promise<unknown>;
   },
   onError: (error: unknown) => void = () => undefined,
   intervalMs = 20 * 60_000,
@@ -173,6 +175,7 @@ export function startPropLineCapture(
         if (snapshot) deps.ledger.record(snapshot.lines, [game], at);
       }
       if (daily) lastDailyCapture = at.slice(0, 10);
+      if (games.length) await deps.afterCapture?.();
     } catch (error) {
       onError(error);
     } finally {

@@ -1,0 +1,482 @@
+{
+  "afton": {
+    "scoring": "Afton (ESPN rules)",
+    "games": 1300,
+    "maeAll": {
+      "ours": 5.45,
+      "baseline": 5.71
+    },
+    "sameGamesWithEspn": {
+      "n": 1219,
+      "mae": {
+        "ours": 5.44,
+        "baseline": 5.67,
+        "espn": 5.3
+      },
+      "pairwiseOrder": {
+        "ours": 0.64,
+        "baseline": 0.627,
+        "espn": 0.66
+      }
+    },
+    "byPosition": {
+      "QB": {
+        "n": 201,
+        "ours": 6.38,
+        "baseline": 6.28,
+        "espn": 6.07
+      },
+      "RB": {
+        "n": 334,
+        "ours": 5.6,
+        "baseline": 6.08,
+        "espn": 5.5
+      },
+      "WR": {
+        "n": 456,
+        "ours": 5.21,
+        "baseline": 5.38,
+        "espn": 5.13
+      },
+      "TE": {
+        "n": 228,
+        "ours": 4.82,
+        "baseline": 5.11,
+        "espn": 4.66
+      }
+    },
+    "blend": {
+      "QB": {
+        "modelWeight": 0.5,
+        "chosenOnEarlyWeeks": 0.5,
+        "testMae": {
+          "blend": 6.2,
+          "model": 6.2,
+          "baseline": 6.44
+        },
+        "testGames": 135
+      },
+      "RB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.79,
+          "model": 5.79,
+          "baseline": 6.1
+        },
+        "testGames": 214
+      },
+      "WR": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.16,
+          "model": 5.16,
+          "baseline": 5.36
+        },
+        "testGames": 288
+      },
+      "TE": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 4.71,
+          "model": 4.71,
+          "baseline": 4.84
+        },
+        "testGames": 145
+      }
+    }
+  },
+  "halfPpr": {
+    "scoring": "Half PPR",
+    "games": 1300,
+    "maeAll": {
+      "ours": 5.45,
+      "baseline": 5.71
+    },
+    "sameGamesWithEspn": {
+      "n": 1219,
+      "mae": {
+        "ours": 5.44,
+        "baseline": 5.67,
+        "espn": 5.3
+      },
+      "pairwiseOrder": {
+        "ours": 0.64,
+        "baseline": 0.627,
+        "espn": 0.66
+      }
+    },
+    "byPosition": {
+      "QB": {
+        "n": 201,
+        "ours": 6.38,
+        "baseline": 6.28,
+        "espn": 6.07
+      },
+      "RB": {
+        "n": 334,
+        "ours": 5.6,
+        "baseline": 6.08,
+        "espn": 5.5
+      },
+      "WR": {
+        "n": 456,
+        "ours": 5.21,
+        "baseline": 5.38,
+        "espn": 5.13
+      },
+      "TE": {
+        "n": 228,
+        "ours": 4.82,
+        "baseline": 5.11,
+        "espn": 4.66
+      }
+    },
+    "blend": {
+      "QB": {
+        "modelWeight": 0.5,
+        "chosenOnEarlyWeeks": 0.5,
+        "testMae": {
+          "blend": 6.2,
+          "model": 6.2,
+          "baseline": 6.44
+        },
+        "testGames": 135
+      },
+      "RB": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.79,
+          "model": 5.79,
+          "baseline": 6.1
+        },
+        "testGames": 214
+      },
+      "WR": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 5.16,
+          "model": 5.16,
+          "baseline": 5.36
+        },
+        "testGames": 288
+      },
+      "TE": {
+        "modelWeight": 1,
+        "chosenOnEarlyWeeks": 1,
+        "testMae": {
+          "blend": 4.71,
+          "model": 4.71,
+          "baseline": 4.84
+        },
+        "testGames": 145
+      }
+    }
+  },
+  "specialTeams": {
+    "halfPpr": {
+      "K": {
+        "train": 514,
+        "test": 234,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0
+        },
+        "maeTest": {
+          "ours": 3.87,
+          "baseline8": 4.05
+        }
+      },
+      "DST": {
+        "train": 544,
+        "test": 242,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0.4
+        },
+        "maeTest": {
+          "ours": 4.05,
+          "baseline8": 4.35
+        }
+      }
+    },
+    "afton": {
+      "K": {
+        "train": 514,
+        "test": 234,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0
+        },
+        "maeTest": {
+          "ours": 0,
+          "baseline8": 0
+        }
+      },
+      "DST": {
+        "train": 544,
+        "test": 242,
+        "params": {
+          "halfLife": 20,
+          "kickerEnvExponent": 0,
+          "defenseOpponentCoefficient": 0.4
+        },
+        "maeTest": {
+          "ours": 4.29,
+          "baseline8": 4.73
+        }
+      }
+    }
+  },
+  "vacatedCarries": {
+    "afton": {
+      "exponent": 0.75,
+      "chosenOn2025": 0.75,
+      "train": 69,
+      "test": 38,
+      "testRmse": {
+        "adjusted": 7.14,
+        "unadjusted": 7.39
+      }
+    }
+  },
+  "outcomeSpread": {
+    "QB": {
+      "train2025": 542,
+      "test2026Weeks5Plus": 107,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.832,
+        "refit on 2025 and 2026": 0.832,
+        "2025 shape, width set on 2026": 0.813
+      },
+      "adopted": "2025 shape, width set on 2026",
+      "coverage2026": 0.803
+    },
+    "RB": {
+      "train2025": 806,
+      "test2026Weeks5Plus": 167,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.778,
+        "refit on 2025 and 2026": 0.754,
+        "2025 shape, width set on 2026": 0.707
+      },
+      "adopted": "2025 only",
+      "coverage2026": 0.82
+    },
+    "WR": {
+      "train2025": 1186,
+      "test2026Weeks5Plus": 226,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.765,
+        "refit on 2025 and 2026": 0.779,
+        "2025 shape, width set on 2026": 0.792
+      },
+      "adopted": "2025 shape, width set on 2026",
+      "coverage2026": 0.803
+    },
+    "TE": {
+      "train2025": 475,
+      "test2026Weeks5Plus": 116,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.716,
+        "refit on 2025 and 2026": 0.741,
+        "2025 shape, width set on 2026": 0.802
+      },
+      "adopted": "2025 shape, width set on 2026",
+      "coverage2026": 0.803
+    },
+    "K": {
+      "train2025": 514,
+      "test2026Weeks5Plus": 115,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.774,
+        "refit on 2025 and 2026": 0.765,
+        "2025 shape, width set on 2026": 0.757
+      },
+      "adopted": "2025 only",
+      "coverage2026": 0.803
+    },
+    "DST": {
+      "train2025": 544,
+      "test2026Weeks5Plus": 114,
+      "coverageWeeks5Plus": {
+        "2025 only": 0.851,
+        "refit on 2025 and 2026": 0.833,
+        "2025 shape, width set on 2026": 0.807
+      },
+      "adopted": "2025 shape, width set on 2026",
+      "coverage2026": 0.802
+    },
+    "wind": {
+      "chosenOn2025": {
+        "windThresholdKph": 10,
+        "windCoefficient": -0.09
+      },
+      "adopted": {
+        "windThresholdKph": 10,
+        "windCoefficient": -0.09
+      },
+      "gamesWithForecast": 247,
+      "windyTest": 500,
+      "windyTestRmse": {
+        "adjusted": 6.109,
+        "unadjusted": 6.13
+      }
+    },
+    "winProbability": {
+      "trainPairs": 5399,
+      "testPairs": 1200,
+      "varianceScale": 1.4,
+      "brier2026": 0.2293,
+      "coinFlip": 0.25,
+      "calibration2026": [
+        {
+          "from": 0,
+          "n": 47,
+          "predicted": 0.153,
+          "actual": 0.085
+        },
+        {
+          "from": 0.2,
+          "n": 329,
+          "predicted": 0.317,
+          "actual": 0.331
+        },
+        {
+          "from": 0.4,
+          "n": 467,
+          "predicted": 0.5,
+          "actual": 0.507
+        },
+        {
+          "from": 0.6,
+          "n": 309,
+          "predicted": 0.684,
+          "actual": 0.605
+        },
+        {
+          "from": 0.8,
+          "n": 48,
+          "predicted": 0.847,
+          "actual": 0.792
+        }
+      ]
+    }
+  },
+  "questionable": {
+    "train": 189,
+    "test": 86,
+    "playChance": {
+      "fitted2025": 0.683,
+      "observed2026": 0.628
+    },
+    "whenPlaying": {
+      "fitted2025": 0.852,
+      "adopted": 0.852
+    },
+    "playedTest2026": {
+      "n": 54,
+      "rmse": {
+        "discounted": 5.591,
+        "undiscounted": 5.745
+      },
+      "mae": {
+        "discounted": 4.569,
+        "undiscounted": 4.834
+      }
+    },
+    "expectedTest2026": {
+      "mae": {
+        "expected": 5.271,
+        "undiscounted": 6.478
+      }
+    }
+  },
+  "replacementQuarterback": {
+    "train": 19,
+    "test": 6,
+    "trainRmse": {
+      "floored": 9.49,
+      "own": 9.61
+    },
+    "testRmse": {
+      "floored": 9.17,
+      "own": 10.79
+    },
+    "testMae": {
+      "floored": 8.14,
+      "own": 9.79
+    },
+    "line": {
+      "passing_yards": 179,
+      "completions": 17.368,
+      "attempts": 27.053,
+      "passing_tds": 1,
+      "passing_interceptions": 0.947,
+      "rushing_yards": 19.263,
+      "carries": 3.947,
+      "rushing_tds": 0.211,
+      "rushing_fumbles_lost": 0.211,
+      "sack_fumbles_lost": 0.211,
+      "passing_2pt_conversions": 0.158
+    },
+    "adopted": true,
+    "testCases": [
+      {
+        "name": "Marcus Mariota",
+        "team": "WAS",
+        "week": 3,
+        "own": 9.32,
+        "floored": 12.41,
+        "actual": 20.42
+      },
+      {
+        "name": "Marcus Mariota",
+        "team": "WAS",
+        "week": 4,
+        "own": 13.34,
+        "floored": 13.34,
+        "actual": 5.34
+      },
+      {
+        "name": "Tyson Bagent",
+        "team": "CHI",
+        "week": 4,
+        "own": 0.81,
+        "floored": 11.93,
+        "actual": 8.82
+      },
+      {
+        "name": "Tyler Huntley",
+        "team": "BAL",
+        "week": 5,
+        "own": 9.04,
+        "floored": 12.34,
+        "actual": 24.04
+      },
+      {
+        "name": "Jayden Daniels",
+        "team": "WAS",
+        "week": 5,
+        "own": 17.45,
+        "floored": 17.45,
+        "actual": 32.26
+      },
+      {
+        "name": "Tanner McKee",
+        "team": "PHI",
+        "week": 6,
+        "own": 14.44,
+        "floored": 15.79,
+        "actual": 12.6
+      }
+    ]
+  }
+}

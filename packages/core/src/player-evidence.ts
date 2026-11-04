@@ -30,6 +30,7 @@ import {
 } from './fantasy-projection.js';
 import {
   fantasyModelWeight,
+  replacementQuarterbackLine,
   fantasyOutcomeSpread,
   questionableSettings,
   specialTeamsSettings,
@@ -68,6 +69,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
   const windOn = input.preferences?.projectionAdjustments?.wind !== false;
   const carriesOn = input.preferences?.projectionAdjustments?.vacatedCarries !== false;
   const questionableOn = input.preferences?.projectionAdjustments?.questionable !== false;
+  const replacementOn = input.preferences?.projectionAdjustments?.replacementQuarterback !== false;
   const forecast =
     input.scope === 'week' ? undefined : prepareFantasyForecast(input.league, input.data, input);
   const history = historicalPlayerGames(input.data, input);
@@ -353,6 +355,7 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
               carriesOn ? vacatedCarryExponent : 0,
               windOn ? weatherSettings : undefined,
               questionableOn ? questionableSettings : undefined,
+              replacementOn ? replacementQuarterbackLine : undefined,
             )
         : undefined;
     if ([...groups.values()].some((group) => group.length > 1))
@@ -445,8 +448,10 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
       const recentAverage = completeScoring
         ? mean(evidence.historicalPoints.slice(0, 8))
         : undefined;
+      // A backup's recent average is his mop-up games, which the replacement line is correcting.
+      const replacing = (own as { replacedQuarterback?: string }).replacedQuarterback;
       evidence.projectedPoints =
-        weight < 1 && recentAverage !== undefined
+        weight < 1 && recentAverage !== undefined && !replacing
           ? weight * own.points + (1 - weight) * recentAverage
           : own.points;
       evidence.projectionScope = 'week';
@@ -550,6 +555,10 @@ export function buildPlayerEvidence(input: PlayerEvidenceInput): PlayerAdviceEvi
             description:
               'Teammates listed Out or Doubtful on the NFL injury report; their recent carries raise this back’s rushing projection (fitted on 2025, checked on 2026).',
           },
+        );
+      if (replacing)
+        evidence.warnings.push(
+          `Expected to start for ${replacing}, who is listed Out or Doubtful: projected at no less than a typical replacement starter (fitted on 2025, checked on 2026).`,
         );
       evidence.warnings.push(
         'Sidekick projections are for a player who plays. Players listed Questionable are discounted and counted at their chance of playing in lineups; running backs get extra carries when a teammate back is listed Out or Doubtful, and forecast wind is applied inside 36 hours of kickoff. Late role changes and news after the last data refresh are not included.',

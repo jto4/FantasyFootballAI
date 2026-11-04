@@ -43,7 +43,12 @@ export interface UserPreferences {
   /** How lineups are chosen from the same projections (see lineupValue). */
   lineupStrategy?: LineupStrategy;
   /** Turn off individual model adjustments; both are on unless set to false. */
-  projectionAdjustments?: { wind?: boolean; vacatedCarries?: boolean; questionable?: boolean };
+  projectionAdjustments?: {
+    wind?: boolean;
+    vacatedCarries?: boolean;
+    questionable?: boolean;
+    replacementQuarterback?: boolean;
+  };
   playerNudges?: PlayerNudge[];
   watchlist?: PlayerRef[];
   /** Overrides the detected redraft, keeper or dynasty format, by league id. */
@@ -188,9 +193,15 @@ export function isValidPreferences(
     projectionAdjustments !== undefined &&
     !(
       isObject(projectionAdjustments) &&
-      onlyKeys(projectionAdjustments, ['wind', 'vacatedCarries', 'questionable']) &&
+      onlyKeys(projectionAdjustments, [
+        'wind',
+        'vacatedCarries',
+        'questionable',
+        'replacementQuarterback',
+      ]) &&
       optionalBoolean(projectionAdjustments.wind) &&
       optionalBoolean(projectionAdjustments.vacatedCarries) &&
+      optionalBoolean(projectionAdjustments.replacementQuarterback) &&
       optionalBoolean(projectionAdjustments.questionable)
     )
   )
@@ -350,6 +361,7 @@ export function hasProjectionChanges(
     preferences?.playerNudges?.some((nudge) => nudge.leagueId === leagueId) ||
     preferences?.projectionAdjustments?.wind === false ||
     preferences?.projectionAdjustments?.vacatedCarries === false ||
-    preferences?.projectionAdjustments?.questionable === false,
+    preferences?.projectionAdjustments?.questionable === false ||
+    preferences?.projectionAdjustments?.replacementQuarterback === false,
   );
 }

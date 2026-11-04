@@ -204,7 +204,7 @@ it('withholds duplicate pagination and oversized responses without unbounded rea
   expect(tooLarge.warnings).toHaveLength(1);
 });
 
-it('keeps signed derived projection fields separate while rejecting negative modeled event counts', () => {
+it('keeps signed derived projection fields separate while withholding negative modeled event counts', () => {
   const value = fixture();
   Object.assign(value.players[0]!.player.stats[1]!.stats, {
     213: -0.012,
@@ -215,22 +215,22 @@ it('keeps signed derived projection fields separate while rejecting negative mod
   expect(result[0]!.stats.receptions).toBe(4.5);
   expect(Object.keys(result[0]!.stats)).not.toContain('213');
   value.players[0]!.player.stats[1]!.stats['53'] = -1;
-  expect(() => parsePublicPlayerForecasts(value, 2026, source)).toThrow('event count');
+  expect(parsePublicPlayerForecasts(value, 2026, source)).toHaveLength(result.length - 1);
 });
 
-it('rounds the publisher’s tiny negative event expectations to zero but rejects real negatives', () => {
+it('rounds the publisher’s small negative event expectations to zero but withholds real negatives', () => {
   const tiny = fixture();
   const week = tiny.players[0]!.player.stats[1]!;
-  // −0.01 receiving touchdowns at 6 points changes the applied total by −0.06.
-  week.stats = { 42: 65.5, 53: 4.5, 43: -0.01 };
-  week.appliedTotal = 10.99;
+  // −0.09 receiving touchdowns, as ESPN published in 2026, at 6 points changes the total by −0.54.
+  week.stats = { 42: 65.5, 53: 4.5, 43: -0.09 };
+  week.appliedTotal = 10.51;
   const rows = parsePublicPlayerForecasts(tiny, 2026, source);
   expect(rows[0]!.stats.receiving_tds).toBe(0);
   const real = fixture();
   const bad = real.players[0]!.player.stats[1]!;
-  bad.stats = { 42: 65.5, 53: 4.5, 43: -0.2 };
-  bad.appliedTotal = 9.85;
-  expect(() => parsePublicPlayerForecasts(real, 2026, source)).toThrow(
-    'Invalid projected event count.',
-  );
+  const before = parsePublicPlayerForecasts(real, 2026, source).length;
+  bad.stats = { 42: 65.5, 53: 4.5, 43: -0.5 };
+  bad.appliedTotal = 8.05;
+  // One bad player-week is withheld; the rest of the page survives.
+  expect(parsePublicPlayerForecasts(real, 2026, source)).toHaveLength(before - 1);
 });

@@ -14,12 +14,14 @@ test('the props board compares lines with projections and hands a prop to bet an
       .getByRole('button', { name: 'Player props', exact: true })
       .click();
     const board = page.getByRole('region', { name: /Player props/ });
+    // Passing yards take the line as is, so the row shows under All rather than Leans.
+    await board.getByRole('group', { name: 'Show' }).getByRole('button', { name: 'All' }).click();
     const row = board.getByRole('row', { name: /Alex Quarterback/ });
     await expect(row).toContainText('Passing yards 265.5');
     await expect(row).toContainText('319.2 → 312.5');
     await expect(row).toContainText('Over 3 of 4');
-    await expect(row).toContainText('54% over · fair 312.5');
-    await expect(row).toContainText('Over · slight');
+    await expect(row).toContainText('Our estimate 312.5');
+    await expect(row.locator('.lean-chip')).toHaveCount(0);
     await expect(board.getByLabel('Lean record')).toContainText('Lean record 0–0');
     await row.getByRole('button', { name: 'Analyze', exact: true }).click();
     await expect(page.getByRole('combobox', { name: 'Bet type', exact: true })).toHaveValue(

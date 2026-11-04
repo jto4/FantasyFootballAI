@@ -716,3 +716,48 @@ scale still 1.4. Mean absolute error over all 2026 skill-player games: 5.39 (8-g
   the same NFL week only.
 - **Reports** hide drafts replaced by a newer draft of the same report for the same league, and
   can delete them in one confirmed step; sent and in-delivery reports are never touched.
+
+## Week 8 review: replacement quarterbacks and props by stat (November 3, 2026)
+
+Week 8 of 2026, skill players under Afton's rules: mean absolute error 5.77 for the model, 5.56
+for ESPN (benchmark) and 6.00 for the 8-game average, on 142 shared games. Season: 5.44, 5.30 and
+5.67. Likely ranges held 74% of results in week 8 and about 80% over the season. The largest misses
+were in-game events no pregame data shows (Lamar Jackson leaving after one pass; Gardner Minshew
+replacing Jacoby Brissett mid-game) and big games by low-projected players. Reports:
+`docs/research/2026-11-03-fantasy-projection-backtest.json`,
+`docs/research/2026-11-03-prop-line-review.json`.
+
+**Replacement quarterbacks.** A backup's history is mostly mop-up snaps, so one starting for a
+ruled-out main passer was projected for as few as two attempts and then threw 25–45. When the
+team's main passer over its last three games (at least half the attempts) is Out or Doubtful and
+the player is first or second on the depth chart, he now gets at least the average stat line of
+2025's 19 replacements, only if that scores higher under the league's rules. The QB blend with the
+recent average is skipped for him, because that average is what is being corrected. RMSE 9.61 →
+9.49 on 2025 and 10.79 → 9.17 on the 6 cases in 2026. That is a small sample; the adjustment has a
+Personalize switch and, like the others, leaves recorded predictions on the unadjusted model when
+off.
+
+Tested and not adopted: a discount for teammates of a replaced quarterback (fitted 0.85 on 2025,
+but 2026 RMSE got slightly worse; tight ends fell about 25% in both years, on only 16 games), and
+adjustments for implied team total, spread, game total, home field and recent form (each under
+0.5% of RMSE). Quarterbacks are not biased overall (2025 stats match to within 1%), so no general
+correction was made. A refit no longer flips a settled blend weight unless the later weeks disagree
+by more than 0.05 points; the QB weight stays 0.5.
+
+**Props by stat.** Rebuilt from data before each game at the saved closing lines (matching the
+saved week 7 record closely: 75–58 against 75–54), the model's best weight against the line was 0
+for carries, rushing yards, attempts, completions and passing yards on week 7 and again on week 8,
+their leans went 35–79, and the line beat the model on carries by about a full carry. Those stats
+now show a projection but no lean, which applies the existing rule (a Brier score not below 0.25
+means weight 0) stat by stat. Receiving stats stay at 0.25 (Brier 0.249 on week 8; leans 117–70 over
+the two weeks). Week 7's refit chose 0.8 for receiving and lost to 0.25 on week 8, so the automatic refit
+now waits for 500 graded props rather than 150, and uses only stats still priced.
+
+**Leans are recorded in the background.** They were saved only when the Props page was opened, so
+week 8 went unrecorded although its lines were captured. The background capture now refreshes the
+board too. Rebuilt weeks are analysis only and are not added to the saved record.
+
+**ESPN benchmark.** One player's forecast of −0.087 touchdowns made the parser reject a whole page
+of 100 top players, cutting the benchmark from about 1,200 games to 600. Small negatives now round
+to zero and a materially negative value withholds only that player-week. The app itself still
+downloads no ESPN forecasts.

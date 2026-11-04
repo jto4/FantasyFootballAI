@@ -633,6 +633,19 @@ export function PersonalizeSection({
           <label>
             <input
               type="checkbox"
+              checked={preferences.projectionAdjustments?.replacementQuarterback !== false}
+              onChange={(event) =>
+                set('projectionAdjustments', {
+                  ...preferences.projectionAdjustments,
+                  replacementQuarterback: event.target.checked,
+                })
+              }
+            />{' '}
+            Project a backup quarterback as a starter when the starter is ruled out
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={preferences.projectionAdjustments?.questionable !== false}
               onChange={(event) =>
                 set('projectionAdjustments', {

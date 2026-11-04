@@ -9,7 +9,7 @@ import {
 } from '@sidekick/integrations';
 import { createChatRouter } from './chat-routes.js';
 import { devFaults } from './dev-faults.js';
-import { createPropBoardRouter, PropLeanStore } from './prop-board-routes.js';
+import { createPropBoard, PropLeanStore } from './prop-board-routes.js';
 import { PropLineLedger, startPropLineCapture } from './prop-line-ledger.js';
 import { ChatStore } from './chat-store.js';
 import { resolveConfiguredAI } from './ai-runtime.js';
@@ -528,26 +528,26 @@ app.use(
 const propLineLedger = new PropLineLedger(
   researchJoin(researchDirname(store.path), 'prop-lines.sqlite'),
 );
+const propLeans = new PropLeanStore(researchJoin(researchDirname(store.path), 'prop-leans.sqlite'));
+const propBoard = createPropBoard({
+  data: publicFootballData,
+  props: publicPropLines,
+  store,
+  leans: propLeans,
+  ledger: propLineLedger,
+  usage: publicUsageData,
+});
+app.use(propBoard.router);
 const propLineCapture = startPropLineCapture(
   {
     data: publicFootballData,
     props: publicPropLines,
     ledger: propLineLedger,
     enabled: () => store.settingsSnapshot().preferences?.props?.lineCapture !== false,
+    afterCapture: () => propBoard.refresh(),
   },
   (error) =>
     logEvent('warn', 'props.capture.failed', { component: 'advice', errorName: errorName(error) }),
-);
-const propLeans = new PropLeanStore(researchJoin(researchDirname(store.path), 'prop-leans.sqlite'));
-app.use(
-  createPropBoardRouter({
-    data: publicFootballData,
-    props: publicPropLines,
-    store,
-    leans: propLeans,
-    ledger: propLineLedger,
-    usage: publicUsageData,
-  }),
 );
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
 app.use(

@@ -66,6 +66,7 @@ it('captures every game of the week once a day and near-kickoff games on each ti
   const nextWeek = game('2026_08_KC_SEA', '2026-11-02T00:20:00.000Z', 8);
   const fetched: string[] = [];
   const ledger = new PropLineLedger(':memory:');
+  let refreshed = 0;
   const capture = startPropLineCapture({
     data: {
       get: async () =>
@@ -81,9 +82,13 @@ it('captures every game of the week once a day and near-kickoff games on each ti
     },
     ledger,
     now: () => now,
+    afterCapture: async () => {
+      refreshed++;
+    },
   });
   await capture.tick();
   expect(fetched).toEqual([soon.id, later.id]);
+  expect(refreshed).toBe(1);
   now += 20 * 60_000;
   fetched.length = 0;
   await capture.tick();
