@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { propLineKey, type FootballGame, type PropLine } from '@sidekick/core';
-import { PropLineLedger, startPropLineCapture } from './prop-line-ledger.js';
+import { PropLineLedger, isPropLineHistory, startPropLineCapture } from './prop-line-ledger.js';
 
 const game = (id: string, kickoffAt: string, week = 7): FootballGame => ({
   id,
@@ -114,4 +114,30 @@ it('gives the latest line per player and stat for the chosen games, averaged acr
   expect([...lines.keys()]).toEqual([propLineKey(sunday.id, 'Patrick Mahomes')]);
   expect(lines.get(propLineKey(sunday.id, 'Patrick Mahomes'))).toEqual({ passing_yards: 227.5 });
   ledger.close();
+});
+
+it('condenses older seasons to their first and closing lines and merges backups without overwriting', () => {
+  const ledger = new PropLineLedger(':memory:');
+  const old = game('2025_07_KC_SEA', '2025-10-26T00:20:00.000Z');
+  const current = game('2026_07_KC_SEA', '2026-10-26T00:20:00.000Z');
+  ledger.record([line(old.id, 220.5)], [old], '2025-10-23T12:00:00.000Z');
+  ledger.record([line(old.id, 224.5)], [old], '2025-10-24T12:00:00.000Z');
+  ledger.record([line(current.id, 240.5)], [current], '2026-10-23T12:00:00.000Z');
+  expect(ledger.condenseBefore(2026)).toBe(1);
+  expect(ledger.condenseBefore(2026)).toBe(0);
+  const [before] = ledger.list(old.id);
+  expect(before).toMatchObject({ daily: {}, first: { line: 220.5 }, closing: { line: 224.5 } });
+  expect(Object.keys(ledger.list(current.id)[0]!.daily)).toHaveLength(1);
+
+  const copy = ledger.list();
+  const restored = new PropLineLedger(':memory:');
+  restored.record([line(current.id, 250.5)], [current], '2026-10-24T12:00:00.000Z');
+  restored.merge(copy);
+  expect(restored.list()).toHaveLength(2);
+  // The line already here is the newer one.
+  expect(restored.list(current.id)[0]!.closing.line).toBe(250.5);
+  expect(copy.every(isPropLineHistory)).toBe(true);
+  expect(isPropLineHistory({ ...copy[0], closing: { line: 'x' } })).toBe(false);
+  ledger.close();
+  restored.close();
 });

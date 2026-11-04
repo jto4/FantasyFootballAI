@@ -26,7 +26,7 @@ function isMessage(value: unknown): value is ChatMessage {
     (m.lookups === undefined || Array.isArray(m.lookups))
   );
 }
-function isConversation(value: unknown): value is ChatConversation {
+export function isConversation(value: unknown): value is ChatConversation {
   if (!value || typeof value !== 'object') return false;
   const c = value as Record<string, unknown>;
   return (
@@ -41,8 +41,9 @@ function isConversation(value: unknown): value is ChatConversation {
 }
 
 /**
- * Chat history, kept apart from app state so it never enters reports, exports or backups of the
- * main store. Only the newest conversations and messages are kept.
+ * Chat history, kept apart from app state so it never enters reports or plain database exports.
+ * It travels only inside the encrypted portable backup, never the unencrypted download.
+ * Only the newest conversations and messages are kept.
  */
 export class ChatStore {
   private db: Database.Database;
@@ -77,6 +78,29 @@ export class ChatStore {
     if (!row) return undefined;
     const value: unknown = JSON.parse(row.payload);
     return isConversation(value) ? value : undefined;
+  }
+  /** Every saved conversation with its messages, for backups. */
+  all(): ChatConversation[] {
+    return (
+      this.db.prepare('SELECT payload FROM conversations').all() as { payload: string }[]
+    ).flatMap((row) => {
+      const value: unknown = JSON.parse(row.payload);
+      return isConversation(value) ? [value] : [];
+    });
+  }
+  /** Adds conversations from a backup; one already here may have continued, so it stays. */
+  merge(conversations: ChatConversation[]) {
+    const write = this.db.prepare(
+      'INSERT INTO conversations (id, updated_at, payload) VALUES (?, ?, ?) ON CONFLICT(id) DO NOTHING',
+    );
+    this.db.transaction(() => {
+      for (const c of conversations) write.run(c.id, c.updatedAt, JSON.stringify(c));
+    })();
+    this.db
+      .prepare(
+        'DELETE FROM conversations WHERE id NOT IN (SELECT id FROM conversations ORDER BY updated_at DESC LIMIT ?)',
+      )
+      .run(maxConversations);
   }
   save(conversation: ChatConversation) {
     const next = { ...conversation, messages: conversation.messages.slice(-maxMessages) };

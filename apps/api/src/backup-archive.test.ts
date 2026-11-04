@@ -42,6 +42,55 @@ afterEach(async () => {
 });
 
 describe('portable local backups', () => {
+  it('carries prop and chat history through a backup, and rejects damaged history', async () => {
+    const line = {
+      key: 'k',
+      gameId: '2026_07_KC_SEA',
+      playerName: 'Fictional Passer',
+      stat: 'passing_yards' as const,
+      sportsbook: 'DraftKings',
+      source: 'espn' as const,
+      first: { line: 220.5, at: '2026-10-23T12:00:00Z' },
+      daily: {},
+      closing: { line: 224.5, at: '2026-10-24T12:00:00Z' },
+      observations: 2,
+    };
+    const lean = {
+      key: 'l',
+      gameId: '2026_07_KC_SEA',
+      playerName: 'Fictional Catcher',
+      stat: 'receptions' as const,
+      line: 4.5,
+      side: 'over' as const,
+      strength: 'slight' as const,
+      projection: 5,
+      observedAt: '2026-10-24T12:00:00Z',
+    };
+    const chat = {
+      id: 'c',
+      title: 'Lineup',
+      createdAt: '2026-10-24T12:00:00Z',
+      updatedAt: '2026-10-24T12:00:00Z',
+      messages: [{ role: 'user' as const, text: 'Who starts?', at: '2026-10-24T12:00:00Z' }],
+    };
+    const database = Buffer.concat([
+      Buffer.from('SQLite format 3\0', 'ascii'),
+      Buffer.from('database'),
+    ]);
+    const path = join(tmpdir(), 'missing-history-backup.sqlite');
+    const history = { propLines: [line], propLeans: [lean], chats: [chat] };
+    const archive = await createPortableBackup(database, path, history);
+    expect(parsePortableBackup(archive).history).toEqual(history);
+    // Without history, the plain download has nothing to carry and restores as before.
+    const plain = await createPortableBackup(database, path);
+    expect(parsePortableBackup(plain).history).toBeUndefined();
+    const damaged = await createPortableBackup(database, path, {
+      ...history,
+      propLeans: [{ ...lean, line: 'bad' }] as never,
+    });
+    expect(() => parsePortableBackup(damaged)).toThrow(/history/);
+  });
+
   it('round-trips the database and private generated images', async () => {
     directory = await mkdtemp(join(tmpdir(), 'sidekick-portable-backup-'));
     const databasePath = join(directory, 'state.sqlite');

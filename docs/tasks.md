@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (saved data): when prediction records fill up, the oldest graded one now makes room
+  instead of new ones being dropped. Prop lines have a game index, and older seasons keep only
+  their first and closing lines. Encrypted backups now carry prop lines, leans and Ask chats, which
+  restore by merging; the unencrypted download still leaves them out.
 - November 4 (app test fixes): from a full walk of the real app. Home's Fix my lineup goes to the
   swaps, with a link to make them on the platform and the score and win chance after them; failed
   reports say why. The league charts stay on Home at the owner's request. Waivers say when no pickup

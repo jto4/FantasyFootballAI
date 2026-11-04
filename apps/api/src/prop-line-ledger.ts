@@ -13,6 +13,28 @@ import {
 } from '@sidekick/core';
 import type { PublicFootballData, PublicPropLines } from '@sidekick/integrations';
 
+const isObservation = (value: unknown) =>
+  Boolean(value) &&
+  typeof value === 'object' &&
+  Number.isFinite((value as PropLineObservation).line) &&
+  typeof (value as PropLineObservation).at === 'string';
+
+/** A saved line read back from a backup file, which is outside this app's control. */
+export function isPropLineHistory(value: unknown): value is PropLineHistory {
+  if (!value || typeof value !== 'object') return false;
+  const line = value as Record<string, unknown>;
+  return (
+    ['key', 'gameId', 'playerName', 'stat', 'sportsbook', 'source'].every(
+      (field) => typeof line[field] === 'string' && (line[field] as string).length <= 300,
+    ) &&
+    isObservation(line.first) &&
+    isObservation(line.closing) &&
+    Boolean(line.daily) &&
+    typeof line.daily === 'object' &&
+    Object.values(line.daily as object).every(isObservation)
+  );
+}
+
 export interface PropLineObservation {
   line: number;
   overOdds?: number;
@@ -66,6 +88,8 @@ export class PropLineLedger {
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS lines (key TEXT PRIMARY KEY, game_id TEXT NOT NULL, payload TEXT NOT NULL) STRICT',
     );
+    // Projections read a week's games on every build, and the table grows all season.
+    this.db.exec('CREATE INDEX IF NOT EXISTS lines_by_game ON lines (game_id)');
     if (path !== ':memory:') chmodSync(path, 0o600);
   }
   /** Records lines seen at `at`; lines for games that have already kicked off are ignored. */
@@ -143,6 +167,35 @@ export class PropLineLedger {
       ]),
     );
   }
+  /**
+   * Drops the day-by-day prices from seasons before this one. The first and closing lines stay:
+   * they are what model reviews use, and the daily entries are most of a line's size.
+   */
+  condenseBefore(season: number) {
+    const rows = this.db
+      .prepare('SELECT key, payload FROM lines WHERE game_id < ?')
+      .all(`${season}_`) as { key: string; payload: string }[];
+    const write = this.db.prepare('UPDATE lines SET payload = ? WHERE key = ?');
+    let condensed = 0;
+    this.db.transaction(() => {
+      for (const row of rows) {
+        const line = JSON.parse(row.payload) as PropLineHistory;
+        if (!Object.keys(line.daily).length) continue;
+        write.run(JSON.stringify({ ...line, daily: {} }), row.key);
+        condensed++;
+      }
+    })();
+    return condensed;
+  }
+  /** Adds lines from a backup; a line already here is newer or the same, so it stays. */
+  merge(lines: PropLineHistory[]) {
+    const write = this.db.prepare(
+      'INSERT INTO lines (key, game_id, payload) VALUES (?, ?, ?) ON CONFLICT(key) DO NOTHING',
+    );
+    this.db.transaction(() => {
+      for (const line of lines) write.run(line.key, line.gameId, JSON.stringify(line));
+    })();
+  }
   summary() {
     const row = this.db
       .prepare('SELECT COUNT(*) AS lines, COUNT(DISTINCT game_id) AS games FROM lines')
@@ -198,7 +251,10 @@ export function startPropLineCapture(
         const snapshot = await deps.props.props(game).catch(() => undefined);
         if (snapshot) deps.ledger.record(snapshot.lines, [game], at);
       }
-      if (daily) lastDailyCapture = at.slice(0, 10);
+      if (daily) {
+        lastDailyCapture = at.slice(0, 10);
+        deps.ledger.condenseBefore(data.season);
+      }
       if (games.length) await deps.afterCapture?.();
     } catch (error) {
       onError(error);

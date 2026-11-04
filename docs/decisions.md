@@ -785,3 +785,12 @@ Tests on our own data, as no public source reports weekly accuracy gains for the
 - **Data limits.** nflverse participation (route data) has no in-season 2026 file. ffopportunity,
   FTN charting and participation are CC BY-SA, and snap counts come from Pro Football Reference,
   whose terms restrict tools built on scraped data; check these before any public release.
+
+## Saved data and backups (November 4, 2026)
+
+The app holds 47 MB and grows about 10–12 MB a season, mostly prop lines. Encrypted backups now
+include prop lines, prop leans and Ask chats in a validated `history.json` (manifest version 2;
+version 1 files still restore). Chats had deliberately stayed out of backups; the owner chose to
+include them. The unencrypted `GET /api/backup` download keeps them out. History merges on restore
+rather than replacing, so an older backup cannot erase records made since, and open database files
+are not swapped; the trade-off is that a deleted chat can come back from a backup.

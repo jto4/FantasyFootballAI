@@ -17,13 +17,21 @@ export function appendPredictionRecords(
   let bytes = Buffer.byteLength(JSON.stringify(previous)),
     omitted = 0;
   const added = [...previous];
+  const full = (extra: number) =>
+    added.length >= maximumPredictionRecords ||
+    bytes + extra > maximumPredictionBytes - maximumPredictionRecords * 160;
   for (const record of records) {
     if (ids.has(record.id)) continue;
     const size = Buffer.byteLength(JSON.stringify(record)) + 1;
-    if (
-      added.length >= maximumPredictionRecords ||
-      bytes + size > maximumPredictionBytes - maximumPredictionRecords * 160
-    ) {
+    // Full: the oldest graded record makes room, so the track record stays current. A forecast
+    // still waiting on its game is never given up for that, so with none graded this one waits.
+    while (full(size)) {
+      const oldest = added.findIndex((item) => item.status !== 'pending');
+      if (oldest < 0) break;
+      bytes -= Buffer.byteLength(JSON.stringify(added[oldest])) + 1;
+      added.splice(oldest, 1);
+    }
+    if (full(size)) {
       omitted++;
       continue;
     }

@@ -28,6 +28,21 @@ import type { PropLineLedger } from './prop-line-ledger.js';
  * Pre-kickoff prop leans and their graded results, kept apart from app state like market
  * research. A lean can change until kickoff; after that it is frozen and only graded.
  */
+/** A saved lean read back from a backup file, which is outside this app's control. */
+export function isPropLeanRecord(value: unknown): value is PropLeanRecord {
+  if (!value || typeof value !== 'object') return false;
+  const lean = value as Record<string, unknown>;
+  return (
+    ['key', 'gameId', 'playerName', 'stat', 'observedAt'].every(
+      (field) => typeof lean[field] === 'string' && (lean[field] as string).length <= 300,
+    ) &&
+    Number.isFinite(lean.line) &&
+    Number.isFinite(lean.projection) &&
+    (lean.side === 'over' || lean.side === 'under') &&
+    ['strong', 'moderate', 'slight'].includes(String(lean.strength))
+  );
+}
+
 export class PropLeanStore {
   private db: Database.Database;
   constructor(path: string) {
@@ -52,6 +67,21 @@ export class PropLeanStore {
   }
   delete(key: string) {
     this.db.prepare('DELETE FROM leans WHERE key = ?').run(key);
+  }
+  /** Every saved lean, for backups; `list` is capped for the board. */
+  all(): PropLeanRecord[] {
+    return (this.db.prepare('SELECT payload FROM leans').all() as { payload: string }[]).map(
+      (row) => JSON.parse(row.payload) as PropLeanRecord,
+    );
+  }
+  /** Adds leans from a backup; one already here may be graded since, so it stays. */
+  merge(records: PropLeanRecord[]) {
+    const write = this.db.prepare(
+      'INSERT INTO leans (key, payload) VALUES (?, ?) ON CONFLICT(key) DO NOTHING',
+    );
+    this.db.transaction(() => {
+      for (const record of records) write.run(record.key, JSON.stringify(record));
+    })();
   }
   save(record: PropLeanRecord) {
     this.db

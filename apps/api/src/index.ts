@@ -133,7 +133,11 @@ async function currentDatabaseBackup() {
   }
 }
 async function currentBackup() {
-  return createPortableBackup(await currentDatabaseBackup(), store.path);
+  return createPortableBackup(await currentDatabaseBackup(), store.path, {
+    propLines: propLineLedger.list(),
+    propLeans: propLeans.all(),
+    chats: chats.all(),
+  });
 }
 const routineBackups = new RoutineBackups({
   store,
@@ -277,15 +281,25 @@ app.use(
 app.use(
   createBackupRouter({
     currentBackup,
+    plainBackup: async () => createPortableBackup(await currentDatabaseBackup(), store.path),
     databaseBackup: currentDatabaseBackup,
     validateBackup: (database) => store.validateBackupBuffer(database),
     listSafetyBackups: () => store.listSafetyBackups(),
     readSafetyBackup: (name) => store.readSafetyBackup(name),
     deleteSafetyBackup: (name) => store.deleteSafetyBackup(name),
-    restoreBackup: async (database, images) => {
+    restoreBackup: async (database, images, history) => {
       await store.validateBackupBuffer(database);
       await routineBackups.disableAfterRestore();
-      return store.restoreFromBuffer(database, () => replaceLocalImages(store.path, images));
+      const safetyCopy = await store.restoreFromBuffer(database, () =>
+        replaceLocalImages(store.path, images),
+      );
+      // Merged, not replaced: an older backup must not erase prop records made since it was taken.
+      if (history) {
+        propLineLedger.merge(history.propLines);
+        propLeans.merge(history.propLeans);
+        chats.merge(history.chats);
+      }
+      return safetyCopy;
     },
     afterRestore: async () => {
       await store.purgeExpiredConversationSources();

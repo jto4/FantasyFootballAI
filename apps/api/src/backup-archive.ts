@@ -12,6 +12,11 @@ import {
   readLocalImage,
 } from './image-library.js';
 
+import type { PropLeanRecord } from '@sidekick/core';
+import { isConversation, type ChatConversation } from './chat-store.js';
+import { isPropLeanRecord } from './prop-board-routes.js';
+import { isPropLineHistory, type PropLineHistory } from './prop-line-ledger.js';
+
 const sqliteSignature = Buffer.from('SQLite format 3\0', 'ascii');
 const maximumDatabaseBytes = 50 * 1024 * 1024;
 const maximumArchiveBytes = 200 * 1024 * 1024;
@@ -80,21 +85,32 @@ export async function decryptPortableBackup(contents: Buffer, passphrase: string
   }
 }
 
+/** History kept outside the main database: prop lines and leans, and Ask conversations. */
+export interface BackupHistory {
+  propLines: PropLineHistory[];
+  propLeans: PropLeanRecord[];
+  chats: ChatConversation[];
+}
+
 export interface PortableBackupContents {
   database: Buffer;
   images: ImportedLocalImage[];
+  /** Absent in backups from versions that did not carry it. */
+  history?: BackupHistory;
 }
 
 /** Package the database and its separately stored generated images into one portable file. */
 export async function createPortableBackup(
   database: Buffer,
   databasePath: string,
+  history?: BackupHistory,
 ): Promise<Buffer> {
   if (!isSqlite(database) || database.length > maximumDatabaseBytes)
     throw new Error('Local database exceeds the portable backup limit.');
   const entries: Record<string, Uint8Array> = {
     'database.sqlite': database,
-    'manifest.json': Buffer.from(JSON.stringify({ format: 'sunday-sidekick-backup', version: 1 })),
+    'manifest.json': Buffer.from(JSON.stringify({ format: 'sunday-sidekick-backup', version: 2 })),
+    ...(history ? { 'history.json': Buffer.from(JSON.stringify(history)) } : {}),
   };
   const images = await listLocalImages(databasePath);
   if (images.length > maximumImageCount)
@@ -134,13 +150,14 @@ export function parsePortableBackup(contents: Buffer): PortableBackupContents {
     filter: ({ name, originalSize }) => {
       entryCount += 1;
       expandedBytes += originalSize;
-      if (entryCount > maximumImageCount + 2 || expandedBytes > maximumArchiveBytes)
+      if (entryCount > maximumImageCount + 3 || expandedBytes > maximumArchiveBytes)
         throw new Error('Backup archive exceeds its expanded size limit.');
       if (entryNames.has(name)) throw new Error('Backup archive repeats a file path.');
       entryNames.add(name);
       if (
         name !== 'database.sqlite' &&
         name !== 'manifest.json' &&
+        name !== 'history.json' &&
         !/^images\/[a-f\d]{8}-[a-f\d]{4}-[1-8][a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}\.(?:png|jpg|webp)$/i.test(
           name,
         )
@@ -164,14 +181,14 @@ export function parsePortableBackup(contents: Buffer): PortableBackupContents {
     !manifest ||
     typeof manifest !== 'object' ||
     (manifest as { format?: unknown }).format !== 'sunday-sidekick-backup' ||
-    (manifest as { version?: unknown }).version !== 1
+    ![1, 2].includes((manifest as { version?: unknown }).version as number)
   )
     throw new Error('Backup archive format is not supported.');
 
   const images: ImportedLocalImage[] = [];
   const imageIds = new Set<string>();
   for (const [name, bytes] of Object.entries(files)) {
-    if (name === 'database.sqlite' || name === 'manifest.json') continue;
+    if (name === 'database.sqlite' || name === 'manifest.json' || name === 'history.json') continue;
     const match = /^images\/([a-f\d-]{36})\.(png|jpg|webp)$/i.exec(name);
     if (!match) throw new Error('Backup archive contains an unsupported file.');
     const id = match[1]!.toLowerCase();
@@ -183,7 +200,22 @@ export function parsePortableBackup(contents: Buffer): PortableBackupContents {
       throw new Error('Backup archive contains an invalid generated image.');
     images.push({ id, mimeType, contents: Buffer.from(bytes) });
   }
-  return { database: Buffer.from(database), images };
+  const history = files['history.json'] ? parseHistory(files['history.json']) : undefined;
+  return { database: Buffer.from(database), images, ...(history ? { history } : {}) };
+}
+
+function parseHistory(bytes: Uint8Array): BackupHistory {
+  const value = JSON.parse(Buffer.from(bytes).toString('utf8')) as Partial<BackupHistory> | null;
+  if (
+    !Array.isArray(value?.propLines) ||
+    !Array.isArray(value?.propLeans) ||
+    !Array.isArray(value?.chats) ||
+    !value.propLines.every(isPropLineHistory) ||
+    !value.propLeans.every(isPropLeanRecord) ||
+    !value.chats.every(isConversation)
+  )
+    throw new Error('Backup archive history is not valid.');
+  return { propLines: value.propLines, propLeans: value.propLeans, chats: value.chats };
 }
 
 function isSqlite(contents: Buffer): boolean {

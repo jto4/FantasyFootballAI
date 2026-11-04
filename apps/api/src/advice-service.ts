@@ -1040,7 +1040,7 @@ export function createAdviceService(deps: AdviceDependencies) {
       const omitted = appendPredictionRecords(state, records);
       if (omitted)
         result.warnings.push(
-          'The prediction ledger reached its storage limit. This advice is saved, but some forecasts were not added to performance tracking. Export or clear the track record before recording more.',
+          'The prediction ledger is full of forecasts still waiting on games. This advice is saved, but some forecasts were not added to performance tracking.',
         );
     });
     return result;

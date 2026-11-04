@@ -6,16 +6,24 @@ import {
   decryptPortableBackup,
   encryptPortableBackup,
   parsePortableBackup,
+  type BackupHistory,
   validateBackupPassphrase,
 } from './backup-archive.js';
 
 export interface BackupRouteDependencies {
+  /** Always leaves the app encrypted: it carries chats and prop history. */
   currentBackup: () => Promise<Buffer>;
+  /** The unencrypted download, without that history; falls back only in test fixtures. */
+  plainBackup?: () => Promise<Buffer>;
   databaseBackup?: () => Promise<Buffer>;
   listSafetyBackups: () => Promise<Array<{ name: string; createdAt: string; size: number }>>;
   readSafetyBackup: (name: string) => Promise<Buffer | undefined>;
   deleteSafetyBackup: (name: string) => Promise<boolean>;
-  restoreBackup: (database: Buffer, images: ImportedLocalImage[]) => Promise<string>;
+  restoreBackup: (
+    database: Buffer,
+    images: ImportedLocalImage[],
+    history?: BackupHistory,
+  ) => Promise<string>;
   afterRestore: () => Promise<AppSettings>;
   validateBackup?: (
     database: Buffer,
@@ -44,7 +52,7 @@ export function createBackupRouter(dependencies: BackupRouteDependencies): Route
   router.get('/api/backup', async (_req, res) => {
     // Portable archives include generated images; desktop database moves use the raw copy above.
     try {
-      const archive = await dependencies.currentBackup();
+      const archive = await (dependencies.plainBackup ?? dependencies.currentBackup)();
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', 'attachment; filename="sunday-sidekick-backup.zip"');
       res.setHeader('Content-Length', archive.length);
@@ -123,7 +131,11 @@ export function createBackupRouter(dependencies: BackupRouteDependencies): Route
         }
         const archive = await decryptPortableBackup(req.body, passphrase);
         const contents = parsePortableBackup(archive);
-        const safetyCopy = await dependencies.restoreBackup(contents.database, contents.images);
+        const safetyCopy = await dependencies.restoreBackup(
+          contents.database,
+          contents.images,
+          contents.history,
+        );
         const settings = await dependencies.afterRestore();
         res.json({ restored: true, safetyCopy: basename(safetyCopy), settings });
       } catch (error) {
@@ -157,7 +169,18 @@ export function createBackupRouter(dependencies: BackupRouteDependencies): Route
         const passphrase = decodeURIComponent(req.get('x-sidekick-backup-passphrase') ?? '');
         const contents = parsePortableBackup(await decryptPortableBackup(req.body, passphrase));
         const counts = await dependencies.validateBackup(contents.database);
-        res.json({ valid: true, ...counts, images: contents.images.length });
+        res.json({
+          valid: true,
+          ...counts,
+          images: contents.images.length,
+          ...(contents.history
+            ? {
+                propLines: contents.history.propLines.length,
+                propLeans: contents.history.propLeans.length,
+                chats: contents.history.chats.length,
+              }
+            : {}),
+        });
       } catch {
         res
           .status(400)
