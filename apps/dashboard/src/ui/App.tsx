@@ -2,6 +2,10 @@ import { ConnectLeagueDialog } from './ConnectLeagueDialog';
 import { useWorkspaceRoute } from './hooks/useWorkspaceRoute';
 import { useLiveDashboard } from './hooks/useLiveDashboard';
 import { requestJson } from './api-client';
+import { useAiConnection } from './hooks/useAiConnection';
+import { useCredentialProviders } from './hooks/useCredentialProviders';
+import { useFootballNews } from './hooks/useFootballNews';
+import { useUnsavedEdits } from './hooks/useUnsavedEdits';
 import {
   isGenerationJob,
   isSavedReport,
@@ -49,15 +53,7 @@ import type { ScheduledRun } from './SchedulePage';
 
 import { LoadError, LoadingStatus } from './LoadFeedback.js';
 import { KeyboardShortcutsDialog, useKeyboardShortcuts } from './KeyboardShortcuts';
-import {
-  initialAppState,
-  isAppState,
-  isCredentialProviders,
-  isNewsSnapshot,
-  type AppState,
-  type CredentialProvider,
-  type NewsSnapshot,
-} from './app-state';
+import { initialAppState, isAppState, type AppState } from './app-state';
 import {
   pageLoaders,
   HelpPage,
@@ -95,8 +91,7 @@ export function App() {
     SearchTask,
     { type: 'delivery' }
   > | null>(null);
-  const [scheduleDirty, setScheduleDirty] = useState(false);
-  const [adviceDirty, setAdviceDirty] = useState(false);
+  const edits = useUnsavedEdits();
   const sidebarRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!sidebarRef.current) return;
@@ -111,24 +106,29 @@ export function App() {
     return () => observer.disconnect();
   }, []);
   const [state, setState] = useState<AppState>(initialAppState);
-  const [news, setNews] = useState<NewsSnapshot>({ items: [], stale: true });
-  const [credentialProviders, setCredentialProviders] = useState<CredentialProvider[]>([]);
-  const [testedRuntimeSignature, setTestedRuntimeSignature] = useState('');
-  const [settingsDirty, setSettingsDirty] = useState(false);
-  const [reportDirty, setReportDirty] = useState(false);
-  const [settingsNavigationKey, setSettingsNavigationKey] = useState(0);
+  const {
+    news,
+    refreshing: refreshingNews,
+    refresh: refreshNews,
+    receive: receiveNews,
+  } = useFootballNews((error) =>
+    showFailure('Football news couldn’t be updated. Try refreshing it again later.', error, 'news'),
+  );
+  const {
+    providers: credentialProviders,
+    refresh: refreshCredentials,
+    receive: receiveCredentials,
+  } = useCredentialProviders(() =>
+    setNotice('Could not refresh credential status. Check the Credentials section in Settings.'),
+  );
   const [searchFocusRevision, setSearchFocusRevision] = useState(0);
   const clearUnsaved = () => {
-    if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
-    setSettingsDirty(false);
-    setReportDirty(false);
-    setScheduleDirty(false);
-    setAdviceDirty(false);
+    edits.discardAll();
     setScheduleEditor(null);
     setDeliveryTask(null);
   };
   const { route, update: updateRoute } = useWorkspaceRoute(() => {
-    if (!(settingsDirty || reportDirty || scheduleDirty || adviceDirty)) {
+    if (!edits.any) {
       clearUnsaved();
       return true;
     }
@@ -170,7 +170,7 @@ export function App() {
     if (pendingJob.status === 'completed' && pendingJob.reportId) {
       setNotice('New draft added to your review queue.');
       setSetupInProgress(false);
-      if (!settingsDirty && !reportDirty && !scheduleDirty && !adviceDirty)
+      if (!edits.any)
         updateRoute({ section: 'Reports', reportId: pendingJob.reportId }, false, false);
     } else
       showFailure(
@@ -178,7 +178,7 @@ export function App() {
         pendingJob.error,
         'reports',
       );
-  }, [pendingJob?.id, pendingJob?.status, settingsDirty, reportDirty, scheduleDirty, adviceDirty]);
+  }, [pendingJob?.id, pendingJob?.status, edits.any]);
   const generatingRef = useRef(false);
   const [setupInProgress, setSetupInProgress] = useState(setupProgress?.inProgress ?? false);
   function navigate(next: string) {
@@ -195,12 +195,9 @@ export function App() {
   const [connectionError, setConnectionError] = useState('');
   const [composerKind, setComposerKind] = useState<ReportKind | null>(null);
   const [setupBusy, setSetupBusy] = useState(false);
-  const [aiCheckError, setAiCheckError] = useState('');
   const guides = usePageGuides();
   // A player name handed to the props board when it opens from a player card.
   const propsPlayer = useRef('');
-  const [aiChecking, setAiChecking] = useState(false);
-  const [aiCredentialRevision, setAiCredentialRevision] = useState(0);
   const [showTools, setShowTools] = useState(false);
   const [chatOpen, setChatOpen] = useChatPanel();
   const [setupWizardOpen, setSetupWizardOpen] = useState(false);
@@ -220,15 +217,14 @@ export function App() {
     });
   }, [setupInProgress, setupWizardStep, platform, espnSeason, leagueId]);
   useEffect(() => {
-    if (!scheduleDirty || verificationMode) return;
+    if (!edits.schedule || verificationMode) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [scheduleDirty, verificationMode]);
+  }, [edits.schedule, verificationMode]);
   const [busy, setBusy] = useState(false);
   const [refreshingLeagueId, setRefreshingLeagueId] = useState('');
   const [disconnectingLeagueId, setDisconnectingLeagueId] = useState('');
-  const [refreshingNews, setRefreshingNews] = useState(false);
   const [retryingRunId, setRetryingRunId] = useState('');
   const [sendingReportId, setSendingReportId] = useState('');
   const [noticeInfo, setNoticeInfo] = useState({ message: '', detail: '', action: '' });
@@ -347,40 +343,7 @@ export function App() {
         fetch('/api/news'),
         fetch('/api/credentials'),
       ]);
-      if (stories.status === 'fulfilled' && stories.value.ok) {
-        try {
-          const snapshot: unknown = await stories.value.json();
-          setNews(
-            isNewsSnapshot(snapshot)
-              ? snapshot
-              : {
-                  items: [],
-                  stale: true,
-                  error: 'Football news returned an invalid response.',
-                },
-          );
-        } catch {
-          setNews((current) => ({
-            ...current,
-            stale: true,
-            error: 'Football news is temporarily unavailable.',
-          }));
-        }
-      } else {
-        setNews((current) => ({
-          ...current,
-          stale: true,
-          error: 'Football news is temporarily unavailable.',
-        }));
-      }
-      if (credentials.status === 'fulfilled' && credentials.value.ok) {
-        try {
-          const result: unknown = await credentials.value.json();
-          if (isCredentialProviders(result)) setCredentialProviders(result);
-        } catch {
-          // Keep the last known credential status if an optional refresh is malformed.
-        }
-      }
+      await Promise.all([receiveNews(stories), receiveCredentials(credentials)]);
     } catch (error) {
       setServiceStatus('unavailable');
       const message =
@@ -410,37 +373,6 @@ export function App() {
       else if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
     };
   }, [setupWizardOpen]);
-
-  async function refreshCredentials() {
-    try {
-      const response = await fetch('/api/credentials');
-      if (!response.ok) throw new Error(`Credential status request failed (${response.status}).`);
-      const credentials: unknown = await response.json();
-      if (!isCredentialProviders(credentials))
-        throw new Error('Credential status response was invalid.');
-      setCredentialProviders(credentials);
-    } catch {
-      setNotice('Could not refresh credential status. Check the Credentials section in Settings.');
-    }
-  }
-
-  async function refreshNews() {
-    setRefreshingNews(true);
-    try {
-      const response = await fetch('/api/news/refresh', { method: 'POST' });
-      const result = (await response.json()) as NewsSnapshot;
-      if (!response.ok) throw new Error(result.error ?? 'Could not refresh football news.');
-      setNews(result);
-    } catch (error) {
-      showFailure(
-        'Football news couldn’t be updated. Try refreshing it again later.',
-        error,
-        'news',
-      );
-    } finally {
-      setRefreshingNews(false);
-    }
-  }
 
   async function retryScheduledRun(run: ScheduledRun) {
     const failedCount =
@@ -516,14 +448,12 @@ export function App() {
       setModal(true);
       return;
     }
-    if (settingsDirty || reportDirty) {
+    if (edits.settings || edits.report) {
       if (
         !(await confirmAction('Creating a report will discard your unsaved edits.', discardOptions))
       )
         return;
-      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
-      setSettingsDirty(false);
-      setReportDirty(false);
+      edits.discardSettingsAndReport();
     }
     if (section === 'Reports' && initialReviewId) setInitialReviewId('');
     setComposerKind(kind as ReportKind);
@@ -750,66 +680,11 @@ export function App() {
   }
 
   const runtime = state.settings.aiRuntime;
-  const aiReady = Boolean(
-    runtime &&
-    testedRuntimeSignature === JSON.stringify(runtime) &&
-    (runtime.mode !== 'api' ||
-      credentialProviders.some(
-        (provider) => provider.provider === 'openai' && provider.configured,
-      )),
-  );
+  const ai = useAiConnection({ runtime, credentialProviders, stateLoaded, paused: setupBusy });
+  const aiReady = ai.ready;
+  const aiChecking = ai.checking;
+  const aiCheckError = ai.error;
   const requiredSetupComplete = Number(Boolean(league)) + Number(aiReady);
-  const lastCheckedRuntime = useRef('');
-  // Check an existing connection once per configuration, without sending any league data.
-  useEffect(() => {
-    if (setupBusy || !stateLoaded || !runtime || testedRuntimeSignature === JSON.stringify(runtime))
-      return;
-    if (
-      runtime.mode === 'api' &&
-      !credentialProviders.some((provider) => provider.provider === 'openai' && provider.configured)
-    )
-      return;
-    const signature = JSON.stringify(runtime);
-    if (lastCheckedRuntime.current === signature) return;
-    lastCheckedRuntime.current = signature;
-    const abort = new AbortController();
-    setAiChecking(true);
-    setAiCheckError('');
-    void requestJson(
-      '/api/ai/test',
-      (value): value is { ok: true } =>
-        Boolean(value && typeof value === 'object' && 'ok' in value && value.ok === true),
-      { method: 'POST', signal: abort.signal },
-      60000,
-    )
-      .then(() => {
-        if (!abort.signal.aborted) setTestedRuntimeSignature(signature);
-      })
-      .catch((error) => {
-        if (!abort.signal.aborted)
-          setAiCheckError(
-            error instanceof Error ? error.message : 'Could not test your AI connection.',
-          );
-      })
-      .finally(() => {
-        if (!abort.signal.aborted) setAiChecking(false);
-      });
-    return () => {
-      abort.abort();
-      if (lastCheckedRuntime.current === signature) lastCheckedRuntime.current = '';
-      setAiChecking(false);
-    };
-  }, [
-    stateLoaded,
-    setupBusy,
-    aiCredentialRevision,
-    runtime && JSON.stringify(runtime),
-    runtime?.mode === 'api'
-      ? credentialProviders
-          .map((provider) => `${provider.provider}:${provider.configured}`)
-          .join('|')
-      : '',
-  ]);
   function openSetupWizard() {
     setSetupWizardStep(league && !homeTeamId ? 1 : suggestedSetupStep(Boolean(league), aiReady));
     setSetupInProgress(true);
@@ -833,9 +708,7 @@ export function App() {
   }
   async function searchNavigate(destination: SearchDestination, check = true) {
     // Ask here (not in the route guard) so the task below opens only after an answer.
-    const reviewedDiscard = Boolean(
-      check && (settingsDirty || reportDirty || scheduleDirty || adviceDirty),
-    );
+    const reviewedDiscard = check && edits.any;
     if (reviewedDiscard) {
       const ok = await confirmAction(
         destination.task
@@ -844,11 +717,7 @@ export function App() {
         discardOptions,
       );
       if (!ok) return false;
-      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
-      setSettingsDirty(false);
-      setReportDirty(false);
-      setScheduleDirty(false);
-      setAdviceDirty(false);
+      edits.discardAll();
     }
     const accepted = updateRoute(
       {
@@ -1125,25 +994,24 @@ export function App() {
                   mode={route.adviceMode ?? 'lineup'}
                   resultId={route.adviceId ?? ''}
                   onNavigate={searchNavigate}
-                  onDirtyChange={setAdviceDirty}
+                  onDirtyChange={edits.setAdvice}
                 />
               </Suspense>
             ) : section === 'Settings' ? (
               <Suspense fallback={<LoadingStatus message="Opening settings…" />}>
                 <SettingsPage
-                  key={settingsNavigationKey}
+                  key={edits.settingsKey}
                   settings={state.settings}
                   leagues={state.leagues}
                   onGuidedSetup={async () => {
                     if (
-                      !settingsDirty ||
+                      !edits.settings ||
                       (await confirmAction(
                         'Guided setup will discard your unsaved settings.',
                         discardOptions,
                       ))
                     ) {
-                      if (settingsDirty) setSettingsNavigationKey((current) => current + 1);
-                      setSettingsDirty(false);
+                      edits.discardSettings();
                       setSetupWizardStep(1);
                       setSetupInProgress(true);
                       setSetupWizardOpen(true);
@@ -1153,16 +1021,11 @@ export function App() {
                     setState((current) => ({ ...current, settings }));
                   }}
                   onCredentialsChanged={(provider) => {
-                    if (provider === 'openai') {
-                      setTestedRuntimeSignature('');
-                      setAiCredentialRevision((current) => current + 1);
-                      lastCheckedRuntime.current = '';
-                    }
+                    if (provider === 'openai') ai.recheck();
                     void refreshCredentials();
                   }}
                   onRuntimeTested={(testedRuntime) => {
-                    setTestedRuntimeSignature(JSON.stringify(testedRuntime));
-                    setAiCheckError('');
+                    ai.markTested(testedRuntime);
                   }}
                   aiConnectionFailed={Boolean(aiCheckError)}
                   focusTarget={settingsFocusTarget}
@@ -1171,7 +1034,7 @@ export function App() {
                   onSearchSettingClear={() => updateRoute({ settingId: '' }, true, false)}
                   onFocusTargetHandled={() => setSettingsFocusTarget(null)}
                   onRestored={refresh}
-                  onDirtyChange={setSettingsDirty}
+                  onDirtyChange={edits.setSettings}
                 />
               </Suspense>
             ) : section === 'Leagues' ? (
@@ -1210,7 +1073,7 @@ export function App() {
                   }}
                   onSend={sendReport}
                   onSaved={refresh}
-                  onDirtyChange={setReportDirty}
+                  onDirtyChange={edits.setReport}
                   league={league}
                   generating={Boolean(generatingKind)}
                   onCreateKind={(kind) => void createReport(kind)}
@@ -1409,13 +1272,13 @@ export function App() {
             prefill={scheduleEditor.prefill}
             onClose={() => {
               setScheduleEditor(null);
-              setScheduleDirty(false);
+              edits.setSchedule(false);
             }}
             onSaved={(settings) => {
               setState((current) => ({ ...current, settings }));
               setNotice('Schedule saved. The next planned run is shown on Schedule.');
             }}
-            onDirtyChange={setScheduleDirty}
+            onDirtyChange={edits.setSchedule}
           />
         </Suspense>
       )}
@@ -1529,16 +1392,11 @@ export function App() {
                 settings={state.settings}
                 onSaved={(settings) => setState((current) => ({ ...current, settings }))}
                 onCredentialsChanged={(provider) => {
-                  if (provider === 'openai') {
-                    setTestedRuntimeSignature('');
-                    setAiCredentialRevision((current) => current + 1);
-                    lastCheckedRuntime.current = '';
-                  }
+                  if (provider === 'openai') ai.recheck();
                   void refreshCredentials();
                 }}
                 onReady={(testedRuntime) => {
-                  setTestedRuntimeSignature(JSON.stringify(testedRuntime));
-                  setAiCheckError('');
+                  ai.markTested(testedRuntime);
                   setSetupWizardStep(2);
                 }}
                 onBusyChange={setSetupBusy}

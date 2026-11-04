@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (refactor, no behaviour change): shared helpers for side databases, positions, recent
+  team games and number formatting; `weekly-lineup.ts` split from `weekly-service.ts`; AI
+  connection, news, credentials and unsaved-edit state moved from `App.tsx` into hooks. Old and new
+  builds gave identical API output on the same data. CSS duplication and `index.ts` were left alone.
 - November 4 (saved data): when prediction records fill up, the oldest graded one now makes room
   instead of new ones being dropped. Prop lines have a game index, and older seasons keep only
   their first and closing lines. Encrypted backups now carry prop lines, leans and Ask chats, which
