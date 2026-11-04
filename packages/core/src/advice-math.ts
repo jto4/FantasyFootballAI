@@ -404,6 +404,42 @@ export function starterSlots(input: unknown): {
   return { slots, warnings };
 }
 
+const slotPosition = (position: string) => (position === 'DEF' ? 'DST' : position);
+
+/** Whether two positions can ever fill the same starting spot under this league's lineup. */
+export function sharesStarterSlot(rawSlots: unknown, first: string, second: string) {
+  const a = slotPosition(first),
+    b = slotPosition(second);
+  if (a === b) return true;
+  return starterSlots(rawSlots).slots.some(
+    (slot) => slot.positions.includes(a) && slot.positions.includes(b),
+  );
+}
+
+/**
+ * Who each incoming starter replaces: same position first, then anyone sharing a slot such as
+ * FLEX. A player with no legal counterpart stays unpaired, so a D/ST is never set against a
+ * receiver. Returns incoming ID → outgoing ID.
+ */
+export function pairLineupSwaps(
+  incoming: { id: string; position: string }[],
+  outgoing: { id: string; position: string }[],
+  rawSlots: unknown,
+) {
+  const pairs = new Map<string, string>();
+  const open = [...outgoing];
+  const match = (fits: (a: string, b: string) => boolean) => {
+    for (const player of incoming) {
+      if (pairs.has(player.id)) continue;
+      const index = open.findIndex((other) => fits(player.position, other.position));
+      if (index >= 0) pairs.set(player.id, open.splice(index, 1)[0]!.id);
+    }
+  };
+  match((a, b) => slotPosition(a) === slotPosition(b));
+  match((a, b) => sharesStarterSlot(rawSlots, a, b));
+  return pairs;
+}
+
 /**
  * Assign each player once; global matching avoids putting a needed TE in FLEX greedily. `locked`
  * players (starters whose games have begun) must keep a starting spot; their remaining value is

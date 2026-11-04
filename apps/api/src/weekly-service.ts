@@ -25,6 +25,8 @@ import {
   matchupWinProbability,
   projectionRange,
   expectedPoints,
+  pairLineupSwaps,
+  sharesStarterSlot,
   type NewsItem,
 } from '@sidekick/core';
 import type { LiveBoxScore, NFLInjuryReportRow } from '@sidekick/integrations';
@@ -263,22 +265,32 @@ export function createWeeklyService(
         ? (() => {
             const ins = optimal.assignments.filter((row) => !starters.has(row.playerId));
             const chosen = new Set(optimal.assignments.map((row) => row.playerId));
-            const outs = [...starters]
-              .filter((id) => !chosen.has(id))
-              .map((id) => ({ id, points: byId.get(id)?.projectedPoints }));
-            return ins.map((row, index) => ({
-              slot: row.slot,
-              start: { id: row.playerId, name: name(row.playerId), points: row.points },
-              ...(outs[index]
-                ? {
-                    bench: {
-                      id: outs[index]!.id,
-                      name: name(outs[index]!.id),
-                      ...(outs[index]!.points !== undefined ? { points: outs[index]!.points } : {}),
-                    },
-                  }
-                : {}),
-            }));
+            const position = (id: string) =>
+              byId.get(id)?.position ?? roster.find((p) => p.id === id)?.position ?? '';
+            const pairs = pairLineupSwaps(
+              ins.map((row) => ({ id: row.playerId, position: position(row.playerId) })),
+              [...starters]
+                .filter((id) => !chosen.has(id))
+                .map((id) => ({ id, position: position(id) })),
+              league.settings.roster_positions,
+            );
+            return ins.map((row) => {
+              const out = pairs.get(row.playerId);
+              const outPoints = out ? byId.get(out)?.projectedPoints : undefined;
+              return {
+                slot: row.slot,
+                start: { id: row.playerId, name: name(row.playerId), points: row.points },
+                ...(out
+                  ? {
+                      bench: {
+                        id: out,
+                        name: name(out),
+                        ...(outPoints !== undefined ? { points: outPoints } : {}),
+                      },
+                    }
+                  : {}),
+              };
+            });
           })()
         : [];
     const considered = roster.filter((p) => !isInactiveFootballStatus(byId.get(p.id)?.status));
@@ -1011,6 +1023,12 @@ export function createWeeklyService(
     const pregame = matchup
       ? [...matchup.you.starters, ...matchup.opponent.starters].every((s) => !s.started)
       : false;
+    // Players who can never fill the same spot (a receiver and a D/ST) have no start/sit answer.
+    const rosterSlots = deps.store.snapshot().leagues.find((l) => l.id === leagueId)
+      ?.settings.roster_positions;
+    const sameSpot = chosen.every((p) =>
+      sharesStarterSlot(rosterSlots, p.position, chosen[0]!.position),
+    );
     const compared = new Set(playerIds);
     const slots = Math.max(1, matchup?.you.starters.filter((s) => compared.has(s.id)).length ?? 1);
     const starter = (p: PlayerAdviceEvidence) => ({
@@ -1022,7 +1040,7 @@ export function createWeeklyService(
       (a, b) => (expectedPoints(b) ?? -Infinity) - (expectedPoints(a) ?? -Infinity),
     );
     const winChanceWith = (player: PlayerAdviceEvidence) => {
-      if (!matchup || !pregame) return undefined;
+      if (!matchup || !pregame || !sameSpot) return undefined;
       const others = matchup.you.starters.filter((s) => !compared.has(s.id));
       const fill = [player, ...byExpected.filter((p) => p !== player).slice(0, slots - 1)];
       return matchupWinProbability(
@@ -1067,10 +1085,14 @@ export function createWeeklyService(
       week: summary.week,
       slots,
       players: rows,
-      ...(pick ? { recommended: pick.id } : {}),
-      ...(matchup && !pregame
-        ? { note: 'Games have started, so win chance is not compared.' }
-        : {}),
+      ...(pick && sameSpot ? { recommended: pick.id } : {}),
+      ...(!sameSpot
+        ? {
+            note: 'These players can’t fill the same lineup spot, so there is no start/sit call. Compare players who share a position or a flex spot.',
+          }
+        : matchup && !pregame
+          ? { note: 'Games have started, so win chance is not compared.' }
+          : {}),
     };
   }
   return { briefing, alerts, waiverDay, tradeIdeas, live, watchlist, playerCard, compare };
@@ -1137,9 +1159,9 @@ export function benchReplacement(
 }
 
 /**
- * The lineup optimizer's swap for a starter. The briefing pairs incoming and outgoing players by
- * list order, not by slot, so a pairing is trusted only when it is the single change or the
- * incoming player plays the same position; otherwise the caller falls back to the bench.
+ * The lineup optimizer's swap for a starter. The briefing pairs players who can share a slot, but
+ * a cross-position pairing may rely on another starter moving, so with several changes it is
+ * trusted only at the same position; otherwise the caller falls back to the bench.
  */
 export function plannedReplacement(
   changes: WeeklyBriefing['lineup']['changes'],

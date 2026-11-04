@@ -9,6 +9,7 @@ import { formatDateTime } from './date-format';
 import { adviceTitle } from './advice-navigation';
 import { DataReadiness } from './DataReadiness';
 import { formatOdds } from './display-preferences';
+import { lineupSlotName } from './lineup-slot';
 
 const verdictNames = {
   recommend: 'Recommended',
@@ -184,10 +185,7 @@ export function AdviceResultView({ result }: { result: AdviceResult }) {
           <p>
             Compared: {result.startSit.candidateIds.map((id) => playerNames.get(id)).join(', ')}.
           </p>
-          <p>
-            Shared spots:{' '}
-            {result.startSit.eligibleSlots.map((slot) => lineupSlotNames[slot] ?? slot).join(', ')}.
-          </p>
+          <p>Shared spots: {result.startSit.eligibleSlots.map(lineupSlotName).join(', ')}.</p>
           <p>
             This checks one spot. Keep the chosen player out of other starting slots and check the
             rest of your lineup separately.
@@ -617,24 +615,6 @@ function MetricTable({ metrics, sources }: { metrics: AdviceMetric[]; sources: S
     </div>
   );
 }
-const lineupSlotNames: Record<string, string> = {
-  QB: 'Quarterback',
-  RB: 'Running back',
-  WR: 'Wide receiver',
-  TE: 'Tight end',
-  K: 'Kicker',
-  DST: 'Team defense',
-  DEF: 'Team defense',
-  FLEX: 'Flex',
-  FLX: 'Flex',
-  WRT: 'Flex',
-  RECFLEX: 'Receiver flex',
-  WRRBFLEX: 'Running back / receiver flex',
-  SUPERFLEX: 'Superflex',
-  OP: 'Superflex',
-  WRTQB: 'Superflex',
-  QBRBWRTE: 'Superflex',
-};
 function Lineup({
   title,
   lineup,
@@ -648,17 +628,13 @@ function Lineup({
   season?: boolean;
   remaining?: boolean;
 }) {
-  const slotName = (slot: string) => {
-    const position = slot.replace(/ \d+$/, '');
-    return Object.hasOwn(lineupSlotNames, position) ? lineupSlotNames[position]! : position;
-  };
   const assignments = [...lineup.assignments].sort(
     (a, b) => Number(a.slot.match(/ (\d+)$/)?.[1] ?? 0) - Number(b.slot.match(/ (\d+)$/)?.[1] ?? 0),
   );
   const totals = new Map<string, number>();
   const seen = new Map<string, number>();
   for (const assignment of assignments) {
-    const name = slotName(assignment.slot);
+    const name = lineupSlotName(assignment.slot);
     totals.set(name, (totals.get(name) ?? 0) + 1);
   }
   return (
@@ -671,7 +647,7 @@ function Lineup({
       </p>
       <ul>
         {assignments.map((assignment, index) => {
-          const name = slotName(assignment.slot);
+          const name = lineupSlotName(assignment.slot);
           const occurrence = (seen.get(name) ?? 0) + 1;
           seen.set(name, occurrence);
           return (

@@ -24,6 +24,17 @@ test('start/sit compares players, and a name opens the player card where he can 
       body: JSON.stringify({ league: 'browser-league', team: '1', players: ['w1'] }),
     });
     expect(bad.status).toBe(400);
+    // A quarterback and a receiver never share a spot here, so there is no start/sit call.
+    const crossSlot = (await (
+      await fetch(`${workspace.url}/api/players/compare`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ league: 'browser-league', team: '1', players: ['w1', 'q1'] }),
+      })
+    ).json()) as { recommended?: string; note?: string; players: { winChance?: number }[] };
+    expect(crossSlot.recommended).toBeUndefined();
+    expect(crossSlot.note).toContain('can’t fill the same lineup spot');
+    expect(crossSlot.players.every((p) => p.winChance === undefined)).toBe(true);
 
     await page.addInitScript(() =>
       localStorage.setItem('sidekick.teamSelection.v1', JSON.stringify({ 'browser-league': '1' })),

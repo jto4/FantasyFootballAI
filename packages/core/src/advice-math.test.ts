@@ -6,6 +6,8 @@ import {
   analyzeBetHistory,
   historicalPlayerGames,
   optimizeLineup,
+  pairLineupSwaps,
+  sharesStarterSlot,
   playerNameKey,
   startedStarterIds,
   scoreHistoricalGame,
@@ -249,6 +251,48 @@ describe('league-specific player scoring', () => {
 });
 
 describe('legal starting lineups', () => {
+  const afton = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'FLEX', 'DST', 'BENCH', 'IR'];
+  it('pairs lineup swaps only between players who can share a slot', () => {
+    // Afton's week 9: list order had set Vikings D/ST against A.J. Brown.
+    const pairs = pairLineupSwaps(
+      [
+        { id: 'vikings', position: 'DST' },
+        { id: 'mahomes', position: 'QB' },
+        { id: 'douglas', position: 'WR' },
+        { id: 'singletary', position: 'RB' },
+      ],
+      [
+        { id: 'brown', position: 'WR' },
+        { id: 'egbuka', position: 'WR' },
+        { id: 'buccaneers', position: 'DST' },
+        { id: 'murray', position: 'QB' },
+      ],
+      afton,
+    );
+    expect(pairs.get('vikings')).toBe('buccaneers');
+    expect(pairs.get('mahomes')).toBe('murray');
+    expect(pairs.get('douglas')).toBe('brown');
+    expect(pairs.get('singletary')).toBe('egbuka');
+  });
+
+  it('leaves a swap unpaired rather than crossing slot types', () => {
+    const pairs = pairLineupSwaps(
+      [{ id: 'd', position: 'DEF' }],
+      [{ id: 'w', position: 'WR' }],
+      afton,
+    );
+    expect(pairs.size).toBe(0);
+  });
+
+  it('knows which positions can share a starting spot', () => {
+    expect(sharesStarterSlot(afton, 'WR', 'RB')).toBe(true);
+    expect(sharesStarterSlot(afton, 'WR', 'TE')).toBe(true);
+    expect(sharesStarterSlot(afton, 'WR', 'DST')).toBe(false);
+    expect(sharesStarterSlot(afton, 'QB', 'WR')).toBe(false);
+    expect(sharesStarterSlot(['QB', 'WR', 'OP'], 'QB', 'WR')).toBe(true);
+    expect(sharesStarterSlot(afton, 'DEF', 'DST')).toBe(true);
+  });
+
   it('starts a healthy player over a Questionable one with a slightly higher projection', () => {
     const questionable = { ...player('hurt', 'WR', 14), playChance: 0.68 };
     const result = optimizeLineup([questionable, player('healthy', 'WR', 12)], ['WR']);

@@ -35,9 +35,9 @@ it('never says all is well before the starter checks come back', () => {
 
 it('only states a point gain when the swap actually gains points', () => {
   expect(swapReason({ slot: 'FLEX 7', start: { points: 9.4 }, bench: { points: 7.1 } })).toBe(
-    'FLEX 7 · estimated +2.3 points this week.',
+    'Flex · estimated +2.3 points this week.',
   );
   expect(swapReason({ slot: 'FLEX 7', start: { points: 9.4 }, bench: { points: 10 } })).toBe(
-    'FLEX 7 · your lineup strategy prefers this close call (9.4 vs 10.0 projected).',
+    'Flex · your lineup strategy prefers this close call (9.4 vs 10.0 projected).',
   );
 });

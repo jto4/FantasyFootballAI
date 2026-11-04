@@ -3,6 +3,7 @@ import { useApi } from './hooks/useApi';
 import { formatDateTime } from './date-format';
 import { describeError } from './error-text';
 import type { WeeklyBriefing } from './weekly-briefing';
+import { lineupSlotName } from './lineup-slot';
 
 type Alerts = {
   alerts: {
@@ -179,6 +180,6 @@ export function swapReason(change: {
 }) {
   const gain = change.start.points - (change.bench?.points ?? 0);
   return gain > 0.05
-    ? `${change.slot} · estimated ${points(gain)} points this week.`
-    : `${change.slot} · your lineup strategy prefers this close call (${change.start.points.toFixed(1)} vs ${(change.bench?.points ?? 0).toFixed(1)} projected).`;
+    ? `${lineupSlotName(change.slot)} · estimated ${points(gain)} points this week.`
+    : `${lineupSlotName(change.slot)} · your lineup strategy prefers this close call (${change.start.points.toFixed(1)} vs ${(change.bench?.points ?? 0).toFixed(1)} projected).`;
 }

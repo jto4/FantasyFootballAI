@@ -2,6 +2,7 @@ import { record, type TradeIdea, type WaiverDay } from '@sidekick/core';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
+import { lineupSlotName } from './lineup-slot';
 
 const points = (n: number) =>
   `${n >= 0 ? '+' : ''}${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n)}`;
@@ -51,7 +52,7 @@ export function WaiverDayPanel({
             <p className="roster-moves-note">
               Weakest starting spots:{' '}
               {data.weakSpots
-                .map((s) => `${s.slot} (${s.name}, ${points(s.points).slice(1)})`)
+                .map((s) => `${lineupSlotName(s.slot)} (${s.name}, ${points(s.points).slice(1)})`)
                 .join(' · ')}
             </p>
           )}

@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (lineup slots): lineup swaps paired players by list order, so Home could say "Start
+  Vikings D/ST over A.J. Brown". Swaps now pair by position, then by a shared slot, and otherwise
+  stay unpaired. Compare gives no start/sit call for players who cannot share a spot, and slot names
+  no longer show the optimizer's list index.
 - November 4 (Linux RPM): rpm 6 runs `%install` from a new folder, which broke
   electron-installer-redhat's relative copy (not fixed upstream through 4.0.0).
   `scripts/desktop-package.mjs` patches that line in the staged tooling and fails if it changes.
