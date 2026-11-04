@@ -59,6 +59,8 @@ On October 28, 2026 `codex-cli 0.165.0-alpha.1.2` passed both captures and the a
 test and was added. It sends the supplied developer instructions twice, byte for byte; with the
 owner's approval the proof now accepts that one exact repeat and still fails any other text or
 item ([evidence](research/2026-10-28-codex-0.165-isolation.json)).
+On November 3, 2026 `codex-cli 0.166.0-alpha.6` passed both captures the same way and was added
+([evidence](research/2026-11-03-codex-0.166-isolation.json)).
 
 Current readiness and gates live in [release status](release-status.md). This matrix retains detailed verification evidence; passing fixtures or package smokes do not prove live account behavior or interactive installation.
 

@@ -1,0 +1,148 @@
+{
+  "recordedAt": "2026-11-04T05:03:35.115Z",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "node": "v22.23.3",
+  "adapterSha256": "6736b8623acb81e5ee203f2b0081e18dfe20aa7e5402b8bd181a678774a0a00d",
+  "note": "Codex 0.166 repeats the supplied developer instructions once, byte for byte, as 0.165 did; the proof accepts that exact repeat and nothing else.",
+  "fixture": {
+    "version": "codex-cli 0.166.0-alpha.6",
+    "executableSha256": "508388df35319042107560d095b271a98a512f59a542848c908b23ed1bad4b44",
+    "passed": true,
+    "authorizationPresent": false,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "toolCount": 0,
+    "payloadKeys": [
+      "model",
+      "stream",
+      "input",
+      "tool_choice",
+      "parallel_tool_calls",
+      "reasoning",
+      "store",
+      "include",
+      "prompt_cache_key",
+      "text",
+      "client_metadata"
+    ],
+    "path": "/v1/responses",
+    "toolNames": [],
+    "onlySuppliedText": true,
+    "onlySuppliedInput": true,
+    "repeatedInstructions": 1,
+    "systemPresent": true,
+    "canaryMatches": [],
+    "canaryLeak": false,
+    "skillContext": false,
+    "inputSummary": [
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": false,
+            "prompt": true
+          }
+        ]
+      }
+    ],
+    "requestSha256": "b3049ae7aba30f30562780dfbd815e1312a707faa6d1f380cba9543f3c338f9c",
+    "globalReadBlocked": true,
+    "mcpFixtureLaunched": false,
+    "sessionPersisted": false,
+    "scope": "Owned fixture home; production isolation arguments; loopback transport only; no authentication or remote inference."
+  },
+  "existingHome": {
+    "version": "codex-cli 0.166.0-alpha.6",
+    "executableSha256": "508388df35319042107560d095b271a98a512f59a542848c908b23ed1bad4b44",
+    "passed": true,
+    "authorizationPresent": false,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "toolCount": 0,
+    "payloadKeys": [
+      "model",
+      "stream",
+      "input",
+      "tool_choice",
+      "parallel_tool_calls",
+      "reasoning",
+      "store",
+      "include",
+      "prompt_cache_key",
+      "text",
+      "client_metadata"
+    ],
+    "path": "/v1/responses",
+    "toolNames": [],
+    "onlySuppliedText": true,
+    "onlySuppliedInput": true,
+    "repeatedInstructions": 1,
+    "systemPresent": true,
+    "canaryMatches": [],
+    "canaryLeak": false,
+    "skillContext": false,
+    "inputSummary": [
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "developer",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": true,
+            "prompt": false
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "type": "message",
+        "content": [
+          {
+            "type": "input_text",
+            "system": false,
+            "prompt": true
+          }
+        ]
+      }
+    ],
+    "requestSha256": "f030f87cca9c1fc5c8ad131647c519c56bc75af76c23e845d39f3c49ac4bb5ed",
+    "globalReadBlocked": true,
+    "scope": "Existing native home; no fixture files written there; production isolation arguments; loopback transport only; no authentication or remote inference."
+  }
+}

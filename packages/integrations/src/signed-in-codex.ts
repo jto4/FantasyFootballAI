@@ -18,6 +18,7 @@ const newProtocolVersions = new Set([
   'codex-cli 0.163.0-alpha.11',
   'codex-cli 0.163.0-alpha.11.2',
   'codex-cli 0.165.0-alpha.1.2',
+  'codex-cli 0.166.0-alpha.6',
 ]);
 const newProtocol = (version: string) => newProtocolVersions.has(version);
 /** A short, printable version line from `codex --version`, or undefined if it looks odd. */
