@@ -43,5 +43,16 @@ interface Window {
     installUpdate(): Promise<boolean>;
     onUpdateStatus(listener: (status: DesktopNativeUpdateState) => void): () => void;
     openReleasePage(): Promise<void>;
+    leagueBrowser?: {
+      open(url: string): Promise<boolean>;
+      espnStatus(): Promise<{ signedIn: boolean }>;
+      espnRead(league: { leagueId: string; season: number }): Promise<string>;
+      espnSubmit(move: {
+        leagueId: string;
+        season: number;
+        teamId: string;
+        request: unknown;
+      }): Promise<{ outcome: 'sent' | 'rejected' | 'signed-out' | 'uncertain'; reason?: string }>;
+    };
   };
 }

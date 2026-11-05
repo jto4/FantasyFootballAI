@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 4 (roster moves): Review this move on Home, waivers and trades shows the exact change
+  and acts only on approval. ESPN lineups can be submitted (off per league), from the saved login
+  or a signed-in desktop window; everything else is a guided checklist confirmed by league data.
+  See `decisions.md`.
 - November 4 (refactor, no behaviour change): shared helpers for side databases, positions, recent
   team games and number formatting; `weekly-lineup.ts` split from `weekly-service.ts`; AI
   connection, news, credentials and unsaved-edit state moved from `App.tsx` into hooks. Old and new
@@ -113,6 +117,9 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
   [betting model history](reviews/2026-10-betting-model-history.md).
 
 ## Open work
+
+- [ ] Owner: read ESPN's terms, turn on submitting for Afton, and approve one lineup change. No
+      move has been sent to a real league yet, so that first one proves the ESPN request.
 
 ### Ask Sidekick chat and UI tidy — October 22, 2026
 

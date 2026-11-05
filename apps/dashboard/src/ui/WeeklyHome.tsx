@@ -17,6 +17,9 @@ import { MatchupCard } from './MatchupCard';
 import { faabBid, regularWeeksLeft } from '@sidekick/core';
 import { readVisit, saveVisit, visitChanges, visitDigest } from './visit-changes';
 import { WatchlistCard } from './WatchlistCard';
+import { MoveReview, RecentMoves, type MoveRequest } from './MoveReview';
+
+const lineupMove: MoveRequest = { kind: 'lineup' };
 export function WeeklyHome({
   league,
   settings,
@@ -49,6 +52,8 @@ export function WeeklyHome({
   >([]);
   const [decisionError, setDecisionError] = useState('');
   const [briefing, setBriefing] = useState<WeeklyBriefing>();
+  const [reviewing, setReviewing] = useState(false);
+  const [moveRevision, setMoveRevision] = useState(0);
   const [briefingError, setBriefingError] = useState<unknown>();
   const [briefingAttempt, setBriefingAttempt] = useState(0);
   const [changes, setChanges] = useState<{ since: string; lines: string[] }>();
@@ -272,14 +277,23 @@ export function WeeklyHome({
                       )}
                       <div className="weekly-actions">
                         {briefing?.lineup.changes.length && lineupUrl ? (
-                          <a
-                            className="primary-button"
-                            href={lineupUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Make changes on {platformName(league.platform)}
-                          </a>
+                          <>
+                            <button
+                              type="button"
+                              className="primary-button"
+                              onClick={() => setReviewing(true)}
+                            >
+                              Review this move
+                            </button>
+                            <a
+                              className="text-button"
+                              href={lineupUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Make changes on {platformName(league.platform)}
+                            </a>
+                          </>
                         ) : (
                           <button className="primary-button" onClick={() => onAdvice('lineup')}>
                             Check my lineup
@@ -295,6 +309,20 @@ export function WeeklyHome({
                           </button>
                         )}
                       </div>
+                      {league && teamId && (
+                        <RecentMoves league={league.id} team={teamId} revision={moveRevision} />
+                      )}
+                      {reviewing && league && teamId && (
+                        <MoveReview
+                          request={lineupMove}
+                          league={league.id}
+                          team={teamId}
+                          onClose={() => {
+                            setReviewing(false);
+                            setMoveRevision((n) => n + 1);
+                          }}
+                        />
+                      )}
                     </article>
                     <article>
                       <h3>Availability to review</h3>

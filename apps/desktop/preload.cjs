@@ -24,4 +24,10 @@ contextBridge.exposeInMainWorld('sidekickDesktop', {
     return () => ipcRenderer.removeListener('sidekick:update-status', handler);
   },
   openReleasePage: () => ipcRenderer.invoke('sidekick:open-release-page'),
+  leagueBrowser: {
+    open: (url) => ipcRenderer.invoke('sidekick:league-browser-open', url),
+    espnStatus: () => ipcRenderer.invoke('sidekick:league-browser-espn-status'),
+    espnRead: (league) => ipcRenderer.invoke('sidekick:league-browser-espn-read', league),
+    espnSubmit: (move) => ipcRenderer.invoke('sidekick:league-browser-espn-submit', move),
+  },
 });

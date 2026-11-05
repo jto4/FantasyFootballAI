@@ -11,6 +11,7 @@ export const pageGuides: Record<string, Guide> = {
       'Check “What needs your attention?” for injuries, empty spots and pickups.',
       'Open your matchup to see your win chance and compare starting lineups.',
       'Click any player’s name for their card: projection, range and news.',
+      'Choose Review this move to see a lineup change exactly, then approve it.',
     ],
     helpId: 'getting-started',
   },

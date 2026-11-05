@@ -135,7 +135,8 @@ dedicated documents. Update `docs/decisions.md` when a durable architectural cho
   output references computed metrics and provided sources/players. Never save raw
   invalid answers or expose private chain-of-thought. Advice history is independent
   of reports and included in backups; opening saved advice never calls the model.
-  Cancellation must reject late saves. Advice never executes roster changes or bets.
+  Cancellation must reject late saves. Advice never executes roster changes or bets;
+  only the owner-approved move flow in `move-routes.ts` can, and only for ESPN lineups.
 
 - Advice model selection and output budgets are request-local. Reuse the saved OS
   credential and endpoint, verify discovered choices, display the selected model

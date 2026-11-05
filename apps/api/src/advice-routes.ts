@@ -19,10 +19,13 @@ import type { MarketBacktest } from '@sidekick/core';
 export function createAdviceRouter(
   deps: AdviceDependencies & {
     store: Pick<LocalStore, 'snapshot' | 'settingsSnapshot' | 'update'>;
+    /** Hands the weekly briefing to the move router, which plans from it but lives elsewhere. */
+    onBriefing?: (briefing: ReturnType<typeof createAdviceService>['briefing']) => void;
   },
 ) {
   const router = Router(),
     service = createAdviceService(deps);
+  deps.onBriefing?.(service.briefing);
   const running = new Map<string, { controller: AbortController; request: AdviceRequest }>();
   const performance = createPredictionPerformanceService(deps);
   let refreshingPerformance = false;

@@ -12,7 +12,7 @@ import {
   readLocalImage,
 } from './image-library.js';
 
-import type { PropLeanRecord } from '@sidekick/core';
+import { isMoveProposal, type MoveProposal, type PropLeanRecord } from '@sidekick/core';
 import { isConversation, type ChatConversation } from './chat-store.js';
 import { isPropLeanRecord } from './prop-board-routes.js';
 import { isPropLineHistory, type PropLineHistory } from './prop-line-ledger.js';
@@ -90,6 +90,8 @@ export interface BackupHistory {
   propLines: PropLineHistory[];
   propLeans: PropLeanRecord[];
   chats: ChatConversation[];
+  /** Absent from backups made before roster moves existed. */
+  moves?: MoveProposal[];
 }
 
 export interface PortableBackupContents {
@@ -212,7 +214,9 @@ function parseHistory(bytes: Uint8Array): BackupHistory {
     !Array.isArray(value?.chats) ||
     !value.propLines.every(isPropLineHistory) ||
     !value.propLeans.every(isPropLeanRecord) ||
-    !value.chats.every(isConversation)
+    !value.chats.every(isConversation) ||
+    (value.moves !== undefined &&
+      (!Array.isArray(value.moves) || !value.moves.every(isMoveProposal)))
   )
     throw new Error('Backup archive history is not valid.');
   return { propLines: value.propLines, propLeans: value.propLeans, chats: value.chats };

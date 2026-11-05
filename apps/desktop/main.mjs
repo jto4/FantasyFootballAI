@@ -7,7 +7,9 @@ import {
   Menu,
   nativeImage,
   nativeTheme,
+  net,
   Notification,
+  session,
   shell,
   Tray,
   utilityProcess,
@@ -24,6 +26,7 @@ import { getLaunchAtLogin, setLaunchAtLogin } from './login-startup.mjs';
 import { startGameDayAlerts } from './game-day-alerts.mjs';
 import { createNotificationHistory } from './notification-history.mjs';
 import { contextMenuTemplate } from './context-menu.mjs';
+import { createLeagueBrowser } from './league-browser.mjs';
 import {
   getTeamSelectionPreference,
   setTeamSelectionPreference,
@@ -259,6 +262,29 @@ ipcMain.handle('sidekick:install-update', (event) => {
 ipcMain.handle('sidekick:get-update-status', (event) => {
   assertTrustedDashboard(event);
   return nativeUpdater.getStatus();
+});
+// Disposable test launches must never reach a real fantasy account.
+const leagueBrowser = createLeagueBrowser({
+  BrowserWindow,
+  session,
+  net,
+  enabled: () => !verificationProfile,
+});
+ipcMain.handle('sidekick:league-browser-open', (event, url) => {
+  assertTrustedDashboard(event);
+  return leagueBrowser.open(url);
+});
+ipcMain.handle('sidekick:league-browser-espn-status', (event) => {
+  assertTrustedDashboard(event);
+  return leagueBrowser.espnStatus();
+});
+ipcMain.handle('sidekick:league-browser-espn-read', (event, league) => {
+  assertTrustedDashboard(event);
+  return leagueBrowser.espnRead(league);
+});
+ipcMain.handle('sidekick:league-browser-espn-submit', (event, move) => {
+  assertTrustedDashboard(event);
+  return leagueBrowser.espnSubmit(move);
 });
 ipcMain.handle('sidekick:open-release-page', async (event) => {
   assertTrustedDashboard(event);

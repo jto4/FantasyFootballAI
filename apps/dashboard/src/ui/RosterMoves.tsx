@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { record, type TradeIdea, type WaiverDay } from '@sidekick/core';
+import { MoveReview, type MoveRequest } from './MoveReview';
 import { useApi } from './hooks/useApi';
 import { LoadingStatus } from './LoadFeedback';
 import { ErrorNotice } from './ErrorNotice';
@@ -33,6 +35,7 @@ export function WaiverDayPanel({
   team: string;
   onUse: (candidateId: string, dropId?: string) => void;
 }) {
+  const [review, setReview] = useState<MoveRequest>();
   const { data, error, loading, reload } = useReport(
     '/api/advice/waiver-day',
     league,
@@ -105,12 +108,35 @@ export function WaiverDayPanel({
                         aria-label={`Analyze adding ${c.name}`}
                       >
                         Analyze
+                      </button>{' '}
+                      <button
+                        type="button"
+                        className="small-button"
+                        onClick={() =>
+                          setReview({
+                            kind: 'add-drop',
+                            addId: c.playerId,
+                            addName: c.name,
+                            ...(c.drop ? { dropId: c.drop.playerId, gain: c.drop.netGain } : {}),
+                          })
+                        }
+                        aria-label={`Review adding ${c.name}`}
+                      >
+                        Review
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          )}
+          {review && (
+            <MoveReview
+              request={review}
+              league={league}
+              team={team}
+              onClose={() => setReview(undefined)}
+            />
           )}
           <p className="roster-moves-note">
             {data.noUpgrade
@@ -133,6 +159,7 @@ export function TradeIdeasPanel({
   team: string;
   onUse: (idea: TradeIdea) => void;
 }) {
+  const [review, setReview] = useState<MoveRequest>();
   const { data, error, loading, reload } = useReport(
     '/api/advice/trade-ideas',
     league,
@@ -191,12 +218,36 @@ export function TradeIdeasPanel({
                         aria-label={`Analyze trading ${idea.give.name} for ${idea.receive.name}`}
                       >
                         Analyze
+                      </button>{' '}
+                      <button
+                        type="button"
+                        className="small-button"
+                        onClick={() =>
+                          setReview({
+                            kind: 'trade',
+                            tradeTeamId: idea.teamId,
+                            giveId: idea.give.playerId,
+                            receiveId: idea.receive.playerId,
+                            gain: idea.myGain,
+                          })
+                        }
+                        aria-label={`Review trading ${idea.give.name} for ${idea.receive.name}`}
+                      >
+                        Review
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          )}
+          {review && (
+            <MoveReview
+              request={review}
+              league={league}
+              team={team}
+              onClose={() => setReview(undefined)}
+            />
           )}
           <p className="roster-moves-note">
             Rest-of-season best-lineup estimates for both teams. A trade that helps both sides is

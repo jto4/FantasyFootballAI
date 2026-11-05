@@ -794,3 +794,26 @@ version 1 files still restore). Chats had deliberately stayed out of backups; th
 include them. The unencrypted `GET /api/backup` download keeps them out. History merges on restore
 rather than replacing, so an older backup cannot erase records made since, and open database files
 are not swapped; the trade-off is that a deleted chat can come back from a backup.
+
+## Roster moves the owner approves (November 4, 2026)
+
+This reverses "Sidekick never submits a roster change", at the owner's request. The app now
+prepares a move, the owner approves the exact change, and it sends the move and checks it took.
+
+- **What can be sent:** ESPN lineup changes only. Add/drop, waivers, trades and every Sleeper or
+  Yahoo move are guided: the app opens the platform page with a checklist and confirms the move
+  when league data shows it. Add/drop stays guided because the stored data can't tell a free
+  agent from a waiver player, and a drop can lose a player. Widen this only after lineups have
+  worked on a real league.
+- **Order of attempts:** the saved ESPN login, then the desktop app's signed-in window, then the
+  owner doing it themself. The window keeps its session in its own Electron partition, so its
+  cookies never reach the API. It does not click through ESPN's pages: page automation can't be
+  tested here and breaks silently, so it makes the same request from that session.
+- **Risk accepted:** ESPN's write endpoint is undocumented and its terms are unreviewed, so
+  submitting is off per league and the switch says so. It stays off after a restore.
+- **Guarantees:** approval names a fingerprint of the exact change and expires after 30 minutes;
+  any roster change cancels it; ownership is checked against ESPN's team owners; a move is
+  claimed once and sent once; success comes from re-reading the league, never from the send. A
+  send with no clear answer becomes `unconfirmed` and is never retried.
+- **Never:** Ask, the AI and MCP have no route to any of this. No draft picks and no bets.
+- **Not verified:** no move has been sent to a real ESPN league. The first real one is the test.

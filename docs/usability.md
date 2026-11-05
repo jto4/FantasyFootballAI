@@ -272,8 +272,10 @@ analyses focus/scroll to the recommendation and show supporting numbers, evidenc
 confidence, risks, an alternative, perception, data gaps and source dates. Confidence
 is not a success probability; AI betting forecasts have a separate uncalibrated
 label. Sources/model/usage can be expanded. Saved advice reopens without new AI
-calls, has a bookmarkable URL, and requires confirmation to delete. Sidekick never
-submits a trade, waiver claim, lineup change or bet for the user.
+calls, has a bookmarkable URL, and requires confirmation to delete. Analysis never
+submits anything. Roster moves go through **Review this move**, which shows the exact
+change and acts only on the owner's approval (see `decisions.md`). Sidekick never makes
+a draft pick or places a bet.
 
 **AI for this analysis** lists supported models available through the existing
 connection and marks the recommended deep reasoning choice. It is displayed before

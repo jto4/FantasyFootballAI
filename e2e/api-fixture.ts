@@ -29,6 +29,8 @@ import { createBackupRouter } from '../apps/api/src/backup-routes.js';
 import { createPortableBackup } from '../apps/api/src/backup-archive.js';
 import { createAdviceRouter } from '../apps/api/src/advice-routes.js';
 import { createChatRouter } from '../apps/api/src/chat-routes.js';
+import { createMoveRouter } from '../apps/api/src/move-routes.js';
+import { MoveStore } from '../apps/api/src/move-store.js';
 import { ChatStore } from '../apps/api/src/chat-store.js';
 import { createPropBoardRouter, PropLeanStore } from '../apps/api/src/prop-board-routes.js';
 import { createProjectionRouter } from '../apps/api/src/projection-routes.js';
@@ -460,6 +462,20 @@ export async function apiWorkspace(
       chats,
       configuredAI,
       local: async (path) => (await fetch(`http://127.0.0.1:${port}${path}`)).json(),
+    }),
+  );
+  app.use(
+    createMoveRouter({
+      store,
+      moves: new MoveStore(':memory:'),
+      briefing: async () => {
+        throw new Error('Not used in these journeys.');
+      },
+      readEspnSession: async () => null,
+      refreshLeague: async () => undefined,
+      espn: () => {
+        throw new Error('The browser tests never reach ESPN.');
+      },
     }),
   );
   app.use(createGenerationRouter(store, queue));

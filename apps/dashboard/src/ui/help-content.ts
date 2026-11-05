@@ -96,7 +96,16 @@ export const helpArticles = [
     aliases:
       'start sit lineup draft pre post trade waivers pickup bet props spread moneyline model intelligent analysis stats',
     answer:
-      'Open Advice and choose your decision. Fantasy advice uses your connected league’s scoring, team and roster slots. Draft and trade comparisons can estimate points automatically from public NFL stats and scheduled games when identity, scoring and history are supported. Matching scoring-confirmed imports take priority. Trades count only remaining games from the current week through your chosen final week; already-earned points are excluded. Automatic estimates assume recorded role and participation continue, with historical error ranges and test results shown beside the estimate. For bets, choose an upcoming NFL game, fetch sportsbook prices and choose Use this price, or enter the line and American odds yourself. Analyze uses your selected existing AI connection for an analysis and a review; provider usage limits and billing apply. Choose the saved service or an installed signed-in Claude or Codex CLI. It needs no new key and never submits roster changes or bets. Results are saved locally with supporting numbers, risks, source dates and model usage.',
+      'Open Advice and choose your decision. Fantasy advice uses your connected league’s scoring, team and roster slots. Draft and trade comparisons can estimate points automatically from public NFL stats and scheduled games when identity, scoring and history are supported. Matching scoring-confirmed imports take priority. Trades count only remaining games from the current week through your chosen final week; already-earned points are excluded. Automatic estimates assume recorded role and participation continue, with historical error ranges and test results shown beside the estimate. For bets, choose an upcoming NFL game, fetch sportsbook prices and choose Use this price, or enter the line and American odds yourself. Analyze uses your selected existing AI connection for an analysis and a review; provider usage limits and billing apply. Choose the saved service or an installed signed-in Claude or Codex CLI. It needs no new key, and analysis never submits roster changes or bets. Results are saved locally with supporting numbers, risks, source dates and model usage.',
+    action: { label: 'Open Advice', section: 'Advice' },
+  },
+  {
+    id: 'roster-moves',
+    title: 'Can Sidekick make a move for me?',
+    category: 'Advice',
+    aliases: 'approve submit set lineup add drop waiver trade draft automatic make move espn',
+    answer:
+      'Choose Review this move on a lineup suggestion, or Review on a pickup or trade idea. You see the exact change first, and nothing happens until you approve it. ESPN lineup changes can be submitted for you once you turn that on for the league; it is off by default and uses ESPN’s private connection, which can stop working and may not be allowed by its terms. With no saved ESPN login, the change is sent from a window you sign in to yourself. Pickups, trades and other platforms open the right page with your checklist, and Sidekick confirms the move when your league data shows it. If a result is unclear, Sidekick says so and never resends. It never makes draft picks or places bets, and Ask and the AI can’t submit anything.',
     action: { label: 'Open Advice', section: 'Advice' },
   },
   {

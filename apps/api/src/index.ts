@@ -46,6 +46,7 @@ import {
 } from '@sidekick/core';
 import {
   connectorFor,
+  EspnMoveClient,
   FootballNewsCache,
   imessageAvailability,
   ImsgClient,
@@ -102,6 +103,9 @@ import { createStateRouter } from './state-routes.js';
 import { createProjectionRouter } from './projection-routes.js';
 import { createDynastyRouter } from './dynasty-routes.js';
 import { createAdviceRouter } from './advice-routes.js';
+import { createMoveRouter } from './move-routes.js';
+import { MoveStore } from './move-store.js';
+import type { WeeklyBriefing } from './weekly-service.js';
 import { createCredentialHealthRouter } from './credential-health-routes.js';
 import { createBackupRouter } from './backup-routes.js';
 import { createLeagueRouter } from './league-routes.js';
@@ -120,6 +124,7 @@ const port = Number(process.env.SIDEKICK_PORT ?? 4173);
 const isDevelopment =
   process.env.SIDEKICK_DEV_MODE === '1' || process.env.npm_lifecycle_event === 'dev';
 const store = new LocalStore();
+let weeklyBriefing: ((league: string, team: string) => Promise<WeeklyBriefing>) | undefined;
 // Public downloads (nflverse files, the Sleeper player list) are revalidated, not re-downloaded.
 configureDownloadCache(researchJoin(researchDirname(store.path), 'download-cache'));
 async function currentDatabaseBackup() {
@@ -137,6 +142,7 @@ async function currentBackup() {
     propLines: propLineLedger.list(),
     propLeans: propLeans.all(),
     chats: chats.all(),
+    moves: moves.all(),
   });
 }
 const routineBackups = new RoutineBackups({
@@ -298,6 +304,7 @@ app.use(
         propLineLedger.merge(history.propLines);
         propLeans.merge(history.propLeans);
         chats.merge(history.chats);
+        moves.merge(history.moves ?? []);
       }
       return safetyCopy;
     },
@@ -506,6 +513,9 @@ app.use(
 app.use(
   createAdviceRouter({
     store,
+    onBriefing: (read) => {
+      weeklyBriefing = read;
+    },
     configuredAI,
     signedInAI: new SignedInClaudeConnection(),
     signedInCodex: new SignedInCodexConnection(),
@@ -565,6 +575,38 @@ const propLineCapture = startPropLineCapture(
     logEvent('warn', 'props.capture.failed', { component: 'advice', errorName: errorName(error) }),
 );
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
+const moves = new MoveStore(researchJoin(researchDirname(store.path), 'moves.sqlite'));
+app.use(
+  createMoveRouter({
+    store,
+    moves,
+    briefing: (league, team) => {
+      if (!weeklyBriefing) throw new Error('Weekly advice is unavailable.');
+      return weeklyBriefing(league, team);
+    },
+    readEspnSession: () => readCredential('espn'),
+    espn: (session) => new EspnMoveClient(session),
+    refreshLeague: async (leagueId) => {
+      const current = store.snapshot().leagues.find((league) => league.id === leagueId);
+      if (!current) throw new Error('League not found.');
+      const session = (await readCredential('espn')) ?? undefined;
+      const refreshed = await connectorFor('espn', session, current.season).fetchLeague(leagueId);
+      const lastSyncedAt = new Date().toISOString();
+      await store.update((state) => {
+        state.leagues = state.leagues.map((league) =>
+          league.id === leagueId
+            ? {
+                ...refreshed,
+                displayName: league.displayName,
+                connectedAt: league.connectedAt,
+                lastSyncedAt,
+              }
+            : league,
+        );
+      });
+    },
+  }),
+);
 app.use(
   createChatRouter({
     store,
