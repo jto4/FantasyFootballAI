@@ -5,6 +5,7 @@ import {
   predictionPerformance,
   capturePredictionRecords,
   recordClosingPrice,
+  withPositionScoring,
   type PredictionRecord,
 } from './prediction-records.js';
 import { isAdviceOptions } from './advice-contracts.js';
@@ -257,4 +258,40 @@ it('records the closing price before kickoff and reports closing line value only
   const performance = predictionPerformance([settlePredictionRecord(closed, data, [final], end)]);
   expect(performance.paper.closingLineValue).toMatchObject({ samples: 1, beatClose: 1 });
   expect(performance.paper.byWeek).toEqual([{ season: 2026, week: 5, netUnits: 100 / 110 }]);
+});
+
+it('regrades D/ST records saved without the league’s position rules, and only those', () => {
+  const dst = {
+    id: 'a:fantasy:-16016',
+    adviceId: 'a',
+    recordedAt: '2026-11-01T00:00:00Z',
+    method: 'sidekick-model-v1',
+    kind: 'fantasy',
+    season: 2026,
+    forecast: 9,
+    games: [],
+    selected: false,
+    player: {
+      id: '-16016',
+      name: 'Vikings D/ST',
+      position: 'DST',
+      team: 'MIN',
+      leagueId: 'L',
+      platform: 'espn',
+      scoring: { sacks: 1 },
+    },
+    scope: 'week',
+    status: 'settled',
+    actual: 2,
+    settledAt: '2026-11-03T00:00:00Z',
+  } as unknown as PredictionRecord;
+  const league = { id: 'L', positionScoring: { DST: { pointsAllowed0: 5 } } };
+  const fixed = withPositionScoring(dst, league);
+  expect(fixed.status).toBe('pending');
+  expect(fixed.actual).toBeUndefined();
+  expect(fixed.player?.positionScoring).toEqual({ DST: { pointsAllowed0: 5 } });
+  expect(withPositionScoring(fixed, league)).toBe(fixed);
+  expect(withPositionScoring(dst, { ...league, id: 'other' })).toBe(dst);
+  const receiver = { ...dst, player: { ...dst.player!, position: 'WR' } };
+  expect(withPositionScoring(receiver, league)).toBe(receiver);
 });

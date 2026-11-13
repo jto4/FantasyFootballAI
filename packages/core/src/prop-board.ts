@@ -216,6 +216,8 @@ export interface PropLeanRecord {
   /** The model's expected value, kept so the market weight can be refit from results. */
   modelMean?: number;
   observedAt: string;
+  /** American odds for the chosen side when the line came with a price; −110 is assumed otherwise. */
+  odds?: number;
   result?: { actual: number; outcome: 'win' | 'loss' | 'push'; gradedAt: string };
 }
 
@@ -267,8 +269,24 @@ export function summarizePropLeans(records: PropLeanRecord[]) {
         return sum + (r.overChance! - over) ** 2;
       }, 0) / priced.length
     : undefined;
+  // Real money needs the real price: only leans saved with a sportsbook price count here.
+  const withPrice = graded.filter((r) => r.odds !== undefined);
+  const units = withPrice.reduce((sum, r) => {
+    if (r.result!.outcome === 'push') return sum;
+    const odds = r.odds!;
+    const profit = odds < 0 ? 100 / -odds : odds / 100;
+    return sum + (r.result!.outcome === 'win' ? profit : -1);
+  }, 0);
   return {
     pending: records.length - graded.length,
+    priced: {
+      ...tally(withPrice),
+      units: Math.round(units * 100) / 100,
+    },
+    bySide: {
+      over: tally(graded.filter((r) => r.side === 'over')),
+      under: tally(graded.filter((r) => r.side === 'under')),
+    },
     ...(brier !== undefined
       ? { brier: Math.round(brier * 1000) / 1000, pricedGames: priced.length }
       : {}),

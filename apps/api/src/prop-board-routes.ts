@@ -37,6 +37,10 @@ export function isPropLeanRecord(value: unknown): value is PropLeanRecord {
     ) &&
     Number.isFinite(lean.line) &&
     Number.isFinite(lean.projection) &&
+    (lean.odds === undefined ||
+      (Number.isInteger(lean.odds) &&
+        Math.abs(lean.odds as number) >= 100 &&
+        Math.abs(lean.odds as number) <= 100000)) &&
     (lean.side === 'over' || lean.side === 'under') &&
     ['strong', 'moderate', 'slight'].includes(String(lean.strength))
   );
@@ -235,6 +239,9 @@ export function createPropBoard(deps: {
         strength: row.lean.strength,
         projection: row.projection ?? row.model.mean,
         ...(row.model ? { overChance: row.model.overChance, modelMean: row.model.mean } : {}),
+        ...((row.lean.side === 'over' ? row.overOdds : row.underOdds) !== undefined
+          ? { odds: (row.lean.side === 'over' ? row.overOdds : row.underOdds)! }
+          : {}),
         observedAt: at,
       };
       const previous = savedLeans.get(key);

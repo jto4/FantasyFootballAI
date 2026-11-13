@@ -22,28 +22,28 @@ export const vacatedCarryExponent = 0.75;
 export const fantasyOutcomeSpread: Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST', OutcomeSpread> =
   {
     QB: {
-      sdIntercept: 6.76,
-      sdSlope: 0.0911,
-      low: -1.158,
-      high: 1.253,
+      sdIntercept: 6.759,
+      sdSlope: 0.0912,
+      low: -1.232,
+      high: 1.331,
     },
     RB: {
       sdIntercept: 3.359,
-      sdSlope: 0.3364,
+      sdSlope: 0.3363,
       low: -1.071,
-      high: 1.419,
+      high: 1.417,
     },
     WR: {
-      sdIntercept: 2.507,
-      sdSlope: 0.4046,
-      low: -1.214,
-      high: 1.313,
+      sdIntercept: 2.526,
+      sdSlope: 0.4094,
+      low: -1.133,
+      high: 1.291,
     },
     TE: {
-      sdIntercept: 2.647,
-      sdSlope: 0.3879,
-      low: -1.173,
-      high: 1.553,
+      sdIntercept: 3.122,
+      sdSlope: 0.3368,
+      low: -1.077,
+      high: 1.39,
     },
     K: {
       sdIntercept: 3.467,
@@ -54,13 +54,13 @@ export const fantasyOutcomeSpread: Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST
     DST: {
       sdIntercept: 5.385,
       sdSlope: 0.0918,
-      low: -1.039,
-      high: 1.31,
+      low: -1.016,
+      high: 1.28,
     },
   };
 
 /** Questionable on the NFL injury report: chance of playing, and the projection multiplier when he plays. */
-export const questionableSettings: QuestionableParams = { playChance: 0.683, whenPlaying: 0.852 };
+export const questionableSettings: QuestionableParams = { playChance: 0.663, whenPlaying: 0.852 };
 
 /** A typical replacement starter's stat line: the floor for a backup stepping in; empty means off. */
 export const replacementQuarterbackLine: Partial<Record<FootballStatKey, number>> = {

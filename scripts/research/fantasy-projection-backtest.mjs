@@ -39,6 +39,9 @@ import {
 
 const [usageDir, espnSettingsFile, outFile] = process.argv.slice(2);
 const linesFile = process.argv.find((a) => a.startsWith('--lines='))?.slice(8);
+// Which saved line to blend toward: closing (default), first (opening) or early (the last line
+// seen at least two days before kickoff, what a midweek lineup check would have had).
+const lineMoment = process.argv.find((a) => a.startsWith('--line-moment='))?.slice(14) ?? 'closing';
 const data = await new PublicFootballData().get(2026);
 const snaps = new Map();
 const depth = new Map();
@@ -684,6 +687,10 @@ function outcomeSpread() {
         testPairs: test.length,
         varianceScale,
         brier2026: r(brier(test, varianceScale), 4),
+        // For review only: the scale is never chosen on 2026.
+        brier2026ByScale: Object.fromEntries(
+          [1, 1.2, 1.4, 1.6, 1.8, 2].map((k) => [k, r(brier(test, k), 4)]),
+        ),
         coinFlip: 0.25,
         calibration2026: bins,
       },
@@ -761,8 +768,11 @@ function questionableFit(league) {
     list.reduce((s, c) => s + Math.abs(c.actual - m * c.projected), 0) / list.length;
   const adopted = playedTest.length && rmse(playedTest, k) < rmse(playedTest, 1) ? k : 1;
   const playChance = playedTrain.length / train.length;
+  // How often a Questionable player plays is a base rate, not a fitted effect: once a season's
+  // games are scored, both seasons count. 2026 ran lower (63% against 68%).
+  const pooledPlayChance = (playedTrain.length + playedTest.length) / (train.length + test.length);
   return {
-    settings: { playChance: r(playChance), whenPlaying: r(adopted) },
+    settings: { playChance: r(pooledPlayChance), whenPlaying: r(adopted) },
     report: {
       train: train.length,
       test: test.length,
@@ -870,7 +880,19 @@ function propLineCheck(league, file) {
   const lines = new Map();
   for (const item of JSON.parse(readFileSync(file, 'utf8')).items) {
     const key = propLineKey(item.gameId, item.playerName);
-    lines.set(key, { ...lines.get(key), [item.stat]: item.closing.line });
+    const early = Object.values(item.daily ?? {})
+      .filter(
+        (o) => item.kickoffAt && Date.parse(o.at) <= Date.parse(item.kickoffAt) - 2 * 86_400_000,
+      )
+      .sort((a, b) => a.at.localeCompare(b.at))
+      .at(-1);
+    const chosen =
+      lineMoment === 'first'
+        ? item.first
+        : lineMoment === 'early'
+          ? (early ?? item.first)
+          : item.closing;
+    lines.set(key, { ...lines.get(key), [item.stat]: chosen.line });
   }
   const cases = [];
   for (const row of data.players) {

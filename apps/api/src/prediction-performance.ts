@@ -2,6 +2,7 @@ import {
   predictionPerformance,
   recordClosingPrice,
   settlePredictionRecord,
+  withPositionScoring,
   type FootballDataSnapshot,
   type FinalFootballResult,
   type FootballGame,
@@ -23,6 +24,18 @@ export function createPredictionPerformanceService(
           'Results were checked recently. Try again in a few minutes if outcome feeds are still updating.',
         ],
       };
+    // Regrade D/ST and kicker records saved without their league's position rules.
+    const leagues = new Map(deps.store.snapshot().leagues.map((l) => [l.id, l]));
+    if (
+      (deps.store.snapshot().predictionRecords ?? []).some(
+        (r) => withPositionScoring(r, leagues.get(r.player?.leagueId ?? '')) !== r,
+      )
+    )
+      await deps.store.update((state) => {
+        state.predictionRecords = (state.predictionRecords ?? []).map((r) =>
+          withPositionScoring(r, leagues.get(r.player?.leagueId ?? '')),
+        );
+      });
     const records = deps.store.snapshot().predictionRecords ?? [];
     const due = records.filter(
       (r) => r.status !== 'settled' && r.games.every((g) => Date.parse(g.kickoffAt!) < now()),

@@ -104,6 +104,7 @@ import { createProjectionRouter } from './projection-routes.js';
 import { createDynastyRouter } from './dynasty-routes.js';
 import { createAdviceRouter } from './advice-routes.js';
 import { createMoveRouter } from './move-routes.js';
+import { captureWeeklyBetForecasts } from './bet-forecast-capture.js';
 import { MoveStore } from './move-store.js';
 import type { WeeklyBriefing } from './weekly-service.js';
 import { createCredentialHealthRouter } from './credential-health-routes.js';
@@ -574,6 +575,22 @@ const propLineCapture = startPropLineCapture(
   (error) =>
     logEvent('warn', 'props.capture.failed', { component: 'advice', errorName: errorName(error) }),
 );
+// The bet model's daily forecasts for the coming week, so it builds a record on its own.
+let lastBetForecastDay = '';
+const captureBetForecasts = () => {
+  const day = new Date().toISOString().slice(0, 10);
+  if (day === lastBetForecastDay) return;
+  lastBetForecastDay = day;
+  void captureWeeklyBetForecasts({
+    store,
+    data: publicFootballData,
+    odds: publicSportsbookLines,
+  }).catch((error) =>
+    logEvent('warn', 'bets.capture.failed', { component: 'advice', errorName: errorName(error) }),
+  );
+};
+setTimeout(captureBetForecasts, 2 * 60_000).unref();
+setInterval(captureBetForecasts, 30 * 60_000).unref();
 const chats = new ChatStore(researchJoin(researchDirname(store.path), 'chat.sqlite'));
 const moves = new MoveStore(researchJoin(researchDirname(store.path), 'moves.sqlite'));
 app.use(

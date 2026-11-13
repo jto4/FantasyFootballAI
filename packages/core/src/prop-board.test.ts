@@ -132,4 +132,13 @@ it('grades a saved lean from the game’s stats and summarizes against break-eve
   const unpriced: PropLeanRecord = { ...lean };
   delete unpriced.overChance;
   expect(summarizePropLeans([unpriced]).pending).toBe(0);
+  // Only leans saved with a price count toward units, at that price.
+  const atPrice = summarizePropLeans([
+    { ...lean, odds: -130, result: { actual: 75, outcome: 'win', gradedAt: 'x' } },
+    { ...lean, odds: 120, result: { actual: 10, outcome: 'loss', gradedAt: 'x' } },
+    { ...lean, side: 'under', result: { actual: 10, outcome: 'win', gradedAt: 'x' } },
+  ]);
+  expect(atPrice.priced).toMatchObject({ wins: 1, losses: 1, units: -0.23 });
+  expect(atPrice.bySide.over).toMatchObject({ wins: 1, losses: 1 });
+  expect(atPrice.bySide.under).toMatchObject({ wins: 1, losses: 0 });
 });

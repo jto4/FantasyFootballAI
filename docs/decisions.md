@@ -817,3 +817,35 @@ prepares a move, the owner approves the exact change, and it sends the move and 
   send with no clear answer becomes `unconfirmed` and is never retried.
 - **Never:** Ask, the AI and MCP have no route to any of this. No draft picks and no bets.
 - **Not verified:** no move has been sent to a real ESPN league. The first real one is the test.
+
+## Week 9 review: grading, prices and a bet record (November 12, 2026)
+
+Through week 9 of 2026 under Afton's rules: mean absolute error 5.35 for the model and 5.27 for
+ESPN (benchmark) on 1,324 shared games; with prop lines blended in, 5.10 against ESPN's 5.22 on
+the 409 week 7–9 players both cover. ESPN still orders pairs of players slightly better (65.8%
+against 63.9%). Reports: `docs/research/2026-11-12-fantasy-projection-backtest.json`,
+`docs/research/2026-11-12-prop-line-review.json`.
+
+- **D/ST and kicker grading.** Saved forecasts kept the league's base scoring but not ESPN's
+  D/ST and kicker overrides, so their results were scored with the wrong rules and D/ST looked
+  over-projected by about 6 points. Records now keep the position rules, and the performance check
+  adds them to older records of the same league and grades those again.
+- **Prices.** ESPN's prop feed carries lines only, so every lean so far is judged against an
+  assumed −110. A lean now keeps the price for its side when one exists (The Odds API), and the
+  record reports units at those prices separately, plus overs and unders apart. With no Odds API
+  key saved, that part stays empty; passing touchdown and interception leans already require a
+  price and appear only then.
+- **Game-bet record.** Bet forecasts were saved only when someone ran paid betting advice, so the
+  game model had one graded forecast. The API now saves the model's forecast for each game of the
+  coming week once a day (home moneyline, home spread, total over at ESPN's displayed price),
+  never as a selected bet. On week 10 its 42 forecasts sit within about a point of the no-vig
+  price, as expected of a model anchored to the market.
+- **Earlier lines.** Blending toward opening or midweek lines (the last seen two days before
+  kickoff) did as well as closing lines: 5.099 and 5.097 against 5.100 over weeks 7–9, 4.86
+  against 4.89 on week 9. The app already uses the latest saved line, so the gain is there from
+  early in the week; no change. `--line-moment=first|early` reruns this.
+- **Refit through week 9.** Questionable players played 62.6% of the time in 2026 against 68.3%
+  in 2025; the play rate is a base rate, so it now pools both seasons (66.3%). Ranges were refit
+  by the existing rule: tight ends keep the 2025-and-2026 fit, which came closest to 80% on the
+  held-out weeks (78%; the wider option overshot to 83%). Win probability stays at variance scale
+  1.4: scales from 1.2 to 2 change 2026 Brier by under 0.001, so a shrink toward 50% has no support.

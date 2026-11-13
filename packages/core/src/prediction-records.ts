@@ -53,6 +53,8 @@ export interface PredictionRecord {
     gsisId?: string;
     platform: LeagueConnection['platform'];
     scoring: Record<string, number>;
+    /** The league's D/ST and kicker rules, which replace `scoring` for those positions. */
+    positionScoring?: NonNullable<LeagueConnection['positionScoring']>;
   };
   scope?: 'week' | 'season' | 'remaining-season';
   status: 'pending' | 'missing' | 'settled';
@@ -293,6 +295,7 @@ export function isPredictionRecord(x: unknown): x is PredictionRecord {
         'gsisId',
         'platform',
         'scoring',
+        'positionScoring',
       ].includes(k),
     ) &&
     text(p.id, 120) &&
@@ -307,8 +310,45 @@ export function isPredictionRecord(x: unknown): x is PredictionRecord {
     Object.keys(p.scoring).length <= 200 &&
     Object.entries(p.scoring).every(
       ([k, v]) => text(k, 80) && finite(v) && Math.abs(Number(v)) <= 10000,
-    )
+    ) &&
+    (p.positionScoring === undefined ||
+      (obj(p.positionScoring) &&
+        Object.entries(p.positionScoring).every(
+          ([position, rules]) =>
+            ['DST', 'K'].includes(position) &&
+            obj(rules) &&
+            Object.keys(rules).length <= 200 &&
+            Object.entries(rules).every(
+              ([k, v]) => text(k, 80) && finite(v) && Math.abs(Number(v)) <= 10000,
+            ),
+        )))
   );
+}
+
+const specialTeams = (position: string) =>
+  position === 'DST' || position === 'DEF' ? 'DST' : position === 'K' ? 'K' : undefined;
+
+/**
+ * Records saved before position rules were kept graded D/ST and kickers with the base rules only,
+ * which ESPN replaces for those positions. Adds the league's rules and sends any such graded
+ * record back to be graded again. Returns the record unchanged when nothing applies.
+ */
+export function withPositionScoring(
+  record: PredictionRecord,
+  league: Pick<LeagueConnection, 'id' | 'positionScoring'> | undefined,
+): PredictionRecord {
+  const p = record.player;
+  const position = p ? specialTeams(p.position) : undefined;
+  const rules = position ? league?.positionScoring?.[position] : undefined;
+  if (!p || !rules || p.positionScoring || p.leagueId !== league?.id) return record;
+  const next: PredictionRecord = {
+    ...record,
+    player: { ...p, positionScoring: { [position!]: structuredClone(rules) } },
+    status: record.status === 'settled' ? 'pending' : record.status,
+  };
+  delete next.actual;
+  delete next.settledAt;
+  return next;
 }
 const frozen = (g: FootballGame): TargetGame =>
   Object.fromEntries(
@@ -436,6 +476,15 @@ export function capturePredictionRecords(
           ...(player?.gsisId ? { gsisId: player.gsisId } : {}),
           platform: league.platform,
           scoring: structuredClone(league.scoring),
+          ...(specialTeams(p.position) && league.positionScoring?.[specialTeams(p.position)!]
+            ? {
+                positionScoring: {
+                  [specialTeams(p.position)!]: structuredClone(
+                    league.positionScoring[specialTeams(p.position)!],
+                  ),
+                },
+              }
+            : {}),
         },
         scope: p.projectionScope ?? 'week',
         status: 'pending',

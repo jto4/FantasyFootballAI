@@ -33,6 +33,8 @@ type Board = {
     pricedGames?: number;
     overall: Tally;
     byStrength: Record<'strong' | 'moderate' | 'slight', Tally>;
+    bySide?: { over: Tally; under: Tally };
+    priced?: Tally & { units: number };
   };
 };
 const isBoard = (x: unknown): x is Board =>
@@ -156,6 +158,15 @@ export function PropsBoard({
                   : 'Not ahead of that; treat leans as conversation, not bets.'}
               {board.record.pending ? ` ${board.record.pending} still waiting on games.` : ''}
             </span>
+            {board.record.bySide && (
+              <span>
+                Overs {tallyText(board.record.bySide.over)} · unders{' '}
+                {tallyText(board.record.bySide.under)}.{' '}
+                {board.record.priced && board.record.priced.wins + board.record.priced.losses > 0
+                  ? `At the real prices saved with ${board.record.priced.wins + board.record.priced.losses} of them: ${board.record.priced.units >= 0 ? '+' : ''}${board.record.priced.units} units.`
+                  : 'No lean has a saved sportsbook price yet, so the record assumes −110. Add an Odds API key in Settings to save real prices.'}
+              </span>
+            )}
             <details className="props-method-inline">
               <summary>How sure is the model?</summary>
               <span>

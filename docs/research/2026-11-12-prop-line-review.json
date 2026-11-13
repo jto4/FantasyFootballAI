@@ -1,0 +1,114 @@
+{
+  "firstWeek": "7",
+  "lastWeek": "9",
+  "report": {
+    "attempts": {
+      "props": 72,
+      "mae": {
+        "model": 6.77,
+        "line": 6.22
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week9": 0.15
+      }
+    },
+    "carries": {
+      "props": 108,
+      "mae": {
+        "model": 4.53,
+        "line": 3.77
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week9": 0.05
+      }
+    },
+    "completions": {
+      "props": 75,
+      "mae": {
+        "model": 5.15,
+        "line": 4.69
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week9": 0.45
+      }
+    },
+    "passing_interceptions": {
+      "props": 66,
+      "mae": {
+        "model": 0.64,
+        "line": 0.68
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0.3,
+        "week9": 0.35
+      }
+    },
+    "passing_tds": {
+      "props": 76,
+      "mae": {
+        "model": 0.88,
+        "line": 0.92
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0.95,
+        "week9": 1
+      }
+    },
+    "passing_yards": {
+      "props": 73,
+      "mae": {
+        "model": 62.08,
+        "line": 59.66
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week9": 0
+      }
+    },
+    "receiving_yards": {
+      "props": 351,
+      "mae": {
+        "model": 23.62,
+        "line": 22.92
+      },
+      "leans": "100-51",
+      "bestWeight": {
+        "week7": 0.85,
+        "week9": 1
+      }
+    },
+    "receptions": {
+      "props": 350,
+      "mae": {
+        "model": 1.57,
+        "line": 1.56
+      },
+      "leans": "94-56",
+      "bestWeight": {
+        "week7": 0.75,
+        "week9": 1
+      }
+    },
+    "rushing_yards": {
+      "props": 148,
+      "mae": {
+        "model": 27.08,
+        "line": 23.06
+      },
+      "leans": "0-0",
+      "bestWeight": {
+        "week7": 0,
+        "week9": 0.2
+      }
+    }
+  }
+}

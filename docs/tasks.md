@@ -14,6 +14,10 @@ it and add a short line to "Completed (summary)"; add a dated review only when
 
 Recent passes, newest first. Details are in `decisions.md` and the dated reviews.
 
+- November 12 (week 9 review): D/ST and kicker forecasts graded with ESPN's position rules
+  (older ones regraded); leans keep their sportsbook price and the record shows units at real
+  prices and overs/unders apart; the game model saves a forecast for every game daily; Questionable
+  play rate refit to 66%. See `decisions.md`.
 - November 4 (roster moves): Review this move on Home, waivers and trades shows the exact change
   and acts only on approval. ESPN lineups can be submitted (off per league), from the saved login
   or a signed-in desktop window; everything else is a guided checklist confirmed by league data.
@@ -117,6 +121,9 @@ Recent passes, newest first. Details are in `decisions.md` and the dated reviews
   [betting model history](reviews/2026-10-betting-model-history.md).
 
 ## Open work
+
+- [ ] Owner: add an Odds API key in Settings (free tier) so leans are saved with real prices; until
+      then the lean record assumes −110.
 
 - [ ] Owner: read ESPN's terms, turn on submitting for Afton, and approve one lineup change. No
       move has been sent to a real league yet, so that first one proves the ESPN request.
