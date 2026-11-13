@@ -58,7 +58,8 @@ jobs:
 
   browser:
     name: Browser journeys (${{ matrix.shard }}/2)
-    runs-on: ubuntu-latest
+    # Pinned: Playwright has no Chromium build for ubuntu-latest (26.04) yet.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
